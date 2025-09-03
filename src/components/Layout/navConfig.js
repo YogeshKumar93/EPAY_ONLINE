@@ -10,7 +10,7 @@ export const Admin_nav = [
   { title: "Users", icon: "👥", icon2: "👥", to: "/admin/users" },
   
   { title: "Transactions", icon: "💳", icon2: "💳", to: "/admin/transactions" },
-   { title: "Accounts", icon: "👥", icon2: "👥", to: "/admin/accounts" },
+ 
 ];
 
 export const customer_nav = [
@@ -20,5 +20,7 @@ export const customer_nav = [
   { title: "Recharge and bill", icon: "🛠️", icon2: "🛠️", to: "/customer/recharge-bill" },
   { title: "Account Ledger", icon: "📒", icon2: "📒", to: "/customer/account-ledger" },
   { title: "My Purchase", icon: "🛠️", icon2: "🛠️", to: "/customer/purchase" },
-  { title: "My Sale", icon: "📒", icon2: "📒", to: "/customer/sale" }
+  { title: "My Sale", icon: "📒", icon2: "📒", to: "/customer/sale" },
+    { title: "Accounts", icon: "👥", icon2: "👥", to: "/customer/accounts" },
+    
 ];

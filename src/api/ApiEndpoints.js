@@ -1,7 +1,8 @@
 // export const BASE_URL = "https://api.impsguru.com/";
-export const BASE_URL = "https://uat.impsguru.com/";
+// export const BASE_URL = "https://uat.impsguru.com/";
 // export const BASE_URL = "https://api.dillipay.com/";
 // export const BASE_URL = "http://192.168.1.14/impsguru-php/";
+   export const BASE_URL = "https://api.biggpay.in/";
 
 const ApiEndpoints = {
   COOKIE: "sanctum/csrf-cookie",
@@ -53,7 +54,7 @@ const ApiEndpoints = {
   BLOCK_UNBLOCK: "admin/blockUnblock",
   GET_TRANSACTIONS: "admin/getTransactions",
   GET_ACC_TRANSACTIONS: "",
-  GET_TRANSACTIONS: "admin/getTransactions",
+  // GET_TRANSACTIONS: "admin/getTransactions",
   CRED_REQ: "admin/getCrRequests",
   CRED_REQ_APPROVE: "admin/crActions",
   GET_OPERATOR: "admin/getOperators",
@@ -65,7 +66,19 @@ const ApiEndpoints = {
   CHANGE_OPERATOR_PIPE: "admin/changePipe",
   GET_ROUTE: "admin/getRoutes",
   GET_CATEGORIES: "admin/getCategories",
-  GET_ACCOUNTS: "admin/getAccounts",
+
+
+
+
+  GET_ACCOUNTS: "account/getAccounts",
+  CREATE_ACCOUNT: "account/createAccount",
+
+
+
+
+
+
+
   GET_ACC_ACCOUNTS: "",
   GET_BANKS: "admin/getBanks",
   GET_ACC_BANKS: "",

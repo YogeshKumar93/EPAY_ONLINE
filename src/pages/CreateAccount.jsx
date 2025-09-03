@@ -9,7 +9,10 @@ import {
   TextField,
   MenuItem,
   Typography,
+  CircularProgress,
 } from "@mui/material";
+import { apiCall } from "../api/apiClient";
+import ApiEndpoints from "../api/ApiEndpoints";
 
 const accountTypes = ["Current", "Savings", "Credit"];
 
@@ -20,6 +23,7 @@ const CreateAccount = ({ open, handleClose, handleSave }) => {
     establishment: "",
     mobile: "",
     type: "",
+    // account:"",
     asm: "",
     credit_limit: "",
     balance: "",
@@ -27,6 +31,7 @@ const CreateAccount = ({ open, handleClose, handleSave }) => {
   });
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const validate = () => {
     let newErrors = {};
@@ -35,9 +40,11 @@ const CreateAccount = ({ open, handleClose, handleSave }) => {
     if (!formData.user_id) newErrors.user_id = "User ID is required";
     if (!formData.establishment.trim())
       newErrors.establishment = "Establishment is required";
+
+        if (!formData.asm.trim()) newErrors.asm = "Asm is required";
     if (!/^\d{10}$/.test(formData.mobile))
       newErrors.mobile = "Enter a valid 10-digit mobile number";
-    if (!formData.type) newErrors.type = "Account type is required";
+    // if (!formData.type) newErrors.type = "Account type is required";
     if (formData.credit_limit < 0)
       newErrors.credit_limit = "Credit limit cannot be negative";
     if (formData.balance < 0)
@@ -55,21 +62,40 @@ const CreateAccount = ({ open, handleClose, handleSave }) => {
     }));
   };
 
-  const onSubmit = () => {
-    if (validate()) {
-      handleSave(formData);
-      handleClose();
-      setFormData({
-        name: "",
-        user_id: "",
-        establishment: "",
-        mobile: "",
-        type: "",
-        asm: "",
-        credit_limit: "",
-        balance: "",
-        status: "1",
-      });
+  const onSubmit = async () => {
+    if (!validate()) return;
+
+    setLoading(true);
+    try {
+      const { error, response } = await apiCall(
+        "POST",
+        ApiEndpoints.CREATE_ACCOUNT,
+        formData
+      );
+
+      if (!error && response?.status === "SUCCESS") {
+        handleSave(response.data); // pass newly created account back
+        handleClose();
+        setFormData({
+          name: "",
+          user_id: "",
+          establishment: "",
+          mobile: "",
+          type: "",
+          asm: "",
+          credit_limit: "",
+          balance: "",
+          status: "1",
+        });
+      } else {
+        console.error("Failed to create account:", error || response);
+        // alert(response?.message || "Failed to create account");
+      }
+    } catch (err) {
+      console.error("Error creating account:", err);
+      alert("Something went wrong while creating account.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -145,6 +171,15 @@ const CreateAccount = ({ open, handleClose, handleSave }) => {
               ))}
             </TextField>
           </Grid>
+           {/* <Grid item xs={12} sm={6}>
+            <TextField
+              label="Account"
+              name="account"
+              fullWidth
+              value={formData.account}
+              onChange={handleChange}
+            />
+          </Grid> */}
 
           <Grid item xs={12} sm={6}>
             <TextField
@@ -183,17 +218,26 @@ const CreateAccount = ({ open, handleClose, handleSave }) => {
           </Grid>
         </Grid>
 
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: "block" }}>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ mt: 2, display: "block" }}
+        >
           * Status will be set to Active (1) by default
         </Typography>
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={handleClose} color="secondary">
+        <Button onClick={handleClose} color="secondary" disabled={loading}>
           Cancel
         </Button>
-        <Button variant="contained" onClick={onSubmit} sx={{ bgcolor: "#1CA895" }}>
-          Save
+        <Button
+          variant="contained"
+          onClick={onSubmit}
+          sx={{ bgcolor: "#1CA895" }}
+          disabled={loading}
+        >
+          {loading ? <CircularProgress size={20} color="inherit" /> : "Save"}
         </Button>
       </DialogActions>
     </Dialog>

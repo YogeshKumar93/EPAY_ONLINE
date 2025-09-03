@@ -184,7 +184,8 @@ export const AuthProvider = ({ children }) => {
     // Original keys
     user,
     loading,
-    login,
+    login:loginHandler,
+    
     logout,
     saveUser,
     isAuthenticated: token,
