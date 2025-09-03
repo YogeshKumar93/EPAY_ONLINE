@@ -1,8 +1,7 @@
 // api/apiClient.js
 import axios from "axios";
 import { BASE_URL } from "./ApiEndpoints";
-import AuthContext, { getToken, clearToken } from "../contexts/AuthContext"; // import logout if exists
-import { useContext } from "react";
+import { getToken, clearToken } from "../contexts/AuthContext"; 
 import { forceLogout } from "../utils/forceLogout";
 
 const apiClient = axios.create({
@@ -16,10 +15,9 @@ const apiClient = axios.create({
 // ------------------
 // Request Deduplication + Memoization
 // ------------------
-const pendingRequests = new Map(); 
+const pendingRequests = new Map();
 const cache = new Map();
-const CACHE_TTL = 2000; 
-
+const CACHE_TTL = 2000;
 
 apiClient.interceptors.request.use(
   (config) => {
@@ -32,27 +30,33 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-
 apiClient.interceptors.response.use(
-  
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-    
-forceLogout()
-   
+      forceLogout();
     }
-
     return Promise.reject(error);
-  }
+  },
 );
-
 
 export const apiCall = async (method, url, data = null, params = null) => {
   try {
+    const token = getToken();
+
+    if (data) {
+      if (data instanceof FormData) {
+        data.append("api_token", token || "");
+      } else {
+        data = { ...data, api_token: token || "" };
+      }
+    }
+
+    params = { ...(params || {}), api_token: token || "" };
+
     const key = JSON.stringify({ method, url, data, params });
 
-   
+    // 1. Cache Check
     if (cache.has(key)) {
       const { timestamp, response } = cache.get(key);
       if (Date.now() - timestamp < CACHE_TTL) {
