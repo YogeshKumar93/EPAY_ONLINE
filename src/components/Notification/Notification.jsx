@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useContext,useState  } from "react";
+import { useMemo, useCallback, useContext, useState } from "react";
 import { Box, Button, Tooltip, Typography } from "@mui/material";
 import AuthContext from "../../contexts/AuthContext";
 import { dateToTime, ddmmyy } from "../../utils/DateUtils";
@@ -101,7 +101,7 @@ const Notification = ({ filters = [], query }) => {
       {/* Notification Table */}
       <CommonTable
         columns={columns}
-        // endpoint={ApiEndpoints.GET_NOTIFICATION}
+        endpoint={ApiEndpoints.GET_NOTIFICATION}
         filters={filters}
         // queryParam={query}
         // refreshInterval={30000}
@@ -109,7 +109,10 @@ const Notification = ({ filters = [], query }) => {
 
       {/* Create Notification Modal */}
       {openCreate && (
-        <CreateNotification open={openCreate} onClose={() => setOpenCreate(false)} />
+        <CreateNotification
+          open={openCreate}
+          onClose={() => setOpenCreate(false)}
+        />
       )}
     </Box>
   );

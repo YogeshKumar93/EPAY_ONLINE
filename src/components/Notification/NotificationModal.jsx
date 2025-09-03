@@ -27,6 +27,8 @@ const NotificationModal = () => {
   // open / close handlers
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
+    handleMarkAsRead();
+    fetchData();
   };
   const handleClose = () => {
     setAnchorEl(null);
@@ -39,11 +41,11 @@ const NotificationModal = () => {
       const { response, error } = await apiCall(
         "POST",
         ApiEndpoints.MARK_READ_NOTI,
-        { id,  is_read: {} }
+        { is_read: 1 }
       );
 
       if (response) {
-        // update local state so UI changes immediately
+     
         setNotifications((prev) =>
           prev.map((n) => (n.id === id ? { ...n, is_read: 1 } : n))
         );
@@ -54,26 +56,24 @@ const NotificationModal = () => {
       console.error("Unexpected error:", err);
     }
   };
+  const fetchData = async () => {
+    try {
+      const { error, response } = await apiCall(
+        "GET",
+        ApiEndpoints.GET_NOTIFICATION
+      );
 
+      if (response) {
+        setNotifications(response?.data?.data || []);
+      } else {
+        console.log("API Response:", error);
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+    }
+  };
   // fetch all notifications once
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { error, response } = await apiCall(
-          "GET",
-          ApiEndpoints.GET_NOTIFICATION
-        );
-
-        if (response) {
-          setNotifications(response.message || []);
-        } else {
-          console.log("API Response:", error);
-        }
-      } catch (err) {
-        console.error("Unexpected error:", err);
-      }
-    };
-
     fetchData();
   }, []);
 
@@ -82,7 +82,7 @@ const NotificationModal = () => {
       {/* Notification Icon */}
       <IconButton color="inherit" onClick={handleClick}>
         <Badge
-          badgeContent={notifications.filter((n) => n.is_read === 0).length}
+          badgeContent={notifications?.filter((n) => n.is_read === 0).length}
           color="error"
         >
           <NotificationsIcon />
@@ -111,7 +111,7 @@ const NotificationModal = () => {
         </Typography>
         <Divider />
 
-        {notifications.length === 0 ? (
+        {notifications?.length === 0 ? (
           <Box sx={{ p: 2 }}>
             <Typography variant="body2" color="text.secondary">
               No notifications available
@@ -119,11 +119,10 @@ const NotificationModal = () => {
           </Box>
         ) : (
           <List>
-            {notifications.map((row) => (
+            {notifications?.map((row) => (
               <React.Fragment key={row.id}>
                 <ListItem
                   alignItems="flex-start"
-                  onClick={() => handleMarkAsRead()} // ✅ clean call
                   sx={{
                     bgcolor: row.is_read ? "background.paper" : "#f0f8ff",
                     borderRadius: 1,

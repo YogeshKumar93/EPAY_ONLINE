@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from "react";
 import {
   Drawer,
   AppBar,
@@ -20,8 +20,8 @@ import {
   CardContent,
   Grid,
   styled,
-  Button
-} from '@mui/material';
+  Button,
+} from "@mui/material";
 import {
   Menu as MenuIcon,
   ChevronLeft as ChevronLeftIcon,
@@ -33,53 +33,57 @@ import {
   Dashboard as DashboardIcon,
   Download as DownloadIcon,
   People as PeopleIcon,
-  Receipt as ReceiptIcon
-} from '@mui/icons-material';
-import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { Admin_nav, customer_nav, nav } from './navConfig';
-import AuthContext from '../../contexts/AuthContext';
-      {/* App Bar with reduced height */}
- import RefreshIcon from '@mui/icons-material/Refresh';
+  Receipt as ReceiptIcon,
+} from "@mui/icons-material";
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
+import { Admin_nav, customer_nav, nav } from "./navConfig";
+import AuthContext from "../../contexts/AuthContext";
+{
+  /* App Bar with reduced height */
+}
+import RefreshIcon from "@mui/icons-material/Refresh";
+import Notification from "../Notification/Notification";
+import NotificationModal from "../Notification/NotificationModal";
 
 // Navigation configuration
 
 const roleNavigation = {
-  'user': nav,
-  'adm': Admin_nav,
-  'ret': customer_nav,
-   'dd': customer_nav,
+  "user": nav,
+  "adm": Admin_nav,
+  "sadm": Admin_nav,
+  "ret": customer_nav,
+  "dd": customer_nav,
 };
 
 const themeSettings = {
   drawerWidth: 240,
   palette: {
     primary: {
-      main: '#1976d2',
+      main: "#1976d2",
     },
     secondary: {
-      main: '#dc004e',
+      main: "#dc004e",
     },
     background: {
-      default: '#f5f5f5',
-      paper: '#ffffff',
+      default: "#f5f5f5",
+      paper: "#ffffff",
     },
   },
 };
 
-const SideNavAndHeader = ({ userRole , userName = "User Name", userAvatar }) => {
+const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
   // console.log("inroute",userRole);
-  
 
-   const authCtx=useContext(AuthContext);
-   const refreshUser=authCtx.loadUserProfile
-  const isMobile = useMediaQuery('(max-width: 900px)');
+  const authCtx = useContext(AuthContext);
+  const refreshUser = authCtx.loadUserProfile;
+  const isMobile = useMediaQuery("(max-width: 900px)");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [desktopOpen, setDesktopOpen] = useState(true);
   const [userMenuAnchor, setUserMenuAnchor] = useState(null);
   const [expandedItems, setExpandedItems] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const MainContent = styled(Box)(({ theme }) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
@@ -91,7 +95,7 @@ const SideNavAndHeader = ({ userRole , userName = "User Name", userAvatar }) => 
       duration: theme.transitions.duration.leavingScreen,
     }),
     [theme.breakpoints.down("sm")]: {
-      minWidth: "90%", 
+      minWidth: "90%",
       padding: theme.spacing(1.5),
     },
     [theme.breakpoints.between("sm", "md")]: {
@@ -101,7 +105,7 @@ const SideNavAndHeader = ({ userRole , userName = "User Name", userAvatar }) => 
       minWidth: "1024px",
     },
     [theme.breakpoints.up("lg")]: {
-      minWidth: desktopOpen ? "1310px" : "1550px", 
+      minWidth: desktopOpen ? "1310px" : "1550px",
     },
   }));
 
@@ -125,7 +129,7 @@ const SideNavAndHeader = ({ userRole , userName = "User Name", userAvatar }) => 
 
   const handleNavigation = (path, hasSubmenus) => {
     if (hasSubmenus) {
-      setExpandedItems(prev => ({ ...prev, [path]: !prev[path] }));
+      setExpandedItems((prev) => ({ ...prev, [path]: !prev[path] }));
     } else {
       navigate(path);
       if (isMobile) {
@@ -137,12 +141,11 @@ const SideNavAndHeader = ({ userRole , userName = "User Name", userAvatar }) => 
   const handleLogout = () => {
     handleUserMenuClose();
     authCtx.logout();
-   
   };
 
   const isActive = (path, submenus) => {
     if (submenus) {
-      return submenus.some(submenu => submenu.to === location.pathname);
+      return submenus.some((submenu) => submenu.to === location.pathname);
     }
     return path === location.pathname;
   };
@@ -161,29 +164,35 @@ const SideNavAndHeader = ({ userRole , userName = "User Name", userAvatar }) => 
             onClick={() => handleNavigation(item.to, hasSubmenus)}
             sx={{
               pl: 2 + level * 2,
-              backgroundColor: isItemActive ? themeSettings.palette.primary.main : 'transparent',
-              color: isItemActive ? '#fff' : 'text.primary',
-              '&:hover': {
-                backgroundColor: isItemActive 
-                  ? themeSettings.palette.primary.main 
-                  : 'action.hover'
+              backgroundColor: isItemActive
+                ? themeSettings.palette.primary.main
+                : "transparent",
+              color: isItemActive ? "#fff" : "text.primary",
+              "&:hover": {
+                backgroundColor: isItemActive
+                  ? themeSettings.palette.primary.main
+                  : "action.hover",
               },
-              mb: 0.5
+              mb: 0.5,
             }}
             className={isItemActive ? "nav-link active" : "nav-link"}
           >
-            <ListItemIcon sx={{ color: isItemActive ? '#fff' : 'text.primary' }} className="nav-icon">
+            <ListItemIcon
+              sx={{ color: isItemActive ? "#fff" : "text.primary" }}
+              className="nav-icon"
+            >
               {isItemActive ? item.icon2 : item.icon}
             </ListItemIcon>
-            
+
             {(desktopOpen || isMobile) && (
               <>
                 <ListItemText primary={item.title} />
-                {hasSubmenus && (isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />)}
+                {hasSubmenus &&
+                  (isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />)}
               </>
             )}
           </ListItem>
-          
+
           {hasSubmenus && (
             <Collapse in={isExpanded} timeout="auto" unmountOnExit>
               <List component="div" disablePadding className="sub-nav">
@@ -198,130 +207,152 @@ const SideNavAndHeader = ({ userRole , userName = "User Name", userAvatar }) => 
 
   // Drawer content
   const drawerContent = (
-    <Box className="side-nav" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box
+      className="side-nav"
+      sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+    >
       {/* Logo area with white background */}
-      <Box 
+      <Box
         className="nav-header"
-        sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: desktopOpen ? 'space-between' : 'center',
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: desktopOpen ? "space-between" : "center",
           p: 1.5, // Reduced padding to decrease height
-          backgroundColor: '#ffffff',
-           height: '64px',
+          backgroundColor: "#ffffff",
+          height: "64px",
           borderBottom: `1px solid rgba(0, 0, 0, 0.12)`,
-          minHeight: '64px' // Matching the header height
+          minHeight: "64px", // Matching the header height
         }}
       >
         {desktopOpen && (
-          <Typography variant="h6" noWrap component="div" className="nav-title" sx={{ fontWeight: 'bold' }}>
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            className="nav-title"
+            sx={{ fontWeight: "bold" }}
+          >
             App Name
           </Typography>
         )}
-        
+
         {!isMobile && (
-          <IconButton onClick={handleDrawerToggle} className="text-primary" size="small">
+          <IconButton
+            onClick={handleDrawerToggle}
+            className="text-primary"
+            size="small"
+          >
             <ChevronLeftIcon />
           </IconButton>
         )}
       </Box>
-      
-      <List className="nav-list" sx={{ flexGrow: 1, overflowY: 'auto' }}>
+
+      <List className="nav-list" sx={{ flexGrow: 1, overflowY: "auto" }}>
         {renderNavItems(navigationItems)}
       </List>
     </Box>
   );
 
   return (
-    <Box sx={{ display: 'flex', backgroundColor: '#f5f5f5' }} className="container">
-
-<AppBar
-  position="fixed"
-  sx={{
-    width: { md: desktopOpen ? `calc(100% - ${themeSettings.drawerWidth}px)` : '100%' },
-    ml: { md: desktopOpen ? `${themeSettings.drawerWidth}px` : 0 },
-    zIndex: (theme) => theme.zIndex.drawer + 1,
-    transition: (theme) =>
-      theme.transitions.create(['width', 'margin'], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-      }),
-    height: '64px', // Reduced header height
-    justifyContent: 'center',
-  }}
-  className="header"
->
-  <Toolbar sx={{ minHeight: '64px !important' }}>
-    <IconButton
-      color="inherit"
-      aria-label="open drawer"
-      edge="start"
-      onClick={handleDrawerToggle}
-      sx={{ mr: 2 }}
+    <Box
+      sx={{ display: "flex", backgroundColor: "#f5f5f5" }}
+      className="container"
     >
-      <MenuIcon />
-    </IconButton>
+      <AppBar
+        position="fixed"
+        sx={{
+          width: {
+            md: desktopOpen
+              ? `calc(100% - ${themeSettings.drawerWidth}px)`
+              : "100%",
+          },
+          ml: { md: desktopOpen ? `${themeSettings.drawerWidth}px` : 0 },
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          transition: (theme) =>
+            theme.transitions.create(["width", "margin"], {
+              easing: theme.transitions.easing.sharp,
+              duration: theme.transitions.duration.leavingScreen,
+            }),
+          height: "64px", // Reduced header height
+          justifyContent: "center",
+        }}
+        className="header"
+      >
+        <Toolbar sx={{ minHeight: "64px !important" }}>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={handleDrawerToggle}
+            sx={{ mr: 2 }}
+          >
+            <MenuIcon />
+          </IconButton>
 
-    <Typography
-      variant="h6"
-      noWrap
-      component="div"
-      sx={{ flexGrow: 1 }}
-      className="text-xl font-semibold"
-    >
-      Dashboard
-    </Typography>
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ flexGrow: 1 }}
+            className="text-xl font-semibold"
+          >
+            Dashboard
+          </Typography>
 
-    {/* ✅ Refresh icon button with black color */}
-    <IconButton onClick={refreshUser}>
-      <RefreshIcon sx={{ color: 'black' }} />
-    </IconButton>
+          {/* ✅ Refresh icon button with black color */}
+          <IconButton onClick={refreshUser}>
+            <RefreshIcon sx={{ color: "black" }} />
+          </IconButton>
 
-    <IconButton color="inherit" onClick={handleUserMenuOpen}>
-      <Avatar src={userAvatar} sx={{ width: 32, height: 32 }}>
-        {!userAvatar && <PersonIcon />}
-      </Avatar>
-    </IconButton>
+          <IconButton color="inherit" onClick={handleUserMenuOpen}>
+            <Avatar src={userAvatar} sx={{ width: 32, height: 32 }}>
+              {!userAvatar && <PersonIcon />}
+            </Avatar>
+          </IconButton>
 
-    <Menu
-      anchorEl={userMenuAnchor}
-      open={Boolean(userMenuAnchor)}
-      onClose={handleUserMenuClose}
-      onClick={handleUserMenuClose}
-      transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-      anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-    >
-      <MenuItem disabled>
-        <ListItemIcon>
-          <PersonIcon fontSize="small" />
-        </ListItemIcon>
-        <span className="text-base font-medium">{userName}</span>
-      </MenuItem>
+          <NotificationModal />
+          <Menu
+            anchorEl={userMenuAnchor}
+            open={Boolean(userMenuAnchor)}
+            onClose={handleUserMenuClose}
+            onClick={handleUserMenuClose}
+            transformOrigin={{ horizontal: "right", vertical: "top" }}
+            anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+          >
+            <MenuItem disabled>
+              <ListItemIcon>
+                <PersonIcon fontSize="small" />
+              </ListItemIcon>
+              <span className="text-base font-medium">{userName}</span>
+            </MenuItem>
 
-      <Divider />
+            <Divider />
 
-      <MenuItem>
-        <ListItemIcon>
-          <SettingsIcon fontSize="small" />
-        </ListItemIcon>
-        <span className="text-base">Settings</span>
-      </MenuItem>
+            <MenuItem>
+              <ListItemIcon>
+                <SettingsIcon fontSize="small" />
+              </ListItemIcon>
+              <span className="text-base">Settings</span>
+            </MenuItem>
 
-      <MenuItem onClick={handleLogout}>
-        <ListItemIcon>
-          <LogoutIcon fontSize="small" />
-        </ListItemIcon>
-        <span className="text-base">Logout</span>
-      </MenuItem>
-    </Menu>
-  </Toolbar>
-</AppBar>
-
+            <MenuItem onClick={handleLogout}>
+              <ListItemIcon>
+                <LogoutIcon fontSize="small" />
+              </ListItemIcon>
+              <span className="text-base">Logout</span>
+            </MenuItem>
+          </Menu>
+        </Toolbar>
+      </AppBar>
 
       {/* Navigation Drawer */}
       <Box
         component="nav"
-        sx={{ width: { md: desktopOpen ? themeSettings.drawerWidth : 0 }, flexShrink: { md: 0 } }}
+        sx={{
+          width: { md: desktopOpen ? themeSettings.drawerWidth : 0 },
+          flexShrink: { md: 0 },
+        }}
         className="main-layout"
       >
         {/* Mobile Drawer */}
@@ -333,10 +364,10 @@ const SideNavAndHeader = ({ userRole , userName = "User Name", userAvatar }) => 
             keepMounted: true,
           }}
           sx={{
-            display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': { 
-              boxSizing: 'border-box', 
-              width: themeSettings.drawerWidth 
+            display: { xs: "block", md: "none" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: themeSettings.drawerWidth,
             },
           }}
         >
@@ -347,20 +378,22 @@ const SideNavAndHeader = ({ userRole , userName = "User Name", userAvatar }) => 
         <Drawer
           variant="permanent"
           sx={{
-            display: { xs: 'none', md: 'block' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
+            display: { xs: "none", md: "block" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
               width: themeSettings.drawerWidth,
-              transition: (theme) => theme.transitions.create('width', {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.enteringScreen,
-              }),
-              ...(!desktopOpen && {
-                overflowX: 'hidden',
-                transition: (theme) => theme.transitions.create('width', {
+              transition: (theme) =>
+                theme.transitions.create("width", {
                   easing: theme.transitions.easing.sharp,
-                  duration: theme.transitions.duration.leavingScreen,
+                  duration: theme.transitions.duration.enteringScreen,
                 }),
+              ...(!desktopOpen && {
+                overflowX: "hidden",
+                transition: (theme) =>
+                  theme.transitions.create("width", {
+                    easing: theme.transitions.easing.sharp,
+                    duration: theme.transitions.duration.leavingScreen,
+                  }),
                 width: (theme) => theme.spacing(7),
               }),
             },
@@ -372,14 +405,18 @@ const SideNavAndHeader = ({ userRole , userName = "User Name", userAvatar }) => 
       </Box>
 
       {/* Main Content */}
-      <MainContent 
-        sx={{ 
-    
-          width: { md: desktopOpen ? `calc(100% - ${themeSettings.drawerWidth}px)` : '100%' }
+      <MainContent
+        sx={{
+          width: {
+            md: desktopOpen
+              ? `calc(100% - ${themeSettings.drawerWidth}px)`
+              : "100%",
+          },
         }}
         className="content"
       >
-        <Toolbar sx={{ minHeight: '64px !important' }} /> {/* Reduced toolbar spacing */}
+        <Toolbar sx={{ minHeight: "64px !important" }} />{" "}
+        {/* Reduced toolbar spacing */}
         <Outlet />
       </MainContent>
     </Box>

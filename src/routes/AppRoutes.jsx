@@ -13,6 +13,7 @@ import FundRequest from "../components/UI/FundRequest";
 import DmtContainer from "../components/UI/MoneyTransfer/DMTcontainer";
 import RechargeAndBill from "../components/UI/rechange and bill/RechargeAndBill";
 import Accounts from "../pages/Accounts";
+import Notification from "../components/Notification/Notification";
 
 // PrivateRoute wrapper
 const PrivateRoute = ({ children }) => {
@@ -24,22 +25,25 @@ const PrivateRoute = ({ children }) => {
 };
 
 const RoleBasedRoutes = ({ user }) => {
-  console.log("user role is ",user.role);
-  
   return (
     <Routes>
       {/* Admin routes */}
-      {user?.role === "adm" && (
-        <>
-          <Route path="admin/dashboard" element={<AdminTransactions />} />
-          <Route path="admin/users" element={<Users />} />
-          <Route path="admin/transactions" element={<Dashboard />} />
-          <Route path="admin/*" element={<Navigate to="/admin/dashboard" replace />} />
-           
-        </>
-      )}
+      {user?.role === "adm" ||
+        (user?.role === "sadm" && (
+          <>
+            <Route path="admin/dashboard" element={<AdminTransactions />} />
+            <Route path="admin/users" element={<Users />} />
+            <Route path="admin/transactions" element={<Dashboard />} />
+            <Route path="admin/notification" element={<Notification />} />
+            {/* Default redirect for admin */}
+            <Route
+              path="admin/*"
+              element={<Navigate to="/admin/dashboard" replace />}
+            />
+          </>
+        ))}
 
-      {/* Retailer and DD routes */}
+      {/* Retailer & DD routes */}
       {(user?.role === "ret" || user?.role === "dd") && (
         <>
           <Route path="customer/dashboard" element={<AdminTransactions />} />
@@ -50,25 +54,13 @@ const RoleBasedRoutes = ({ user }) => {
           <Route path="customer/purchase" element={<MyPurchase />} />
           <Route path="customer/fund-request" element={<FundRequest />} />
           <Route path="customer/sale" element={<MySale />} />
-          <Route path="customer/*" element={<Navigate to="/customer/dashboard" replace />} />
-       
+          {/* Default redirect for customer */}
+          <Route
+            path="customer/*"
+            element={<Navigate to="/customer/dashboard" replace />}
+          />
         </>
       )}
-
-      {/* Default route for authenticated users */}
-      <Route
-        path="*"
-        element={
-          <Navigate
-            to={
-              user?.role === "Admin"
-                ? "/admin/dashboard"
-                : "/customer/dashboard"
-            }
-            replace
-          />
-        }
-      />
     </Routes>
   );
 };
@@ -82,7 +74,8 @@ export default function AppRoutes() {
       <Routes>
         {/* Public route */}
         <Route path="/login" element={<Login />} />
-           <Route path="customer/accounts" element={<Accounts />} />
+        <Route path="customer/accounts" element={<Accounts />} />
+
         {/* Protected routes with layout */}
         <Route
           path="/*"
@@ -98,7 +91,6 @@ export default function AppRoutes() {
         >
           {/* This is where the nested routes will be rendered */}
           <Route path="*" element={<RoleBasedRoutes user={user} />} />
-          
         </Route>
 
         {/* Catch-all for non-existent routes */}

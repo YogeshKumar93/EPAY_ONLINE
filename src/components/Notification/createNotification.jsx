@@ -39,10 +39,10 @@ const CreateNotification = ({ open, onClose }) => {
       const { response, error } = await apiCall("get", ApiEndpoints.GET_USERS);
 
       if (response) {
-        const userData = response.message
-          ? Array.isArray(response.message)
-            ? response.message
-            : [response.message] // wrap single object in array
+        const userData = response.data
+          ? Array.isArray(response.data)
+            ? response.data
+            : [response.data] // wrap single object in array
           : [];
         setUsers(userData);
       } else {
