@@ -8,7 +8,9 @@ export const nav = [
 export const Admin_nav = [
   { title: "Dashboard", icon: "📊", icon2: "📊", to: "/admin/dashboard" },
   { title: "Users", icon: "👥", icon2: "👥", to: "/admin/users" },
-  { title: "Transactions", icon: "💳", icon2: "💳", to: "/admin/transactions" }
+  
+  { title: "Transactions", icon: "💳", icon2: "💳", to: "/admin/transactions" },
+   { title: "Accounts", icon: "👥", icon2: "👥", to: "/admin/accounts" },
 ];
 
 export const customer_nav = [
