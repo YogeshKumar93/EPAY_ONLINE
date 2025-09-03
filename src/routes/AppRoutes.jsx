@@ -12,6 +12,7 @@ import MySale from "../components/UI/MySale";
 import FundRequest from "../components/UI/FundRequest";
 import DmtContainer from "../components/UI/MoneyTransfer/DMTcontainer";
 import RechargeAndBill from "../components/UI/rechange and bill/RechargeAndBill";
+import Accounts from "../pages/Accounts";
 
 // PrivateRoute wrapper
 const PrivateRoute = ({ children }) => {
@@ -33,6 +34,7 @@ const RoleBasedRoutes = ({ user }) => {
           <Route path="admin/users" element={<Users />} />
           <Route path="admin/transactions" element={<Dashboard />} />
           <Route path="admin/*" element={<Navigate to="/admin/dashboard" replace />} />
+           <Route path="admin/accounts" element={<Accounts />} />
         </>
       )}
       
@@ -82,6 +84,7 @@ export default function AppRoutes() {
         >
           {/* This is where the nested routes will be rendered */}
           <Route path="*" element={<RoleBasedRoutes user={user} />} />
+          
         </Route>
         
         {/* Catch-all for non-existent routes */}
