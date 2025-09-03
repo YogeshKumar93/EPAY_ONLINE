@@ -1,12 +1,12 @@
 // export const BASE_URL = "https://api.impsguru.com/";
-export const BASE_URL = "https://uat.impsguru.com/";
+export const BASE_URL = "https://api.biggpay.in";
 // export const BASE_URL = "https://api.dillipay.com/";
 // export const BASE_URL = "http://192.168.1.14/impsguru-php/";
 
 const ApiEndpoints = {
   COOKIE: "sanctum/csrf-cookie",
   SIGN_IN: "auth/signIn",
-  REQUEST_HASH:"auth/signRequest",
+  REQUEST_HASH: "auth/signRequest",
   GET_LOGIN_HISTORY: "user/getLoginHistory",
   LOGOUT: "auth/logOut",
   GET_FILES: "user/getFile",
@@ -36,7 +36,7 @@ const ApiEndpoints = {
   CHANGE_MPIN: "auth/changeMpin",
   OBTAIN_DOCS: "auth/getDocs",
   GET_RECENT_DATA: "reports/recentHistory",
-  GET_USERS: "admin/getUsers",
+  GET_USERS: "user/getUsers",
   GET_USERS_ACC: "",
   VERIFY_PIC: "admin/approveRejectKyc",
   PAYOUT_BENES: "admin/payoutBene",
@@ -90,8 +90,7 @@ const ApiEndpoints = {
   DELETE_PLAN: "admin/deletePlan",
   COMPLAINTS: "admin/getIssues",
   GET_USER_AD_ASM: "admin/getUserAdAsm",
-  GET_NOTIFICATION: "admin/getNotifications",
-  MARK_READ_NOTI: "admin/updateNotification",
+
   ADMIN_OP_SERVICE: "admin/service",
   VERIFY_PAN: "admin/verifyPan",
   ADMIN_PG_ORDERS: "admin/pgOrders",
@@ -200,7 +199,7 @@ const ApiEndpoints = {
   AEPS_OUTLET_LOGIN: "aeps/outletLogin",
 
   DMR_WALLET_TRANSFER: "dmr/walletTransfer",
-  DELETE_NOTIFICATION: "admin/deleteNotification",
+
   CHANGE_USERNAME_OTP: "",
   CHANGE_USERNAME: "",
   GET_BOOKS: "books/getBooks",
@@ -234,7 +233,7 @@ const ApiEndpoints = {
   ADMIN_DASHBOARD_GET_USER_DATA: "admin/getUserCount",
   ASM_PRODUCTION_SALE_DATA: "reports/asmReportAll",
   GET_RET_PROD_SALE: "reports/getTertiaryDataServiceWise",
-  ADMIN_NOTIFICATION: "admin/createNotification",
+
   ACCOUNT_BALANCE: "admin/accBalance",
   DASHBOARD_ASM_REPORT: "reports/getTertiaryDataServiceWise",
   MY_EARNINGS: "reports/myEarnings",
@@ -329,5 +328,9 @@ const ApiEndpoints = {
   CREATE_QR: "admin/generateVirQr",
   GET_TIME: "https://timeapi.io/api/time/current/zone?timeZone=Asia%2FKolkata",
   GET_MERCHANTS: "admin/getMerchantsData",
+
+  GET_NOTIFICATION: "notification/getNotification",
+  MARK_READ_NOTI: "notification/updateNotification",
+  ADMIN_NOTIFICATION: "notification/createNotification",
 };
 export default ApiEndpoints;

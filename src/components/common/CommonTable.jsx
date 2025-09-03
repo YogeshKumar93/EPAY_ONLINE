@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo, memo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+  memo,
+} from "react";
 import {
   Box,
   TextField,
@@ -17,8 +24,8 @@ import {
   DialogContent,
   DialogActions,
   useMediaQuery,
-  useTheme
-} from '@mui/material';
+  useTheme,
+} from "@mui/material";
 import {
   Refresh as RefreshIcon,
   FilterList as FilterListIcon,
@@ -26,31 +33,43 @@ import {
   FirstPage as FirstPageIcon,
   KeyboardArrowLeft,
   KeyboardArrowRight,
-  LastPage as LastPageIcon
-} from '@mui/icons-material';
-import { apiCall } from '../../api/apiClient';
-import Loader from './Loader';
+  LastPage as LastPageIcon,
+} from "@mui/icons-material";
+import { apiCall } from "../../api/apiClient";
+import Loader from "./Loader";
 
 // Memoized TablePaginationActions component
 const TablePaginationActions = memo(function TablePaginationActions(props) {
   const theme = useTheme();
   const { count, page, rowsPerPage, onPageChange } = props;
 
-  const handleFirstPageButtonClick = useCallback((event) => {
-    onPageChange(event, 0);
-  }, [onPageChange]);
+  const handleFirstPageButtonClick = useCallback(
+    (event) => {
+      onPageChange(event, 0);
+    },
+    [onPageChange]
+  );
 
-  const handleBackButtonClick = useCallback((event) => {
-    onPageChange(event, page - 1);
-  }, [onPageChange, page]);
+  const handleBackButtonClick = useCallback(
+    (event) => {
+      onPageChange(event, page - 1);
+    },
+    [onPageChange, page]
+  );
 
-  const handleNextButtonClick = useCallback((event) => {
-    onPageChange(event, page + 1);
-  }, [onPageChange, page]);
+  const handleNextButtonClick = useCallback(
+    (event) => {
+      onPageChange(event, page + 1);
+    },
+    [onPageChange, page]
+  );
 
-  const handleLastPageButtonClick = useCallback((event) => {
-    onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
-  }, [onPageChange, count, rowsPerPage]);
+  const handleLastPageButtonClick = useCallback(
+    (event) => {
+      onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+    },
+    [onPageChange, count, rowsPerPage]
+  );
 
   return (
     <Box sx={{ flexShrink: 0, ml: 2.5 }}>
@@ -59,28 +78,36 @@ const TablePaginationActions = memo(function TablePaginationActions(props) {
         disabled={page === 0}
         aria-label="first page"
       >
-        {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
+        {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
       </IconButton>
       <IconButton
         onClick={handleBackButtonClick}
         disabled={page === 0}
         aria-label="previous page"
       >
-        {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+        {theme.direction === "rtl" ? (
+          <KeyboardArrowRight />
+        ) : (
+          <KeyboardArrowLeft />
+        )}
       </IconButton>
       <IconButton
         onClick={handleNextButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
         aria-label="next page"
       >
-        {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+        {theme.direction === "rtl" ? (
+          <KeyboardArrowLeft />
+        ) : (
+          <KeyboardArrowRight />
+        )}
       </IconButton>
       <IconButton
         onClick={handleLastPageButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
         aria-label="last page"
       >
-        {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
+        {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
       </IconButton>
     </Box>
   );
@@ -105,7 +132,7 @@ const CommonTable = ({
   defaultFilters,
   title = "Data Table",
 
-  queryParam = ""
+  queryParam = "",
 }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -116,22 +143,22 @@ const CommonTable = ({
   const [rowsPerPage, setRowsPerPage] = useState(defaultPageSize);
   const [totalCount, setTotalCount] = useState(0);
   const [filterModalOpen, setFilterModalOpen] = useState(false);
-  
+
   // Use refs to track values without causing re-renders
   const appliedFiltersRef = useRef({});
   const pageRef = useRef(0);
   const rowsPerPageRef = useRef(defaultPageSize);
   const refreshIntervalRef = useRef(refreshInterval);
   const hasFetchedInitialData = useRef(false);
-  
+
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   // Memoized initial filter values
   const initialFilterValues = useMemo(() => {
     const values = {};
-    availableFilters.forEach(filter => {
-      values[filter.id] = filter.type === 'dropdown' ? 'All' : '';
+    availableFilters.forEach((filter) => {
+      values[filter.id] = filter.type === "dropdown" ? "All" : "";
     });
     return values;
   }, [availableFilters]);
@@ -144,65 +171,77 @@ const CommonTable = ({
   }, []);
 
   // Memoized fetch data function
-  const fetchData = useCallback(async (isManualRefresh = false) => {
-    setLoading(true);
-    setError(null);
-    
-    const currentAppliedFilters = appliedFiltersRef.current;
-    const currentPage = pageRef.current;
-    const currentRowsPerPage = rowsPerPageRef.current;
-    
-    // Prepare params for API call
-    const params = { 
-      ...currentAppliedFilters,
-      page: currentPage + 1,
-      paginate: currentRowsPerPage
-    };
-    
-    // Clean up params
-    Object.keys(params).forEach(key => {
-      if (params[key] === 'All' || params[key] === '' || params[key] == null) {
-        delete params[key];
+  const fetchData = useCallback(
+    async (isManualRefresh = false) => {
+      setLoading(true);
+      setError(null);
+
+      const currentAppliedFilters = appliedFiltersRef.current;
+      const currentPage = pageRef.current;
+      const currentRowsPerPage = rowsPerPageRef.current;
+
+      // Prepare params for API call
+      const params = {
+        ...currentAppliedFilters,
+        page: currentPage + 1,
+        paginate: currentRowsPerPage,
+      };
+
+      // Clean up params
+      Object.keys(params).forEach((key) => {
+        if (
+          params[key] === "All" ||
+          params[key] === "" ||
+          params[key] == null
+        ) {
+          delete params[key];
+        }
+      });
+
+      // Add queryParam if provided
+      let finalEndpoint = endpoint;
+      if (queryParam) {
+        finalEndpoint = `${endpoint}?${queryParam}`;
       }
-    });
 
-    // Add queryParam if provided
-    let finalEndpoint = endpoint;
-    if (queryParam) {
-      finalEndpoint = `${endpoint}?${queryParam}`;
-    }
+      try {
+        const { error: apiError, response } = await apiCall(
+          "GET",
+          finalEndpoint,
+          null,
+          params
+        );
 
-    try {
-      const { error: apiError, response } = await apiCall('GET', finalEndpoint, null, params);
-      
-      if (apiError) {
-        setError(apiError.message || 'Failed to fetch data');
-      } else {
-        if (response && response.status === 'SUCCESS') {
-          if (response.data && Array.isArray(response.data.data)) {
-            setData(response.data.data);
-            setTotalCount(response.data.total || response.data.data.length);
-          } else if (Array.isArray(response.data)) {
-            setData(response.data);
-            setTotalCount(response.data.length);
+        if (apiError) {
+          setError(apiError.message || "Failed to fetch data");
+        } else {
+          if (response) {
+            if (response) {
+              setData(response.data.data || response?.message);
+              console.log("THe finalEndpoint", data); setTotalCount(response.data.total || response.data.data.length);
+            } else if (Array.isArray(response.data)) {
+              setData(response.data);
+              setTotalCount(response.data.length);
+            } else {
+              setData([]);
+              setTotalCount(0);
+            }
+          } else if (Array.isArray(response)) {
+            setData(response);
+            setTotalCount(response.length);
           } else {
             setData([]);
             setTotalCount(0);
           }
-        } else if (Array.isArray(response)) {
-          setData(response);
-          setTotalCount(response.length);
-        } else {
-          setData([]);
-          setTotalCount(0);
         }
+      } catch (err) {
+        setError(err.message || "An error occurred");
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError(err.message || 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
-  }, [endpoint, queryParam]);
+    },
+    [endpoint, queryParam]
+  );
 
   // Update refs when state changes
   useEffect(() => {
@@ -228,7 +267,7 @@ const CommonTable = ({
         fetchData();
       }, refreshIntervalRef.current);
     }
-    
+
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
@@ -236,9 +275,9 @@ const CommonTable = ({
 
   // Memoized filter handlers
   const handleFilterChange = useCallback((filterId, value) => {
-    setFilterValues(prev => ({
+    setFilterValues((prev) => ({
       ...prev,
-      [filterId]: value
+      [filterId]: value,
     }));
   }, []);
 
@@ -262,32 +301,47 @@ const CommonTable = ({
     fetchData();
   }, [initialFilterValues, fetchData]);
 
-  const removeFilter = useCallback((filterId) => {
-    const resetValue = availableFilters.find(f => f.id === filterId)?.type === 'dropdown' ? 'All' : '';
-    
-    setFilterValues(prev => ({ ...prev, [filterId]: resetValue }));
-    setAppliedFilters(prev => ({ ...prev, [filterId]: resetValue }));
-    appliedFiltersRef.current = { ...appliedFiltersRef.current, [filterId]: resetValue };
-    setPage(0);
-    pageRef.current = 0;
-    fetchData();
-  }, [availableFilters, fetchData]);
+  const removeFilter = useCallback(
+    (filterId) => {
+      const resetValue =
+        availableFilters.find((f) => f.id === filterId)?.type === "dropdown"
+          ? "All"
+          : "";
+
+      setFilterValues((prev) => ({ ...prev, [filterId]: resetValue }));
+      setAppliedFilters((prev) => ({ ...prev, [filterId]: resetValue }));
+      appliedFiltersRef.current = {
+        ...appliedFiltersRef.current,
+        [filterId]: resetValue,
+      };
+      setPage(0);
+      pageRef.current = 0;
+      fetchData();
+    },
+    [availableFilters, fetchData]
+  );
 
   // Memoized pagination handlers
-  const handleChangePage = useCallback((event, newPage) => {
-    setPage(newPage);
-    pageRef.current = newPage;
-    fetchData();
-  }, [fetchData]);
+  const handleChangePage = useCallback(
+    (event, newPage) => {
+      setPage(newPage);
+      pageRef.current = newPage;
+      fetchData();
+    },
+    [fetchData]
+  );
 
-  const handleChangeRowsPerPage = useCallback((event) => {
-    const newRowsPerPage = parseInt(event.target.value, 10);
-    setRowsPerPage(newRowsPerPage);
-    rowsPerPageRef.current = newRowsPerPage;
-    setPage(0);
-    pageRef.current = 0;
-    fetchData();
-  }, [fetchData]);
+  const handleChangeRowsPerPage = useCallback(
+    (event) => {
+      const newRowsPerPage = parseInt(event.target.value, 10);
+      setRowsPerPage(newRowsPerPage);
+      rowsPerPageRef.current = newRowsPerPage;
+      setPage(0);
+      pageRef.current = 0;
+      fetchData();
+    },
+    [fetchData]
+  );
 
   // Manual refresh handler
   const handleManualRefresh = useCallback(() => {
@@ -295,62 +349,70 @@ const CommonTable = ({
   }, [fetchData]);
 
   // Memoized filter inputs renderer
-  const renderFilterInputs = useCallback(() => (
-    availableFilters.map(filter => (
-      <Box key={filter.id} sx={{ minWidth: 120, mb: 2 }}>
-        {filter.type === 'dropdown' ? (
-          <FormControl size="small" fullWidth>
+  const renderFilterInputs = useCallback(
+    () =>
+      availableFilters.map((filter) => (
+        <Box key={filter.id} sx={{ minWidth: 120, mb: 2 }}>
+          {filter.type === "dropdown" ? (
+            <FormControl size="small" fullWidth>
+              <TextField
+                select
+                label={filter.label}
+                value={filterValues[filter.id] || "All"}
+                onChange={(e) => handleFilterChange(filter.id, e.target.value)}
+              >
+                <MenuItem value="All">All</MenuItem>
+                {filter.options &&
+                  filter.options.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+              </TextField>
+            </FormControl>
+          ) : (
             <TextField
-              select
+              fullWidth
+              size="small"
               label={filter.label}
-              value={filterValues[filter.id] || 'All'}
+              value={filterValues[filter.id] || ""}
               onChange={(e) => handleFilterChange(filter.id, e.target.value)}
-            >
-              <MenuItem value="All">All</MenuItem>
-              {filter.options && filter.options.map(option => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
-          </FormControl>
-        ) : (
-          <TextField
-            fullWidth
-            size="small"
-            label={filter.label}
-            value={filterValues[filter.id] || ''}
-            onChange={(e) => handleFilterChange(filter.id, e.target.value)}
-          />
-        )}
-      </Box>
-    ))
-  ), [availableFilters, filterValues, handleFilterChange]);
+            />
+          )}
+        </Box>
+      )),
+    [availableFilters, filterValues, handleFilterChange]
+  );
 
   // Memoized applied filters chips
-  const appliedFiltersChips = useMemo(() => 
-    Object.entries(appliedFilters)
-      .filter(([key, value]) => value && value !== 'All' && value !== '')
-      .map(([key, value]) => {
-        const filterConfig = availableFilters.find(f => f.id === key);
-        return (
-          <FilterChip
-            key={key}
-            filterId={key}
-            value={value}
-            filterConfig={filterConfig}
-            onRemove={removeFilter}
-          />
-        );
-      })
-  , [appliedFilters, availableFilters, removeFilter]);
+  const appliedFiltersChips = useMemo(
+    () =>
+      Object.entries(appliedFilters)
+        .filter(([key, value]) => value && value !== "All" && value !== "")
+        .map(([key, value]) => {
+          const filterConfig = availableFilters.find((f) => f.id === key);
+          return (
+            <FilterChip
+              key={key}
+              filterId={key}
+              value={value}
+              filterConfig={filterConfig}
+              onRemove={removeFilter}
+            />
+          );
+        }),
+    [appliedFilters, availableFilters, removeFilter]
+  );
 
   // Memoized table rows
   const tableRows = useMemo(() => {
     if (loading) {
       return (
         <tr>
-          <td colSpan={initialColumns.length} style={{ textAlign: 'center', padding: '20px' }}>
+          <td
+            colSpan={initialColumns.length}
+            style={{ textAlign: "center", padding: "20px" }}
+          >
             <CircularProgress />
           </td>
         </tr>
@@ -360,7 +422,10 @@ const CommonTable = ({
     if (data.length === 0) {
       return (
         <tr>
-          <td colSpan={initialColumns.length} style={{ textAlign: 'center', padding: '20px' }}>
+          <td
+            colSpan={initialColumns.length}
+            style={{ textAlign: "center", padding: "20px" }}
+          >
             No data found
           </td>
         </tr>
@@ -368,17 +433,17 @@ const CommonTable = ({
     }
 
     return data.map((row, rowIndex) => (
-      <tr key={rowIndex} style={{ borderBottom: '1px solid #e0e0e0' }}>
+      <tr key={rowIndex} style={{ borderBottom: "1px solid #e0e0e0" }}>
         {initialColumns.map((column, colIndex) => (
           <td
             key={colIndex}
             style={{
-              padding: '12px',
-              verticalAlign: 'top',
-              width: column.width || 'auto'
+              padding: "12px",
+              verticalAlign: "top",
+              width: column.width || "auto",
             }}
           >
-            {column.selector ? column.selector(row) : row[column.name] || 'N/A'}
+            {column.selector ? column.selector(row) : row[column.name] || "N/A"}
           </td>
         ))}
       </tr>
@@ -386,56 +451,70 @@ const CommonTable = ({
   }, [loading, data, initialColumns]);
 
   // Memoized table headers
-  const tableHeaders = useMemo(() => 
-    initialColumns.map((column, index) => (
-      <th
-        key={index}
-        style={{
-          padding: '12px',
-          textAlign: 'left',
-          fontWeight: 'bold',
-          width: column.width || 'auto',
-          minWidth: column.width || 'auto'
-        }}
-      >
-        {typeof column.name === 'string' ? column.name : column.name?.props?.children || `Column ${index + 1}`}
-      </th>
-    ))
-  , [initialColumns]);
+  const tableHeaders = useMemo(
+    () =>
+      initialColumns.map((column, index) => (
+        <th
+          key={index}
+          style={{
+            padding: "12px",
+            textAlign: "left",
+            fontWeight: "bold",
+            width: column.width || "auto",
+            minWidth: column.width || "auto",
+          }}
+        >
+          {typeof column.name === "string"
+            ? column.name
+            : column.name?.props?.children || `Column ${index + 1}`}
+        </th>
+      )),
+    [initialColumns]
+  );
 
   return (
     <Box sx={{ p: 2 }}>
-      <Loader request={loading}/>
+      <Loader request={loading} />
       {/* Filter Section */}
       {availableFilters.length > 0 && (
         <>
-          <Paper sx={{ p: 2, mb: 2, display: { xs: 'none', md: 'block' } }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <Paper sx={{ p: 2, mb: 2, display: { xs: "none", md: "block" } }}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
               <FilterListIcon sx={{ mr: 1 }} />
               <Typography variant="h6">Filters</Typography>
             </Box>
-            
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 2 }}>
               {renderFilterInputs()}
-              
+
               <Button variant="contained" onClick={applyFilters}>
                 Apply
               </Button>
-              <Button variant="outlined" onClick={resetFilters} startIcon={<ClearIcon />}>
+              <Button
+                variant="outlined"
+                onClick={resetFilters}
+                startIcon={<ClearIcon />}
+              >
                 Reset
               </Button>
             </Box>
-            
+
             {/* Applied filters chips */}
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
               {appliedFiltersChips}
             </Box>
           </Paper>
 
           {/* Mobile filter button */}
-          <Box sx={{ display: { xs: 'flex', md: 'none' }, justifyContent: 'flex-end', mb: 2 }}>
-            <Button 
-              variant="outlined" 
+          <Box
+            sx={{
+              display: { xs: "flex", md: "none" },
+              justifyContent: "flex-end",
+              mb: 2,
+            }}
+          >
+            <Button
+              variant="outlined"
               startIcon={<FilterListIcon />}
               onClick={() => setFilterModalOpen(true)}
             >
@@ -444,25 +523,23 @@ const CommonTable = ({
           </Box>
 
           {/* Filter Modal for mobile */}
-          <Dialog 
-            open={filterModalOpen} 
+          <Dialog
+            open={filterModalOpen}
             onClose={() => setFilterModalOpen(false)}
             maxWidth="sm"
             fullWidth
           >
             <DialogTitle>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
                 <FilterListIcon sx={{ mr: 1 }} />
                 Filters
               </Box>
             </DialogTitle>
             <DialogContent>
-              <Box sx={{ mt: 2 }}>
-                {renderFilterInputs()}
-              </Box>
-              
+              <Box sx={{ mt: 2 }}>{renderFilterInputs()}</Box>
+
               {/* Applied filters chips */}
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 2 }}>
                 {appliedFiltersChips}
               </Box>
             </DialogContent>
@@ -470,16 +547,13 @@ const CommonTable = ({
               <Button onClick={resetFilters} startIcon={<ClearIcon />}>
                 Reset
               </Button>
-              <Button 
+              <Button
                 onClick={() => setFilterModalOpen(false)}
                 variant="outlined"
               >
                 Cancel
               </Button>
-              <Button 
-                onClick={applyFilters}
-                variant="contained"
-              >
+              <Button onClick={applyFilters} variant="contained">
                 Apply
               </Button>
             </DialogActions>
@@ -488,7 +562,14 @@ const CommonTable = ({
       )}
 
       {/* Table Header with Refresh */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
+      >
         <Typography variant="h5">{title}</Typography>
         <Tooltip title="Refresh">
           <IconButton onClick={handleManualRefresh} disabled={loading}>
@@ -498,29 +579,29 @@ const CommonTable = ({
       </Box>
 
       {/* Data Table */}
-      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+      <Paper sx={{ width: "100%", overflow: "hidden" }}>
         {error ? (
-          <Box sx={{ p: 3, textAlign: 'center' }}>
+          <Box sx={{ p: 3, textAlign: "center" }}>
             <Typography color="error">Error: {error}</Typography>
-            <Button variant="contained" onClick={handleManualRefresh} sx={{ mt: 2 }}>
+            <Button
+              variant="contained"
+              onClick={handleManualRefresh}
+              sx={{ mt: 2 }}
+            >
               Retry
             </Button>
           </Box>
         ) : (
           <>
-            <Box sx={{ overflow: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <Box sx={{ overflow: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
-                  <tr style={{ backgroundColor: '#f5f5f5' }}>
-                    {tableHeaders}
-                  </tr>
+                  <tr style={{ backgroundColor: "#f5f5f5" }}>{tableHeaders}</tr>
                 </thead>
-                <tbody>
-                  {tableRows}
-                </tbody>
+                <tbody>{tableRows}</tbody>
               </table>
             </Box>
-            
+
             {/* Pagination */}
             <TablePagination
               rowsPerPageOptions={[5, 10, 15, 25, 50]}
