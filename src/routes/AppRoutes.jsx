@@ -25,6 +25,8 @@ console.log("isAuthenticated",isAuthenticated);
 
 
 const RoleBasedRoutes = ({ user }) => {
+  console.log("user role is ",user.role);
+  
   return (
     <Routes>
       {/* Admin routes */}
@@ -39,7 +41,7 @@ const RoleBasedRoutes = ({ user }) => {
       )}
       
       {/* Retailer and DD routes */}
-      {(user?.role === "Ret" || user?.role === "Dd") && (
+      {(user?.role === "ret" || user?.role === "dd") && (
         <>
           <Route path="customer/dashboard" element={<AdminTransactions />} />
           <Route path="customer/services" element={<Dashboard />} />

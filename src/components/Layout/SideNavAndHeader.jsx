@@ -45,9 +45,9 @@ import AuthContext from '../../contexts/AuthContext';
 
 const roleNavigation = {
   'user': nav,
-  'Admin': Admin_nav,
-  'Ret': customer_nav,
-   'Dd': customer_nav,
+  'adm': Admin_nav,
+  'ret': customer_nav,
+   'dd': customer_nav,
 };
 
 const themeSettings = {

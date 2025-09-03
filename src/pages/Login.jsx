@@ -42,6 +42,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [secureValidate, setSecureValidate] = useState("");
   const [loginError, setLoginError] = useState("");
+  const [otpRef,setOtpRef]=useState("")
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext);
   const user = authCtx.user;
@@ -85,23 +86,24 @@ const Login = () => {
 
     console.log("response is ", response);
 
-     if (response.data?.access_token) {
-        const token = response.data.access_token;
+    //  if (response.data?.access_token) {
+    //     const token = response.data.access_token;
         
-        navigate('/customer/dashboard');
+    //     navigate('/customer/dashboard');
      
-         authCtx.login(token);
+    //      authCtx.login(token);
         
 
-    // if (response?.data === "MPIN") {
-    //   setSecureValidate("MPIN");
-    //   setIsMpinRequired(true);
-    // } else if (response?.data === "OTP") {
-    //   setSecureValidate("OTP");
-    //   setIsMpinRequired(true);
-    // } else if (response?.data?.access_token) {
-    //   const token = response.data.access_token;
-    //   await authCtx.login(token);
+    if (response?.data === "MPIN") {
+      setSecureValidate("MPIN");
+      setIsMpinRequired(true);
+    } else if (response?.data === "OTP") {
+      setSecureValidate("OTP");
+      setOtpRef(response.message)
+      setIsMpinRequired(true);
+    } else if (response?.data?.access_token) {
+      const token = response.data.access_token;
+      await authCtx.login(token);
 
       // 🔹 Extract role from response (depends on your API response structure)
       // const role = response.data.role || response.data.user?.role;
@@ -126,12 +128,6 @@ const Login = () => {
     setLoading(false);
   }
 };
-
- 
- 
- 
- 
-
 
   const handleMpinVerificationSuccess = () => {
     setIsMpinRequired(false);
@@ -259,6 +255,7 @@ const Login = () => {
           <VerifyMpinLogin
             username={username}
             password={password}
+            otpRef={otpRef}
             secureValidate={secureValidate}
             setIsOtpField={setIsMpinRequired}
             onVerificationSuccess={handleMpinVerificationSuccess}

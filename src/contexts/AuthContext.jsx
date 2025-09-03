@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
 
       if (error) throw new Error(error.message || "Failed to load user profile");
 
-      if (response?.data) {
+      if (response) {
         console.log("response data is ",response.data);
         
         setUser(response.data);
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (err) {
       console.error("Failed to load user profile:", err);
-      logout(); // fallback if profile fails
+      // logout(); // fallback if profile fails
       throw err;
     }
   };
@@ -79,6 +79,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setToken(token);
       setTokenState(token);
+          localStorage.setItem("access_token", token);
       const userProfile = await loadUserProfile();
       return userProfile;
     } catch (err) {
@@ -184,7 +185,7 @@ export const AuthProvider = ({ children }) => {
     // Original keys
     user,
     loading,
-    login:loginHandler,
+    login:login,
     
     logout,
     saveUser,

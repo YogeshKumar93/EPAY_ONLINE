@@ -273,7 +273,6 @@ const CommonTable = ({
     fetchData();
   }, [availableFilters, fetchData]);
 
-  // Memoized pagination handlers
   const handleChangePage = useCallback((event, newPage) => {
     setPage(newPage);
     pageRef.current = newPage;

@@ -19,6 +19,7 @@ import AuthContext from '../../contexts/AuthContext';
 const VerifyMpinLogin = ({
   username,
   password,
+  otpRef,
   secureValidate,
   setIsOtpField,
   onVerificationSuccess,
@@ -78,6 +79,7 @@ const VerifyMpinLogin = ({
         payload = {
           username,
           password,
+          otp_ref:otpRef,
           mpin: fullCode
         };
       } else {  
@@ -85,6 +87,7 @@ const VerifyMpinLogin = ({
         payload = {
           username,
           otp: fullCode,
+          otp_ref:otpRef,
           password
         };
       }
@@ -96,8 +99,10 @@ const VerifyMpinLogin = ({
         return;
       }
 
-      if (response.data?.access_token) {
-        const token = response.data.access_token;
+      if (response) {
+        console.log("loge response",response);
+        
+        const token = response.data;
         
         navigate('/customer/dashboard');
      
