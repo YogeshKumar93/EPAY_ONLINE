@@ -17,10 +17,14 @@ import Notification from "../components/Notification/Notification";
 import Services from "../pages/Services";
 
 const PrivateRoute = ({ children }) => {
-  const { isAuthenticated } = useContext(AuthContext) || {};
+  const { isAuthenticated, loading } = useContext(AuthContext);
+console.log("THe aufdgaegaee",isAuthenticated)
+  if (loading) {
+    return <div>Loading...</div>; // spinner or splash screen
+  }
+
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
-
 export default function AppRoutes() {
   const { user } = useContext(AuthContext) || {};
   const role = user?.role;
@@ -64,11 +68,23 @@ export default function AppRoutes() {
           {/* CUSTOMER (ret, dd) */}
           {isCustomer && (
             <>
-              <Route path="customer/dashboard" element={<AdminTransactions />} />
+              <Route
+                path="customer/dashboard"
+                element={<AdminTransactions />}
+              />
               <Route path="customer/services" element={<Dashboard />} />
-              <Route path="customer/account-ledger" element={<AccountLadger />} />
-              <Route path="customer/money-transfer" element={<DmtContainer />} />
-              <Route path="customer/recharge-bill" element={<RechargeAndBill />} />
+              <Route
+                path="customer/account-ledger"
+                element={<AccountLadger />}
+              />
+              <Route
+                path="customer/money-transfer"
+                element={<DmtContainer />}
+              />
+              <Route
+                path="customer/recharge-bill"
+                element={<RechargeAndBill />}
+              />
               <Route path="customer/purchase" element={<MyPurchase />} />
               <Route path="customer/fund-request" element={<FundRequest />} />
               <Route path="customer/sale" element={<MySale />} />

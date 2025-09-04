@@ -2,14 +2,14 @@
 // export const BASE_URL = "https://uat.impsguru.com/";
 // export const BASE_URL = "https://api.dillipay.com/";
 // export const BASE_URL = "http://192.168.1.14/impsguru-php/";
-   export const BASE_URL = "https://api.biggpay.in/";
+export const BASE_URL = "https://api.biggpay.in/";
 
 const ApiEndpoints = {
   COOKIE: "sanctum/csrf-cookie",
-  SIGN_IN: "auth/signIn",
+
   REQUEST_HASH: "auth/signRequest",
   GET_LOGIN_HISTORY: "user/getLoginHistory",
-  LOGOUT: "auth/logout",
+
   GET_FILES: "user/getFile",
   GET_SCHEME: "schemes/getScheme",
   EDIT_SUPER_RATE: "admin/updateSuperRate",
@@ -29,12 +29,9 @@ const ApiEndpoints = {
   CREATE_PAYOUT2_SCHEME: "schemes/createPayout2Scheme",
   CREATE_DMT_SCHEME: "schemes/createDmtScheme",
   GET_NEWS: "admin/news",
-  LOGIN_OTP_VALIDATE: "auth/secureLogin",
+
   GET_ME_USER: "user/getUser",
-  FORGOT_PASS: "auth/forgetPassword",
-  RESET_MPIN: "auth/resetMpinByUsername",
-  CHANGE_PASS: "auth/changePassword",
-  CHANGE_MPIN: "auth/changeMpin",
+
   OBTAIN_DOCS: "auth/getDocs",
   GET_RECENT_DATA: "reports/recentHistory",
   GET_USERS: "user/getUsers",
@@ -67,25 +64,26 @@ const ApiEndpoints = {
   GET_ROUTE: "admin/getRoutes",
   GET_CATEGORIES: "admin/getCategories",
 
+  // ****************************** NEW API'S ******************************
+  SIGN_IN: "auth/signIn",
+  LOGIN_OTP_VALIDATE: "auth/secureLogin",
+  LOGOUT: "auth/logout",
+  FORGOT_PASS: "auth/forgetPassword",
+  RESET_MPIN: "auth/resetMpin",
+  CHANGE_PASS: "auth/changePassword",
+  CHANGE_MPIN: "auth/changeMpin",
+  INITIATE_NUMBER: "auth/initiateChangeNumber",
+  VERIFY_CHAGNENUMBER: "auth/verifyChangeNumber",
 
-
-
-
-// ****************************** NEW API'S ******************************
   GET_ACCOUNTS: "account/getAccounts",
   CREATE_ACCOUNT: "account/createAccount",
-  DELETE_ACCOUNT : "account/deleteAccount",
-  UPDATE_ACCOUNT : "account/updateAccount",
-GET_SERVICES:"service/getServices",
-  
+  DELETE_ACCOUNT: "account/deleteAccount",
+  UPDATE_ACCOUNT: "account/updateAccount",
+  GET_NOTIFICATION: "notification/getNotification",
+  MARK_READ_NOTI: "notification/updateNotification",
+  ADMIN_NOTIFICATION: "notification/createNotification",
 
-
-
-
-// ****************************** NEW API'S ABOVE ******************************
-
-
-
+  // ****************************** NEW API'S ABOVE ******************************
 
   GET_ACC_ACCOUNTS: "",
   GET_BANKS: "admin/getBanks",
@@ -349,9 +347,5 @@ GET_SERVICES:"service/getServices",
   CREATE_QR: "admin/generateVirQr",
   GET_TIME: "https://timeapi.io/api/time/current/zone?timeZone=Asia%2FKolkata",
   GET_MERCHANTS: "admin/getMerchantsData",
-
-  GET_NOTIFICATION: "notification/getNotification",
-  MARK_READ_NOTI: "notification/updateNotification",
-  ADMIN_NOTIFICATION: "notification/createNotification",
 };
 export default ApiEndpoints;

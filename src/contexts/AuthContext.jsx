@@ -1,10 +1,15 @@
 // contexts/AuthContext.js
-import React, { createContext, useContext, useState, useEffect, useRef } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 
 // import useSessionTimeout from "../hooks/useSessionTimeout";
-
 
 export const getToken = () => localStorage.getItem("access_token");
 export const setToken = (token) => localStorage.setItem("access_token", token);
@@ -19,13 +24,15 @@ export const AuthProvider = ({ children }) => {
   const initialUser = localStorage.getItem("user");
   const initialNepalUser = localStorage.getItem("user_nepal");
   const docsData = JSON.parse(localStorage.getItem("docs"));
-  
+
   const [token, setTokenState] = useState(initialToken);
   const [nepalToken, setNepalToken] = useState(initialNepalToken);
   const [user, setUser] = useState(initialUser);
   const [nepalUser, setNepalUser] = useState(initialNepalUser);
   const [ifDocsUploaded, setIfDocsUploaded] = useState(docsData);
-  const [location, setLocation] = useState(JSON.parse(localStorage.getItem("location")));
+  const [location, setLocation] = useState(
+    JSON.parse(localStorage.getItem("location"))
+  );
   const [theame, setTheame] = useState();
   const [iconColor, setIconColor] = useState();
   const [currentView, setCurrentView] = useState(null);
@@ -38,13 +45,17 @@ export const AuthProvider = ({ children }) => {
 
   const loadUserProfile = async () => {
     try {
-      const { error, response } = await apiCall("GET", ApiEndpoints.GET_ME_USER);
+      const { error, response } = await apiCall(
+        "GET",
+        ApiEndpoints.GET_ME_USER
+      );
 
-      if (error) throw new Error(error.message || "Failed to load user profile");
+      if (error)
+        throw new Error(error.message || "Failed to load user profile");
 
       if (response) {
-        console.log("response data is ",response.data);
-        
+        console.log("response data is ", response.data);
+
         setUser(response.data);
         localStorage.setItem("user", JSON.stringify(response.data));
         return response.data;
@@ -79,7 +90,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setToken(token);
       setTokenState(token);
-          localStorage.setItem("access_token", token);
+      localStorage.setItem("access_token", token);
       const userProfile = await loadUserProfile();
       return userProfile;
     } catch (err) {
@@ -152,7 +163,7 @@ export const AuthProvider = ({ children }) => {
     setNepalUser(null);
     setIfDocsUploaded(null);
     setLocation(null);
-    
+
     localStorage.removeItem("access_token");
     localStorage.removeItem("aepsType");
     localStorage.removeItem("user");
@@ -185,12 +196,12 @@ export const AuthProvider = ({ children }) => {
     // Original keys
     user,
     loading,
-    login:login,
-    
+    login: login,
+
     logout,
     saveUser,
-    isAuthenticated: token,
-    
+    isAuthenticated: !!token,
+
     // New keys from second context
     token: token,
     nepalToken: nepalToken,
@@ -214,13 +225,12 @@ export const AuthProvider = ({ children }) => {
     ip: ip,
     setDmt2Doc: setDmt2Doc,
     dmt2Doc: dmt2Doc,
-    loadUserProfile,loadUserProfile
+    loadUserProfile,
+    loadUserProfile,
   };
 
   return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 
