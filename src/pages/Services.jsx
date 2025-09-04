@@ -1,15 +1,17 @@
 import { useMemo, useContext, useState } from "react";
-import { Box, Button, Tooltip, Typography, Chip } from "@mui/material";
+import { Box, Button, Tooltip, Chip } from "@mui/material";
 import AuthContext from "../contexts/AuthContext";
 import { dateToTime, ddmmyy } from "../utils/DateUtils";
 import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
+import CreateServiceModal from "../components/CreateServiceModal";
 
 const Services = ({ filters = [], query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
 
   const [openCreate, setOpenCreate] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const columns = useMemo(
     () => [
@@ -69,7 +71,7 @@ const Services = ({ filters = [], query }) => {
     <Box>
       {/* Create Service Button */}
       {(user?.role === "sadm" || user?.role === "adm") && (
-        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 0 }}>
           <Button variant="contained" onClick={() => setOpenCreate(true)}>
             Create Service
           </Button>
@@ -78,11 +80,19 @@ const Services = ({ filters = [], query }) => {
 
       {/* Services Table */}
       <CommonTable
+        // key={refreshKey} // 🔄 refresh when key changes
         columns={columns}
         endpoint={ApiEndpoints.GET_SERVICES}
         filters={filters}
         queryParam={query}
-        // refreshInterval={30000}
+      />
+
+      {/* Create Service Modal */}
+      <CreateServiceModal
+        open={openCreate}
+        onClose={() => setOpenCreate(false)}
+        token={authCtx?.token}
+        onSuccess={() => setRefreshKey((prev) => prev + 1)}
       />
     </Box>
   );

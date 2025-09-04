@@ -77,6 +77,8 @@ const ApiEndpoints = {
   DELETE_ACCOUNT : "account/deleteAccount",
   UPDATE_ACCOUNT : "account/updateAccount",
 GET_SERVICES:"service/getServices",
+CREATE_SERVICE:"service/createService",
+UPDATE_SERVICE:"service/updateService",
   
 
 
