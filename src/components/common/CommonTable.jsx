@@ -217,8 +217,10 @@ const CommonTable = ({
         } else {
           if (response) {
             if (response) {
-              setData(response.data.data || response?.message);
-              console.log("THe finalEndpoint", data); setTotalCount(response.data.total || response.data.data.length);
+              console.log("responseeee",response.data);
+              
+              setData(response.data || response?.message);
+              console.log("THe finalEndpoint", data); setTotalCount(response.data.total || response.data.length);
             } else if (Array.isArray(response.data)) {
               setData(response.data);
               setTotalCount(response.data.length);

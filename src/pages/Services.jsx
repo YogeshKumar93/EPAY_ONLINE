@@ -1,85 +1,65 @@
-import { useMemo, useCallback, useContext, useState } from "react";
-import { Box, Button, Tooltip, Typography } from "@mui/material";
+import { useMemo, useContext, useState } from "react";
+import { Box, Button, Tooltip, Typography, Chip } from "@mui/material";
 import AuthContext from "../contexts/AuthContext";
 import { dateToTime, ddmmyy } from "../utils/DateUtils";
 import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
+
 const Services = ({ filters = [], query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
 
-  const [openCreate, setOpenCreate] = useState(false); // Modal open state
+  const [openCreate, setOpenCreate] = useState(false);
 
   const columns = useMemo(
     () => [
       {
         name: "Date/Time",
         selector: (row) => (
-          <div className="mb-1" style={{ textAlign: "left" }}>
+          <div style={{ textAlign: "left" }}>
             {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
           </div>
         ),
         wrap: true,
       },
       {
-        name: "User Id",
+        name: "Service Name",
         selector: (row) => (
-          <Tooltip title={row?.user_id}>
-            <div style={{ textAlign: "left" }}>{row?.user_id}</div>
+          <Tooltip title={row?.name}>
+            <div style={{ textAlign: "left" }}>{row?.name}</div>
           </Tooltip>
         ),
-        width: "185px",
         wrap: true,
       },
       {
-        name: "Title",
+        name: "Code",
         selector: (row) => (
-          <Tooltip title={row?.title}>
-            <div style={{ textAlign: "left" }}>{row?.title}</div>
+          <Tooltip title={row?.code}>
+            <div style={{ textAlign: "left" }}>{row?.code}</div>
           </Tooltip>
         ),
+        width: "150px",
       },
       {
-        name: "Message",
+        name: "Route",
         selector: (row) => (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              fontSize: "16px",
-              textAlign: "justify",
-              fontWeight: "500",
-            }}
-          >
-            <Tooltip title={row?.message}>
-              <div style={{ textAlign: "left" }}>{row?.message}</div>
-            </Tooltip>
-          </Box>
+          <Tooltip title={row?.route}>
+            <div style={{ textAlign: "left" }}>{row?.route || "-"}</div>
+          </Tooltip>
         ),
-        wrap: true,
-        center: false,
+        width: "150px",
       },
       {
         name: "Status",
-        selector: (row) => (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              fontSize: "16px",
-              textAlign: "justify",
-              fontWeight: "500",
-            }}
-          >
-            {row.is_read === 0 ? (
-              <Typography>Not Read</Typography>
-            ) : (
-              <Typography>Already Read</Typography>
-            )}
-          </Box>
-        ),
-        wrap: true,
-        center: false,
+        selector: (row) =>
+          row?.is_active === 1 ? (
+            <Chip label="Active" color="success" size="small" />
+          ) : row?.is_active === 0 ? (
+            <Chip label="Inactive" color="error" size="small" />
+          ) : (
+            <Chip label="Pending" color="warning" size="small" />
+          ),
+        width: "120px",
       },
     ],
     []
@@ -87,31 +67,23 @@ const Services = ({ filters = [], query }) => {
 
   return (
     <Box>
-      {/* Create Notification Button */}
+      {/* Create Service Button */}
       {(user?.role === "sadm" || user?.role === "adm") && (
         <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
           <Button variant="contained" onClick={() => setOpenCreate(true)}>
-            Create Notification
+            Create Service
           </Button>
         </Box>
       )}
 
-      {/* Notification Table */}
+      {/* Services Table */}
       <CommonTable
         columns={columns}
         endpoint={ApiEndpoints.GET_SERVICES}
         filters={filters}
-        // queryParam={query}
+        queryParam={query}
         // refreshInterval={30000}
       />
-
-      {/* Create Notification Modal */}
-      {/* {openCreate && (
-        <CreateNotification
-          open={openCreate}
-          onClose={() => setOpenCreate(false)}
-        />
-      )} */}
     </Box>
   );
 };
