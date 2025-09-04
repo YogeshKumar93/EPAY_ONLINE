@@ -1,16 +1,20 @@
 import { useMemo, useContext, useState } from "react";
-import { Box, Button, Tooltip, Chip } from "@mui/material";
+import { Box, Button, Tooltip, Chip, IconButton } from "@mui/material";
+import { Edit } from "@mui/icons-material";
 import AuthContext from "../contexts/AuthContext";
 import { dateToTime, ddmmyy } from "../utils/DateUtils";
 import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CreateServiceModal from "../components/CreateServiceModal";
+import EditServiceModal from "../components/EditServiceModaL";
 
 const Services = ({ filters = [], query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
 
   const [openCreate, setOpenCreate] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [selectedService, setSelectedService] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const columns = useMemo(
@@ -63,6 +67,21 @@ const Services = ({ filters = [], query }) => {
           ),
         width: "120px",
       },
+      {
+        name: "Actions",
+        selector: (row) => (
+          <IconButton
+            color="primary"
+            onClick={() => {
+              setSelectedService(row);
+              setOpenEdit(true);
+            }}
+          >
+            <Edit />
+          </IconButton>
+        ),
+        width: "100px",
+      },
     ],
     []
   );
@@ -80,7 +99,7 @@ const Services = ({ filters = [], query }) => {
 
       {/* Services Table */}
       <CommonTable
-        // key={refreshKey} // 🔄 refresh when key changes
+        key={refreshKey} // 🔄 refresh on changes
         columns={columns}
         endpoint={ApiEndpoints.GET_SERVICES}
         filters={filters}
@@ -91,7 +110,14 @@ const Services = ({ filters = [], query }) => {
       <CreateServiceModal
         open={openCreate}
         onClose={() => setOpenCreate(false)}
-        token={authCtx?.token}
+        onSuccess={() => setRefreshKey((prev) => prev + 1)}
+      />
+
+      {/* Edit Service Modal */}
+      <EditServiceModal
+        open={openEdit}
+        onClose={() => setOpenEdit(false)}
+        service={selectedService}
         onSuccess={() => setRefreshKey((prev) => prev + 1)}
       />
     </Box>

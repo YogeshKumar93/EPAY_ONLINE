@@ -200,8 +200,16 @@ const CommonTable = ({
 
       // Add queryParam if provided
       let finalEndpoint = endpoint;
-      if (queryParam) {
+   if (typeof queryParam === "string" && queryParam.trim() !== "") {
+        // queryParam is a query string → append to URL
         finalEndpoint = `${endpoint}?${queryParam}`;
+      } else if (
+        typeof queryParam === "object" &&
+        queryParam !== null &&
+        Object.keys(queryParam).length > 0
+      ) {
+        // queryParam is an object → merge into params
+        Object.assign(params, queryParam);
       }
 
       try {
@@ -213,6 +221,10 @@ const CommonTable = ({
         );
 
         if (apiError) {
+          setError(apiError.message || "Failed to fetch data");
+        } else {
+          if (response) {
+           if (apiError) {
           setError(apiError.message || "Failed to fetch data");
         } else if (response) {
           // ✅ Normalize data structure
@@ -233,9 +245,17 @@ const CommonTable = ({
             Array.isArray(normalizedData) ? normalizedData : [normalizedData]
           );
           setTotalCount(total);
-        } else {
-          setData([]);
-          setTotalCount(0);
+        }else {
+              setData([]);
+              setTotalCount(0);
+            }
+          } else if (Array.isArray(response)) {
+            setData(response);
+            setTotalCount(response.length);
+          } else {
+            setData([]);
+            setTotalCount(0);
+          }
         }
       } catch (err) {
         setError(err.message || "An error occurred");

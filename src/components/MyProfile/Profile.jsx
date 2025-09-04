@@ -1,25 +1,19 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from "react";
 import {
   Container,
   Paper,
-  Typography,
-  TextField,
-  Button,
-  Grid,
   Box,
+  Typography,
   Avatar,
+  Grid,
+  Button,
+  Fade,
   Card,
   CardContent,
-  Divider,
-  IconButton,
-  InputAdornment,
-  Tab,
-  Tabs,
-  Fade,
   Slide,
   useTheme,
-  useMediaQuery
-} from '@mui/material';
+  useMediaQuery,
+} from "@mui/material";
 import {
   Visibility,
   VisibilityOff,
@@ -28,8 +22,13 @@ import {
   PhoneIphone,
   Person,
   Email,
-  CheckCircle
-} from '@mui/icons-material';
+  CheckCircle,
+} from "@mui/icons-material";
+import AuthContext from "../../contexts/AuthContext";
+import ResetMpin from "../common/ResetMpin";
+import ChangePassword from "../common/ChangePassword";
+import ChangeMpin from "../common/ChangeMpin";
+import NumberVerificationComponent from "../common/NumberVerificationComponent";
 
 // Tab panel component
 function TabPanel(props) {
@@ -49,457 +48,357 @@ function TabPanel(props) {
 
 const ProfilePage = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [tabValue, setTabValue] = useState(0);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showMpin, setShowMpin] = useState(false);
-  const [showNewMpin, setShowNewMpin] = useState(false);
-  const [showConfirmMpin, setShowConfirmMpin] = useState(false);
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
-  // Form states
-  const [resetMpinData, setResetMpinData] = useState({ mobile: '', otp: '' });
-  const [changePasswordData, setChangePasswordData] = useState({ 
-    currentPassword: '', newPassword: '', confirmPassword: '' 
-  });
-  const [changeMpinData, setChangeMpinData] = useState({ 
-    currentMpin: '', newMpin: '', confirmMpin: '' 
-  });
-  const [changeNumberData, setChangeNumberData] = useState({ 
-    currentNumber: '', newNumber: '', otp: '' 
-  });
-  
-  const [successMessage, setSuccessMessage] = useState('');
+  const authCtx = useContext(AuthContext);
+  const user = authCtx?.user;
+  const username = `GURU1${user?.id}`;
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const [resetMpinModalOpen, setResetMpinModalOpen] = useState(false);
+  const [chagnePasswordModal, setChagnePasswordModal] = useState(false);
+  const [changeMpinModal, setChangeMpinModal] = useState(false);
+  const [newNumberModal, setNewNumberModal] = useState(false);
 
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
-    setSuccessMessage('');
-  };
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleResetMpin = () => {
-    console.log("Reset MPIN with:", resetMpinData);
-    // API call to reset MPIN would go here
-    setSuccessMessage('MPIN reset successfully!');
+    setResetMpinModalOpen(true);
   };
 
-  const handleChangePassword = () => {
-    console.log("Change password with:", changePasswordData);
-    // API call to change password would go here
-    setSuccessMessage('Password changed successfully!');
+  const handelChangePassowrd = () => {
+    setChagnePasswordModal(true);
   };
-
-  const handleChangeMpin = () => {
-    console.log("Change MPIN with:", changeMpinData);
-    // API call to change MPIN would go here
-    setSuccessMessage('MPIN changed successfully!');
-  };
-
-  const handleInitiateNumberChange = () => {
-    console.log("Initiate number change with:", changeNumberData);
-    // API call to initiate number change would go here
-    setSuccessMessage('OTP sent to your new number!');
-  };
-
-  const handleVerifyNumberChange = () => {
-    console.log("Verify number change with:", changeNumberData);
-    // API call to verify number change would go here
-    setSuccessMessage('Mobile number updated successfully!');
+  
+  const handleChangeMpin = () => setChangeMpinModal(true);
+  
+  const handleNewNumber = () => {
+    setNewNumberModal(true);
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="md" sx={{ py: 5 }}>
       <Slide in={true} direction="up" timeout={500}>
-        <Paper 
-          elevation={isMobile ? 0 : 8} 
-          sx={{ 
-            borderRadius: 2, 
-            overflow: 'hidden',
-            background: 'linear-gradient(to bottom, #f5f7fa, #e4e8f0)'
+        <Paper
+          elevation={isMobile ? 0 : 10}
+          sx={{
+            borderRadius: 4,
+            overflow: "hidden",
+            background: "linear-gradient(145deg, #f9fafc, #eef1f7)",
+            p: isMobile ? 2 : 4,
+            boxShadow: "0 8px 25px rgba(0,0,0,0.08)",
           }}
         >
-          {/* Header Section */}
-          <Box sx={{ 
-            p: 4, 
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 
-            color: 'white' 
-          }}>
+          {/* Profile Header */}
+          <Box
+            sx={{
+              p: 4,
+              borderRadius: 3,
+              mb: 4,
+              background: "linear-gradient(135deg, #667eea, #764ba2)",
+              color: "white",
+              textAlign: isMobile ? "center" : "left",
+            }}
+          >
             <Grid container spacing={3} alignItems="center">
-              <Grid item>
+              <Grid item xs={12} sm="auto">
                 <Avatar
-                  sx={{ 
-                    width: 100, 
-                    height: 100, 
-                    border: '4px solid rgba(255,255,255,0.3)',
-                    bgcolor: 'rgba(255,255,255,0.2)'
+                  sx={{
+                    width: 110,
+                    height: 110,
+                    border: "5px solid rgba(255,255,255,0.4)",
+                    bgcolor: "rgba(255,255,255,0.2)",
+                    mx: isMobile ? "auto" : 0,
                   }}
                 >
-                  <Person sx={{ fontSize: 50 }} />
+                  <Person sx={{ fontSize: 60 }} />
                 </Avatar>
               </Grid>
               <Grid item xs>
-                <Typography variant="h4" fontWeight="600">
-                  John Doe
+                <Typography
+                  variant="h4"
+                  fontWeight="bold"
+                  sx={{ letterSpacing: "0.5px" }}
+                >
+                  {user?.name}
                 </Typography>
                 <Typography variant="body1" sx={{ opacity: 0.9, mt: 1 }}>
-                  john.doe@example.com
+                  {user?.email}
                 </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.8, mt: 0.5 }}>
-                  +1 (555) 123-4567
+                <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                  📱 {user?.mobile}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{ display: "block", mt: 0.5, opacity: 0.7 }}
+                >
+                  Username: <strong>{username}</strong>
                 </Typography>
               </Grid>
             </Grid>
           </Box>
 
-          {/* Tabs Section */}
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs 
-              value={tabValue} 
-              onChange={handleTabChange} 
-              variant={isMobile ? "scrollable" : "fullWidth"}
-              scrollButtons="auto"
-            >
-              <Tab icon={<LockReset />} label="Reset MPIN" />
-              <Tab icon={<Security />} label="Change Password" />
-              <Tab icon={<Security />} label="Change MPIN" />
-              <Tab icon={<PhoneIphone />} label="Change Number" />
-            </Tabs>
-          </Box>
-
           {/* Success Message */}
           {successMessage && (
             <Fade in={true}>
-              <Box sx={{ 
-                p: 2, 
-                m: 2, 
-                backgroundColor: 'success.light', 
-                color: 'white', 
-                borderRadius: 1,
-                display: 'flex',
-                alignItems: 'center'
-              }}>
+              <Box
+                sx={{
+                  p: 2,
+                  mb: 3,
+                  background:
+                    "linear-gradient(90deg, #4caf50, #81c784, #66bb6a)",
+                  color: "white",
+                  borderRadius: 2,
+                  display: "flex",
+                  alignItems: "center",
+                  boxShadow: "0px 4px 12px rgba(76, 175, 80, 0.4)",
+                }}
+              >
                 <CheckCircle sx={{ mr: 1 }} />
-                <Typography>{successMessage}</Typography>
+                <Typography fontWeight="500">{successMessage}</Typography>
               </Box>
             </Fade>
           )}
 
-          {/* Reset MPIN Tab */}
-          <TabPanel value={tabValue} index={0}>
-            <Card sx={{ mb: 3 }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom color="primary">
-                  Reset MPIN
-                </Typography>
-                <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
-                  Enter your registered mobile number to receive OTP for resetting your MPIN
-                </Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Mobile Number"
-                      value={resetMpinData.mobile}
-                      onChange={(e) => setResetMpinData({ ...resetMpinData, mobile: e.target.value })}
-                      placeholder="Enter your mobile number"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="OTP"
-                      value={resetMpinData.otp}
-                      onChange={(e) => setResetMpinData({ ...resetMpinData, otp: e.target.value })}
-                      placeholder="Enter OTP received on your mobile"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Button 
-                      variant="contained" 
-                      fullWidth 
-                      onClick={handleResetMpin}
-                      sx={{ py: 1.5 }}
-                    >
-                      Reset MPIN
-                    </Button>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
-          </TabPanel>
+          {/* Actions Section */}
+          <Grid container spacing={3}>
+            {/* Reset MPIN */}
+            <Grid item xs={12} sm={4}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  transition: "0.3s",
+                  "&:hover": {
+                    transform: "translateY(-5px)",
+                    boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+                  },
+                }}
+              >
+                <CardContent sx={{ textAlign: "center" }}>
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    color="primary"
+                    fontWeight="600"
+                  >
+                    Reset MPIN
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{ mb: 2 }}
+                  >
+                    Reset your MPIN quickly with OTP verification.
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    onClick={handleResetMpin}
+                    sx={{
+                      py: 1.2,
+                      px: 3,
+                      borderRadius: 2,
+                      textTransform: "none",
+                      fontWeight: "bold",
+                      fontSize: "0.95rem",
+                      background: "linear-gradient(135deg, #43cea2, #185a9d)",
+                      "&:hover": {
+                        background: "linear-gradient(135deg, #36d1dc, #5b86e5)",
+                      },
+                    }}
+                    fullWidth
+                  >
+                    Reset MPIN
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
 
-          {/* Change Password Tab */}
-          <TabPanel value={tabValue} index={1}>
-            <Card sx={{ mb: 3 }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom color="primary">
-                  Change Password
-                </Typography>
-                <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
-                  Update your password to keep your account secure
-                </Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Current Password"
-                      type={showCurrentPassword ? 'text' : 'password'}
-                      value={changePasswordData.currentPassword}
-                      onChange={(e) => setChangePasswordData({ 
-                        ...changePasswordData, 
-                        currentPassword: e.target.value 
-                      })}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton
-                              onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                              edge="end"
-                            >
-                              {showCurrentPassword ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="New Password"
-                      type={showNewPassword ? 'text' : 'password'}
-                      value={changePasswordData.newPassword}
-                      onChange={(e) => setChangePasswordData({ 
-                        ...changePasswordData, 
-                        newPassword: e.target.value 
-                      })}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton
-                              onClick={() => setShowNewPassword(!showNewPassword)}
-                              edge="end"
-                            >
-                              {showNewPassword ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Confirm New Password"
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      value={changePasswordData.confirmPassword}
-                      onChange={(e) => setChangePasswordData({ 
-                        ...changePasswordData, 
-                        confirmPassword: e.target.value 
-                      })}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton
-                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                              edge="end"
-                            >
-                              {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Button 
-                      variant="contained" 
-                      fullWidth 
-                      onClick={handleChangePassword}
-                      sx={{ py: 1.5 }}
-                    >
-                      Change Password
-                    </Button>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
-          </TabPanel>
+            {/* Change Password */}
+            <Grid item xs={12} sm={4}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  transition: "0.3s",
+                  "&:hover": {
+                    transform: "translateY(-5px)",
+                    boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+                  },
+                }}
+              >
+                <CardContent sx={{ textAlign: "center" }}>
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    color="secondary"
+                    fontWeight="600"
+                  >
+                    Change Password
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{ mb: 2 }}
+                  >
+                    Update your account password for better security.
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={handelChangePassowrd}
+                    sx={{
+                      py: 1.2,
+                      px: 3,
+                      borderRadius: 2,
+                      textTransform: "none",
+                      fontWeight: "bold",
+                      fontSize: "0.95rem",
+                      "&:hover": { bgcolor: "secondary.dark" },
+                    }}
+                    fullWidth
+                  >
+                    Change Password
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
 
-          {/* Change MPIN Tab */}
-          <TabPanel value={tabValue} index={2}>
-            <Card sx={{ mb: 3 }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom color="primary">
-                  Change MPIN
-                </Typography>
-                <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
-                  Update your MPIN for secure transactions
-                </Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Current MPIN"
-                      type={showMpin ? 'text' : 'password'}
-                      value={changeMpinData.currentMpin}
-                      onChange={(e) => setChangeMpinData({ 
-                        ...changeMpinData, 
-                        currentMpin: e.target.value 
-                      })}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton
-                              onClick={() => setShowMpin(!showMpin)}
-                              edge="end"
-                            >
-                              {showMpin ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="New MPIN"
-                      type={showNewMpin ? 'text' : 'password'}
-                      value={changeMpinData.newMpin}
-                      onChange={(e) => setChangeMpinData({ 
-                        ...changeMpinData, 
-                        newMpin: e.target.value 
-                      })}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton
-                              onClick={() => setShowNewMpin(!showNewMpin)}
-                              edge="end"
-                            >
-                              {showNewMpin ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Confirm New MPIN"
-                      type={showConfirmMpin ? 'text' : 'password'}
-                      value={changeMpinData.confirmMpin}
-                      onChange={(e) => setChangeMpinData({ 
-                        ...changeMpinData, 
-                        confirmMpin: e.target.value 
-                      })}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton
-                              onClick={() => setShowConfirmMpin(!showConfirmMpin)}
-                              edge="end"
-                            >
-                              {showConfirmMpin ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Button 
-                      variant="contained" 
-                      fullWidth 
-                      onClick={handleChangeMpin}
-                      sx={{ py: 1.5 }}
-                    >
-                      Change MPIN
-                    </Button>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
-          </TabPanel>
-
-          {/* Change Number Tab */}
-          <TabPanel value={tabValue} index={3}>
-            <Card sx={{ mb: 3 }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom color="primary">
-                  Change Mobile Number
-                </Typography>
-                <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
-                  Update your mobile number for account verification
-                </Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Current Mobile Number"
-                      value={changeNumberData.currentNumber}
-                      onChange={(e) => setChangeNumberData({ 
-                        ...changeNumberData, 
-                        currentNumber: e.target.value 
-                      })}
-                      disabled
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="New Mobile Number"
-                      value={changeNumberData.newNumber}
-                      onChange={(e) => setChangeNumberData({ 
-                        ...changeNumberData, 
-                        newNumber: e.target.value 
-                      })}
-                      placeholder="Enter your new mobile number"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Button 
-                      variant="outlined" 
-                      fullWidth 
-                      onClick={handleInitiateNumberChange}
-                      sx={{ py: 1.5 }}
-                    >
-                      Send OTP to New Number
-                    </Button>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="OTP"
-                      value={changeNumberData.otp}
-                      onChange={(e) => setChangeNumberData({ 
-                        ...changeNumberData, 
-                        otp: e.target.value 
-                      })}
-                      placeholder="Enter OTP received on your new number"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Button 
-                      variant="contained" 
-                      fullWidth 
-                      onClick={handleVerifyNumberChange}
-                      sx={{ py: 1.5 }}
-                    >
-                      Verify and Update Number
-                    </Button>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
-          </TabPanel>
+            {/* New Number */}
+            <Grid item xs={12} sm={4}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  transition: "0.3s",
+                  "&:hover": {
+                    transform: "translateY(-5px)",
+                    boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+                  },
+                }}
+              >
+                <CardContent sx={{ textAlign: "center" }}>
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    color="info.main"
+                    fontWeight="600"
+                  >
+                    New Number
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{ mb: 2 }}
+                  >
+                    Add and verify a new mobile number.
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    onClick={handleNewNumber}
+                    sx={{
+                      py: 1.2,
+                      px: 3,
+                      borderRadius: 2,
+                      textTransform: "none",
+                      fontWeight: "bold",
+                      fontSize: "0.95rem",
+                      background: "linear-gradient(135deg, #4facfe, #00f2fe)",
+                      "&:hover": {
+                        background: "linear-gradient(135deg, #43e97b, #38f9d7)",
+                      },
+                    }}
+                    fullWidth
+                  >
+                    New Number
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+            
+            {/* Change MPIN */}
+            <Grid item xs={12} sm={4}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  transition: "0.3s",
+                  "&:hover": {
+                    transform: "translateY(-5px)",
+                    boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+                  },
+                }}
+              >
+                <CardContent sx={{ textAlign: "center" }}>
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    color="warning.main"
+                    fontWeight="600"
+                  >
+                    Change MPIN
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{ mb: 2 }}
+                  >
+                    Change your existing MPIN securely.
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    onClick={handleChangeMpin}
+                    sx={{
+                      py: 1.2,
+                      px: 3,
+                      borderRadius: 2,
+                      textTransform: "none",
+                      fontWeight: "bold",
+                      fontSize: "0.95rem",
+                      background: "linear-gradient(135deg, #ff9a9e, #f6416c)",
+                      "&:hover": {
+                        background: "linear-gradient(135deg, #ff758c, #ff7eb3)",
+                      },
+                    }}
+                    fullWidth
+                  >
+                    Change MPIN
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
         </Paper>
       </Slide>
+      
+      {/* Modals */}
+      {resetMpinModalOpen && (
+        <ResetMpin
+          open={resetMpinModalOpen}
+          onClose={() => setResetMpinModalOpen(false)}
+          username={username}
+        />
+      )}
+      {chagnePasswordModal && (
+        <ChangePassword
+          open={chagnePasswordModal}
+          onClose={() => setChagnePasswordModal(false)}
+          username={username}
+        />
+      )}
+      {changeMpinModal && (
+        <ChangeMpin
+          open={changeMpinModal}
+          onClose={() => setChangeMpinModal(false)}
+        />
+      )}
+      
+      {/* New Number Modal */}
+      <NumberVerificationComponent 
+        open={newNumberModal} 
+        onClose={() => setNewNumberModal(false)}
+        onSuccess={(message) => {
+          setSuccessMessage(message);
+          setNewNumberModal(false);
+        }}
+        username={user?.username}
+      />
     </Container>
   );
 };
+
 
 export default ProfilePage;
