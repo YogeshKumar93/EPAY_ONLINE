@@ -489,21 +489,26 @@ const CommonModal = ({
       </DialogTitle>
 
       {/* Content */}
-      <DialogContent dividers={dividers} sx={{ p: 3 }}>
-        {fieldConfig.length > 0
-          ? fieldConfig.map((field, i) => (
-              <Box key={i} sx={{ mb: 2 }}>
-                <CommonFormField
-                  field={field}
-                  formData={formData}
-                  handleChange={handleChange}
-                  errors={errors}
-                  loading={loading}
-                />
-              </Box>
-            ))
-          : children}
-      </DialogContent>
+     <DialogContent dividers={dividers} sx={{ p: 3 }}>
+  {fieldConfig.length > 0 ? (
+    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+      {fieldConfig.map((field, i) => (
+        <Box key={i} sx={{ flex: "1 1 calc(50% - 16px)" }}>
+          <CommonFormField
+            field={field}
+            formData={formData}
+            handleChange={handleChange}
+            errors={errors}
+            loading={loading}
+          />
+        </Box>
+      ))}
+    </Box>
+  ) : (
+    children
+  )}
+</DialogContent>
+
 
       {/* Footer */}
       {footerButtons && footerButtons.length > 0 && (

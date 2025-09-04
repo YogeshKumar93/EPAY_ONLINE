@@ -83,34 +83,101 @@ const [errors, setErrors] = useState({});
       },
     ];
 
-    const fieldConfig = [
-        {name: "bank_name", label: "Name", type:"text" },
-        {name: "status", label:"Status", type: "select", options:[
-            {value: "Pending", label: "Pending"},
-            {value: "Failed", label: "Failed"},
-            {value: "Success", label:"Success"},
-        ]},
-        {name:"asm_id", label: "Asm Id", type: "text" },
-        {name:"user_id", label:"User Id", type: "text"},
-        {name:"name", label:"Name", type:"text"},
-         {name:"mode", label:"Mode", type:"text"},
-          {name:"bank_ref_id", label:"Band Ref Id", type:"text"},
-          {name:"date", label:"Date", type:"text"},
-        {name:"amount", label:"Amount", type:"text"},
-         {name:"remark", label:"Remarks", type:"text"},
-          {name:"txn_id", label:"TXN ID", type:"text"},
+const fieldConfig = [
+  {
+    name: "bank_name",
+    label: "Bank Name",
+    type: "text",
+    validation: { required: true, minLength: 3 },
+  },
+  {
+    name: "status",
+    label: "Status",
+    type: "select",
+    options: [
+      { value: "Pending", label: "Pending" },
+      { value: "Failed", label: "Failed" },
+      { value: "Success", label: "Success" },
+    ],
+    validation: { required: true },
+  },
+  {
+    name: "asm_id",
+    label: "Asm Id",
+    type: "text",
+    validation: { required: false },
+  },
+  {
+    name: "user_id",
+    label: "User Id",
+    type: "text",
+    validation: { required: true, pattern: /^[0-9]+$/ },
+  },
+  {
+    name: "name",
+    label: "Merchant Name",
+    type: "text",
+    validation: { required: true, minLength: 2 },
+  },
+  {
+    name: "mode",
+    label: "Account / Mode",
+    type: "number",
+    validation: { required: true, min: 1 },
+  },
+  {
+    name: "bank_ref_id",
+    label: "Bank Ref Id",
+    type: "text",
+    validation: {
+      required: true,
+      minLength: 11,
+      maxLength: 11,
+      pattern: /^[A-Z0-9]+$/, // uppercase alphanumeric only
+    },
+  },
+  {
+    name: "date",
+    label: "Date",
+    type: "number", // important: matches backend "must be a number"
+    validation: { required: true },
+  },
+  {
+    name: "amount",
+    label: "Amount",
+    type: "number",
+    validation: { required: true, min: 1 },
+  },
+  {
+    name: "remark",
+    label: "Remarks",
+    type: "text",
+    validation: { required: false, maxLength: 200 },
+  },
+  {
+    name: "txn_id",
+    label: "TXN ID",
+    type: "text",
+    validation: {
+      required: true,
+      minLength: 6,
+      maxLength: 20,
+      pattern: /^[A-Za-z0-9_-]+$/,
+    },
+  },
+];
 
-    ]
 
     return (
     
 <CommonModal
  open={open}
       onClose={handleClose}
-      title="Create Account"
+      title="Create Fund Request"
       footerButtons={footerButtons}
       size="medium"
       iconType="info"
+       layout="two-column"
       showCloseButton={true}
       closeOnBackdropClick={!loading}
       dividers={true}
@@ -119,7 +186,7 @@ const [errors, setErrors] = useState({});
       handleChange={handleChange}
       errors={errors}
       loading={loading}
-      layout="two-column"
+      
 >
 
 
