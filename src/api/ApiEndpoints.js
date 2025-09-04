@@ -77,35 +77,36 @@ const ApiEndpoints = {
 
   GET_ACCOUNTS: "account/getAccounts",
   CREATE_ACCOUNT: "account/createAccount",
-  DELETE_ACCOUNT : "account/deleteAccount",
-  UPDATE_ACCOUNT : "account/updateAccount",
-GET_SERVICES:"service/getServices",
-CREATE_SERVICE:"service/createService",
-UPDATE_SERVICE:"service/updateService",
-GET_TEMPLATES:"template/getTemplates",
-CREATE_TEMPLATE:"template/createTemplate",
-UPDATE_TEMPLATE:"template/updateTemplate",
-DELETE_TEMPLATE:"template/deleteTemplate",
-GET_LOGS:"auditlog/getAuditLogs",
-DELETE_LOG:"auditlog/deleteAuditLog",
-GET_LOG:"auditlog/getAuditLog",
-GET_FUND_REQUESTS:"fundrequest/getFundRequests",
-CREATE_FUND_REQUEST:"fundrequest/createFundRequest",
-UPDATE_FUND_REQUEST:"fundrequest/updateFundRequest",
-DELETE_FUND_REQUEST:"fundrequest/deleteFundRequest",
+  DELETE_ACCOUNT: "account/deleteAccount",
+  UPDATE_ACCOUNT: "account/updateAccount",
+  GET_SERVICES: "service/getServices",
+  CREATE_SERVICE: "service/createService",
+  UPDATE_SERVICE: "service/updateService",
+  GET_TEMPLATES: "template/getTemplates",
+  CREATE_TEMPLATE: "template/createTemplate",
+  UPDATE_TEMPLATE: "template/updateTemplate",
+  DELETE_TEMPLATE: "template/deleteTemplate",
+  GET_LOGS: "auditlog/getAuditLogs",
+  DELETE_LOG: "auditlog/deleteAuditLog",
+  GET_LOG: "auditlog/getAuditLog",
+  GET_FUND_REQUESTS: "fundrequest/getFundRequests",
+  CREATE_FUND_REQUEST: "fundrequest/createFundRequest",
+  UPDATE_FUND_REQUEST: "fundrequest/updateFundRequest",
+  DELETE_FUND_REQUEST: "fundrequest/deleteFundRequest",
 
-// ****************************** NEW API'S ABOVE ******************************
-
+  // ****************************** NEW API'S ABOVE ******************************
 
   GET_NOTIFICATION: "notification/getNotification",
   MARK_READ_NOTI: "notification/updateNotification",
   ADMIN_NOTIFICATION: "notification/createNotification",
 
-
-  // GET_BANKS:"BANK/G"
+  GET_BANKS: "bank/getBanks",
+  CREATE_BANK: "bank/createBank",
+  UPDATE_BANK: "bank/updateBank",
+  DELETE_BANK: "bank/deleteBank",
   // ****************************** NEW API'S ABOVE ******************************
 
-  GET_ACC_ACCOUNTS: "",
+  // GET_ACC_ACCOUNTS: "",
 
   GET_ACC_BANKS: "",
   UPDATE_BANKS: "admin/changeBankStatus",

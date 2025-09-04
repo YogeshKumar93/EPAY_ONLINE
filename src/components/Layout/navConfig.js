@@ -17,6 +17,7 @@ export const Admin_nav = [
     to: "/admin/fund-request",
   },
   { title: "Accounts", icon: "👥", icon2: "👥", to: "/admin/accounts" },
+  { title: "Banks", icon: "👥", icon2: "👥", to: "/admin/banks" },
   { title: "Services", icon: "👥", icon2: "👥", to: "/admin/services" },
   { title: "Templates", icon: "👥", icon2: "👥", to: "/admin/templates" },
   { title: "Logs", icon: "👥", icon2: "👥", to: "/admin/logs" },
@@ -42,6 +43,7 @@ export const customer_nav = [
     icon2: "🛠️",
     to: "/customer/recharge-bill",
   },
+    { title: "Banks", icon: "👥", icon2: "👥", to: "/customer/banks" },
   {
     title: "Notification",
     icon: "💳",
