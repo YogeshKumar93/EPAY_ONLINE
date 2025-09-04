@@ -73,7 +73,7 @@ const ApiEndpoints = {
   CHANGE_PASS: "auth/changePassword",
   CHANGE_MPIN: "auth/changeMpin",
   INITIATE_NUMBER: "auth/initiateChangeNumber",
-  VERIFY_CHAGNENUMBER: "auth/verifyChangeNumber",
+  VERIFY_CHAGNE_NUMBER: "auth/verifyChangeNumber",
 
   GET_ACCOUNTS: "account/getAccounts",
   CREATE_ACCOUNT: "account/createAccount",

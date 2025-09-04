@@ -28,6 +28,7 @@ import AuthContext from "../../contexts/AuthContext";
 import ResetMpin from "../common/ResetMpin";
 import ChangePassword from "../common/ChangePassword";
 import ChangeMpin from "../common/ChangeMpin";
+import NumberVerificationComponent from "../common/NumberVerificationComponent";
 
 // Tab panel component
 function TabPanel(props) {
@@ -54,6 +55,7 @@ const ProfilePage = () => {
   const [resetMpinModalOpen, setResetMpinModalOpen] = useState(false);
   const [chagnePasswordModal, setChagnePasswordModal] = useState(false);
   const [changeMpinModal, setChangeMpinModal] = useState(false);
+  const [newNumberModal, setNewNumberModal] = useState(false);
 
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -64,7 +66,13 @@ const ProfilePage = () => {
   const handelChangePassowrd = () => {
     setChagnePasswordModal(true);
   };
+  
   const handleChangeMpin = () => setChangeMpinModal(true);
+  
+  const handleNewNumber = () => {
+    setNewNumberModal(true);
+  };
+
   return (
     <Container maxWidth="md" sx={{ py: 5 }}>
       <Slide in={true} direction="up" timeout={500}>
@@ -251,6 +259,57 @@ const ProfilePage = () => {
               </Card>
             </Grid>
 
+            {/* New Number */}
+            <Grid item xs={12} sm={4}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  transition: "0.3s",
+                  "&:hover": {
+                    transform: "translateY(-5px)",
+                    boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+                  },
+                }}
+              >
+                <CardContent sx={{ textAlign: "center" }}>
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    color="info.main"
+                    fontWeight="600"
+                  >
+                    New Number
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{ mb: 2 }}
+                  >
+                    Add and verify a new mobile number.
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    onClick={handleNewNumber}
+                    sx={{
+                      py: 1.2,
+                      px: 3,
+                      borderRadius: 2,
+                      textTransform: "none",
+                      fontWeight: "bold",
+                      fontSize: "0.95rem",
+                      background: "linear-gradient(135deg, #4facfe, #00f2fe)",
+                      "&:hover": {
+                        background: "linear-gradient(135deg, #43e97b, #38f9d7)",
+                      },
+                    }}
+                    fullWidth
+                  >
+                    New Number
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+            
             {/* Change MPIN */}
             <Grid item xs={12} sm={4}>
               <Card
@@ -304,25 +363,42 @@ const ProfilePage = () => {
           </Grid>
         </Paper>
       </Slide>
-
-      {/* Reset MPIN Modal */}
-      <ResetMpin
-        open={resetMpinModalOpen}
-        onClose={() => setResetMpinModalOpen(false)}
-        username={username}
-      />
-      <ChangePassword
-        open={chagnePasswordModal}
-        onClose={() => setChagnePasswordModal(false)}
-        username={username}
-      />
-
-      <ChangeMpin
-        open={changeMpinModal}
-        onClose={() => setChangeMpinModal(false)}
+      
+      {/* Modals */}
+      {resetMpinModalOpen && (
+        <ResetMpin
+          open={resetMpinModalOpen}
+          onClose={() => setResetMpinModalOpen(false)}
+          username={username}
+        />
+      )}
+      {chagnePasswordModal && (
+        <ChangePassword
+          open={chagnePasswordModal}
+          onClose={() => setChagnePasswordModal(false)}
+          username={username}
+        />
+      )}
+      {changeMpinModal && (
+        <ChangeMpin
+          open={changeMpinModal}
+          onClose={() => setChangeMpinModal(false)}
+        />
+      )}
+      
+      {/* New Number Modal */}
+      <NumberVerificationComponent 
+        open={newNumberModal} 
+        onClose={() => setNewNumberModal(false)}
+        onSuccess={(message) => {
+          setSuccessMessage(message);
+          setNewNumberModal(false);
+        }}
+        username={user?.username}
       />
     </Container>
   );
 };
+
 
 export default ProfilePage;

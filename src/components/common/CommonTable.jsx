@@ -218,7 +218,8 @@ const CommonTable = ({
           if (response) {
             if (response) {
               setData(response.data.data || response?.message);
-              console.log("THe finalEndpoint", data); setTotalCount(response.data.total || response.data.data.length);
+              console.log("THe finalEndpoint", data);
+              setTotalCount(response.data.total || response.data.data.length);
             } else if (Array.isArray(response.data)) {
               setData(response.data);
               setTotalCount(response.data.length);
@@ -321,11 +322,14 @@ const CommonTable = ({
     [availableFilters, fetchData]
   );
 
-  const handleChangePage = useCallback((event, newPage) => {
-    setPage(newPage);
-    pageRef.current = newPage;
-    fetchData();
-  }, [fetchData]);
+  const handleChangePage = useCallback(
+    (event, newPage) => {
+      setPage(newPage);
+      pageRef.current = newPage;
+      fetchData();
+    },
+    [fetchData]
+  );
 
   const handleChangeRowsPerPage = useCallback(
     (event) => {
