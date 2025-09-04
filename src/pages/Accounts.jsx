@@ -3,12 +3,13 @@ import { Box, Button, IconButton, Tooltip } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { apiCall } from "../api/apiClient";
+
 import CreateAccount from "./CreateAccount";
 import UpdateAccount from "./UpdateAccount"; // ✅ import update modal
-import CommonTable from "../components/common/CommonTable";
+
 import ApiEndpoints from "../api/ApiEndpoints";
 import DeleteAccount from "./DeleteAccount";
+import CommonTable from "../components/common/CommonTable";
 
 const Accounts = () => {
   const [openCreate, setOpenCreate] = useState(false);

@@ -3,7 +3,7 @@ export const nav = [
   { title: "Dashboard", icon: "📊", icon2: "📊", to: "/dashboard" },
   { title: "Recharge", icon: "🔋", icon2: "🔋", to: "/recharge" },
   { title: "Money Transfer", icon: "💸", icon2: "💸", to: "/money-transfer" },
-   { title: "Accounts", icon: "👥", icon2: "👥", to: "/admin/accounts" },
+ 
 ];
 
 export const Admin_nav = [
@@ -51,5 +51,5 @@ export const customer_nav = [
   },
   { title: "My Purchase", icon: "🛠️", icon2: "🛠️", to: "/customer/purchase" },
   { title: "My Sale", icon: "📒", icon2: "📒", to: "/customer/sale" },
-  { title: "Accounts", icon: "👥", icon2: "👥", to: "/customer/accounts" },
+ 
 ];

@@ -214,27 +214,28 @@ const CommonTable = ({
 
         if (apiError) {
           setError(apiError.message || "Failed to fetch data");
+        } else if (response) {
+          // ✅ Normalize data structure
+          let normalizedData =
+            response?.data?.data || // case: response.data.data
+            response?.data || // case: response.data
+            response || // case: direct response
+            [];
+
+          // ✅ Handle total count safely
+          let total =
+            response?.data?.total ||
+            response?.total ||
+            normalizedData?.length ||
+            0;
+
+          setData(
+            Array.isArray(normalizedData) ? normalizedData : [normalizedData]
+          );
+          setTotalCount(total);
         } else {
-          if (response) {
-            if (response) {
-              console.log("responseeee",response.data);
-              
-              setData(response.data || response?.message);
-              console.log("THe finalEndpoint", data); setTotalCount(response.data.total || response.data.length);
-            } else if (Array.isArray(response.data)) {
-              setData(response.data);
-              setTotalCount(response.data.length);
-            } else {
-              setData([]);
-              setTotalCount(0);
-            }
-          } else if (Array.isArray(response)) {
-            setData(response);
-            setTotalCount(response.length);
-          } else {
-            setData([]);
-            setTotalCount(0);
-          }
+          setData([]);
+          setTotalCount(0);
         }
       } catch (err) {
         setError(err.message || "An error occurred");
@@ -323,11 +324,14 @@ const CommonTable = ({
     [availableFilters, fetchData]
   );
 
-  const handleChangePage = useCallback((event, newPage) => {
-    setPage(newPage);
-    pageRef.current = newPage;
-    fetchData();
-  }, [fetchData]);
+  const handleChangePage = useCallback(
+    (event, newPage) => {
+      setPage(newPage);
+      pageRef.current = newPage;
+      fetchData();
+    },
+    [fetchData]
+  );
 
   const handleChangeRowsPerPage = useCallback(
     (event) => {
