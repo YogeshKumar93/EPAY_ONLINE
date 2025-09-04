@@ -14,6 +14,7 @@ import DmtContainer from "../components/UI/MoneyTransfer/DMTcontainer";
 import RechargeAndBill from "../components/UI/rechange and bill/RechargeAndBill";
 import Accounts from "../pages/Accounts";
 import Notification from "../components/Notification/Notification";
+import Services from "../pages/Services";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated } = useContext(AuthContext) || {};
@@ -52,6 +53,7 @@ export default function AppRoutes() {
               <Route path="admin/transactions" element={<Dashboard />} />
               <Route path="admin/notification" element={<Notification />} />
               <Route path="admin/accounts" element={<Accounts />} />
+              <Route path="admin/services" element={<Services />} />
               <Route
                 path="admin/*"
                 element={<Navigate to="/admin/dashboard" replace />}

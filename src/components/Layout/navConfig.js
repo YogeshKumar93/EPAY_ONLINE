@@ -12,6 +12,7 @@ export const Admin_nav = [
   { title: "Notification", icon: "💳", icon2: "💳", to: "/admin/notification" },
   { title: "Transactions", icon: "💳", icon2: "💳", to: "/admin/transactions" },
      { title: "Accounts", icon: "👥", icon2: "👥", to: "/admin/accounts" },
+     { title: "Services", icon: "👥", icon2: "👥", to: "/admin/services" },
     
  
 ];
