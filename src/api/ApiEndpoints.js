@@ -70,11 +70,19 @@ const ApiEndpoints = {
 
 
 
+
+// ****************************** NEW API'S ******************************
   GET_ACCOUNTS: "account/getAccounts",
   CREATE_ACCOUNT: "account/createAccount",
+  DELETE_ACCOUNT : "account/deleteAccount",
+  UPDATE_ACCOUNT : "account/updateAccount",
+
+  
 
 
 
+
+// ****************************** NEW API'S ABOVE ******************************
 
 
 

@@ -2,7 +2,8 @@
 export const nav = [
   { title: "Dashboard", icon: "📊", icon2: "📊", to: "/dashboard" },
   { title: "Recharge", icon: "🔋", icon2: "🔋", to: "/recharge" },
-  { title: "Money Transfer", icon: "💸", icon2: "💸", to: "/money-transfer" }
+  { title: "Money Transfer", icon: "💸", icon2: "💸", to: "/money-transfer" },
+   { title: "Accounts", icon: "👥", icon2: "👥", to: "/admin/accounts" },
 ];
 
 export const Admin_nav = [
@@ -10,6 +11,8 @@ export const Admin_nav = [
   { title: "Users", icon: "👥", icon2: "👥", to: "/admin/users" },
   
   { title: "Transactions", icon: "💳", icon2: "💳", to: "/admin/transactions" },
+     { title: "Accounts", icon: "👥", icon2: "👥", to: "/admin/accounts" },
+    
  
 ];
 

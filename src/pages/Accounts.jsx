@@ -8,6 +8,7 @@ import CreateAccount from "./CreateAccount";
 import UpdateAccount from "./UpdateAccount"; // ✅ import update modal
 import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
+import DeleteAccount from "./DeleteAccount";
 
 const Accounts = () => {
   const [openCreate, setOpenCreate] = useState(false);
@@ -23,7 +24,8 @@ const Accounts = () => {
       setLoading(true);
       const { error, response } = await apiCall("GET", ApiEndpoints.GET_ACCOUNTS);
       if (!error && response?.status === "SUCCESS") {
-        setAccounts(response.data || []);
+      setAccounts(response?.data || []);
+
       } else {
         console.error("Failed to fetch accounts:", error || response);
       }
@@ -110,14 +112,12 @@ const handleDelete = (row) => {
       </Box>
 
       {/* ✅ Table */}
-      <CommonTable
-        title="Accounts"
-        columns={columns}
-        rows={accounts}
-        loading={loading}
-        endpoint={ApiEndpoints.GET_ACCOUNTS}
-      />
-
+<CommonTable
+  title="Accounts"
+  columns={columns}
+  data={accounts}   // instead of rows
+  loading={loading}
+/>
       {/* ✅ Create Account Modal */}
       <CreateAccount
         open={openCreate}

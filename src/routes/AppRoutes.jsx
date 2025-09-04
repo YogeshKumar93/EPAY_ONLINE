@@ -36,6 +36,7 @@ const RoleBasedRoutes = ({ user }) => {
           <Route path="admin/users" element={<Users />} />
           <Route path="admin/transactions" element={<Dashboard />} />
           <Route path="admin/*" element={<Navigate to="/admin/dashboard" replace />} />
+             <Route path="admin/accounts" element={<Accounts />} />
            
         </>
       )}
@@ -52,6 +53,7 @@ const RoleBasedRoutes = ({ user }) => {
               <Route path="customer/fund-request" element={<FundRequest />} />
           <Route path="customer/sale" element={<MySale />} />
           <Route path="customer/*" element={<Navigate to="/customer/dashboard" replace />} />
+            <Route path="customer/accounts" element={<Accounts />} />
        
         </>
       )}
@@ -71,7 +73,7 @@ export default function AppRoutes() {
       <Routes>
         {/* Public route */}
         <Route path="/login" element={<Login />} />
-           <Route path="customer/accounts" element={<Accounts />} />
+         
         {/* Protected routes with layout */}
         <Route
           path="/*"
