@@ -54,7 +54,7 @@ const themeSettings = {
   drawerWidth: 240,
   palette: {
     primary: {
-      main: '#1976d2',
+      main: '#0037D7',
     },
     secondary: {
       main: '#dc004e',

@@ -30,7 +30,8 @@ const VerifyMpinLogin = ({
   const [error, setError] = useState('');
    const authCtx=useContext(AuthContext)
   const navigate = useNavigate();
-
+const user = authCtx?.user
+console.log("user",user);
 
   const handleInputChange = (index, value) => {
     if (!/^\d*$/.test(value)) return; // Only allow numbers
@@ -103,18 +104,33 @@ const VerifyMpinLogin = ({
         console.log("loge response",response);
         
         const token = response.data;
-        
-        navigate('/customer/dashboard');
      
          authCtx.login(token);
-        
-        // Call success callback if provided
-        if (onVerificationSuccess) {
-          onVerificationSuccess();
+        const userResult = await apiCall("get", ApiEndpoints.GET_ME_USER);
+        if (userResult.response) {
+          const userData = userResult.response.data;
+          authCtx.saveUser(userData);
+          localStorage.setItem("user", JSON.stringify(userData));
+          response.message;
+          if (userData.role === "adm") {
+            navigate("/admin/dashboard");
+          } else if (userData.role === "sadm") {
+            navigate("/sadmin/dashboard");
+          } else if (userData.role === "Asm") {
+            navigate("/asm/dashboard");
+          }
+          else if (userData.role === "Delivery") {
+            navigate("/delivery/dashboard");
+          } else {
+            navigate("/other/dashboard");
+          }
+        } else {
+          // showToast(userResult.error || "Failed to fetch user details","error");
         }
-        
-  
-      }
+      } else {
+        // showToast(error?.message || "Invalid MPIN","error");
+      }    
+      // #0037D7
     } catch (err) {
       setError(err.message || "Verification failed");
     } finally {
