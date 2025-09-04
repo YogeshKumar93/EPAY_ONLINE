@@ -59,6 +59,7 @@ export default function AppRoutes() {
               <Route path="admin/users" element={<Users />} />
               <Route path="admin/transactions" element={<Dashboard />} />
               <Route path="admin/notification" element={<Notification />} />
+              <Route path="admin/fund-request" element={<FundRequest />} />
               <Route path="admin/accounts" element={<Accounts />} />
               <Route path="admin/services" element={<Services />} />
               <Route path="admin/templates" element={<Templates />} />

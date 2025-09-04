@@ -246,7 +246,7 @@ const FundRequest = () => {
   return (
     <CommonTable
       columns={columns}
-      endpoint={ApiEndpoints.CRED_REQ}
+      endpoint={ApiEndpoints.GET_FUND_REQUESTS}
       queryParam="status=SUCCESS"
       filters={filters}
       defaultFilters={{

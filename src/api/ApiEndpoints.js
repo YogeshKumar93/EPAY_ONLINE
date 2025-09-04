@@ -88,11 +88,14 @@ DELETE_TEMPLATE:"template/deleteTemplate",
 GET_LOGS:"auditlog/getAuditLogs",
 DELETE_LOG:"auditlog/deleteAuditLog",
 GET_LOG:"auditlog/getAuditLog",
+GET_FUND_REQUESTS:"fundrequest/getFundRequests",
+CREATE_FUND_REQUEST:"fundrequest/createFundRequest",
+UPDATE_FUND_REQUEST:"fundrequest/updateFundRequest",
+DELETE_FUND_REQUEST:"fundrequest/deleteFundRequest",
+
 // ****************************** NEW API'S ABOVE ******************************
 
 
-  DELETE_ACCOUNT: "account/deleteAccount",
-  UPDATE_ACCOUNT: "account/updateAccount",
   GET_NOTIFICATION: "notification/getNotification",
   MARK_READ_NOTI: "notification/updateNotification",
   ADMIN_NOTIFICATION: "notification/createNotification",
