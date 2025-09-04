@@ -13,6 +13,8 @@ export const Admin_nav = [
   { title: "Transactions", icon: "💳", icon2: "💳", to: "/admin/transactions" },
      { title: "Accounts", icon: "👥", icon2: "👥", to: "/admin/accounts" },
      { title: "Services", icon: "👥", icon2: "👥", to: "/admin/services" },
+     { title: "Templates", icon: "👥", icon2: "👥", to: "/admin/templates" },
+     { title: "Logs", icon: "👥", icon2: "👥", to: "/admin/logs" },
     
  
 ];
@@ -51,5 +53,6 @@ export const customer_nav = [
   },
   { title: "My Purchase", icon: "🛠️", icon2: "🛠️", to: "/customer/purchase" },
   { title: "My Sale", icon: "📒", icon2: "📒", to: "/customer/sale" },
+  { title: "Logs", icon: "📒", icon2: "📒", to: "/customer/logs" },
  
 ];
