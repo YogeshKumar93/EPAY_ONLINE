@@ -19,31 +19,38 @@ const Accounts = () => {
   const [loading, setLoading] = useState(false);
 
   // ✅ Fetch accounts
-  const getAccounts = async () => {
-    try {
-      setLoading(true);
-      const { error, response } = await apiCall("GET", ApiEndpoints.GET_ACCOUNTS);
-      if (!error && response?.status === "SUCCESS") {
-      setAccounts(response?.data?.data || []);
+  // const getAccounts = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const { error, response } = await apiCall("GET", ApiEndpoints.GET_ACCOUNTS);
+  //     if (!error && response?.status === "SUCCESS") {
+  //     setAccounts(response?.data?.data || []);
 
-      } else {
-        console.error("Failed to fetch accounts:", error || response);
-      }
-    } catch (err) {
-      console.error("Error fetching accounts:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     } else {
+  //       console.error("Failed to fetch accounts:", error || response);
+  //     }
+  //   } catch (err) {
+  //     console.error("Error fetching accounts:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  useEffect(() => {
-    getAccounts();
-  }, []);
+  // useEffect(() => {
+  //   getAccounts();
+  // }, []);
+
+  
+const handleManualRefresh = () => {
+  getAccounts();
+};
+
 
   // ✅ Add new account
   const handleSaveCreate = (newAccount) => {
     setAccounts((prev) => [newAccount, ...prev]);
     handleManualRefresh();
+     setOpenCreate(false);
   };
 
   // ✅ Update existing account
@@ -51,17 +58,23 @@ const Accounts = () => {
     setAccounts((prev) =>
       prev.map((acc) => (acc.id === updatedAccount.id ? updatedAccount : acc))
     );
+       handleManualRefresh();
+     setOpenCreate(false);
   };
 
   // ✅ Handle edit
   const handleEdit = (row) => {
     setSelectedAccount(row);
     setOpenUpdate(true);
+       handleManualRefresh();
+     setOpenCreate(false);
   };
 
 const handleDelete = (row) => {
   setSelectedAccount(row);
   setOpenDelete(true);
+     handleManualRefresh();
+     setOpenCreate(false);
 };
 
 
@@ -116,8 +129,9 @@ const handleDelete = (row) => {
 <CommonTable
   title="Accounts"
   columns={columns}
-  data={accounts}   // instead of rows
+  // data={accounts}   // instead of rows
   loading={loading}
+endpoint={ApiEndpoints.GET_ACCOUNTS}
   handleManualRefresh={handleManualRefresh}
 />
       {/* ✅ Create Account Modal */}
