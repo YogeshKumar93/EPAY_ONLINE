@@ -226,7 +226,7 @@ export const AuthProvider = ({ children }) => {
     setDmt2Doc: setDmt2Doc,
     dmt2Doc: dmt2Doc,
     loadUserProfile,
-    loadUserProfile,
+
   };
 
   return (
