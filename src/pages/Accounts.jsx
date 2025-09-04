@@ -24,7 +24,7 @@ const Accounts = () => {
       setLoading(true);
       const { error, response } = await apiCall("GET", ApiEndpoints.GET_ACCOUNTS);
       if (!error && response?.status === "SUCCESS") {
-      setAccounts(response?.data || []);
+      setAccounts(response?.data?.data || []);
 
       } else {
         console.error("Failed to fetch accounts:", error || response);
@@ -43,6 +43,7 @@ const Accounts = () => {
   // ✅ Add new account
   const handleSaveCreate = (newAccount) => {
     setAccounts((prev) => [newAccount, ...prev]);
+    handleManualRefresh();
   };
 
   // ✅ Update existing account
@@ -117,6 +118,7 @@ const handleDelete = (row) => {
   columns={columns}
   data={accounts}   // instead of rows
   loading={loading}
+  handleManualRefresh={handleManualRefresh}
 />
       {/* ✅ Create Account Modal */}
       <CreateAccount
