@@ -161,7 +161,7 @@ const AccountLadger = ({ filters=[], query }) => {
   return (
     <CommonTable
       columns={columns}
-      endpoint={ApiEndpoints.GET_TRANSACTIONS}
+      endpoint={ApiEndpoints.GET_WALLETLEDGER}
       filters={filters}
       queryParam={queryParam}
       // refreshInterval={30000}

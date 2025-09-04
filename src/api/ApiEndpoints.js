@@ -88,6 +88,7 @@ DELETE_TEMPLATE:"template/deleteTemplate",
 GET_LOGS:"auditlog/getAuditLogs",
 DELETE_LOG:"auditlog/deleteAuditLog",
 GET_LOG:"auditlog/getAuditLog",
+GET_WALLETLEDGER:"walletledger/getWalletLedgers",
 // ****************************** NEW API'S ABOVE ******************************
 
 
