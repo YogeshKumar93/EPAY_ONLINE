@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Box, Button, IconButton, Tooltip } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 import CreateAccount from "./CreateAccount";
-import UpdateAccount from "./UpdateAccount"; // ✅ import update modal
+import UpdateAccount from "./UpdateAccount";
+import DeleteAccount from "./DeleteAccount";
 
 import ApiEndpoints from "../api/ApiEndpoints";
-import DeleteAccount from "./DeleteAccount";
 import CommonTable from "../components/common/CommonTable";
 
-const Accounts = () => {
+const Accounts = ( ) => {
   const [openCreate, setOpenCreate] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -19,39 +19,16 @@ const Accounts = () => {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Fetch accounts
-  // const getAccounts = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const { error, response } = await apiCall("GET", ApiEndpoints.GET_ACCOUNTS);
-  //     if (!error && response?.status === "SUCCESS") {
-  //     setAccounts(response?.data?.data || []);
-
-  //     } else {
-  //       console.error("Failed to fetch accounts:", error || response);
-  //     }
-  //   } catch (err) {
-  //     console.error("Error fetching accounts:", err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   getAccounts();
-  // }, []);
-
-  
-const handleManualRefresh = () => {
-  getAccounts();
-};
-
+  // ✅ Manual refresh trigger
+  const handleManualRefresh = () => {
+    // CommonTable will handle fetch since endpoint is passed
+  };
 
   // ✅ Add new account
   const handleSaveCreate = (newAccount) => {
     setAccounts((prev) => [newAccount, ...prev]);
     handleManualRefresh();
-     setOpenCreate(false);
+    setOpenCreate(false);
   };
 
   // ✅ Update existing account
@@ -59,25 +36,24 @@ const handleManualRefresh = () => {
     setAccounts((prev) =>
       prev.map((acc) => (acc.id === updatedAccount.id ? updatedAccount : acc))
     );
-       handleManualRefresh();
-     setOpenCreate(false);
+    
+    // handleManualRefresh();
+    // setOpenUpdate(false);
+    // setSelectedAccount(null);
   };
 
   // ✅ Handle edit
-  const handleEdit = (row) => {
-    setSelectedAccount(row);
-    setOpenUpdate(true);
-       handleManualRefresh();
-     setOpenCreate(false);
-  };
-
-const handleDelete = (row) => {
+ const handleEdit = (row) => {
   setSelectedAccount(row);
-  setOpenDelete(true);
-     handleManualRefresh();
-     setOpenCreate(false);
+  setOpenUpdate(true);
 };
 
+
+  // ✅ Handle delete
+  const handleDelete = (row) => {
+    setSelectedAccount(row);
+    setOpenDelete(true);
+  };
 
   // ✅ Columns definition
   const columns = [
@@ -103,7 +79,7 @@ const handleDelete = (row) => {
             </IconButton>
           </Tooltip>
           <Tooltip title="Delete">
-            <IconButton color="error" onClick={() => handleDelete(row.id)}>
+            <IconButton color="error" onClick={() => handleDelete(row)}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Tooltip>
@@ -127,14 +103,15 @@ const handleDelete = (row) => {
       </Box>
 
       {/* ✅ Table */}
-<CommonTable
-  title="Accounts"
-  columns={columns}
-  // data={accounts}   // instead of rows
-  loading={loading}
-endpoint={ApiEndpoints.GET_ACCOUNTS}
-  handleManualRefresh={handleManualRefresh}
-/>
+      <CommonTable
+        title="Accounts"
+        columns={columns}
+        loading={loading}
+        endpoint={ApiEndpoints.GET_ACCOUNTS}
+        handleManualRefresh={handleManualRefresh}
+          
+      />
+
       {/* ✅ Create Account Modal */}
       <CreateAccount
         open={openCreate}
@@ -143,34 +120,31 @@ endpoint={ApiEndpoints.GET_ACCOUNTS}
       />
 
       {/* ✅ Update Account Modal */}
-      {selectedAccount && (
-        <UpdateAccount
-          open={openUpdate}
-          handleClose={() => {
-            setOpenUpdate(false);
-            setSelectedAccount(null);
-          }}
-          handleSave={handleSaveUpdate}
-          selectedAccount={selectedAccount}
-        />
-      )}
-
-       {/* ✅ Delete Account Modal */}
-{selectedAccount && (
-  <DeleteAccount
-    open={openDelete}
+    {openUpdate && selectedAccount && (
+  <UpdateAccount
+    open={openUpdate}
     handleClose={() => {
-      setOpenDelete(false);
+      setOpenUpdate(false);
       setSelectedAccount(null);
     }}
+    handleSave={handleSaveUpdate}
     selectedAccount={selectedAccount}
-    onDeleted={(id) =>
-      setAccounts((prev) => prev.filter((acc) => acc.id !== id))
-    }
   />
 )}
 
 
+      {/* ✅ Delete Account Modal */}
+      {selectedAccount && (
+        <DeleteAccount
+          open={openDelete}
+          handleClose={() => {
+            setOpenDelete(false);
+            setSelectedAccount(null);
+          }}
+          selectedAccount={selectedAccount}
+         
+        />
+      )}
     </Box>
   );
 };

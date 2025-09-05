@@ -7,11 +7,13 @@ import {
   Button,
   Typography,
   CircularProgress,
+  Box,
 } from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
+import CommonModal from "../components/common/CommonModal";
 
-const DeleteAccount = ({ open, handleClose, selectedAccount, onDeleted }) => {
+const DeleteAccount = ({ open, handleClose, selectedAccount}) => {
   const [loading, setLoading] = useState(false);
 
   const handleConfirmDelete = async () => {
@@ -19,11 +21,11 @@ const DeleteAccount = ({ open, handleClose, selectedAccount, onDeleted }) => {
       setLoading(true);
       const { error, response } = await apiCall(
         "POST",
-        `${ApiEndpoints.DELETE_ACCOUNT}/${selectedAccount.id}`
+        `${ApiEndpoints.DELETE_ACCOUNT}`,
+        { id: selectedAccount.id } 
       );
 
-      if (!error && response?.status === "SUCCESS") {
-        onDeleted(selectedAccount.id); // ✅ update parent state
+      if  (response) {
         handleClose();
       } else {
         console.error("Delete failed:", error || response);
@@ -38,9 +40,22 @@ const DeleteAccount = ({ open, handleClose, selectedAccount, onDeleted }) => {
   return (
       <CommonModal
       open={open}
-      handleClose={handleClose}
+      onClose={handleClose}
       title="Delete Account"
       maxWidth="xs"
+   footerButtons={[
+        {
+          text: "Cancel",
+          variant: "outlined",
+          onClick: handleClose
+        },
+        {
+          text: loading ? "Deleting..." : "Confirm",
+          variant: "contained",
+          onClick: handleConfirmDelete,
+          disabled: loading
+        }
+      ]}
     >
       <Box sx={{ p: 2 }}>
         <Typography sx={{ mb: 3 }}>
@@ -48,19 +63,10 @@ const DeleteAccount = ({ open, handleClose, selectedAccount, onDeleted }) => {
           <b>{selectedAccount?.name}</b>?
         </Typography>
 
-        <Box display="flex" justifyContent="flex-end" gap={2}>
-          <Button onClick={handleClose} disabled={loading}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleConfirmDelete}
-            color="error"
-            variant="contained"
-            disabled={loading}
-          >
-            {loading ? <CircularProgress size={20} /> : "Delete"}
-          </Button>
-        </Box>
+
+       
+
+
       </Box>
     </CommonModal>
   );

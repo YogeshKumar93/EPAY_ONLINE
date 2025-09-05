@@ -64,6 +64,13 @@ const ApiEndpoints = {
   GET_ROUTE: "admin/getRoutes",
   GET_CATEGORIES: "admin/getCategories",
 
+
+
+
+
+
+
+
   // ****************************** NEW API'S ******************************
   SIGN_IN: "auth/signIn",
   LOGIN_OTP_VALIDATE: "auth/secureLogin",
@@ -77,6 +84,22 @@ const ApiEndpoints = {
 
   GET_ACCOUNTS: "account/getAccounts",
   CREATE_ACCOUNT: "account/createAccount",
+  DELETE_ACCOUNT : "account/deleteAccount",
+  UPDATE_ACCOUNT : "account/updateAccount",
+GET_SERVICES:"service/getServices",
+CREATE_SERVICE:"service/createService",
+UPDATE_SERVICE:"service/updateService",
+GET_TEMPLATES:"template/getTemplates",
+CREATE_TEMPLATE:"template/createTemplate",
+UPDATE_TEMPLATE:"template/updateTemplate",
+DELETE_TEMPLATE:"template/deleteTemplate",
+GET_LOGS:"auditlog/getAuditLogs",
+DELETE_LOG:"auditlog/deleteAuditLog",
+GET_LOG:"auditlog/getAuditLog",
+GET_WALLETLEDGER:"walletledger/getWalletLedgers",
+// ****************************** NEW API'S ABOVE ******************************
+
+
   DELETE_ACCOUNT: "account/deleteAccount",
   UPDATE_ACCOUNT: "account/updateAccount",
   GET_SERVICES: "service/getServices",
@@ -93,6 +116,8 @@ const ApiEndpoints = {
   CREATE_FUND_REQUEST: "fundrequest/createFundRequest",
   UPDATE_FUND_REQUEST: "fundrequest/updateFundRequest",
   DELETE_FUND_REQUEST: "fundrequest/deleteFundRequest",
+  GET_BANKS: "bank/getBanks",
+   
 
   // ****************************** NEW API'S ABOVE ******************************
 
@@ -100,7 +125,7 @@ const ApiEndpoints = {
   MARK_READ_NOTI: "notification/updateNotification",
   ADMIN_NOTIFICATION: "notification/createNotification",
 
-  GET_BANKS: "bank/getBanks",
+
   CREATE_BANK: "bank/createBank",
   UPDATE_BANK: "bank/updateBank",
   DELETE_BANK: "bank/deleteBank",
@@ -112,8 +137,29 @@ const ApiEndpoints = {
   GET_PAYOUT_TXN: "payouttxn/getPayoutTxns",
   GET_RECHARGE_TXN: "rechargetxn/getRechargeTxns",
   GET_IRCTC_TXN: "irctctxn/getIrctcTxns",
+
+  GET_DMT_TXN: "dmt/getDmtTxns",
+  GET_BBPS_TXN: "bbps/getBbpsTxns",
+  GET_AEPS_TXN: "aeps/getAepsTxns",
+  GET_MATM_TXN: "matm/getMatmTxns",
+  GET_PAYOUT_TXN: "payout/getPayoutTxns",
+  GET_RECHARGE_TXN: "recharge/getRechargeTxns",
+  GET_IRCTC_TXN: "irctc/getIrctcTxns",
+  GET_FUNDREQUEST_SCHEMA:"fundrequest/getFundRequestsSchema",
+  GET_ACCOUNT_SCHEMA:"account/getAccountSchema",
+  GET_BANK_SCHEMA:"bank/getBankSchema",
+  GET_NOTIFICATION_SCHEMA:"notification/getNotificationSchema",
   // ****************************** NEW API'S ABOVE ******************************
 
+
+
+
+
+
+
+
+
+  GET_ACC_ACCOUNTS: "",
   // GET_ACC_ACCOUNTS: "",
 
   GET_ACC_BANKS: "",
@@ -131,7 +177,7 @@ const ApiEndpoints = {
   GET_PENDING_ACCOUNT_TRANSACTION: "admin/getPendingBankTxn",
   GET_STATUS: "admin/checkTxnStatus",
   CHANGE_STATUS: "admin/changeTxnStatus",
-  UPDATE_ACCOUNT: "admin/updateAccounts",
+  
   GET_PLANS: "admin/getPlans",
   BLOCK_UNBLOCK_PLANS: "",
   ADD_PLAN: "admin/createPlan",
@@ -189,7 +235,7 @@ const ApiEndpoints = {
   ADD_REM: "dmr/registerRemitter",
   NEW_ADD_REM: "dmr/registerExpRemitter",
   GET_BLOCKED_AC: "admin/blockedAccounts",
-  GET_BLOCKED_AC: "admin/blockedAccounts",
+
   DMT2_ADD_REM: "dmr/registerRemitterDmt2",
   ADD_BENE_EXPRESS: "dmr/addBenExpress",
   ADD_BENE_SUPER: "dmr/addBenExpress",

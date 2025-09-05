@@ -1,229 +1,200 @@
-import { useMemo, useCallback, useContext } from "react";
-import { Box, Tooltip, Typography } from "@mui/material";
+import { useMemo, useCallback, useState, useContext } from "react";
+import { Box, Button, Tooltip, Typography } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import { currencySetter } from "../../utils/Currencyutil";
 import { dateToTime, ddmmyy } from "../../utils/DateUtils";
-import { capitalize1 } from "../../utils/TextUtil";
+import AddIcon from "@mui/icons-material/Add";
+import CreateFundRequest from "../../pages/CreateFundRequest";
+ 
+import FundRequestModal from "../../pages/FundRequestModal";
 import AuthContext from "../../contexts/AuthContext";
-import InstallMobileIcon from "@mui/icons-material/InstallMobile";
-import LaptopIcon from "@mui/icons-material/Laptop";
-import AndroidIcon from "@mui/icons-material/Android";
-import AppleIcon from "@mui/icons-material/Apple";
-import SyncAltIcon from "@mui/icons-material/SyncAlt";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
+ 
+ 
 
 const FundRequest = () => {
+  const [openCreate, setOpenCreate] = useState(false);
+  const [openUpdate, setOpenUpdate] = useState(false);
+  // const [selectedFund, setSelectedFund] = useState(null);
   const authCtx = useContext(AuthContext);
-  const user = authCtx?.user;
+  const user = authCtx.user;
+  const [selectedRow, setSelectedRow] = useState(null);
+const [status, setStatus] = useState("");
+const [openModal, setOpenModal] = useState(false);
+
+const handleOpen = (row, statusType) => {
+  setSelectedRow(row);
+  setStatus(statusType);
+  setOpenModal(true);
+};
 
   const getStatusColor = useCallback((status) => {
     switch (status?.toUpperCase()) {
       case "SUCCESS":
-        return "success";
+        return "#2e7d32"; // green
       case "FAILED":
-        return "error";
+        return "#d32f2f"; // red
       case "REFUND":
-        return "warning";
+        return "#ed6c02"; // orange
       case "PENDING":
-        return "info";
+        return "#0288d1"; // blue
+      case "REJECTED":
+        return "#9e9e9e"; // grey
       default:
-        return "default";
+        return "#616161"; // default grey
     }
   }, []);
 
-  // memoized columns
+  // ✅ After create
+  const handleSaveCreate = () => {
+    setOpenCreate(false);
+  };
+
+  // ✅ After update
+  // const handleSaveUpdate = () => {
+  //   setOpenUpdate(false);
+  // };
+
+  // ✅ Handle edit
+  // const handleEdit = (row) => {
+  //   setSelectedFund(row);
+  //   setOpenUpdate(true);
+  // };
+
+  // ✅ Columns
   const columns = useMemo(
     () => [
       {
-        name: "Date/Time",
+        name: "ID",
+        selector: (row) => row?.id,
+        width: "70px",
+      },
+      {
+        name: "Name",
+        selector: (row) => <Typography>{row?.name}</Typography>,
+        wrap: true,
+      },
+      {
+        name: "Bank Name",
+        selector: (row) => <Typography>{row?.bank_name}</Typography>,
+        wrap: true,
+      },
+      {
+        name: "Account / Mode",
+        selector: (row) => <Typography>{row?.mode}</Typography>,
+        wrap: true,
+      },
+      {
+        name: "Bank Ref ID",
+        selector: (row) => <Typography>{row?.bank_ref_id}</Typography>,
+        wrap: true,
+      },
+      {
+        name: "Remark",
         selector: (row) => (
-          <div className="mb-1" style={{ textAlign: "left" }}>
+          <Tooltip title={row?.remark}>
+            <Typography noWrap>{row?.remark}</Typography>
+          </Tooltip>
+        ),
+        grow: 2,
+      },
+      {
+        name: "Ledger Balance",
+        selector: (row) => (
+          <Typography>
+            {currencySetter(parseFloat(row?.ledger_bal).toFixed(2))}
+          </Typography>
+        ),
+      },
+      {
+        name: "Date",
+        selector: (row) => ddmmyy(row?.date),
+      },
+      {
+        name: "Txn ID",
+        selector: (row) => row?.txn_id,
+      },
+      {
+        name: "Amount",
+        selector: (row) => (
+          <Typography sx={{ fontWeight: "bold" }}>
+            {currencySetter(parseFloat(row?.amount).toFixed(2))}
+          </Typography>
+        ),
+      },
+      {
+        name: "Status",
+        selector: (row) => (
+          <Box
+            sx={{
+              px: 1,
+              py: 0.5,
+              borderRadius: "6px",
+              bgcolor: getStatusColor(row?.status),
+              color: "white",
+              fontSize: "12px",
+              textTransform: "capitalize",
+              textAlign: "center",
+            }}
+          >
+            {row?.status}
+          </Box>
+        ),
+      },
+      {
+        name: "Created At",
+        selector: (row) => (
+          <div style={{ textAlign: "left" }}>
             {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
           </div>
         ),
         wrap: true,
       },
       {
-        name: "Route",
-        cell: (row) => (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              flexDirection: "column",
-            }}
-          >
-            <div>
-              {row.platform === "APP" ? (
-                <Tooltip title="APP">
-                  <InstallMobileIcon fontSize="small" />
-                </Tooltip>
-              ) : row.platform === "WEB" ? (
-                <Tooltip title="WEB">
-                  <LaptopIcon fontSize="small" />
-                </Tooltip>
-              ) : row.platform === "ANDROID" ? (
-                <Tooltip title="ANDROID">
-                  <AndroidIcon fontSize="small" />
-                </Tooltip>
-              ) : row.platform === "IOS" ? (
-                <Tooltip title="IOS">
-                  <AppleIcon fontSize="small" />
-                </Tooltip>
-              ) : (
-                <Tooltip title="API">
-                  <SyncAltIcon fontSize="small" />
-                </Tooltip>
-              )}
-            </div>
+        name: "Updated At",
+        selector: (row) => (
+          <div style={{ textAlign: "left" }}>
+            {ddmmyy(row.updated_at)} {dateToTime(row.updated_at)}
           </div>
         ),
-        width: "70px",
-      },
-      {
-        name: "Number",
-        selector: (row) => (
-          <div style={{ textAlign: "left" }} className="d-flex">
-            <span
-              style={{ marginRight: "4px", cursor: "pointer" }}
-              onClick={() => {
-                navigator.clipboard.writeText(row.number);
-              }}
-            >
-              {row.number}
-            </span>
-          </div>
-        ),
-        center: false,
-      },
-      {
-        name: "Particular",
-        selector: (row) => (
-          <Tooltip title={row?.operator}>
-            <div style={{ textAlign: "left" }}>{capitalize1(row?.operator)}</div>
-          </Tooltip>
-        ),
-        width: "185px",
         wrap: true,
       },
-      {
-        name: "Amount txn",
-        selector: (row) => (
-          <Tooltip title={row?.amount}>
-            <div style={{ textAlign: "left" }}>
-              {parseFloat(row?.amount).toFixed(2)}
-            </div>
-          </Tooltip>
-        ),
-      },
-      {
-        name: "Debit",
-        selector: (row) => {
-          return (
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                fontSize: "16px",
-                textAlign: "justify",
-                fontWeight: "500",
-              }}
-            >
-              {(user.role === "Ad" || user.role === "Md") &&
-                row.txn_type === "DR" && (
-                  <div style={{ color: "red", textAlign: "left" }}>
-                    {row.type === "W2W TRANSFER"
-                      ? currencySetter(parseFloat(row.net_amount).toFixed(2))
-                      : "0"}
-                  </div>
-                )}
 
-              {(user.role === "Ret" || user.role === "Dd") &&
-                row.txn_type === "DR" && (
-                  <div style={{ color: "red", textAlign: "left" }}>
-                    -{currencySetter(parseFloat(row.net_amount).toFixed(2))}
-                  </div>
-                )}
-            </Box>
-          );
-        },
-        wrap: true,
-        center: false,
-      },
       {
-        name: "Credit",
-        selector: (row) => {
-          return (
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                fontSize: "16px",
-                textAlign: "justify",
-                fontWeight: "500",
-              }}
-            >
-              {(user.role === "Ad" || user.role === "Md") &&
-                row.txn_type === "CR" && (
-                  <div style={{ color: "green", textAlign: "left" }}>
-                    {row.type === "W2W TRANSFER"
-                      ? currencySetter(parseFloat(row.net_amount).toFixed(2))
-                      : currencySetter(parseFloat(row.ad_comm).toFixed(2))}
-                  </div>
-                )}
-
-              {(user.role === "Ret" || user.role === "Dd") &&
-                row.txn_type === "CR" && (
-                  <div style={{ color: "green", textAlign: "left" }}>
-                    + {currencySetter(parseFloat(row.net_amount).toFixed(2))}
-                  </div>
-                )}
-            </Box>
-          );
-        },
-        wrap: true,
-        center: false,
-      },
-      {
-        name: "Closing Balance",
-        selector: (row) => {
-          return (
-            <Tooltip title={row.ip}>
-              {(user.role === "Ad" || user.role === "Md") && (
-                <Typography>
-                  {row.user_id === user.id
-                    ? currencySetter(parseFloat(row.w1).toFixed(2))
-                    : currencySetter(parseFloat(row.ad_closing).toFixed(2))}
-                </Typography>
-              )}
-
-              {(user.role === "Dd" || user.role === "Ret") && (
-                <>
-                  <Typography align="left">
-                    {currencySetter(parseFloat(row.w1).toFixed(2))}
-                  </Typography>
-                  <Typography align="left">
-                    {currencySetter(parseFloat(row.w2).toFixed(2))}
-                  </Typography>
-                </>
-              )}
-            </Tooltip>
-          );
-        },
-        width: "190px",
-      },
-      {
-        name: "Status",
-        selector: (row) => (
-          <Box sx={{ display: "flex", justifyContent: "center" }}>
-            {row?.status?.status}
-          </Box>
-        ),
-      },
-    ],
-    [user]
+  name: "Actions",
+  selector: (row) => (
+    <Box sx={{ display: "flex", gap: 1 }}>
+      <Tooltip title="approved">
+        <Button
+          color="success"
+          size="small"
+          onClick={() => handleOpen(row, "approved")}
+        >
+          <CheckCircleIcon fontSize="small" />
+        </Button>
+      </Tooltip>
+      <Tooltip title="reject">
+        <Button
+          color="error"
+          size="small"
+          onClick={() => handleOpen(row, "rejected")}
+        >
+          <CancelIcon fontSize="small" />
+        </Button>
+      </Tooltip>
+    </Box>
+  ),
+  width: "120px",
+}
+    ]
   );
+   
+    
 
+
+  // ✅ Filters
   const filters = useMemo(
     () => [
       {
@@ -231,28 +202,63 @@ const FundRequest = () => {
         label: "Status",
         type: "dropdown",
         options: [
-          { value: "All", label: "All" },
-          { value: "SUCCESS", label: "Success" },
-          { value: "FAILED", label: "Failed" },
-          { value: "REFUND", label: "Refund" },
-          { value: "PENDING", label: "Pending" },
+          { value: "all", label: "All" },
+          { value: "success", label: "Success" },
+          { value: "failed", label: "Failed" },
+          { value: "refund", label: "Refund" },
+          { value: "pending", label: "Pending" },
+          { value: "approved", label: "Approved" },
+            { value: "rejected", label: "Rejected" },
         ],
+         defaultValue: "pending", 
       },
-      { id: "establishment", label: "User", type: "textfield" },
+      { id: "name", label: "Name", type: "textfield" },
+      { id: "bank_name", label: "Bank Name", type: "textfield" },
+      { id: "txn_id", label: "Txn ID", type: "textfield" },
     ],
     []
   );
 
   return (
-    <CommonTable
-      columns={columns}
-      endpoint={ApiEndpoints.GET_FUND_REQUESTS}
-      queryParam="status=SUCCESS"
-      filters={filters}
-      defaultFilters={{
-        status: "SUCCESS",
-      }}
-    />
+    <Box sx={{ p: 3 }}>
+      {/* ✅ Header */}
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          sx={{ bgcolor: "#1CA895" }}
+          onClick={() => setOpenCreate(true)}
+        >
+            Request
+        </Button>
+      </Box>
+
+      {/* ✅ Table */}
+      <CommonTable
+        columns={columns}
+        endpoint={ApiEndpoints.GET_FUND_REQUESTS}
+        filters={filters}
+      />
+
+      {/* ✅ Create Fund Request Modal */}
+      <CreateFundRequest
+        open={openCreate}
+        handleClose={() => setOpenCreate(false)}
+        handleSave={handleSaveCreate}
+      />
+
+    
+
+      {/* Render modal outside table */}
+{openModal && (
+  <FundRequestModal
+    open={openModal}
+    handleClose={() => setOpenModal(false)}
+    row={selectedRow}
+    status={status}
+  />
+)}
+    </Box>
   );
 };
 

@@ -43,29 +43,34 @@ export const AuthProvider = ({ children }) => {
   const isUserNavigatingAway = useRef(false);
   const userIsLoggedIn = !!token;
 
-  const loadUserProfile = async () => {
-    try {
-      const { error, response } = await apiCall(
-        "GET",
-        ApiEndpoints.GET_ME_USER
-      );
+const loadUserProfile = async () => {
+  try {
+    const { error, response } = await apiCall("GET", ApiEndpoints.GET_ME_USER);
 
-      if (error)
-        throw new Error(error.message || "Failed to load user profile");
+    if (error) throw new Error(error.message || "Failed to load user profile");
 
-      if (response) {
-        console.log("response data is ", response.data);
+    if (response) {
+      const latestUser = response.data;
+      const savedUser = JSON.parse(localStorage.getItem("user"));
 
-        setUser(response.data);
-        localStorage.setItem("user", JSON.stringify(response.data));
-        return response.data;
+      // 🚨 Compare critical fields like role, status, etc.
+      if (savedUser && savedUser.role !== latestUser.role) {
+        console.warn("User role has changed, logging out...");
+        await logout(); // logout API + clear storage
+        return null;
       }
-    } catch (err) {
-      console.error("Failed to load user profile:", err);
-      // logout(); // fallback if profile fails
-      throw err;
+
+      // ✅ Keep user updated
+      setUser(latestUser);
+      localStorage.setItem("user", JSON.stringify(latestUser));
+      return latestUser;
     }
-  };
+  } catch (err) {
+    console.error("Failed to load user profile:", err);
+    throw err;
+  }
+};
+
 
   // Initialize auth state on app load
   useEffect(() => {

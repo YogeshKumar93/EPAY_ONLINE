@@ -19,6 +19,10 @@ const pendingRequests = new Map();
 const cache = new Map();
 const CACHE_TTL = 2000;
 
+// Helper to generate unique client_ref
+const generateClientRef = () =>
+  `${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+
 apiClient.interceptors.request.use(
   (config) => {
     const token = getToken();
@@ -43,16 +47,21 @@ apiClient.interceptors.response.use(
 export const apiCall = async (method, url, data = null, params = null) => {
   try {
     const token = getToken();
+    const clientRef = generateClientRef(); // generate unique client_ref
 
     if (data) {
       if (data instanceof FormData) {
         data.append("api_token", token || "");
+        data.append("client_ref", clientRef);
       } else {
-        data = { ...data, api_token: token || "" };
+        data = { ...data, api_token: token || "", client_ref: clientRef };
       }
+    } else {
+      // ensure client_ref is still passed even if no data
+      data = { api_token: token || "", client_ref: clientRef };
     }
 
-    params = { ...(params || {}), api_token: token || "" };
+    params = { ...(params || {}), api_token: token || "", client_ref: clientRef };
 
     const key = JSON.stringify({ method, url, data, params });
 
