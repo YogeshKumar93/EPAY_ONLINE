@@ -139,6 +139,10 @@ GET_WALLETLEDGER:"walletledger/getWalletLedgers",
   GET_ACCOUNT_SCHEMA:"account/getAccountSchema",
   GET_BANK_SCHEMA:"bank/getBankSchema",
   GET_NOTIFICATION_SCHEMA:"notification/getNotificationSchema",
+  GET_COLOR_SCHEMA:"layout/colorSchema",
+  GET_COLOURS:"layout/getColours",
+  CREATE_COLOUR:"layout/createColour",
+  UPDATE_COLOUR:"layout/updateColour",
   // ****************************** NEW API'S ABOVE ******************************
 
 

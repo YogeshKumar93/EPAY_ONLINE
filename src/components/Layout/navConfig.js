@@ -21,6 +21,7 @@ export const Admin_nav = [
   { title: "Services", icon: "👥", icon2: "👥", to: "/admin/services" },
   { title: "Templates", icon: "👥", icon2: "👥", to: "/admin/templates" },
   { title: "Logs", icon: "👥", icon2: "👥", to: "/admin/logs" },
+  { title: "Layout", icon: "👥", icon2: "👥", to: "/admin/layout" },
 ];
 
 export const customer_nav = [

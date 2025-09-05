@@ -21,6 +21,7 @@ import RetailerLogs from "../pages/RetailerLogs";
 import ProfilePage from "../components/MyProfile/Profile";
 import Banks from "../pages/Banks";
 import { Transaction } from "../pages/Transaction";
+import Layouts from "../pages/Layouts";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useContext(AuthContext);
@@ -69,6 +70,7 @@ export default function AppRoutes() {
               <Route path="admin/logs" element={<Logs />} />
               <Route path="admin/profile" element={<ProfilePage />} />
               <Route path="admin/banks" element={<Banks />} />
+              <Route path="admin/layout" element={<Layouts />} />
               <Route
                 path="admin/*"
                 element={<Navigate to="/admin/dashboard" replace />}

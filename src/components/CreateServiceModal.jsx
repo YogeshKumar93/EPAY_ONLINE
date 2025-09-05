@@ -3,6 +3,7 @@ import { Box, TextField, MenuItem } from "@mui/material";
 import CommonModal from "./common/CommonModal";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { apiCall } from "../api/apiClient";
+import { useToast } from "../utils/ToastContext";
 
 const CreateServiceModal = ({ open, onClose, onSuccess }) => {
   const [form, setForm] = useState({
@@ -11,29 +12,28 @@ const CreateServiceModal = ({ open, onClose, onSuccess }) => {
     route: "",
     is_active: 1,
   });
+const {showToast} = useToast();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleCreate = async () => {
-    try {
       const { error, response } = await apiCall(
         "POST",
         ApiEndpoints.CREATE_SERVICE,
         form
+        
       );
-
-      if (!error && response?.status) {
-        onSuccess?.(); // refresh parent table
         onClose();
+      if (response) {
+        onSuccess?.(); 
+        showToast(response?.message || "Service created successfully", "success");
         setForm({ name: "", code: "", route: "", is_active: 1 });
       } else {
-        alert("Failed: " + (error?.message || response?.message));
+      showToast(error?.message || "Failed to create Service", "error");
       }
-    } catch (err) {
-      console.error("Error creating service:", err);
-    }
+    
   };
 
   return (
