@@ -1,26 +1,21 @@
-import { useMemo, useCallback, useState } from "react";
-import {
-  Box,
-  Button,
-  Tooltip,
-  Typography,
-  IconButton,
-} from "@mui/material";
+import { useMemo, useCallback, useState, useContext } from "react";
+import { Box, Button, Tooltip, Typography } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import { currencySetter } from "../../utils/Currencyutil";
 import { dateToTime, ddmmyy } from "../../utils/DateUtils";
 import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import CreateFundRequest from "../../pages/CreateFundRequest";
 import UpdateFundRequest from "../../pages/UpdateFundRequest";
+import FundRequestModal from "../../pages/FundRequestModal";
+import AuthContext from "../../contexts/AuthContext";
 
 const FundRequest = () => {
   const [openCreate, setOpenCreate] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
-  const [openDelete, setOpenDelete] = useState(false);
-  const [selectedFund, setSelectedFund] = useState(null);
+  // const [selectedFund, setSelectedFund] = useState(null);
+  const authCtx = useContext(AuthContext);
+  const user = authCtx.user;
 
   const getStatusColor = useCallback((status) => {
     switch (status?.toUpperCase()) {
@@ -32,34 +27,28 @@ const FundRequest = () => {
         return "#ed6c02"; // orange
       case "PENDING":
         return "#0288d1"; // blue
+      case "REJECTED":
+        return "#9e9e9e"; // grey
       default:
-        return "#616161"; // grey
+        return "#616161"; // default grey
     }
   }, []);
 
   // ✅ After create
   const handleSaveCreate = () => {
     setOpenCreate(false);
-    // refresh table if needed
   };
 
   // ✅ After update
   const handleSaveUpdate = () => {
     setOpenUpdate(false);
-    // refresh table if needed
   };
 
   // ✅ Handle edit
-  const handleEdit = (row) => {
-    setSelectedFund(row);
-    setOpenUpdate(true);
-  };
-
-  // ✅ Handle delete
-  const handleDelete = (row) => {
-    setSelectedFund(row);
-    setOpenDelete(true);
-  };
+  // const handleEdit = (row) => {
+  //   setSelectedFund(row);
+  //   setOpenUpdate(true);
+  // };
 
   // ✅ Columns
   const columns = useMemo(
@@ -160,24 +149,25 @@ const FundRequest = () => {
         wrap: true,
       },
       {
-        name: "Actions",
+        name: <span className="mx-3">Actions</span>,
         selector: (row) => (
-          <Box sx={{ display: "flex", gap: 1 }}>
-            <Tooltip title="Edit">
-              <IconButton color="primary" onClick={() => handleEdit(row)}>
-                <EditIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Delete">
-              <IconButton color="error" onClick={() => handleDelete(row)}>
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {row?.status === "REJECTED" ? (
+              <FundRequestModal row={row} action="REOPEN" />
+            ) : row?.status === "PENDING" ? (
+              <>
+                <FundRequestModal row={row} action="APPROVE" />
+                <FundRequestModal row={row} action="REJECT" />
+              </>
+            ) : null}
           </Box>
         ),
+        wrap: true,
+        width: "170px",
+        omit: user && user.role === "adm" ? false : true,
       },
     ],
-    [getStatusColor]
+    [getStatusColor, user]
   );
 
   // ✅ Filters
@@ -193,6 +183,7 @@ const FundRequest = () => {
           { value: "FAILED", label: "Failed" },
           { value: "REFUND", label: "Refund" },
           { value: "PENDING", label: "Pending" },
+          { value: "REJECTED", label: "Rejected" },
         ],
       },
       { id: "name", label: "Name", type: "textfield" },

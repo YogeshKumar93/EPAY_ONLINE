@@ -10,14 +10,14 @@ import {
   Drawer,
 } from "@mui/material";
 
-import { apiCall } from "../api/apiClient"; // ✅ use apiCall instead of postJsonData
-// import ModalHeader from "./ModalHeader";
-// import ModalFooter from "./ModalFooter";
+
+import ModalHeader from "./ModalHeader";
+import ModalFooter from "./ModalFooter";
 import { apiErrorToast, okSuccessToast } from "../utils/ToastUtil";
 import numWords from "num-words";
 import { useState } from "react";
 import PinInput from "react-pin-input";
-import ResetMpin from "./ResetMpin";
+
 import { secondaryColor } from "../theme/setThemeColor";
 import { Icon } from "@iconify/react";
 import ApiEndpoints from "../api/ApiEndpoints";
@@ -42,7 +42,7 @@ const FundRequestModal = ({ row, action = "status", refresh }) => {
     setNumberToWord(numWords(event.target.value));
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
     const form = event.currentTarget;
     const data = {
@@ -54,10 +54,12 @@ const FundRequestModal = ({ row, action = "status", refresh }) => {
     };
 
     setRequest(true);
-    try {
-      const response = await apiCall("POST", ApiEndpoints.UPDATE_FUND_REQUEST, data);
 
-      if (response?.success) {
+    post(
+      ApiEndpoints.UPDATE_FUND_REQUEST,
+      data,
+      setRequest,
+      (response) => {
         if (data.action === "REJECT") {
           okSuccessToast("Request cancelled successfully");
         } else {
@@ -65,24 +67,21 @@ const FundRequestModal = ({ row, action = "status", refresh }) => {
         }
         handleClose();
         if (refresh) refresh();
-      } else {
-        apiErrorToast(response?.message || "Something went wrong");
+      },
+      (error) => {
+        apiErrorToast(error);
       }
-    } catch (error) {
-      apiErrorToast(error.message || "API Error");
-    } finally {
-      setRequest(false);
-    }
+    );
   };
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center", gap: 0.4 }}>
       {action === "APPROVE" && (
-        <Tooltip title="Approve">
-          <IconButton onClick={handleOpen} sx={{ color: "#32b83b" }}>
-            <Icon icon="mdi:check-circle" width={25} height={25} />
-          </IconButton>
-        </Tooltip>
+      <Tooltip title="Approve">
+  <IconButton onClick={handleOpen} sx={{ color: "#32b83b" }}>
+    <Icon icon="mdi:check-circle" width={25} height={25} />
+  </IconButton>
+</Tooltip>
       )}
 
       {action === "REOPEN" && (
@@ -99,11 +98,11 @@ const FundRequestModal = ({ row, action = "status", refresh }) => {
       )}
 
       {action === "REJECT" && (
-        <Tooltip title="Reject">
-          <IconButton onClick={handleOpen} sx={{ color: "#e01a1a" }}>
-            <Icon icon="mdi:close-circle" width={25} height={25} />
-          </IconButton>
-        </Tooltip>
+       <Tooltip title="Reject">
+  <IconButton onClick={handleOpen} sx={{ color: "#e01a1a" }}>
+    <Icon icon="mdi:close-circle" width={25} height={25} />
+  </IconButton>
+</Tooltip>
       )}
 
       <Drawer open={open} anchor="right" onClose={handleClose}>
@@ -214,7 +213,7 @@ const FundRequestModal = ({ row, action = "status", refresh }) => {
                 }}
               >
                 <Box sx={{ mr: 4 }}>
-                  <ResetMpin variant="text" />
+                  <ResetMpin />
                 </Box>
               </Grid>
             </Grid>

@@ -213,34 +213,44 @@ const CommonFormField = ({ field, formData, handleChange, errors, loading }) => 
 
   // Switch between field types
   switch (type) {
-    case "select":
-      return (
-        <ReTextField
-          select
-          fullWidth
-          label={label}
-          name={name}
-          value={formData[name] || ""}
-          onChange={handleChange}
-          disabled={loading}
-          {...getErrorProps()}
-          {...props}
-        >
-          {options.map((option, i) => (
-            <MenuItem key={i} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </ReTextField>
-      );
+   case "select":
+  return (
+    <ReTextField
+      select
+      fullWidth
+      label={label}
+      name={name}
+      value={formData[name] || ""}    
+      onChange={handleChange}  
+      disabled={loading}
+      error={!!errors[name]}
+      helperText={errors[name]}
+    >
+      {options && options.length > 0 ? (
+        options.map((opt) => (
+          <MenuItem key={opt.value} value={opt.value}>
+            {opt.label}
+          </MenuItem>
+        ))
+      ) : (
+        <MenuItem disabled>No options</MenuItem>
+      )}
+    </ReTextField>
+  );
 
-   case "datepicker":
+
+case "datepicker":
   return (
     <DatePicker
       label={label}
-      value={formData[name] ? dayjs(formData[name]) : null}
+      value={formData[name] ? dayjs(Number(formData[name])) : null}
       onChange={(newValue) =>
-        handleChange({ target: { name, value: newValue?.toISOString() } })
+        handleChange({
+          target: {
+            name,
+            value: newValue ? newValue.valueOf() : null, // number (timestamp)
+          },
+        })
       }
       slotProps={{
         textField: {
@@ -252,6 +262,10 @@ const CommonFormField = ({ field, formData, handleChange, errors, loading }) => 
       {...props}
     />
   );
+
+
+  
+
 
  case "timepicker":
   return (

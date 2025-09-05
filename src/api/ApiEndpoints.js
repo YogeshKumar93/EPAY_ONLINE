@@ -100,6 +100,8 @@ const ApiEndpoints = {
   CREATE_FUND_REQUEST: "fundrequest/createFundRequest",
   UPDATE_FUND_REQUEST: "fundrequest/updateFundRequest",
   DELETE_FUND_REQUEST: "fundrequest/deleteFundRequest",
+  GET_BANKS: "bank/getBanks",
+   
 
   // ****************************** NEW API'S ABOVE ******************************
 
@@ -107,7 +109,7 @@ const ApiEndpoints = {
   MARK_READ_NOTI: "notification/updateNotification",
   ADMIN_NOTIFICATION: "notification/createNotification",
 
-  GET_BANKS: "bank/getBanks",
+
   CREATE_BANK: "bank/createBank",
   UPDATE_BANK: "bank/updateBank",
   DELETE_BANK: "bank/deleteBank",
@@ -119,6 +121,7 @@ const ApiEndpoints = {
   GET_PAYOUT_TXN: "payouttxn/getPayoutTxns",
   GET_RECHARGE_TXN: "rechargetxn/getRechargeTxns",
   GET_IRCTC_TXN: "irctctxn/getIrctcTxns",
+
   // ****************************** NEW API'S ABOVE ******************************
 
 
