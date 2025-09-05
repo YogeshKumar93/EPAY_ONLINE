@@ -101,18 +101,7 @@ const fieldConfig = [
     ],
     validation: { required: true },
   },
-  {
-    name: "asm_id",
-    label: "Asm Id",
-    type: "text",
-    validation: { required: false },
-  },
-  {
-    name: "user_id",
-    label: "User Id",
-    type: "text",
-    validation: { required: true, pattern: /^[0-9]+$/ },
-  },
+ 
   {
     name: "name",
     label: "Merchant Name",
@@ -131,8 +120,7 @@ const fieldConfig = [
     type: "text",
     validation: {
       required: true,
-      minLength: 11,
-      maxLength: 11,
+     
       pattern: /^[A-Z0-9]+$/, // uppercase alphanumeric only
     },
   },
