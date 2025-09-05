@@ -64,16 +64,24 @@ const ApiEndpoints = {
   GET_ROUTE: "admin/getRoutes",
   GET_CATEGORIES: "admin/getCategories",
 
+
+
+
+
+
+
+
   // ****************************** NEW API'S ******************************
   SIGN_IN: "auth/signIn",
   LOGIN_OTP_VALIDATE: "auth/secureLogin",
-  LOGOUT: "auth/logout",
+  LOGOUT: "auth/Logout",
   FORGOT_PASS: "auth/forgetPassword",
   RESET_MPIN: "auth/resetMpin",
   CHANGE_PASS: "auth/changePassword",
   CHANGE_MPIN: "auth/changeMpin",
   INITIATE_NUMBER: "auth/initiateChangeNumber",
-  VERIFY_CHAGNENUMBER: "auth/verifyChangeNumber",
+  VERIFY_CHAGNE_NUMBER: "auth/verifyChangeNumber",
+
   GET_ACCOUNTS: "account/getAccounts",
   CREATE_ACCOUNT: "account/createAccount",
   DELETE_ACCOUNT : "account/deleteAccount",
@@ -94,14 +102,52 @@ GET_WALLETLEDGER:"walletledger/getWalletLedgers",
 
   DELETE_ACCOUNT: "account/deleteAccount",
   UPDATE_ACCOUNT: "account/updateAccount",
+  GET_SERVICES: "service/getServices",
+  CREATE_SERVICE: "service/createService",
+  UPDATE_SERVICE: "service/updateService",
+  GET_TEMPLATES: "template/getTemplates",
+  CREATE_TEMPLATE: "template/createTemplate",
+  UPDATE_TEMPLATE: "template/updateTemplate",
+  DELETE_TEMPLATE: "template/deleteTemplate",
+  GET_LOGS: "auditlog/getAuditLogs",
+  DELETE_LOG: "auditlog/deleteAuditLog",
+  GET_LOG: "auditlog/getAuditLog",
+  GET_FUND_REQUESTS: "fundrequest/getFundRequests",
+  CREATE_FUND_REQUEST: "fundrequest/createFundRequest",
+  UPDATE_FUND_REQUEST: "fundrequest/updateFundRequest",
+  DELETE_FUND_REQUEST: "fundrequest/deleteFundRequest",
+
+  // ****************************** NEW API'S ABOVE ******************************
+
   GET_NOTIFICATION: "notification/getNotification",
   MARK_READ_NOTI: "notification/updateNotification",
   ADMIN_NOTIFICATION: "notification/createNotification",
 
+  GET_BANKS: "bank/getBanks",
+  CREATE_BANK: "bank/createBank",
+  UPDATE_BANK: "bank/updateBank",
+  DELETE_BANK: "bank/deleteBank",
+
+  GET_DMT_TXN: "dmttxn/getDmtTxns",
+  GET_BBPS_TXN: "bbpstxn/getBbpsTxns",
+  GET_AEPS_TXN: "aepstxn/getAepsTxns",
+  GET_MATM_TXN: "matmtxn/getMatmTxns",
+  GET_PAYOUT_TXN: "payouttxn/getPayoutTxns",
+  GET_RECHARGE_TXN: "rechargetxn/getRechargeTxns",
+  GET_IRCTC_TXN: "irctctxn/getIrctcTxns",
   // ****************************** NEW API'S ABOVE ******************************
 
+
+
+
+
+
+
+
+
   GET_ACC_ACCOUNTS: "",
-  GET_BANKS: "admin/getBanks",
+  // GET_ACC_ACCOUNTS: "",
+
   GET_ACC_BANKS: "",
   UPDATE_BANKS: "admin/changeBankStatus",
   ADD_ACCOUNT: "admin/createNewAcc",
@@ -117,7 +163,7 @@ GET_WALLETLEDGER:"walletledger/getWalletLedgers",
   GET_PENDING_ACCOUNT_TRANSACTION: "admin/getPendingBankTxn",
   GET_STATUS: "admin/checkTxnStatus",
   CHANGE_STATUS: "admin/changeTxnStatus",
-  UPDATE_ACCOUNT: "admin/updateAccounts",
+  
   GET_PLANS: "admin/getPlans",
   BLOCK_UNBLOCK_PLANS: "",
   ADD_PLAN: "admin/createPlan",
@@ -175,7 +221,7 @@ GET_WALLETLEDGER:"walletledger/getWalletLedgers",
   ADD_REM: "dmr/registerRemitter",
   NEW_ADD_REM: "dmr/registerExpRemitter",
   GET_BLOCKED_AC: "admin/blockedAccounts",
-  GET_BLOCKED_AC: "admin/blockedAccounts",
+
   DMT2_ADD_REM: "dmr/registerRemitterDmt2",
   ADD_BENE_EXPRESS: "dmr/addBenExpress",
   ADD_BENE_SUPER: "dmr/addBenExpress",

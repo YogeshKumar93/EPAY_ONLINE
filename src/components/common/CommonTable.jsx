@@ -200,7 +200,7 @@ const CommonTable = ({
 
       // Add queryParam if provided
       let finalEndpoint = endpoint;
-   if (typeof queryParam === "string" && queryParam.trim() !== "") {
+      if (typeof queryParam === "string" && queryParam.trim() !== "") {
         // queryParam is a query string → append to URL
         finalEndpoint = `${endpoint}?${queryParam}`;
       } else if (
@@ -214,7 +214,7 @@ const CommonTable = ({
 
       try {
         const { error: apiError, response } = await apiCall(
-          "GET",
+          "POST",
           finalEndpoint,
           null,
           params
@@ -224,28 +224,30 @@ const CommonTable = ({
           setError(apiError.message || "Failed to fetch data");
         } else {
           if (response) {
-           if (apiError) {
-          setError(apiError.message || "Failed to fetch data");
-        } else if (response) {
-          // ✅ Normalize data structure
-          let normalizedData =
-            response?.data?.data || // case: response.data.data
-            response?.data || // case: response.data
-            response || // case: direct response
-            [];
+            if (apiError) {
+              setError(apiError.message || "Failed to fetch data");
+            } else if (response) {
+              // ✅ Normalize data structure
+              let normalizedData =
+                response?.data?.data || // case: response.data.data
+                response?.data || // case: response.data
+                response || // case: direct response
+                [];
 
-          // ✅ Handle total count safely
-          let total =
-            response?.data?.total ||
-            response?.total ||
-            normalizedData?.length ||
-            0;
+              // ✅ Handle total count safely
+              let total =
+                response?.data?.total ||
+                response?.total ||
+                normalizedData?.length ||
+                0;
 
-          setData(
-            Array.isArray(normalizedData) ? normalizedData : [normalizedData]
-          );
-          setTotalCount(total);
-        }else {
+              setData(
+                Array.isArray(normalizedData)
+                  ? normalizedData
+                  : [normalizedData]
+              );
+              setTotalCount(total);
+            } else {
               setData([]);
               setTotalCount(0);
             }
@@ -344,11 +346,14 @@ const CommonTable = ({
     [availableFilters, fetchData]
   );
 
-  const handleChangePage = useCallback((event, newPage) => {
-    setPage(newPage);
-    pageRef.current = newPage;
-    fetchData();
-  }, [fetchData]);
+  const handleChangePage = useCallback(
+    (event, newPage) => {
+      setPage(newPage);
+      pageRef.current = newPage;
+      fetchData();
+    },
+    [fetchData]
+  );
 
   const handleChangeRowsPerPage = useCallback(
     (event) => {

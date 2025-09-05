@@ -1,0 +1,163 @@
+import { useMemo, useCallback, useContext, useState } from "react";
+import { Box, Tooltip, Typography, Button } from "@mui/material";
+import CommonTable from "../common/CommonTable";
+import ApiEndpoints from "../../api/ApiEndpoints";
+import AuthContext from "../../contexts/AuthContext";
+import { dateToTime1, ddmmyy } from "../../utils/DateUtils";
+
+const MatmTxn = ({ filters = [], query }) => {
+  const authCtx = useContext(AuthContext);
+  const user = authCtx?.user;
+  const [openCreate, setOpenCreate] = useState(false);
+
+  const columns = useMemo(
+    () => [
+      {
+        name: "Txn ID",
+        selector: (row) => (
+          <div style={{ textAlign: "left", fontWeight: 500 }}>{row.txn_id}</div>
+        ),
+        wrap: true,
+      },
+      {
+        name: "Client Ref",
+        selector: (row) => (
+          <div style={{ textAlign: "left" }}>{row.client_ref}</div>
+        ),
+        wrap: true,
+      },
+      {
+        name: "Biller",
+        selector: (row) => (
+          <div style={{ textAlign: "left" }}>
+            <strong style={{ fontSize: "0.95rem" }}>{row.biller_name}</strong>
+            <br />
+            <span style={{ fontSize: "0.8rem", color: "#666" }}>
+              ID: {row.biller_id}
+            </span>
+          </div>
+        ),
+        wrap: true,
+      },
+      {
+        name: "Consumer",
+        selector: (row) => (
+          <div style={{ textAlign: "left" }}>
+            <span>Number: {row.consumer_number}</span>
+            <br />
+            <span style={{ color: "#444" }}>Mobile: {row.customer_mobile}</span>
+          </div>
+        ),
+        wrap: true,
+      },
+      {
+        name: "Route / Platform",
+        selector: (row) => (
+          <div style={{ textAlign: "left" }}>
+            <span>{row.route}</span>
+            <br />
+            <span style={{ fontWeight: 500, color: "#1976d2" }}>
+              {row.pf?.toUpperCase()}
+            </span>
+          </div>
+        ),
+        wrap: true,
+      },
+      {
+        name: "Amount (₹)",
+        selector: (row) => (
+          <div
+            style={{ color: "green", fontWeight: "600", textAlign: "right" }}
+          >
+            ₹ {parseFloat(row.amount).toFixed(2)}
+          </div>
+        ),
+        wrap: true,
+        right: true,
+      },
+      {
+        name: "Charges & Comm",
+        selector: (row) => (
+          <div style={{ textAlign: "right", fontSize: "0.85rem" }}>
+            <div>Charges: ₹{parseFloat(row.charges).toFixed(2)}</div>
+            <div>GST: ₹{parseFloat(row.gst).toFixed(2)}</div>
+            <div>Comm: ₹{parseFloat(row.commission).toFixed(2)}</div>
+            <div>TDS: ₹{parseFloat(row.tds).toFixed(2)}</div>
+            <div style={{ fontWeight: 600, color: "#1976d2" }}>
+              Net: ₹{parseFloat(row.net_commission).toFixed(2)}
+            </div>
+          </div>
+        ),
+        wrap: true,
+        right: true,
+      },
+      {
+        name: "Status",
+        selector: (row) => (
+          <div
+            style={{
+              color:
+                row.status === "SUCCESS"
+                  ? "green"
+                  : row.status === "PENDING"
+                  ? "orange"
+                  : "red",
+              fontWeight: 700,
+              textAlign: "center",
+            }}
+          >
+            {row.status}
+          </div>
+        ),
+        center: true,
+      },
+      {
+        name: "RRN",
+        selector: (row) => (
+          <div style={{ textAlign: "left", fontSize: "0.85rem" }}>
+            {row.rrn}
+          </div>
+        ),
+        wrap: true,
+      },
+      {
+        name: "Created At",
+        selector: (row) => (
+          <div
+            style={{ textAlign: "left", fontSize: "0.85rem", color: "#444" }}
+          >
+            {ddmmyy(row.created_at)} {dateToTime1(row.created_at)}
+          </div>
+        ),
+        wrap: true,
+      },
+      {
+        name: "Updated At",
+        selector: (row) => (
+          <div
+            style={{ textAlign: "left", fontSize: "0.85rem", color: "#444" }}
+          >
+            {ddmmyy(row.updated_at)} {dateToTime1(row.updated_at)}
+          </div>
+        ),
+        wrap: true,
+      },
+    ],
+    []
+  );
+
+  const queryParam = "";
+
+  return (
+    <>
+      <CommonTable
+        columns={columns}
+        endpoint={ApiEndpoints.GET_MATM_TXN}
+        filters={filters}
+        queryParam={queryParam}
+      />
+    </>
+  );
+};
+
+export default MatmTxn;

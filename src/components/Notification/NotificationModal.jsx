@@ -45,7 +45,6 @@ const NotificationModal = () => {
       );
 
       if (response) {
-     
         setNotifications((prev) =>
           prev.map((n) => (n.id === id ? { ...n, is_read: 1 } : n))
         );
@@ -59,7 +58,7 @@ const NotificationModal = () => {
   const fetchData = async () => {
     try {
       const { error, response } = await apiCall(
-        "GET",
+        "POST",
         ApiEndpoints.GET_NOTIFICATION
       );
 

@@ -34,6 +34,7 @@ import {
   Download as DownloadIcon,
   People as PeopleIcon,
   Receipt as ReceiptIcon,
+  AccountCircle,
 } from "@mui/icons-material";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { Admin_nav, customer_nav, nav } from "./navConfig";
@@ -48,18 +49,18 @@ import NotificationModal from "../Notification/NotificationModal";
 // Navigation configuration
 
 const roleNavigation = {
-  "user": nav,
-  "adm": Admin_nav,
-  "sadm": Admin_nav,
-  "ret": customer_nav,
-  "dd": customer_nav,
+  user: nav,
+  adm: Admin_nav,
+  sadm: Admin_nav,
+  ret: customer_nav,
+  dd: customer_nav,
 };
 
 const themeSettings = {
   drawerWidth: 240,
   palette: {
     primary: {
-      main: '#0037D7',
+      main: "#0037D7",
     },
     secondary: {
       main: "#dc004e",
@@ -75,6 +76,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
   // console.log("inroute",userRole);
 
   const authCtx = useContext(AuthContext);
+  const user = authCtx?.user;
   const refreshUser = authCtx.loadUserProfile;
   const isMobile = useMediaQuery("(max-width: 900px)");
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -290,7 +292,6 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
           >
             <MenuIcon />
           </IconButton>
-
           <Typography
             variant="h6"
             noWrap
@@ -300,19 +301,17 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
           >
             Dashboard
           </Typography>
-
           {/* ✅ Refresh icon button with black color */}
           <IconButton onClick={refreshUser}>
             <RefreshIcon sx={{ color: "black" }} />
           </IconButton>
-
           <IconButton color="inherit" onClick={handleUserMenuOpen}>
             <Avatar src={userAvatar} sx={{ width: 32, height: 32 }}>
               {!userAvatar && <PersonIcon />}
             </Avatar>
           </IconButton>
-
           <NotificationModal />
+
           <Menu
             anchorEl={userMenuAnchor}
             open={Boolean(userMenuAnchor)}
@@ -330,11 +329,75 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
 
             <Divider />
 
-            <MenuItem>
-              <ListItemIcon>
-                <SettingsIcon fontSize="small" />
-              </ListItemIcon>
-              <span className="text-base">Settings</span>
+            <MenuItem
+              disableRipple
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                width: "100%",
+                marginTop: "-8px",
+                "&:hover": { cursor: "default", background: "#fff" },
+              }}
+            >
+              {user && user.profile_image !== "0" ? (
+                <Avatar
+                  id="user_img"
+                  alt="Remy Sharp"
+                  src={""}
+                  sx={{ width: 80, height: 80 }}
+                />
+              ) : (
+                <AccountCircle sx={{ fontSize: "80px" }} />
+              )}
+
+              <span
+                style={{
+                  fontWeight: "550",
+                  fontSize: "0.9rem",
+                  marginTop: "0.3rem",
+                }}
+              >
+                {user && user.name}
+              </span>
+
+              <span
+                onClick={() => {
+                  if (user && user.role === "adm") {
+                    navigate("/admin/profile");
+                  } else if (user && user.role === "sadm") {
+                    navigate("/admin/profile");
+                  } else if (user && user.role === "Zsm") {
+                  } else if (user && user.role === "Asm") {
+                    navigate("/asm/profile");
+                  } else if (user && user.role === "Zsm") {
+                    navigate("/zsm/profile");
+                  } else if (user && user.role === "Ad") {
+                    navigate("/ad/profile");
+                  } else if (user && user.role === "Md") {
+                    navigate("/md/profile");
+                  } else if (
+                    user &&
+                    (user.role === "Ret" || user.role === "Dd")
+                  ) {
+                    navigate("/customer/profile");
+                  } else if (user && user.role === "Api") {
+                    navigate("/api-user/profile");
+                  } else {
+                    navigate("/other/profile");
+                  }
+                }}
+                style={{
+                  border: "1px solid #3f3f3f",
+                  borderRadius: "16px",
+                  padding: "0.2rem 1rem",
+                  fontSize: "0.9rem",
+                  margin: "1rem 0",
+                }}
+                className="simple-hover"
+              >
+                Manage your Profile
+              </span>
             </MenuItem>
 
             <MenuItem onClick={handleLogout}>

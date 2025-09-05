@@ -18,10 +18,13 @@ import Services from "../pages/Services";
 import Templates from "../pages/Templates";
 import Logs from "../pages/Logs";
 import RetailerLogs from "../pages/RetailerLogs";
+import ProfilePage from "../components/MyProfile/Profile";
+import Banks from "../pages/Banks";
+import { Transaction } from "../pages/Transaction";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useContext(AuthContext);
-console.log("THe aufdgaegaee",isAuthenticated)
+  console.log("THe aufdgaegaee", isAuthenticated);
   if (loading) {
     return <div>Loading...</div>; // spinner or splash screen
   }
@@ -57,12 +60,15 @@ export default function AppRoutes() {
             <>
               <Route path="admin/dashboard" element={<AdminTransactions />} />
               <Route path="admin/users" element={<Users />} />
-              <Route path="admin/transactions" element={<Dashboard />} />
+              <Route path="admin/transactions" element={<Transaction />} />
               <Route path="admin/notification" element={<Notification />} />
+              <Route path="admin/fund-request" element={<FundRequest />} />
               <Route path="admin/accounts" element={<Accounts />} />
               <Route path="admin/services" element={<Services />} />
               <Route path="admin/templates" element={<Templates />} />
               <Route path="admin/logs" element={<Logs />} />
+              <Route path="admin/profile" element={<ProfilePage />} />
+              <Route path="admin/banks" element={<Banks />} />
               <Route
                 path="admin/*"
                 element={<Navigate to="/admin/dashboard" replace />}
@@ -82,10 +88,7 @@ export default function AppRoutes() {
                 path="customer/account-ledger"
                 element={<AccountLadger />}
               />
-              <Route
-                path="customer/logs"
-                element={<RetailerLogs />}
-              />
+              <Route path="customer/logs" element={<RetailerLogs />} />
               <Route
                 path="customer/money-transfer"
                 element={<DmtContainer />}
@@ -98,6 +101,8 @@ export default function AppRoutes() {
               <Route path="customer/fund-request" element={<FundRequest />} />
               <Route path="customer/sale" element={<MySale />} />
               <Route path="customer/notification" element={<Notification />} />
+              <Route path="customer/profile" element={<ProfilePage />} />
+              <Route path="customer/banks" element={<Banks />} />
               <Route
                 path="customer/*"
                 element={<Navigate to="/customer/dashboard" replace />}

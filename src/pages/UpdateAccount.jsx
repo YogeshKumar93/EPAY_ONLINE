@@ -7,8 +7,9 @@ import {
 } from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
-import CommonModal from "../components/common/CommonModal";
+
 import { ReTextField } from "../components/common/ReTextField";
+import CommonModal from "../components/common/CommonModal";
 
 const accountTypes = ["Current", "Savings", "Credit"];
 
@@ -29,7 +30,7 @@ const UpdateAccount = ({ open, handleClose, handleSave, selectedAccount }) => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // Prefill data when modal opens
+  // ✅ Prefill data when modal opens
   useEffect(() => {
     if (selectedAccount) {
       setFormData({
@@ -54,7 +55,7 @@ const UpdateAccount = ({ open, handleClose, handleSave, selectedAccount }) => {
     if (!formData.user_id) newErrors.user_id = "User ID is required";
     if (!formData.establishment.trim())
       newErrors.establishment = "Establishment is required";
-    if (!formData.asm.trim()) newErrors.asm = "Asm is required";
+    // if (!formData.asm.trim()) newErrors.asm = "ASM is required";
     if (!/^[0-9]{10}$/.test(formData.mobile))
       newErrors.mobile = "Enter a valid 10-digit mobile number";
     if (formData.credit_limit < 0)
@@ -81,13 +82,14 @@ const UpdateAccount = ({ open, handleClose, handleSave, selectedAccount }) => {
     try {
       const { error, response } = await apiCall(
         "POST", // update method
-        ApiEndpoints.UPDATE_ACCOUNT, // your API endpoint for update
+        ApiEndpoints.UPDATE_ACCOUNT,
         formData
       );
 
-      if (!error && response?.status === "SUCCESS") {
-        handleSave(response.data); // pass updated account back
-        handleClose();
+      if (response) {
+        // handleSave(response.data); // ✅ update parent state
+      
+    handleClose();
       } else {
         console.error("Failed to update account:", error || response);
       }
