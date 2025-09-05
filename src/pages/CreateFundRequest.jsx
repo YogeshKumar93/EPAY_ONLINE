@@ -1,232 +1,204 @@
-import * as React from "react";
-import Box from "@mui/material/Box";
-import {
-  FormControl,
-  Grid,
-  TextField,
-  IconButton,
-  Tooltip,
-  Button,
-  Drawer,
-} from "@mui/material";
+import React, { useEffect, useState } from 'react'
+import CommonModal from '../components/common/CommonModal'
+import { apiCall } from '../api/apiClient';
+import ApiEndpoints from '../api/ApiEndpoints';
+import { CircularProgress } from '@mui/material';
 
-import { apiCall } from "../api/apiClient"; // ✅ use apiCall instead of postJsonData
-// import ModalHeader from "./ModalHeader";
-// import ModalFooter from "./ModalFooter";
-import { apiErrorToast, okSuccessToast } from "../utils/ToastUtil";
-import numWords from "num-words";
-import { useState } from "react";
-import PinInput from "react-pin-input";
-import ResetMpin from "./ResetMpin";
-import { secondaryColor } from "../theme/setThemeColor";
-import { Icon } from "@iconify/react";
-import ApiEndpoints from "../api/ApiEndpoints";
+const CreateFundRequest = ({open, handleClose, handleSave}) => {
 
-const FundRequestModal = ({ row, action = "status", refresh }) => {
-  const [open, setOpen] = useState(false);
-  const [request, setRequest] = useState(false);
-  const [mpin, setMpin] = useState("");
-  const [remarkVal, setRemarkVal] = useState("");
-  const [numberToWord, setNumberToWord] = useState(numWords(row.amount));
+const [formData, setFormData] = useState({
+    bank_name: "",
+    status: "",
+    asm_id: "",
+    user_id: "",
+    name: "",
+    mode: "",
+    bank_ref_id: "",
+    date: "",
+    amount: "",
+    remark: "",
+    txn_id:"",
+});
 
-  const handleOpen = () => {
-    setNumberToWord(numWords(row.amount));
-    setOpen(true);
-  };
+const [errors, setErrors] = useState({});
+ 
+  const [banks, setBanks] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleAmountChange = (event) => {
-    setNumberToWord(numWords(event.target.value));
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const data = {
-      id: row.id,
-      amount: form.amt.value,
-      remark: remarkVal,
-      action: action,
-      mpin: mpin,
-    };
-
-    setRequest(true);
+  useEffect(() => {
+  const fetchBanks = async () => {
+    setLoading(true);
     try {
-      const response = await apiCall("POST", ApiEndpoints.UPDATE_FUND_REQUEST, data);
+      const response = await apiCall("POST", ApiEndpoints.GET_BANKS);
 
-      if (response?.success) {
-        if (data.action === "REJECT") {
-          okSuccessToast("Request cancelled successfully");
-        } else {
-          okSuccessToast("Request Processed successfully");
-        }
-        handleClose();
-        if (refresh) refresh();
+      if (response?.data) {
+        setBanks(response.data); // ✅ extract array
       } else {
-        apiErrorToast(response?.message || "Something went wrong");
+        console.error("Unexpected response:", response);
       }
-    } catch (error) {
-      apiErrorToast(error.message || "API Error");
+    } catch (err) {
+      console.error("Error fetching banks", err);
     } finally {
-      setRequest(false);
+      setLoading(false);
     }
   };
 
-  return (
-    <Box sx={{ display: "flex", justifyContent: "center", gap: 0.4 }}>
-      {action === "APPROVE" && (
-        <Tooltip title="Approve">
-          <IconButton onClick={handleOpen} sx={{ color: "#32b83b" }}>
-            <Icon icon="mdi:check-circle" width={25} height={25} />
-          </IconButton>
-        </Tooltip>
-      )}
+  fetchBanks();
+}, []);
 
-      {action === "REOPEN" && (
-        <Tooltip title="Reopen">
-          <Button
-            className="button-red"
-            sx={{ fontSize: "10px", background: secondaryColor() }}
-            variant="contained"
-            onClick={handleOpen}
-          >
-            Reopen
-          </Button>
-        </Tooltip>
-      )}
 
-      {action === "REJECT" && (
-        <Tooltip title="Reject">
-          <IconButton onClick={handleOpen} sx={{ color: "#e01a1a" }}>
-            <Icon icon="mdi:close-circle" width={25} height={25} />
-          </IconButton>
-        </Tooltip>
-      )}
+   const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-      <Drawer open={open} anchor="right" onClose={handleClose}>
-        <Box sx={{ width: 400 }} className="sm_modal">
-          <ModalHeader
-            subtitle="Take Action: Quick and Simple Fund Request!"
-            title={`${action} (${row.name})`}
-            handleClose={handleClose}
-          />
+    const onSubmit = async () => {
+    // if (!validate()) return;
+    setLoading(true);
+    try {
+      const { error, response } = await apiCall(
+        "POST",
+        ApiEndpoints.CREATE_FUND_REQUEST,
+        formData
+      );
 
-          <Box
-            component="form"
-            id="cred_req"
-            autoComplete="off"
-            validate="true"
-            onSubmit={handleSubmit}
-            sx={{
-              "& .MuiTextField-root": { m: 2 },
-              objectFit: "contain",
-              overflowY: "scroll",
-            }}
-          >
-            <Grid container sx={{ pt: 1 }}>
-              <Grid item md={12} xs={12}>
-                <FormControl sx={{ width: "100%" }}>
-                  <TextField
-                    autoComplete="off"
-                    label="Amount"
-                    id="amt"
-                    defaultValue={row.amount}
-                    inputProps={{
-                      readOnly: action !== "APPROVE" ? true : false,
-                      maxLength: 9,
-                      type: "number",
-                    }}
-                    onChange={handleAmountChange}
-                    size="small"
-                    required
-                  />
-                </FormControl>
-              </Grid>
+      if (response) {
+        handleSave(response.data);
+        handleClose();
+        setFormData({
+           bank_name: "",
+    status: "",
+    asm_id: "",
+    user_id: "",
+    name: "",
+    mode: "",
+    bank_ref_id: "",
+    date: "",
+    amount: "",
+    remark: "",
+    txn_id:"",
+        });
+      } else {
+        console.error("Failed to create account:", error || response);
+      }
+    } catch (err) {
+      console.error("Error creating account:", err);
+      alert("Something went wrong while creating account.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-              <Grid item md={12} xs={12}>
-                <FormControl sx={{ width: "100%" }}>
-                  <TextField
-                    autoComplete="off"
-                    label="Amount in Words"
-                    id="inWords"
-                    value={numberToWord}
-                    inputProps={{ readOnly: true }}
-                    size="small"
-                    required
-                  />
-                </FormControl>
-              </Grid>
+  const footerButtons = [
+      {
+        text: "Cancel",
+        variant: "outlined",
+        onClick: handleClose,
+        disabled: loading,
+      },
+      {
+        text: "Save",
+        variant: "contained",
+        onClick: onSubmit,
+        disabled: loading,
+        startIcon: loading ? <CircularProgress size={20} color="inherit" /> : null,
+      },
+    ];
 
-              <Grid item md={12} xs={12}>
-                <FormControl sx={{ width: "100%" }}>
-                  <TextField
-                    autoComplete="off"
-                    label="Remarks"
-                    id="remarks"
-                    size="small"
-                    onChange={(e) => setRemarkVal(e.target.value)}
-                    required
-                  />
-                </FormControl>
-              </Grid>
+const fieldConfig = [
+    {
+    name: "txn_id",
+    label: "TXN ID",
+    type: "text",
+    validation: {
+      required: true,
+      minLength: 6,
+      maxLength: 20,
+      pattern: /^[A-Za-z0-9_-]+$/,
+    },
+  },
 
-              <Grid
-                item
-                md={12}
-                xs={12}
-                sx={{ display: "flex", justifyContent: "center" }}
-              >
-                <FormControl>
-                  <div style={{ textAlign: "center", marginBottom: "8px" }}>
-                    M-PIN
-                  </div>
-                  <PinInput
-                    length={6}
-                    type="password"
-                    onChange={(value) => setMpin(value)}
-                    inputMode="numeric"
-                    regexCriteria={/^[0-9]*$/}
-                    inputStyle={{
-                      width: "40px",
-                      height: "40px",
-                      marginRight: "5px",
-                      textAlign: "center",
-                      border: "none",
-                      borderBottom: "1px solid #000",
-                      outline: "none",
-                    }}
-                  />
-                </FormControl>
-              </Grid>
+{
+  name: "bank_name",
+  label: "Bank Name",
+  type: "select",
+  options: banks.map((bank) => ({
+    value: bank.id,   // what you want to POST to backend
+    label: bank.name, // what you want to display
+  })),
+  validation: { required: true },
+},
 
-              <Grid
-                item
-                md={12}
-                xs={12}
-                sx={{
-                  display: "flex",
-                  justifyContent: "end",
-                  pr: 12,
-                  mt: 2,
-                }}
-              >
-                <Box sx={{ mr: 4 }}>
-                  <ResetMpin variant="text" />
-                </Box>
-              </Grid>
-            </Grid>
-          </Box>
 
-          <Box sx={{ mr: "5px" }}>
-            <ModalFooter form="cred_req" type="submit" request={request} />
-          </Box>
-        </Box>
-      </Drawer>
-    </Box>
-  );
-};
 
-export default FundRequestModal;
+  
+  {
+    name: "mode",
+    label: "Account / Mode",
+    type: "select",
+    validation: { required: true, min: 1 },
+  },
+{
+  name: "bank_ref_id",
+  label: "Bank Ref Id",
+  type: "text",
+  validation: {
+    required: true,
+    pattern: /^[A-Z]{4}0[0-9A-Z]{6}$/, // matches backend rule
+  },
+},
+
+{
+  name: "date",
+  label: "Date",
+  type: "date",  
+  validation: { required: true },
+},
+
+  {
+    name: "amount",
+    label: "Amount",
+    type: "number",
+    validation: { required: true, min: 1 },
+  },
+  {
+    name: "remark",
+    label: "Remarks",
+    type: "text",
+    validation: { required: false, maxLength: 200 },
+  },
+
+];
+
+
+    return (
+    
+<CommonModal
+ open={open}
+      onClose={handleClose}
+      title="Create Fund Request"
+      footerButtons={footerButtons}
+      size="medium"
+      iconType="info"
+       layout="two-column"
+      showCloseButton={true}
+      closeOnBackdropClick={!loading}
+      dividers={true}
+      fieldConfig={fieldConfig} // ✅ pass config
+      formData={formData}
+      handleChange={handleChange}
+      errors={errors}
+      loading={loading}
+      
+>
+
+
+</CommonModal>
+
+  )
+}
+
+export default CreateFundRequest

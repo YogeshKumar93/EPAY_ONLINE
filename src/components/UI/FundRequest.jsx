@@ -6,9 +6,13 @@ import { currencySetter } from "../../utils/Currencyutil";
 import { dateToTime, ddmmyy } from "../../utils/DateUtils";
 import AddIcon from "@mui/icons-material/Add";
 import CreateFundRequest from "../../pages/CreateFundRequest";
-import UpdateFundRequest from "../../pages/UpdateFundRequest";
+ 
 import FundRequestModal from "../../pages/FundRequestModal";
 import AuthContext from "../../contexts/AuthContext";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
+ 
+ 
 
 const FundRequest = () => {
   const [openCreate, setOpenCreate] = useState(false);
@@ -16,6 +20,15 @@ const FundRequest = () => {
   // const [selectedFund, setSelectedFund] = useState(null);
   const authCtx = useContext(AuthContext);
   const user = authCtx.user;
+  const [selectedRow, setSelectedRow] = useState(null);
+const [status, setStatus] = useState("");
+const [openModal, setOpenModal] = useState(false);
+
+const handleOpen = (row, statusType) => {
+  setSelectedRow(row);
+  setStatus(statusType);
+  setOpenModal(true);
+};
 
   const getStatusColor = useCallback((status) => {
     switch (status?.toUpperCase()) {
@@ -40,9 +53,9 @@ const FundRequest = () => {
   };
 
   // ✅ After update
-  const handleSaveUpdate = () => {
-    setOpenUpdate(false);
-  };
+  // const handleSaveUpdate = () => {
+  //   setOpenUpdate(false);
+  // };
 
   // ✅ Handle edit
   // const handleEdit = (row) => {
@@ -148,27 +161,38 @@ const FundRequest = () => {
         ),
         wrap: true,
       },
+
       {
-        name: <span className="mx-3">Actions</span>,
-        selector: (row) => (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            {row?.status === "REJECTED" ? (
-              <FundRequestModal row={row} action="REOPEN" />
-            ) : row?.status === "PENDING" ? (
-              <>
-                <FundRequestModal row={row} action="APPROVE" />
-                <FundRequestModal row={row} action="REJECT" />
-              </>
-            ) : null}
-          </Box>
-        ),
-        wrap: true,
-        width: "170px",
-        omit: user && user.role === "adm" ? false : true,
-      },
-    ],
-    [getStatusColor, user]
+  name: "Actions",
+  selector: (row) => (
+    <Box sx={{ display: "flex", gap: 1 }}>
+      <Tooltip title="approved">
+        <Button
+          color="success"
+          size="small"
+          onClick={() => handleOpen(row, "approved")}
+        >
+          <CheckCircleIcon fontSize="small" />
+        </Button>
+      </Tooltip>
+      <Tooltip title="reject">
+        <Button
+          color="error"
+          size="small"
+          onClick={() => handleOpen(row, "rejected")}
+        >
+          <CancelIcon fontSize="small" />
+        </Button>
+      </Tooltip>
+    </Box>
+  ),
+  width: "120px",
+}
+    ]
   );
+   
+    
+
 
   // ✅ Filters
   const filters = useMemo(
@@ -178,12 +202,13 @@ const FundRequest = () => {
         label: "Status",
         type: "dropdown",
         options: [
-          { value: "All", label: "All" },
-          { value: "SUCCESS", label: "Success" },
-          { value: "FAILED", label: "Failed" },
-          { value: "REFUND", label: "Refund" },
-          { value: "PENDING", label: "Pending" },
-          { value: "REJECTED", label: "Rejected" },
+          { value: "all", label: "All" },
+          { value: "success", label: "Success" },
+          { value: "failed", label: "Failed" },
+          { value: "refund", label: "Refund" },
+          { value: "pending", label: "Pending" },
+          { value: "approved", label: "Approved" },
+            { value: "rejected", label: "Rejected" },
         ],
       },
       { id: "name", label: "Name", type: "textfield" },
@@ -203,7 +228,7 @@ const FundRequest = () => {
           sx={{ bgcolor: "#1CA895" }}
           onClick={() => setOpenCreate(true)}
         >
-          Create Fund Request
+            Request
         </Button>
       </Box>
 
@@ -221,13 +246,17 @@ const FundRequest = () => {
         handleSave={handleSaveCreate}
       />
 
-      {/* ✅ Update Fund Request Modal */}
-      <UpdateFundRequest
-        open={openUpdate}
-        handleClose={() => setOpenUpdate(false)}
-        handleSave={handleSaveUpdate}
-        selectedFundRequest={selectedFund}
-      />
+    
+
+      {/* Render modal outside table */}
+{openModal && (
+  <FundRequestModal
+    open={openModal}
+    handleClose={() => setOpenModal(false)}
+    row={selectedRow}
+    status={status}
+  />
+)}
     </Box>
   );
 };
