@@ -19,6 +19,7 @@ export const Admin_nav = [
   { title: "Accounts", icon: "👥", icon2: "👥", to: "/admin/accounts" },
   { title: "Banks", icon: "👥", icon2: "👥", to: "/admin/banks" },
   { title: "Services", icon: "👥", icon2: "👥", to: "/admin/services" },
+  { title: "Commission Rules", icon: "👥", icon2: "👥", to: "/admin/commissionrule" },
   { title: "Templates", icon: "👥", icon2: "👥", to: "/admin/templates" },
   { title: "Logs", icon: "👥", icon2: "👥", to: "/admin/logs" },
   { title: "Layout", icon: "👥", icon2: "👥", to: "/admin/layout" },

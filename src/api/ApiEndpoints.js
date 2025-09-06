@@ -108,7 +108,7 @@ GET_WALLETLEDGER:"walletledger/getWalletLedgers",
    
 
   // ****************************** NEW API'S ABOVE ******************************
-
+GET_COMMISSION_RULE:"commission/getCommissions",
   GET_NOTIFICATION: "notification/getNotification",
   MARK_READ_NOTI: "notification/updateNotification",
   ADMIN_NOTIFICATION: "notification/createNotification",

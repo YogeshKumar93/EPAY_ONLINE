@@ -22,6 +22,7 @@ import ProfilePage from "../components/MyProfile/Profile";
 import Banks from "../pages/Banks";
 import { Transaction } from "../pages/Transaction";
 import Layouts from "../pages/Layouts";
+import CommissionRule from "../pages/CommissionRule";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useContext(AuthContext);
@@ -71,6 +72,7 @@ export default function AppRoutes() {
               <Route path="admin/profile" element={<ProfilePage />} />
               <Route path="admin/banks" element={<Banks />} />
               <Route path="admin/layout" element={<Layouts />} />
+              <Route path="admin/commissionrule" element={<CommissionRule />} />
               <Route
                 path="admin/*"
                 element={<Navigate to="/admin/dashboard" replace />}

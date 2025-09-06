@@ -115,13 +115,20 @@ console.log("user",user);
           if (userData.role === "adm") {
             navigate("/admin/dashboard");
           } else if (userData.role === "sadm") {
-            navigate("/sadmin/dashboard");
-          } else if (userData.role === "Asm") {
+            navigate("/admin/dashboard");
+          } else if (userData.role === "asm") {
             navigate("/asm/dashboard");
           }
-          else if (userData.role === "Delivery") {
-            navigate("/delivery/dashboard");
-          } else {
+           else if (userData.role === "di") {
+            navigate("/ad/dashboard");
+          }
+           else if (userData.role === "ret") {
+            navigate("/customer/dashboard");
+          }
+           else if (userData.role === "dd") {
+            navigate("/customer/dashboard");
+          }
+         else {
             navigate("/other/dashboard");
           }
         } else {
