@@ -138,9 +138,9 @@ export default function AppRoutes() {
               <Route path="customer/purchase" element={<MyPurchase />} />
               <Route path="customer/fund-request" element={<FundRequest />} />
               <Route path="customer/sale" element={<MySale />} />
-              <Route path="customer/notification" element={<Notification />} />
+         
               <Route path="customer/profile" element={<ProfilePage />} />
-              <Route path="customer/banks" element={<Banks />} />
+        
               <Route
                 path="customer/*"
                 element={<Navigate to="/customer/dashboard" replace />}
