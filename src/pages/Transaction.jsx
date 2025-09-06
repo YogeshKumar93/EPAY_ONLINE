@@ -34,13 +34,13 @@ export const Transaction = () => {
         indicatorColor="primary"
         sx={{ borderBottom: 1, borderColor: "divider" }}
       >
-        <Tab label="DMT Txn" />
-        <Tab label="BBPS Txn" />
-        <Tab label="Aeps Txn" />
-        <Tab label="Matm Txn" />
-        <Tab label="Payout Txn" />
-        <Tab label="Recharge Txn" />
-        <Tab label="Irctc Txn" />
+        <Tab label="DMT" />
+        <Tab label="BBPS" />
+        <Tab label="Aeps" />
+        <Tab label="Matm" />
+        <Tab label="Payout" />
+        <Tab label="Recharge" />
+        <Tab label="Irctc" />
       </Tabs>
 
       <TabPanel value={tab} index={0}>

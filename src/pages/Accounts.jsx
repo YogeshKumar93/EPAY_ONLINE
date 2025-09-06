@@ -11,6 +11,7 @@ import DeleteAccount from "./DeleteAccount";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CommonTable from "../components/common/CommonTable";
 import ReButton from "../components/common/ReButton";
+import CommonStatus from "../components/common/CommonStatus";
 
 const Accounts = () => {
   const [openCreate, setOpenCreate] = useState(false);
@@ -67,7 +68,7 @@ const Accounts = () => {
     { name: "Balance", selector: (row) => row.balance },
     {
       name: "Status",
-      selector: (row) => (row.status === 1 ? "Active" : "Inactive"),
+      selector: (row) =>  <CommonStatus value={row.status} />,
     },
     {
       name: "Actions",

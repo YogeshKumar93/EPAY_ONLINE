@@ -7,6 +7,7 @@ import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CreateServiceModal from "../components/CreateServiceModal";
 import EditServiceModal from "../components/EditServiceModaL";
+import CommonStatus from "../components/common/CommonStatus";
 
 const Users = ({ filters = [], query }) => {
   const authCtx = useContext(AuthContext);
@@ -58,14 +59,7 @@ const Users = ({ filters = [], query }) => {
       {
         name: "Status",
         selector: (row) =>
-          row?.is_active === 1 ? (
-            <Chip label="Active" color="success" size="small" />
-          ) : row?.is_active === 0 ? (
-            <Chip label="Inactive" color="error" size="small" />
-          ) : (
-            <Chip label="Pending" color="warning" size="small" />
-          ),
-        width: "120px",
+         <CommonStatus value={row.is_active} />
       },
 
     ],

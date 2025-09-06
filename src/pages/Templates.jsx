@@ -20,6 +20,7 @@ import CreateTemplateModal from "../components/CreateTemplateModal";
 import UpdateTemplateModal from "../components/UpdateTemplateModal";
 import { apiCall } from "../api/apiClient";
 import ReButton from "../components/common/ReButton";
+import CommonStatus from "../components/common/CommonStatus";
 
 const Templates = ({ filters = [], query }) => {
   const authCtx = useContext(AuthContext);
@@ -103,14 +104,7 @@ const Templates = ({ filters = [], query }) => {
       {
         name: "Status",
         selector: (row) =>
-          row?.status === 1 ? (
-            <Chip label="Active" color="success" size="small" />
-          ) : row?.status === 0 ? (
-            <Chip label="Inactive" color="error" size="small" />
-          ) : (
-            <Chip label="Pending" color="warning" size="small" />
-          ),
-        width: "120px",
+          <CommonStatus value={row.status} />
       },
       {
         name: "Actions",

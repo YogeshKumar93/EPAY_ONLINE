@@ -269,15 +269,7 @@ const Login = () => {
               >
                 {loading ? <CircularProgress size={24} /> : "Login"}
               </Button>
-              <Button
-                fullWidth
-                variant="outlined"
-                size="large"
-                sx={{ mt: 2, py: 1.5 }}
-                onClick={() => navigate("/sign-up")}
-              >
-                Sign Up
-              </Button>
+              
             </Box>
           </Paper>
         </Grid>

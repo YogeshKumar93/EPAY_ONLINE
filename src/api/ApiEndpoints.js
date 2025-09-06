@@ -135,6 +135,9 @@ GET_COMMISSION_RULE:"commission/getCommissions",
   GET_COLOURS:"layout/getColours",
   CREATE_COLOUR:"layout/createColour",
   UPDATE_COLOUR:"layout/updateColour",
+  CREATE_COMMISSION_RULE:"commission/createCommissionRule",
+  GET_COMMISSION_SCHEMA:"commission/getCommissionSchema",
+  UPDATE_COMMISSION_RULE:"commission/updateCommissionRule",
   // ****************************** NEW API'S ABOVE ******************************
 
 

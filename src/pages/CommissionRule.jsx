@@ -7,6 +7,9 @@ import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CreateServiceModal from "../components/CreateServiceModal";
 import EditServiceModal from "../components/EditServiceModaL";
+import ReButton from "../components/common/ReButton";
+import CreateCommissionRule from "./CreateCommissionRule";
+import EditCommissionModal from "../components/EditCommissionModal";
 
 const CommissionRule = ({ filters = [], query }) => {
   const authCtx = useContext(AuthContext);
@@ -16,7 +19,9 @@ const CommissionRule = ({ filters = [], query }) => {
   const [openEdit, setOpenEdit] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
-
+ const handleSaveCreate = () => {
+    setOpenCreate(false);
+  };
   const columns = useMemo(
     () => [
       {
@@ -74,16 +79,43 @@ const CommissionRule = ({ filters = [], query }) => {
         width: "150px",
       },
       {
-        name: "Value",
+        name: "DD Comm",
         selector: (row) => (
-          <Tooltip title={row?.value}>
-            <div style={{ textAlign: "left" }}>{row?.value || "-"}</div>
+          <Tooltip title={row?.comm_dd}>
+            <div style={{ textAlign: "left" }}>{row?.comm_dd || "-"}</div>
           </Tooltip>
         ),
-        width: "150px",
+        width: "100px",
       },
       {
-        name: "Min Amount",
+        name: "Ret Comm",
+        selector: (row) => (
+          <Tooltip title={row?.comm_ret}>
+            <div style={{ textAlign: "left" }}>{row?.comm_ret || "-"}</div>
+          </Tooltip>
+        ),
+        width: "100px",
+      },
+      {
+        name: "Di Comm",
+        selector: (row) => (
+          <Tooltip title={row?.comm_di}>
+            <div style={{ textAlign: "left" }}>{row?.comm_di || "-"}</div>
+          </Tooltip>
+        ),
+        width: "100px",
+      },
+      {
+        name: "Md Comm",
+        selector: (row) => (
+          <Tooltip title={row?.comm_md}>
+            <div style={{ textAlign: "left" }}>{row?.comm_md || "-"}</div>
+          </Tooltip>
+        ),
+        width: "100px",
+      },
+      {
+        name: "Min Amt",
         selector: (row) => (
           <Tooltip title={row?.min_amount}>
             <div style={{ textAlign: "left" }}>{row?.min_amount || "-"}</div>
@@ -92,7 +124,7 @@ const CommissionRule = ({ filters = [], query }) => {
         width: "150px",
       },
       {
-        name: "Max Amount",
+        name: "Max Amt",
         selector: (row) => (
           <Tooltip title={row?.max_amount}>
             <div style={{ textAlign: "left" }}>{row?.max_amount || "-"}</div>
@@ -100,30 +132,27 @@ const CommissionRule = ({ filters = [], query }) => {
         ),
         width: "150px",
       },
-    
-    //   {
-    //     name: "Actions",
-    //     selector: (row) => (
-    //       <IconButton
-    //         color="primary"
-    //         onClick={() => {
-    //           setSelectedService(row);
-    //           setOpenEdit(true);
-    //         }}
-    //       >
-    //         <Edit />
-    //       </IconButton>
-    //     ),
-    //     width: "100px",
-    //   },
+          {
+        name: "Actions",
+        selector: (row) => (
+          <IconButton
+            color="primary"
+            onClick={() => {
+              setSelectedService(row);
+              setOpenEdit(true);
+            }}
+          >
+            <Edit />
+          </IconButton>
+        ),
+        width: "100px",
+      },
     ],
     []
   );
 
   return (
-    <Box>
-      {/* Create Service Button */}
-  
+    <Box>  
 
       {/* Services Table */}
       <CommonTable
@@ -132,7 +161,25 @@ const CommissionRule = ({ filters = [], query }) => {
         endpoint={ApiEndpoints.GET_COMMISSION_RULE}
         filters={filters}
         queryParam={query}
-       
+        customHeader={
+          <ReButton
+            variant="contained"
+            label="Commission"
+            onClick={() => setOpenCreate(true)}
+          ></ReButton>
+        }
+      />
+         <CreateCommissionRule
+        open={openCreate}
+        handleClose={() => setOpenCreate(false)}
+        handleSave={handleSaveCreate}
+      />
+           {/* Edit Service Modal */}
+      <EditCommissionModal
+        open={openEdit}
+        onClose={() => setOpenEdit(false)}
+        service={selectedService}
+        onSuccess={() => setRefreshKey((prev) => prev + 1)}
       />
     </Box>
   );
