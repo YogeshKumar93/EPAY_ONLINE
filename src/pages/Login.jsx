@@ -150,8 +150,8 @@ const Login = () => {
   };
 
   return (
-    <>
-      <Grid
+       <Grid container sx={{ height: "100vh", width: "100vw" }}>
+      {/* <Grid
         container
         sx={{
           minHeight: "100vh",
@@ -159,8 +159,34 @@ const Login = () => {
         }}
         justifyContent="center"
         alignItems="center"
+      > */}
+
+{/* Left Side with Image */}
+      <Grid
+        item
+        xs={12}
+        md={6}
+        sx={{
+          backgroundImage:
+            "url('https://source.unsplash.com/1600x900/?t",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          height: "80%",
+          width:"900px"
+        }}
+      />
+
+
+    {/* Right Side with Login Form */}
+      <Grid
+        item
+        xs={12}
+        md={6}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        sx={{ p: 4, height: "100%" }}
       >
-        <Grid item xs={12} sm={8} md={6} lg={4}>
           <Paper sx={{ p: 4, borderRadius: 3 }}>
             <Typography
               variant="h5"
@@ -254,7 +280,7 @@ const Login = () => {
             </Box>
           </Paper>
         </Grid>
-      </Grid>
+      {/* </Grid> */}
 
       {/* MPIN/OTP Verification Modal */}
       <Modal
@@ -291,7 +317,7 @@ const Login = () => {
         onClose={() => setForgotModalOpen(false)}
         initialUsername={username}
       />
-    </>
+ </Grid>
   );
 };
 
