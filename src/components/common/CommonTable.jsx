@@ -1,23 +1,13 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-  useMemo,
-  memo,
-} from "react";
+import React, { useState, useEffect, useMemo, memo } from "react";
 import {
   Box,
   TextField,
   MenuItem,
-  FormControl,
-  Tooltip,
   Button,
   Paper,
   Chip,
   IconButton,
   CircularProgress,
-  TablePagination,
   Typography,
   Dialog,
   DialogTitle,
@@ -30,108 +20,18 @@ import {
   Refresh as RefreshIcon,
   FilterList as FilterListIcon,
   Clear as ClearIcon,
-  FirstPage as FirstPageIcon,
-  KeyboardArrowLeft,
-  KeyboardArrowRight,
-  LastPage as LastPageIcon,
 } from "@mui/icons-material";
 import { apiCall } from "../../api/apiClient";
-import Loader from "./Loader";
-
-// Memoized TablePaginationActions component
-const TablePaginationActions = memo(function TablePaginationActions(props) {
-  const theme = useTheme();
-  const { count, page, rowsPerPage, onPageChange } = props;
-
-  const handleFirstPageButtonClick = useCallback(
-    (event) => {
-      onPageChange(event, 0);
-    },
-    [onPageChange]
-  );
-
-  const handleBackButtonClick = useCallback(
-    (event) => {
-      onPageChange(event, page - 1);
-    },
-    [onPageChange, page]
-  );
-
-  const handleNextButtonClick = useCallback(
-    (event) => {
-      onPageChange(event, page + 1);
-    },
-    [onPageChange, page]
-  );
-
-  const handleLastPageButtonClick = useCallback(
-    (event) => {
-      onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
-    },
-    [onPageChange, count, rowsPerPage]
-  );
-
-  return (
-    <Box sx={{ flexShrink: 0, ml: 2.5 }}>
-      <IconButton
-        onClick={handleFirstPageButtonClick}
-        disabled={page === 0}
-        aria-label="first page"
-      >
-        {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
-      </IconButton>
-      <IconButton
-        onClick={handleBackButtonClick}
-        disabled={page === 0}
-        aria-label="previous page"
-      >
-        {theme.direction === "rtl" ? (
-          <KeyboardArrowRight />
-        ) : (
-          <KeyboardArrowLeft />
-        )}
-      </IconButton>
-      <IconButton
-        onClick={handleNextButtonClick}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="next page"
-      >
-        {theme.direction === "rtl" ? (
-          <KeyboardArrowLeft />
-        ) : (
-          <KeyboardArrowRight />
-        )}
-      </IconButton>
-      <IconButton
-        onClick={handleLastPageButtonClick}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="last page"
-      >
-        {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
-      </IconButton>
-    </Box>
-  );
-});
-
-// Memoized filter chip component
-const FilterChip = memo(({ filterId, value, filterConfig, onRemove }) => (
-  <Chip
-    label={`${filterConfig?.label}: ${value}`}
-    onDelete={() => onRemove(filterId)}
-    size="small"
-    sx={{ m: 0.5 }}
-  />
-));
+import DataTable from "react-data-table-component";
+import { red } from "@mui/material/colors";
 
 const CommonTable = ({
-  columns: initialColumns,
+  columns,
   endpoint,
-  filters: availableFilters = [],
+  filters = [],
   refreshInterval = 0,
-  defaultPageSize = 15,
-  defaultFilters,
+  defaultPageSize = 10,
   title = "Data Table",
-
   queryParam = "",
 }) => {
   const [data, setData] = useState([]);
@@ -139,376 +39,313 @@ const CommonTable = ({
   const [error, setError] = useState(null);
   const [filterValues, setFilterValues] = useState({});
   const [appliedFilters, setAppliedFilters] = useState({});
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(defaultPageSize);
-  const [totalCount, setTotalCount] = useState(0);
+  const [totalRows, setTotalRows] = useState(0);
+  const [perPage, setPerPage] = useState(defaultPageSize);
+  const [currentPage, setCurrentPage] = useState(1);
   const [filterModalOpen, setFilterModalOpen] = useState(false);
-
-  // Use refs to track values without causing re-renders
-  const appliedFiltersRef = useRef({});
-  const pageRef = useRef(0);
-  const rowsPerPageRef = useRef(defaultPageSize);
-  const refreshIntervalRef = useRef(refreshInterval);
-  const hasFetchedInitialData = useRef(false);
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
 
-  // Memoized initial filter values
-  const initialFilterValues = useMemo(() => {
-    const values = {};
-    availableFilters.forEach((filter) => {
-      values[filter.id] = filter.type === "dropdown" ? "All" : "";
-    });
-    return values;
-  }, [availableFilters]);
-
   // Initialize filter values
   useEffect(() => {
+    const initialFilterValues = {};
+    filters.forEach((filter) => {
+      initialFilterValues[filter.id] = filter.type === "dropdown" ? "All" : "";
+    });
     setFilterValues(initialFilterValues);
     setAppliedFilters(initialFilterValues);
-    appliedFiltersRef.current = initialFilterValues;
-  }, []);
+  }, [filters]);
 
-  // Memoized fetch data function
-  const fetchData = useCallback(
-    async (isManualRefresh = false) => {
-      setLoading(true);
-      setError(null);
+  // Fetch data function
+  const fetchData = async (page = currentPage, limit = perPage) => {
+    setLoading(true);
+    setError(null);
 
-      const currentAppliedFilters = appliedFiltersRef.current;
-      const currentPage = pageRef.current;
-      const currentRowsPerPage = rowsPerPageRef.current;
+    const params = {
+      ...appliedFilters,
+      page,
+      paginate: limit,
+    };
 
-      // Prepare params for API call
-      const params = {
-        ...currentAppliedFilters,
-        page: currentPage + 1,
-        paginate: currentRowsPerPage,
-      };
-
-      // Clean up params
-      Object.keys(params).forEach((key) => {
-        if (
-          params[key] === "All" ||
-          params[key] === "" ||
-          params[key] == null
-        ) {
-          delete params[key];
-        }
-      });
-
-      // Add queryParam if provided
-      let finalEndpoint = endpoint;
-      if (typeof queryParam === "string" && queryParam.trim() !== "") {
-        // queryParam is a query string → append to URL
-        finalEndpoint = `${endpoint}?${queryParam}`;
-      } else if (
-        typeof queryParam === "object" &&
-        queryParam !== null &&
-        Object.keys(queryParam).length > 0
-      ) {
-        // queryParam is an object → merge into params
-        Object.assign(params, queryParam);
+    // Clean up params
+    Object.keys(params).forEach((key) => {
+      if (params[key] === "All" || params[key] === "" || params[key] == null) {
+        delete params[key];
       }
+    });
 
-      try {
-        const { error: apiError, response } = await apiCall(
-          "POST",
-          finalEndpoint,
-          null,
-          params
+    // Add queryParam if provided
+    let finalEndpoint = endpoint;
+    if (typeof queryParam === "string" && queryParam.trim() !== "") {
+      finalEndpoint = `${endpoint}?${queryParam}`;
+    } else if (
+      typeof queryParam === "object" &&
+      queryParam !== null &&
+      Object.keys(queryParam).length > 0
+    ) {
+      Object.assign(params, queryParam);
+    }
+
+    try {
+      const { error: apiError, response } = await apiCall(
+        "POST",
+        finalEndpoint,
+        null,
+        params
+      );
+
+      if (apiError) {
+        setError(apiError.message || "Failed to fetch data");
+      } else {
+        // Normalize data structure
+        let normalizedData =
+          response?.data?.data || response?.data || response || [];
+
+        // Handle total count
+        let total =
+          response?.data?.total ||
+          response?.total ||
+          normalizedData?.length ||
+          0;
+
+        setData(
+          Array.isArray(normalizedData) ? normalizedData : [normalizedData]
         );
-
-        if (apiError) {
-          setError(apiError.message || "Failed to fetch data");
-        } else {
-          if (response) {
-            if (apiError) {
-              setError(apiError.message || "Failed to fetch data");
-            } else if (response) {
-              // ✅ Normalize data structure
-              let normalizedData =
-                response?.data?.data || // case: response.data.data
-                response?.data || // case: response.data
-                response || // case: direct response
-                [];
-
-              // ✅ Handle total count safely
-              let total =
-                response?.data?.total ||
-                response?.total ||
-                normalizedData?.length ||
-                0;
-
-              setData(
-                Array.isArray(normalizedData)
-                  ? normalizedData
-                  : [normalizedData]
-              );
-              setTotalCount(total);
-            } else {
-              setData([]);
-              setTotalCount(0);
-            }
-          } else if (Array.isArray(response)) {
-            setData(response);
-            setTotalCount(response.length);
-          } else {
-            setData([]);
-            setTotalCount(0);
-          }
-        }
-      } catch (err) {
-        setError(err.message || "An error occurred");
-      } finally {
-        setLoading(false);
+        setTotalRows(total);
       }
-    },
-    [endpoint, queryParam]
-  );
-
-  // Update refs when state changes
-  useEffect(() => {
-    appliedFiltersRef.current = appliedFilters;
-    pageRef.current = page;
-    rowsPerPageRef.current = rowsPerPage;
-    refreshIntervalRef.current = refreshInterval;
-  }, [appliedFilters, page, rowsPerPage, refreshInterval]);
+    } catch (err) {
+      setError(err.message || "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Initial data fetch
   useEffect(() => {
-    if (!hasFetchedInitialData.current) {
-      fetchData();
-      hasFetchedInitialData.current = true;
-    }
-  }, [fetchData]);
+    fetchData();
+  }, []);
 
   // Setup refresh interval
   useEffect(() => {
     let intervalId;
-    if (refreshIntervalRef.current > 0) {
+    if (refreshInterval > 0) {
       intervalId = setInterval(() => {
         fetchData();
-      }, refreshIntervalRef.current);
+      }, refreshInterval);
     }
 
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
-  }, [fetchData]);
+  }, [refreshInterval]);
 
-  // Memoized filter handlers
-  const handleFilterChange = useCallback((filterId, value) => {
+  // Handle filter changes
+  const handleFilterChange = (filterId, value) => {
     setFilterValues((prev) => ({
       ...prev,
       [filterId]: value,
     }));
-  }, []);
+  };
 
-  const applyFilters = useCallback(() => {
+  const applyFilters = () => {
     setAppliedFilters({ ...filterValues });
-    appliedFiltersRef.current = { ...filterValues };
-    setPage(0);
-    pageRef.current = 0;
+    setCurrentPage(1);
     if (isSmallScreen) {
       setFilterModalOpen(false);
     }
-    fetchData();
-  }, [filterValues, isSmallScreen, fetchData]);
+    fetchData(1, perPage);
+  };
 
-  const resetFilters = useCallback(() => {
-    setFilterValues(initialFilterValues);
-    setAppliedFilters(initialFilterValues);
-    appliedFiltersRef.current = initialFilterValues;
-    setPage(0);
-    pageRef.current = 0;
-    fetchData();
-  }, [initialFilterValues, fetchData]);
+  const resetFilters = () => {
+    const resetValues = {};
+    filters.forEach((filter) => {
+      resetValues[filter.id] = filter.type === "dropdown" ? "All" : "";
+    });
+    setFilterValues(resetValues);
+    setAppliedFilters(resetValues);
+    setCurrentPage(1);
+    fetchData(1, perPage);
+  };
 
-  const removeFilter = useCallback(
-    (filterId) => {
-      const resetValue =
-        availableFilters.find((f) => f.id === filterId)?.type === "dropdown"
-          ? "All"
-          : "";
+  const removeFilter = (filterId) => {
+    const resetValue =
+      filters.find((f) => f.id === filterId)?.type === "dropdown" ? "All" : "";
 
-      setFilterValues((prev) => ({ ...prev, [filterId]: resetValue }));
-      setAppliedFilters((prev) => ({ ...prev, [filterId]: resetValue }));
-      appliedFiltersRef.current = {
-        ...appliedFiltersRef.current,
-        [filterId]: resetValue,
-      };
-      setPage(0);
-      pageRef.current = 0;
-      fetchData();
-    },
-    [availableFilters, fetchData]
-  );
+    setFilterValues((prev) => ({ ...prev, [filterId]: resetValue }));
+    setAppliedFilters((prev) => ({ ...prev, [filterId]: resetValue }));
+    setCurrentPage(1);
+    fetchData(1, perPage);
+  };
 
-  const handleChangePage = useCallback(
-    (event, newPage) => {
-      setPage(newPage);
-      pageRef.current = newPage;
-      fetchData();
-    },
-    [fetchData]
-  );
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    fetchData(page, perPage);
+  };
 
-  const handleChangeRowsPerPage = useCallback(
-    (event) => {
-      const newRowsPerPage = parseInt(event.target.value, 10);
-      setRowsPerPage(newRowsPerPage);
-      rowsPerPageRef.current = newRowsPerPage;
-      setPage(0);
-      pageRef.current = 0;
-      fetchData();
-    },
-    [fetchData]
-  );
+  const handlePerRowsChange = (newPerPage, page) => {
+    setPerPage(newPerPage);
+    setCurrentPage(page);
+    fetchData(page, newPerPage);
+  };
 
-  // Manual refresh handler
-  const handleManualRefresh = useCallback(() => {
-    fetchData(true);
-  }, [fetchData]);
+  const handleManualRefresh = () => {
+    fetchData(currentPage, perPage);
+  };
 
-  // Memoized filter inputs renderer
-  const renderFilterInputs = useCallback(
-    () =>
-      availableFilters.map((filter) => (
-        <Box key={filter.id} sx={{ minWidth: 120, mb: 2 }}>
-          {filter.type === "dropdown" ? (
-            <FormControl size="small" fullWidth>
-              <TextField
-                select
-                label={filter.label}
-                value={filterValues[filter.id] || "All"}
-                onChange={(e) => handleFilterChange(filter.id, e.target.value)}
-              >
-                <MenuItem value="All">All</MenuItem>
-                {filter.options &&
-                  filter.options.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-              </TextField>
-            </FormControl>
-          ) : (
-            <TextField
-              fullWidth
-              size="small"
-              label={filter.label}
-              value={filterValues[filter.id] || ""}
-              onChange={(e) => handleFilterChange(filter.id, e.target.value)}
-            />
-          )}
-        </Box>
-      )),
-    [availableFilters, filterValues, handleFilterChange]
-  );
+  // Render filter inputs
+  const renderFilterInputs = () =>
+    filters.map((filter) => (
+      <Box key={filter.id} sx={{ minWidth: 120, mb: 2 }}>
+        {filter.type === "dropdown" ? (
+          <TextField
+            select
+            fullWidth
+            size="small"
+            label={filter.label}
+            value={filterValues[filter.id] || "All"}
+            onChange={(e) => handleFilterChange(filter.id, e.target.value)}
+          >
+            <MenuItem value="All">All</MenuItem>
+            {filter.options &&
+              filter.options.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+          </TextField>
+        ) : (
+          <TextField
+            fullWidth
+            size="small"
+            label={filter.label}
+            value={filterValues[filter.id] || ""}
+            onChange={(e) => handleFilterChange(filter.id, e.target.value)}
+          />
+        )}
+      </Box>
+    ));
 
-  // Memoized applied filters chips
+  // Applied filters chips
   const appliedFiltersChips = useMemo(
     () =>
       Object.entries(appliedFilters)
         .filter(([key, value]) => value && value !== "All" && value !== "")
         .map(([key, value]) => {
-          const filterConfig = availableFilters.find((f) => f.id === key);
+          const filterConfig = filters.find((f) => f.id === key);
           return (
-            <FilterChip
+            <Chip
               key={key}
-              filterId={key}
-              value={value}
-              filterConfig={filterConfig}
-              onRemove={removeFilter}
+              label={`${filterConfig?.label}: ${value}`}
+              onDelete={() => removeFilter(key)}
+              size="small"
+              sx={{ m: 0.5 }}
             />
           );
         }),
-    [appliedFilters, availableFilters, removeFilter]
+    [appliedFilters, filters]
   );
 
-  // Memoized table rows
-  const tableRows = useMemo(() => {
-    if (loading) {
-      return (
-        <tr>
-          <td
-            colSpan={initialColumns.length}
-            style={{ textAlign: "center", padding: "20px" }}
-          >
-            <CircularProgress />
-          </td>
-        </tr>
-      );
-    }
+  // Custom styles for the data table with improved responsive behavior
+  const customStyles = {
+    table: {
+      style: {
+        width: "100%",
+        minWidth: "100%",
+        tableLayout: "fixed",
+      },
+    },
+    tableWrapper: {
+      style: {
+        display: "table",
+        width: "100%",
+        overflowX: "auto",
+      },
+    },
+    headRow: {
+      style: {
+        backgroundColor: theme.palette.grey[100],
+        minHeight: "56px",
+      },
+    },
+    headCells: {
+      style: {
+        paddingLeft: "8px",
+        paddingRight: "8px",
+        fontSize: "14px",
+        fontWeight: "bold",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        minWidth: "80px", // Added minimum width for cells
+      },
+    },
+    cells: {
+      style: {
+        paddingLeft: "8px",
+        paddingRight: "8px",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        minWidth: "80px", // Added minimum width for cells
+      },
+    },
+    pagination: {
+      style: {
+        minHeight: "56px",
+        flexWrap: "wrap",
+        justifyContent: "center",
+      },
+    },
+  };
 
-    if (data.length === 0) {
-      return (
-        <tr>
-          <td
-            colSpan={initialColumns.length}
-            style={{ textAlign: "center", padding: "20px" }}
-          >
-            No data found
-          </td>
-        </tr>
-      );
-    }
-
-    return data.map((row, rowIndex) => (
-      <tr key={rowIndex} style={{ borderBottom: "1px solid #e0e0e0" }}>
-        {initialColumns.map((column, colIndex) => (
-          <td
-            key={colIndex}
-            style={{
-              padding: "12px",
-              verticalAlign: "top",
-              width: column.width || "auto",
-            }}
-          >
-            {column.selector ? column.selector(row) : row[column.name] || "N/A"}
-          </td>
-        ))}
-      </tr>
-    ));
-  }, [loading, data, initialColumns]);
-
-  // Memoized table headers
-  const tableHeaders = useMemo(
-    () =>
-      initialColumns.map((column, index) => (
-        <th
-          key={index}
-          style={{
-            padding: "12px",
-            textAlign: "left",
-            fontWeight: "bold",
-            width: column.width || "auto",
-            minWidth: column.width || "auto",
-          }}
-        >
-          {typeof column.name === "string"
-            ? column.name
-            : column.name?.props?.children || `Column ${index + 1}`}
-        </th>
-      )),
-    [initialColumns]
-  );
+  const responsiveColumns = useMemo(() => {
+    return columns.map((column) => {
+      return {
+        ...column,
+        omit: isSmallScreen && column.omitOnMobile,
+        // Add responsive width for small screens
+        width:
+          isSmallScreen && column.maxWidth ? column.maxWidth : column.width,
+        minWidth: column.minWidth || "80px", // Ensure columns have a minimum width
+      };
+    });
+  }, [columns, isSmallScreen]);
 
   return (
-    <Box sx={{ p: 2 }}>
-      <Loader request={loading} />
+    <Box
+      sx={{
+        width: "100%",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       {/* Filter Section */}
-      {availableFilters.length > 0 && (
+      {filters.length > 0 && (
         <>
-          <Paper sx={{ p: 2, mb: 2, display: { xs: "none", md: "block" } }}>
+          <Paper
+            sx={{
+              p: 2,
+              mb: 2,
+              display: { xs: "none", md: "block" },
+              width: "100%",
+            }}
+          >
             <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
               <FilterListIcon sx={{ mr: 1 }} />
               <Typography variant="h6">Filters</Typography>
             </Box>
 
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 2 }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 2,
+                mb: 2,
+                width: "100%",
+              }}
+            >
               {renderFilterInputs()}
 
               <Button variant="contained" onClick={applyFilters}>
@@ -523,18 +360,17 @@ const CommonTable = ({
               </Button>
             </Box>
 
-            {/* Applied filters chips */}
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
               {appliedFiltersChips}
             </Box>
           </Paper>
 
-          {/* Mobile filter button */}
           <Box
             sx={{
               display: { xs: "flex", md: "none" },
               justifyContent: "flex-end",
               mb: 2,
+              width: "100%",
             }}
           >
             <Button
@@ -592,18 +428,41 @@ const CommonTable = ({
           justifyContent: "space-between",
           alignItems: "center",
           mb: 2,
+          flexDirection: { xs: "column", sm: "row" },
+          gap: { xs: 2, sm: 0 },
+          width: "100%",
         }}
       >
-        <Typography variant="h5">{title}</Typography>
-        <Tooltip title="Refresh">
-          <IconButton onClick={handleManualRefresh} disabled={loading}>
-            {loading ? <CircularProgress size={24} /> : <RefreshIcon />}
-          </IconButton>
-        </Tooltip>
+        <Typography
+          variant="h5"
+          sx={{
+            fontSize: { xs: "1.5rem", sm: "2rem" },
+            textAlign: { xs: "center", sm: "left" },
+            width: { xs: "100%", sm: "auto" },
+          }}
+        >
+          {title}
+        </Typography>
+        <IconButton
+          onClick={handleManualRefresh}
+          disabled={loading}
+          sx={{
+            alignSelf: { xs: "center", sm: "flex-end" },
+          }}
+        >
+          {loading ? <CircularProgress size={24} /> : <RefreshIcon />}
+        </IconButton>
       </Box>
 
       {/* Data Table */}
-      <Paper sx={{ width: "100%", overflow: "hidden" }}>
+      <Paper
+        sx={{
+          width: "100%",
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         {error ? (
           <Box sx={{ p: 3, textAlign: "center" }}>
             <Typography color="error">Error: {error}</Typography>
@@ -616,28 +475,35 @@ const CommonTable = ({
             </Button>
           </Box>
         ) : (
-          <>
-            <Box sx={{ overflow: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
-                  <tr style={{ backgroundColor: "#f5f5f5" }}>{tableHeaders}</tr>
-                </thead>
-                <tbody>{tableRows}</tbody>
-              </table>
-            </Box>
-
-            {/* Pagination */}
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 15, 25, 50]}
-              component="div"
-              count={totalCount}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              ActionsComponent={TablePaginationActions}
+          <Box sx={{ width: "100%", overflow: "auto" }}>
+            <DataTable
+              columns={responsiveColumns}
+              data={data}
+              progressPending={loading}
+              progressComponent={
+                <Box sx={{ display: "flex", justifyContent: "center", py: 3 }}>
+                  <CircularProgress />
+                </Box>
+              }
+              pagination
+              paginationServer
+              paginationTotalRows={totalRows}
+              onChangeRowsPerPage={handlePerRowsChange}
+              onChangePage={handlePageChange}
+              customStyles={customStyles}
+              responsive
+              striped
+              highlightOnHover
+              pointerOnHover
+              noDataComponent={
+                <Typography sx={{ py: 3, textAlign: "center" }}>
+                  No data found
+                </Typography>
+              }
+              fixedHeader
+              fixedHeaderScrollHeight="400px"
             />
-          </>
+          </Box>
         )}
       </Paper>
     </Box>

@@ -86,31 +86,6 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const MainContent = styled(Box)(({ theme }) => ({
-    flexGrow: 1,
-    padding: theme.spacing(3),
-    backgroundColor: theme.palette.background.default,
-    minHeight: "100vh",
-    marginLeft: 0,
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    [theme.breakpoints.down("sm")]: {
-      minWidth: "90%",
-      padding: theme.spacing(1.5),
-    },
-    [theme.breakpoints.between("sm", "md")]: {
-      minWidth: "768px",
-    },
-    [theme.breakpoints.up("md")]: {
-      minWidth: "1024px",
-    },
-    [theme.breakpoints.up("lg")]: {
-      minWidth: desktopOpen ? "1310px" : "1550px",
-    },
-  }));
-
   const navigationItems = roleNavigation[userRole] || nav;
 
   const handleDrawerToggle = () => {
@@ -264,7 +239,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
       <AppBar
         position="fixed"
         sx={{
-          backgroundColor:"#0037D7",
+          backgroundColor: "#0037D7",
           width: {
             md: desktopOpen
               ? `calc(100% - ${themeSettings.drawerWidth}px)`
@@ -415,7 +390,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
         component="nav"
         sx={{
           width: { md: desktopOpen ? themeSettings.drawerWidth : 0 },
-          flexShrink: { md: 0 },
+        
         }}
         className="main-layout"
       >
@@ -452,7 +427,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                   duration: theme.transitions.duration.enteringScreen,
                 }),
               ...(!desktopOpen && {
-                overflowX: "hidden",
+           
                 transition: (theme) =>
                   theme.transitions.create("width", {
                     easing: theme.transitions.easing.sharp,
@@ -467,22 +442,6 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
           {drawerContent}
         </Drawer>
       </Box>
-
-      {/* Main Content */}
-      <MainContent
-        sx={{
-          width: {
-            md: desktopOpen
-              ? `calc(100% - ${themeSettings.drawerWidth}px)`
-              : "100%",
-          },
-        }}
-        className="content"
-      >
-        <Toolbar sx={{ minHeight: "64px !important" }} />{" "}
-        {/* Reduced toolbar spacing */}
-        <Outlet />
-      </MainContent>
     </Box>
   );
 };
