@@ -283,7 +283,7 @@ const MainContent = styled(Box)(({ theme }) => ({
             <MenuIcon />
           </IconButton> */}
           <Typography
-            variant="h6"
+            variant="h5"
             noWrap
             component="div"
             sx={{ flexGrow: 1 }}
