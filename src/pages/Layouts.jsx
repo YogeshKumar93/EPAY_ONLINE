@@ -17,6 +17,7 @@ import UpdateLayouts from "./UpdateLayouts";
 const Layouts = ({ filters = [], query }) => {
   const[openCreate, setOpenCreate] = useState(false);
    const [openUpdate, setOpenUpdate] = useState(false);
+   const [selectedLayout, setSelectedLayout] = useState(null);
    const [selectedColor, setSelectedColor] = useState(null);
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
@@ -32,8 +33,9 @@ const Layouts = ({ filters = [], query }) => {
     setOpenUpdate(false);
   }
 
-  const handleEdit = (row) => {
-  setSelectedColor(row);
+  const handleEdit = (layout) => {
+     setSelectedLayout(layout); 
+  // setSelectedColor(row);
   setOpenUpdate(true);
 };
 
@@ -119,6 +121,7 @@ const Layouts = ({ filters = [], query }) => {
 
       <UpdateLayouts 
          open={openUpdate}
+          row={selectedLayout}
     handleClose={() => {
       setOpenUpdate(false);
       setSelectedColor(null);

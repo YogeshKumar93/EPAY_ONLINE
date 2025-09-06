@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import CommonModal from "../components/common/CommonModal";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { CircularProgress } from "@mui/material";
+import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
 
-const UpdateLayouts = ({ open, handleClose, handleSave, selectedLayout }) => {
+const UpdateLayouts = ({ open, handleClose, row }) => {
   const [formData, setFormData] = useState({
     id: "",
     name: "",
@@ -15,19 +16,19 @@ const UpdateLayouts = ({ open, handleClose, handleSave, selectedLayout }) => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // ✅ Pre-fill data when modal opens
-  useEffect(() => {
-    if (selectedLayout) {
-      setFormData({
-        id: selectedLayout.id || "",
-        name: selectedLayout.name || "",
-        color_code: selectedLayout.color_code || "",
-        element_type: selectedLayout.element_type || "",
-      });
-    }
-  }, [selectedLayout, open]);
+  // ✅ Prefill data when modal opens
+ useEffect(() => {
+  if (open && row) {
+    setFormData({
+      id: row?.id || "",
+      name: row?.name || "",
+      color_code: row?.color_code || "",
+      element_type: row?.element_type || "",
+    });
+  }
+}, [open, row]);
 
-  // ✅ Handle input change
+  // ✅ Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -40,27 +41,34 @@ const UpdateLayouts = ({ open, handleClose, handleSave, selectedLayout }) => {
   const onSubmit = async () => {
     setLoading(true);
     try {
-      const { error, response } = await apiCall(
-        "POST", // change to PUT/PATCH if backend requires
-              `${ApiEndpoints.UPDATE_COLOUR} `,
-        formData
+      const payload = {
+        id: formData.id,
+        name: formData.name,
+        color_code: formData.color_code,
+        element_type: formData.element_type,
+      };
+
+      const response = await apiCall(
+        "POST", // change to PUT/PATCH if backend expects
+        ApiEndpoints.UPDATE_COLOUR,
+        payload
       );
 
       if (response) {
-        handleSave(response.data); // update parent state
+        okSuccessToast("Layout updated successfully!");
         handleClose();
       } else {
-        console.error("Failed to update layout:", error || response);
+        apiErrorToast("Failed to update layout");
       }
     } catch (err) {
-      console.error("Error updating layout:", err);
-      alert("Something went wrong while updating layout.");
+      console.error(err);
+      apiErrorToast("Something went wrong while updating layout");
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ Footer buttons
+  // ✅ Footer Buttons
   const footerButtons = [
     {
       text: "Cancel",
@@ -77,11 +85,26 @@ const UpdateLayouts = ({ open, handleClose, handleSave, selectedLayout }) => {
     },
   ];
 
-  // ✅ Field Config (like FundRequest)
+  // ✅ Field Config
   const fieldConfig = [
-    { name: "name", label: "Name", type: "text" },
-    { name: "color_code", label: "Colour Code", type: "color" },
-    { name: "element_type", label: "Element Type", type: "text" },
+    {
+      name: "name",
+      label: "Name",
+      type: "text",
+      validation: { required: true, maxLength: 100 },
+    },
+    {
+      name: "color_code",
+      label: "Colour Code",
+      type: "color",
+      validation: { required: true },
+    },
+    {
+      name: "element_type",
+      label: "Element Type",
+      type: "text",
+      validation: { required: true },
+    },
   ];
 
   return (
