@@ -3,7 +3,7 @@ import { Box, Tooltip, Typography, Button } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import AuthContext from "../../contexts/AuthContext";
-import { dateToTime1, ddmmyy } from "../../utils/DateUtils";
+import { dateToTime1, ddmmyy, ddmmyyWithTime } from "../../utils/DateUtils";
 
 const IrctcTxn = ({ filters = [], query }) => {
   const authCtx = useContext(AuthContext);
@@ -12,6 +12,27 @@ const IrctcTxn = ({ filters = [], query }) => {
 
   const columns = useMemo(
     () => [
+            
+      {
+        name: "Date",
+        selector: (row) => (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Tooltip title={`Created: ${ddmmyyWithTime(row.created_at)}`} arrow>
+              <span>
+                {ddmmyy(row.created_at)} {dateToTime1(row.created_at)}
+              </span>
+            </Tooltip>
+      
+            <Tooltip title={`Updated: ${ddmmyyWithTime(row.updated_at)}`} arrow>
+              <span>
+               {ddmmyy(row.updated_at)} {dateToTime1(row.updated_at)}
+              </span>
+            </Tooltip>
+          </div>
+        ),
+        wrap: true,
+        width: "140px", 
+      },
       {
         name: "Txn ID",
         selector: (row) => row.txn_id,
@@ -77,18 +98,7 @@ const IrctcTxn = ({ filters = [], query }) => {
           fontWeight: 600,
         }),
       },
-      {
-        name: "Created At",
-        selector: (row) =>
-          `${ddmmyy(row.created_at)} ${dateToTime1(row.created_at)}`,
-        wrap: true,
-      },
-      {
-        name: "Updated At",
-        selector: (row) =>
-          `${ddmmyy(row.updated_at)} ${dateToTime1(row.updated_at)}`,
-        wrap: true,
-      },
+     
     ],
     []
   );
