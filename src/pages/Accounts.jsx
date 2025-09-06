@@ -10,6 +10,7 @@ import DeleteAccount from "./DeleteAccount";
 
 import ApiEndpoints from "../api/ApiEndpoints";
 import CommonTable from "../components/common/CommonTable";
+import ReButton from "../components/common/ReButton";
 
 
 const Accounts = () => {
@@ -89,7 +90,7 @@ const Accounts = () => {
   ];
 
   return (
-    <Box sx={{ p: 1.5 }}>
+    <Box sx={{  }}>
       {/* ✅ Header */}
     
 
@@ -101,14 +102,15 @@ const Accounts = () => {
         endpoint={ApiEndpoints.GET_ACCOUNTS}
         handleManualRefresh={handleManualRefresh}
         customHeader={
-          <Button
+          <ReButton
             variant="contained"
-            startIcon={<AddIcon />}
-            sx={{ bgcolor: "#1CA895", mr: 2 }}
+            label="Account"
+           
+         
             onClick={() => setOpenCreate(true)}
           >
-            Account
-          </Button>
+        
+          </ReButton>
         }
       />
 

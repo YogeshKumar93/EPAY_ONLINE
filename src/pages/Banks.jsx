@@ -1,5 +1,5 @@
 import { useMemo, useCallback, useContext, useState } from "react";
-import { Box, Tooltip, Typography,Button } from "@mui/material";
+import { Box, Tooltip, Typography, Button } from "@mui/material";
 import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { currencySetter } from "../utils/Currencyutil";
@@ -8,6 +8,8 @@ import { dateToTime, dateToTime1, ddmmyy } from "../utils/DateUtils";
 import { capitalize1 } from "../utils/TextUtil";
 import CreateBankModal from "../components/Bank/CreateBanks";
 import AddIcon from "@mui/icons-material/Add";
+import ReButton from "../components/common/ReButton";
+
 
 const Banks = ({ filters = [], query }) => {
   const authCtx = useContext(AuthContext);
@@ -108,16 +110,14 @@ const Banks = ({ filters = [], query }) => {
         endpoint={ApiEndpoints.GET_BANKS}
         filters={filters}
         queryParam={queryParam}
-         customHeader={
-    <Button
-      variant="contained"
-      startIcon={<AddIcon />}
-      sx={{ bgcolor: "#1CA895", mr: 2 }}
-      onClick={() => setOpenCreate(true)}
-    >
-      Bank
-    </Button>
-  }
+        customHeader={
+          <ReButton
+             label="Bank"
+          
+            onClick={() => setOpenCreate(true)}
+           
+          />
+        }
       />
 
       {/* Create Bank Modal */}

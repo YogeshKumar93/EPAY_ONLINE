@@ -7,6 +7,7 @@ import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CreateServiceModal from "../components/CreateServiceModal";
 import EditServiceModal from "../components/EditServiceModaL";
+import ReButton from "../components/common/ReButton";
 
 const Services = ({ filters = [], query }) => {
   const authCtx = useContext(AuthContext);
@@ -88,14 +89,7 @@ const Services = ({ filters = [], query }) => {
 
   return (
     <Box>
-      {/* Create Service Button */}
-      {(user?.role === "sadm" || user?.role === "adm") && (
-        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 0 }}>
-          <Button variant="contained" onClick={() => setOpenCreate(true)}>
-            Create Service
-          </Button>
-        </Box>
-      )}
+     
 
       {/* Services Table */}
       <CommonTable
@@ -104,7 +98,20 @@ const Services = ({ filters = [], query }) => {
         endpoint={ApiEndpoints.GET_SERVICES}
         filters={filters}
         queryParam={query}
-      />
+         customHeader={
+               (user?.role !== "sadm" || user?.role !== "adm") && (
+    <ReButton
+      variant="contained"
+     label="Services"
+     
+      onClick={() => setOpenCreate(true)}
+    >
+  
+    </ReButton>
+               )
+  }
+/>
+      
 
       {/* Create Service Modal */}
       <CreateServiceModal
