@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useContext } from "react";
+import { useMemo, useCallback, useContext, useEffect, useState } from "react";
 import { Box, Tooltip, Typography } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
@@ -7,6 +7,7 @@ import { dateToTime, ddmmyy } from "../../utils/DateUtils";
 import { capitalize1 } from "../../utils/TextUtil";
 import AuthContext from "../../contexts/AuthContext";
 import CommonStatus from "../common/CommonStatus";
+import CommonLoader from "../common/CommonLoader";
 
 
 const AccountLadger = ({ filters=[], query }) => {
@@ -14,20 +15,16 @@ const AccountLadger = ({ filters=[], query }) => {
 
  const authCtx=useContext(AuthContext)
  const user=authCtx?.user
-  // const getStatusColor = useCallback((status) => {
-  //   switch (status?.toUpperCase()) {
-  //     case "SUCCESS":
-  //       return "success";
-  //     case "FAILED":
-  //       return "error";
-  //     case "REFUND":
-  //       return "warning";
-  //     case "PENDING":
-  //       return "info";
-  //     default:
-  //       return "default";
-  //   }
-  // }, []);
+   const [loading, setLoading] = useState(true); // initially true
+ 
+   useEffect(() => {
+     const timer = setTimeout(() => {
+       setLoading(false); // stop loader after data is ready
+     }, 1000); // 1 second delay just as an example
+ 
+     return () => clearTimeout(timer);
+   }, []);
+  
 
   // memoized columns
   const columns = useMemo(() => [
@@ -160,6 +157,12 @@ const AccountLadger = ({ filters=[], query }) => {
   const queryParam = "type_txn=LEDGER";
 
   return (
+  <>
+  {/* Loader */}
+  <CommonLoader loading={loading} text="Loading Fund Requests" />
+
+  {/* Table */}
+  {!loading && (
     <CommonTable
       columns={columns}
       endpoint={ApiEndpoints.GET_WALLETLEDGER}
@@ -167,6 +170,9 @@ const AccountLadger = ({ filters=[], query }) => {
       queryParam={queryParam}
       // refreshInterval={30000}
     />
+  )}
+</>
+
   );
 };
 

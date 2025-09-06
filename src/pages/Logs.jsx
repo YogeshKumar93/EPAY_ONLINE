@@ -1,4 +1,4 @@
-import { useMemo, useContext, useState } from "react";
+import { useMemo, useContext, useState, useEffect } from "react";
 import { Box, Tooltip, Chip, IconButton } from "@mui/material";
 import { Delete, Info as InfoIcon } from "@mui/icons-material";
 import AuthContext from "../contexts/AuthContext";
@@ -8,6 +8,7 @@ import ApiEndpoints from "../api/ApiEndpoints";
 import DeleteLogModal from "../components/DeleteLogModal";
 import DrawerDetails from "../components/common/DrawerDetails";
 import CommonStatus from "../components/common/CommonStatus";
+import CommonLoader from "../components/common/CommonLoader";
 
 const Logs = ({ filters = [], query }) => {
   const authCtx = useContext(AuthContext);
@@ -19,6 +20,15 @@ const Logs = ({ filters = [], query }) => {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
+ const [loading, setLoading] = useState(true); // initially true
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false); // stop loader after data is ready
+    }, 1000); // 1 second delay just as an example
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const columns = useMemo(
     () => [
@@ -74,6 +84,11 @@ const Logs = ({ filters = [], query }) => {
   );
 
   return (
+
+  <>
+  <CommonLoader loading={loading} text="Loading Fund Requests" />
+
+  {!loading && (
     <Box>
       <CommonTable
         key={refreshKey}
@@ -104,6 +119,9 @@ const Logs = ({ filters = [], query }) => {
         ]}
       />
     </Box>
+  )}
+</>
+
   );
 };
 

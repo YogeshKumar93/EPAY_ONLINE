@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useContext } from "react";
+import { useMemo, useCallback, useContext, useState, useEffect } from "react";
 import { Box, Tooltip, Typography } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
@@ -7,10 +7,21 @@ import { dateToTime, ddmmyy } from "../../utils/DateUtils";
 import { capitalize1 } from "../../utils/TextUtil";
 import AuthContext from "../../contexts/AuthContext";
 import CommonStatus from "../common/CommonStatus";
+import CommonLoader from "../common/CommonLoader";
 
 
 const MyPurchase = ({ filters, query }) => {
  
+   const [loading, setLoading] = useState(true); // initially true
+  
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setLoading(false); // stop loader after data is ready
+      }, 1000); // 1 second delay just as an example
+  
+      return () => clearTimeout(timer);
+    }, []);
+  
 
  const authCtx=useContext(AuthContext)
  const user=authCtx?.user
@@ -227,6 +238,10 @@ const MyPurchase = ({ filters, query }) => {
   const queryParam = "type_txn=PURCHASE";
 
   return (
+<>
+  <CommonLoader loading={loading} text="Loading Fund Requests" />
+
+  {!loading && (
     <CommonTable
       columns={columns}
       endpoint={ApiEndpoints.GET_TRANSACTIONS}
@@ -234,6 +249,9 @@ const MyPurchase = ({ filters, query }) => {
       queryParam={queryParam}
       // refreshInterval={30000}
     />
+  )}
+</>
+
   );
 };
 

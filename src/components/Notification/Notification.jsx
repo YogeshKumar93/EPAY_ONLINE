@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useContext, useState } from "react";
+import { useMemo, useCallback, useContext, useState, useEffect } from "react";
 import { Box, Button, IconButton, Tooltip, Typography } from "@mui/material";
 import AuthContext from "../../contexts/AuthContext";
 import { dateToTime, ddmmyy } from "../../utils/DateUtils";
@@ -13,6 +13,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteNotification from "./DeleteNotification";
 import AddIcon from "@mui/icons-material/Add";
 import CommonStatus from "../common/CommonStatus";
+import CommonLoader from "../common/CommonLoader";
 
 const Notification = ({ filters = [], query }) => {
   const authCtx = useContext(AuthContext);
@@ -22,6 +23,18 @@ const Notification = ({ filters = [], query }) => {
   const [openUpdate, setOpenUpdate] = useState(false); 
   const [openDelete, setOpenDelete] = useState(false); 
 const [selectedId, setSelectedId] = useState(null);
+
+  const [loading, setLoading] = useState(true); // initially true
+
+  useEffect(() => {
+  const timer = setTimeout(() => {
+    setLoading(false); // stop loader after data is ready
+  }, 1000); // 1 second delay just as an example
+
+  return () => clearTimeout(timer);
+}, []);
+
+
 const handleEdit = (row) => {
   setSelectedId(row.id);
   setOpenUpdate(true);
@@ -107,28 +120,29 @@ const handleDelete = (row) => {
   );
 
   return (
+<>
+  {/* Loader */}
+  <CommonLoader loading={loading} text="Loading Fund Requests" />
+
+  {/* Table and Modals */}
+  {!loading && (
     <Box>
-      {/* Create Notification Button */}
-     
       {/* Notification Table */}
       <CommonTable
         columns={columns}
         endpoint={ApiEndpoints.GET_NOTIFICATION}
         filters={filters}
         customHeader={
-           (user?.role === "sadm" || user?.role === "adm") && (
-        <Button
-      variant="contained"
-      startIcon={<AddIcon />}
-      sx={{ bgcolor: "#1CA895", mr: 2 }}
-      onClick={() => setOpenCreate(true)}
-    >
-      Notification
-    </Button>
-      
-        
-      )
-
+          (user?.role === "sadm" || user?.role === "adm") && (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              sx={{ bgcolor: "#1CA895", mr: 2 }}
+              onClick={() => setOpenCreate(true)}
+            >
+              Notification
+            </Button>
+          )
         }
         // queryParam={query}
         // refreshInterval={30000}
@@ -141,22 +155,28 @@ const handleDelete = (row) => {
           onClose={() => setOpenCreate(false)}
         />
       )}
-          {/* Create Notification Modal */}
+
+      {/* Update Notification Modal */}
       {openUpdate && (
         <UpdateNotification
           open={openUpdate}
           onClose={() => setOpenUpdate(false)}
-            notification={selectedId}
+          notification={selectedId}
         />
       )}
-        {openDelete && (
+
+      {/* Delete Notification Modal */}
+      {openDelete && (
         <DeleteNotification
           open={openDelete}
           onClose={() => setOpenDelete(false)}
-            notificationId={selectedId}
+          notificationId={selectedId}
         />
       )}
     </Box>
+  )}
+</>
+
   );
 };
 
