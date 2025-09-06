@@ -10,8 +10,9 @@ import DeleteAccount from "./DeleteAccount";
 
 import ApiEndpoints from "../api/ApiEndpoints";
 import CommonTable from "../components/common/CommonTable";
+import ReButton from "../components/common/ReButton";
 
-const Accounts = ( ) => {
+const Accounts = () => {
   const [openCreate, setOpenCreate] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -36,18 +37,17 @@ const Accounts = ( ) => {
     setAccounts((prev) =>
       prev.map((acc) => (acc.id === updatedAccount.id ? updatedAccount : acc))
     );
-    
+
     // handleManualRefresh();
     // setOpenUpdate(false);
     // setSelectedAccount(null);
   };
 
   // ✅ Handle edit
- const handleEdit = (row) => {
-  setSelectedAccount(row);
-  setOpenUpdate(true);
-};
-
+  const handleEdit = (row) => {
+    setSelectedAccount(row);
+    setOpenUpdate(true);
+  };
 
   // ✅ Handle delete
   const handleDelete = (row) => {
@@ -89,18 +89,8 @@ const Accounts = ( ) => {
   ];
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{}}>
       {/* ✅ Header */}
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          sx={{ bgcolor: "#1CA895" }}
-          onClick={() => setOpenCreate(true)}
-        >
-          Create Account
-        </Button>
-      </Box>
 
       {/* ✅ Table */}
       <CommonTable
@@ -109,7 +99,13 @@ const Accounts = ( ) => {
         loading={loading}
         endpoint={ApiEndpoints.GET_ACCOUNTS}
         handleManualRefresh={handleManualRefresh}
-          
+        customHeader={
+          <ReButton
+            variant="contained"
+            label="Account"
+            onClick={() => setOpenCreate(true)}
+          ></ReButton>
+        }
       />
 
       {/* ✅ Create Account Modal */}
@@ -120,18 +116,17 @@ const Accounts = ( ) => {
       />
 
       {/* ✅ Update Account Modal */}
-    {openUpdate && selectedAccount && (
-  <UpdateAccount
-    open={openUpdate}
-    handleClose={() => {
-      setOpenUpdate(false);
-      setSelectedAccount(null);
-    }}
-    handleSave={handleSaveUpdate}
-    selectedAccount={selectedAccount}
-  />
-)}
-
+      {openUpdate && selectedAccount && (
+        <UpdateAccount
+          open={openUpdate}
+          handleClose={() => {
+            setOpenUpdate(false);
+            setSelectedAccount(null);
+          }}
+          handleSave={handleSaveUpdate}
+          selectedAccount={selectedAccount}
+        />
+      )}
 
       {/* ✅ Delete Account Modal */}
       {selectedAccount && (
@@ -142,7 +137,6 @@ const Accounts = ( ) => {
             setSelectedAccount(null);
           }}
           selectedAccount={selectedAccount}
-         
         />
       )}
     </Box>

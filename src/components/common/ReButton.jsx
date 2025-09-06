@@ -1,42 +1,39 @@
+// ReButton.js
 import React from "react";
-import {
-  Box,
-  Stack,
-  TextField,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormHelperText
-} from "@mui/material";
-export const ReButton = ({
-  lable,
+import { Button } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+
+// Default colors for the button
+const DEFAULT_BG = "#1CA895"; 
+const DEFAULT_TEXT = "#ffffff";
+
+const ReButton = ({
+  label,
   onClick,
-  type = "button",
-  variant = "contained",
-  size = "medium",
-  fullWidth = false,
-  disabled = false,
-  startIcon,
-  endIcon,
-  color = "primary",
-  ...props
+  startIcon = <AddIcon />, 
 }) => {
   return (
     <Button
-      onClick={onClick}
-      type={type}
-      variant={variant}
-      size={size}
-      fullWidth={fullWidth}
-      disabled={disabled}
+      variant="contained"
+      size="medium"
+      fullWidth={false}
+      disabled={false}
       startIcon={startIcon}
-      endIcon={endIcon}
-      color={color}
-      {...props}
+      onClick={onClick}
+      sx={{
+        backgroundColor: DEFAULT_BG,
+        color: DEFAULT_TEXT,
+        textTransform: "none",
+        fontWeight: 500,
+        "&:hover": {
+          backgroundColor: DEFAULT_BG,
+          opacity: 0.9,
+        },
+      }}
     >
-      {lable}
+      {label}
     </Button>
   );
 };
+
+export default ReButton;

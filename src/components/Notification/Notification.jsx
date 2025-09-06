@@ -11,6 +11,7 @@ import UpdateNotification from "./UpdateNotification";
 import CommonTable from "../common/CommonTable";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteNotification from "./DeleteNotification";
+import AddIcon from "@mui/icons-material/Add";
 import CommonStatus from "../common/CommonStatus";
 
 const Notification = ({ filters = [], query }) => {
@@ -116,11 +117,16 @@ const handleDelete = (row) => {
         filters={filters}
         customHeader={
            (user?.role === "sadm" || user?.role === "adm") && (
-        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <Button variant="contained" onClick={() => setOpenCreate(true)}>
-            Create Notification
-          </Button>
-        </Box>
+        <Button
+      variant="contained"
+      startIcon={<AddIcon />}
+      sx={{ bgcolor: "#1CA895", mr: 2 }}
+      onClick={() => setOpenCreate(true)}
+    >
+      Notification
+    </Button>
+      
+        
       )
 
         }

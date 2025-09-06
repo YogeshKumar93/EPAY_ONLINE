@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState, useContext } from "react";
+import { useMemo, useState, useContext } from "react";
 import { Box, Button, Tooltip, Typography } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
@@ -6,30 +6,30 @@ import { currencySetter } from "../../utils/Currencyutil";
 import { dateToTime, ddmmyy } from "../../utils/DateUtils";
 import AddIcon from "@mui/icons-material/Add";
 import CreateFundRequest from "../../pages/CreateFundRequest";
- 
+
 import FundRequestModal from "../../pages/FundRequestModal";
 import AuthContext from "../../contexts/AuthContext";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
+import ReButton from "../common/ReButton";
 import CommonStatus from "../common/CommonStatus";
  
  
 
 const FundRequest = () => {
   const [openCreate, setOpenCreate] = useState(false);
-  const [openUpdate, setOpenUpdate] = useState(false);
   // const [selectedFund, setSelectedFund] = useState(null);
   const authCtx = useContext(AuthContext);
   const user = authCtx.user;
   const [selectedRow, setSelectedRow] = useState(null);
-const [status, setStatus] = useState("");
-const [openModal, setOpenModal] = useState(false);
+  const [status, setStatus] = useState("");
+  const [openModal, setOpenModal] = useState(false);
 
-const handleOpen = (row, statusType) => {
-  setSelectedRow(row);
-  setStatus(statusType);
-  setOpenModal(true);
-};
+  const handleOpen = (row, statusType) => {
+    setSelectedRow(row);
+    setStatus(statusType);
+    setOpenModal(true);
+  };
 
   // const getStatusColor = useCallback((status) => {
   //   switch (status?.toUpperCase()) {
@@ -178,9 +178,7 @@ const handleOpen = (row, statusType) => {
     : []),
     ]
   );
-   
-    
-
+  
 
   // ✅ Filters
   const filters = useMemo(
@@ -196,9 +194,9 @@ const handleOpen = (row, statusType) => {
           { value: "refund", label: "Refund" },
           { value: "pending", label: "Pending" },
           { value: "approved", label: "Approved" },
-            { value: "rejected", label: "Rejected" },
+          { value: "rejected", label: "Rejected" },
         ],
-         defaultValue: "pending", 
+        defaultValue: "pending",
       },
       { id: "name", label: "Name", type: "textfield" },
       { id: "bank_name", label: "Bank Name", type: "textfield" },
@@ -208,37 +206,24 @@ const handleOpen = (row, statusType) => {
   );
 
   return (
-    <Box sx={{  }}>
+    <Box sx={{}}>
       {/* ✅ Header */}
-      {/* <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          sx={{ bgcolor: "#1CA895" }}
-          onClick={() => setOpenCreate(true)}
-        >
-            Request
-        </Button>
-      </Box> */}
 
       {/* ✅ Table */}
-<CommonTable
-  columns={columns}
-  endpoint={ApiEndpoints.GET_FUND_REQUESTS}
-  filters={filters}
-  customHeader={
-               (user?.role !== "sadm" || user?.role !== "adm") && (
-    <Button
-      variant="contained"
-      startIcon={<AddIcon />}
-      sx={{ bgcolor: "#1CA895", mr: 2 }}
-      onClick={() => setOpenCreate(true)}
-    >
-      Request
-    </Button>
-               )
-  }
-/>
+      <CommonTable
+        columns={columns}
+        endpoint={ApiEndpoints.GET_FUND_REQUESTS}
+        filters={filters}
+        customHeader={
+          (user?.role !== "sadm" || user?.role !== "adm") && (
+            <ReButton
+              variant="contained"
+              label="Request"
+              onClick={() => setOpenCreate(true)}
+            ></ReButton>
+          )
+        }
+      />
 
       {/* ✅ Create Fund Request Modal */}
       <CreateFundRequest
@@ -247,17 +232,15 @@ const handleOpen = (row, statusType) => {
         handleSave={handleSaveCreate}
       />
 
-    
-
       {/* Render modal outside table */}
-{openModal && (
-  <FundRequestModal
-    open={openModal}
-    handleClose={() => setOpenModal(false)}
-    row={selectedRow}
-    status={status}
-  />
-)}
+      {openModal && (
+        <FundRequestModal
+          open={openModal}
+          handleClose={() => setOpenModal(false)}
+          row={selectedRow}
+          status={status}
+        />
+      )}
     </Box>
   );
 };

@@ -12,6 +12,18 @@ const DmtTxn = ({ filters = [], query }) => {
 
   const columns = useMemo(
     () => [
+         {
+        name: "Created At",
+        selector: (row) =>
+          `${ddmmyy(row.created_at)} ${dateToTime1(row.created_at)}`,
+        wrap: true,
+      },
+      {
+        name: "Updated At",
+        selector: (row) =>
+          `${ddmmyy(row.updated_at)} ${dateToTime1(row.updated_at)}`,
+        wrap: true,
+      },
       {
         name: "Txn ID",
         selector: (row) => row.txn_id,
@@ -90,18 +102,7 @@ const DmtTxn = ({ filters = [], query }) => {
           fontWeight: 600,
         }),
       },
-      {
-        name: "Created At",
-        selector: (row) =>
-          `${ddmmyy(row.created_at)} ${dateToTime1(row.created_at)}`,
-        wrap: true,
-      },
-      {
-        name: "Updated At",
-        selector: (row) =>
-          `${ddmmyy(row.updated_at)} ${dateToTime1(row.updated_at)}`,
-        wrap: true,
-      },
+   
     ],
     []
   );

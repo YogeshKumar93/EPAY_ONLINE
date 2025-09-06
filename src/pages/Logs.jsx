@@ -1,11 +1,12 @@
 import { useMemo, useContext, useState } from "react";
 import { Box, Tooltip, Chip, IconButton } from "@mui/material";
-import { Delete } from "@mui/icons-material";
+import { Delete, Info as InfoIcon } from "@mui/icons-material";
 import AuthContext from "../contexts/AuthContext";
 import { dateToTime, ddmmyy } from "../utils/DateUtils";
 import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
 import DeleteLogModal from "../components/DeleteLogModal";
+import DrawerDetails from "../components/common/DrawerDetails";
 import CommonStatus from "../components/common/CommonStatus";
 
 const Logs = ({ filters = [], query }) => {
@@ -15,6 +16,9 @@ const Logs = ({ filters = [], query }) => {
 
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedLogId, setSelectedLogId] = useState(null);
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
 
   const columns = useMemo(
     () => [
@@ -29,13 +33,9 @@ const Logs = ({ filters = [], query }) => {
       },
       { name: "Id", selector: (row) => row?.id, wrap: true },
       { name: "User Id", selector: (row) => row?.user_id, wrap: true },
+      { name: "Service Name", selector: (row) => row?.service_name, wrap: true },
       { name: "Role", selector: (row) => row?.role, wrap: true },
       { name: "Action", selector: (row) => row?.action, width: "100px" },
-      { name: "Service Name", selector: (row) => row?.service_name || "-", width: "150px" },
-      { name: "Ip Address", selector: (row) => row?.ip_address || "-", width: "150px" },
-      { name: "Request Data", selector: (row) => row?.request_data || "-", width: "150px" },
-      { name: "Response Data", selector: (row) => row?.response_data || "-", width: "150px" },
-      { name: "User Agent", selector: (row) => row?.user_agent || "-", width: "150px" },
       {
   name: "Status",
   selector: (row) => <CommonStatus value={row.status} />,
@@ -44,18 +44,30 @@ const Logs = ({ filters = [], query }) => {
       {
         name: "Actions",
         selector: (row) => (
-          <IconButton
-            color="error"
-            onClick={() => {
-              setSelectedLogId(row.id);
-              setOpenDelete(true);
-            }}
-            size="small"
-          >
-            <Delete />
-          </IconButton>
+          <>
+            <IconButton
+              color="info"
+              onClick={() => {
+                setSelectedRow(row);
+                setDrawerOpen(true);
+              }}
+              size="small"
+            >
+              <InfoIcon />
+            </IconButton>
+            <IconButton
+              color="error"
+              onClick={() => {
+                setSelectedLogId(row.id);
+                setOpenDelete(true);
+              }}
+              size="small"
+            >
+              <Delete />
+            </IconButton>
+          </>
         ),
-        width: "100px",
+        width: "120px",
       },
     ],
     []
@@ -77,6 +89,19 @@ const Logs = ({ filters = [], query }) => {
         onClose={() => setOpenDelete(false)}
         logId={selectedLogId}
         onSuccess={() => setRefreshKey((prev) => prev + 1)}
+      />
+
+      {/* Drawer Details */}
+      <DrawerDetails
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        rowData={selectedRow}
+        fields={[
+          { label: "IP Address", key: "ip_address" },
+          { label: "Request Data", key: "request_data" },
+          { label: "Response Data", key: "response_data" },
+          { label: "User Agent", key: "user_agent" },
+        ]}
       />
     </Box>
   );

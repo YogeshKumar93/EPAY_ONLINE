@@ -1,67 +1,89 @@
-import React from "react";
-import {
-  Typography,
-  Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Chip,
-} from "@mui/material";
+import { useMemo, useContext, useState } from "react";
+import { Box, Button, Tooltip, Chip, IconButton } from "@mui/material";
+import { Edit } from "@mui/icons-material";
+import AuthContext from "../contexts/AuthContext";
+import { dateToTime, ddmmyy } from "../utils/DateUtils";
+import CommonTable from "../components/common/CommonTable";
+import ApiEndpoints from "../api/ApiEndpoints";
+import CreateServiceModal from "../components/CreateServiceModal";
+import EditServiceModal from "../components/EditServiceModaL";
 
-const sampleUsers = [
-  { id: 1, name: "John Doe", email: "john@example.com", role: "Admin" },
-  { id: 2, name: "Jane Smith", email: "jane@example.com", role: "User" },
-  { id: 3, name: "Mike Johnson", email: "mike@example.com", role: "Manager" },
-  { id: 4, name: "Emily Davis", email: "emily@example.com", role: "User" },
-];
+const Users = ({ filters = [], query }) => {
+  const authCtx = useContext(AuthContext);
+  const user = authCtx?.user;
 
-const Users = () => {
+  const [openCreate, setOpenCreate] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [selectedService, setSelectedService] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const columns = useMemo(
+    () => [
+      {
+        name: "Date/Time",
+        selector: (row) => (
+          <div style={{ textAlign: "left" }}>
+            {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
+          </div>
+        ),
+        wrap: true,
+      },
+         {
+        name: "Id",
+        selector: (row) => (
+          <Tooltip title={row?.id}>
+            <div style={{ textAlign: "left" }}>{row?.id}</div>
+          </Tooltip>
+        ),
+        wrap: true,
+      },
+      {
+        name: "Name",
+        selector: (row) => (
+          <Tooltip title={row?.name}>
+            <div style={{ textAlign: "left" }}>{row?.name}</div>
+          </Tooltip>
+        ),
+        wrap: true,
+      },
+      {
+        name: "Mobile",
+        selector: (row) => (
+          <Tooltip title={row?.mobile}>
+            <div style={{ textAlign: "left" }}>{row?.mobile}</div>
+          </Tooltip>
+        ),
+        width: "150px",
+      },
+      {
+        name: "Status",
+        selector: (row) =>
+          row?.is_active === 1 ? (
+            <Chip label="Active" color="success" size="small" />
+          ) : row?.is_active === 0 ? (
+            <Chip label="Inactive" color="error" size="small" />
+          ) : (
+            <Chip label="Pending" color="warning" size="small" />
+          ),
+        width: "120px",
+      },
+
+    ],
+    []
+  );
+
   return (
-    <Box p={3}>
-      <Typography variant="h4" gutterBottom>
-        Users Management
-      </Typography>
-      <Typography paragraph>
-        Manage and view all registered users below.
-      </Typography>
+    <Box>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell><strong>ID</strong></TableCell>
-              <TableCell><strong>Name</strong></TableCell>
-              <TableCell><strong>Email</strong></TableCell>
-              <TableCell><strong>Role</strong></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {sampleUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>{user.id}</TableCell>
-                <TableCell>{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={user.role}
-                    color={
-                      user.role === "Admin"
-                        ? "primary"
-                        : user.role === "Manager"
-                        ? "secondary"
-                        : "default"
-                    }
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      {/* Services Table */}
+      <CommonTable
+        key={refreshKey} // 🔄 refresh on changes
+        columns={columns}
+        endpoint={ApiEndpoints.GET_USERS}
+        filters={filters}
+        queryParam={query}
+       
+      />
     </Box>
   );
 };

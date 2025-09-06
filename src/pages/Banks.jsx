@@ -1,18 +1,17 @@
-import { useMemo, useCallback, useContext, useState } from "react";
-import { Box, Tooltip, Typography,Button } from "@mui/material";
+import { useMemo, useContext, useState } from "react";
+import { Box, Tooltip, Typography, Button } from "@mui/material";
 import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
-import { currencySetter } from "../utils/Currencyutil";
 import AuthContext from "../contexts/AuthContext";
-import { dateToTime, dateToTime1, ddmmyy } from "../utils/DateUtils";
-import { capitalize1 } from "../utils/TextUtil";
+import {  dateToTime1, ddmmyy } from "../utils/DateUtils";
 import CreateBankModal from "../components/Bank/CreateBanks";
 import AddIcon from "@mui/icons-material/Add";
+import ReButton from "../components/common/ReButton";
+
 import CommonStatus from "../components/common/CommonStatus";
 
-const Banks = ({ filters = [], query }) => {
+const Banks = ({ filters = [], }) => {
   const authCtx = useContext(AuthContext);
-  const user = authCtx?.user;
   const [openCreate, setOpenCreate] = useState(false);
 
   // memoized columns
@@ -83,32 +82,20 @@ const Banks = ({ filters = [], query }) => {
 
   return (
     <>
-      {/* Top Bar with Create Button */}
-      {/* <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setOpenCreate(true)}
-        >
-          + Create Bank
-        </Button>
-      </Box> */}
 
       <CommonTable
         columns={columns}
         endpoint={ApiEndpoints.GET_BANKS}
         filters={filters}
         queryParam={queryParam}
-         customHeader={
-    <Button
-      variant="contained"
-      startIcon={<AddIcon />}
-      sx={{ bgcolor: "#1CA895", mr: 2 }}
-      onClick={() => setOpenCreate(true)}
-    >
-      Bank
-    </Button>
-  }
+        customHeader={
+          <ReButton
+             label="Bank"
+          
+            onClick={() => setOpenCreate(true)}
+           
+          />
+        }
       />
 
       {/* Create Bank Modal */}

@@ -392,6 +392,7 @@ const CommonModal = ({
   handleChange = () => {},
   errors = {},
   loading = false,
+  
 }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));

@@ -19,6 +19,7 @@ import ApiEndpoints from "../api/ApiEndpoints";
 import CreateTemplateModal from "../components/CreateTemplateModal";
 import UpdateTemplateModal from "../components/UpdateTemplateModal";
 import { apiCall } from "../api/apiClient";
+import ReButton from "../components/common/ReButton";
 
 const Templates = ({ filters = [], query }) => {
   const authCtx = useContext(AuthContext);
@@ -143,15 +144,6 @@ const Templates = ({ filters = [], query }) => {
 
   return (
     <Box>
-      {/* Create Template Button */}
-      {(user?.role === "sadm" || user?.role === "adm") && (
-        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 0 }}>
-          <Button variant="contained" onClick={() => setOpenCreate(true)}>
-            Create Template
-          </Button>
-        </Box>
-      )}
-
       {/* Templates Table */}
       <CommonTable
         key={refreshKey} // 🔄 refresh on changes
@@ -159,6 +151,15 @@ const Templates = ({ filters = [], query }) => {
         endpoint={ApiEndpoints.GET_TEMPLATES}
         filters={filters}
         queryParam={query}
+        customHeader={
+          (user?.role !== "sadm" || user?.role !== "adm") && (
+            <ReButton
+              variant="contained"
+              label="Template"
+              onClick={() => setOpenCreate(true)}
+            ></ReButton>
+          )
+        }
       />
 
       {/* Create Template Modal */}
@@ -180,7 +181,9 @@ const Templates = ({ filters = [], query }) => {
       <Dialog open={deleteConfirm} onClose={() => setDeleteConfirm(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
-          <Typography>Are you sure you want to delete this template?</Typography>
+          <Typography>
+            Are you sure you want to delete this template?
+          </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteConfirm(false)}>Cancel</Button>

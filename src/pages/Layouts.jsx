@@ -12,13 +12,13 @@ import EditIcon from "@mui/icons-material/Edit";
 
 import CreateLayouts from "../pages/CreateLayouts";
 import UpdateLayouts from "./UpdateLayouts";
-
+import ReButton from "../components/common/ReButton";
 
 const Layouts = ({ filters = [], query }) => {
-  const[openCreate, setOpenCreate] = useState(false);
-   const [openUpdate, setOpenUpdate] = useState(false);
-   const [selectedLayout, setSelectedLayout] = useState(null);
-   const [selectedColor, setSelectedColor] = useState(null);
+  const [openCreate, setOpenCreate] = useState(false);
+  const [openUpdate, setOpenUpdate] = useState(false);
+  const [selectedLayout, setSelectedLayout] = useState(null);
+  const [selectedColor, setSelectedColor] = useState(null);
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   // const [openEdit, setOpenEdit] = useState(false);
@@ -27,17 +27,17 @@ const Layouts = ({ filters = [], query }) => {
 
   const handleSaveCreate = () => {
     setOpenCreate(false);
-  }
+  };
 
   const handleSaveUpdate = () => {
     setOpenUpdate(false);
-  }
+  };
 
   const handleEdit = (layout) => {
-     setSelectedLayout(layout); 
-  // setSelectedColor(row);
-  setOpenUpdate(true);
-};
+    setSelectedLayout(layout);
+    // setSelectedColor(row);
+    setOpenUpdate(true);
+  };
 
   const columns = useMemo(
     () => [
@@ -69,40 +69,30 @@ const Layouts = ({ filters = [], query }) => {
         width: "150px",
       },
       {
-      name: "Actions",
-      selector: (row) => (
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <Tooltip title="Edit">
-            <IconButton color="primary" onClick={() => handleEdit(row)}>
-              <EditIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          {/* <Tooltip title="Delete">
+        name: "Actions",
+        selector: (row) => (
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Tooltip title="Edit">
+              <IconButton color="primary" onClick={() => handleEdit(row)}>
+                <EditIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            {/* <Tooltip title="Delete">
             <IconButton color="error" onClick={() => handleDelete(row)}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Tooltip> */}
-        </Box>
-      ),
-    },
+          </Box>
+        ),
+      },
     ],
     []
   );
 
   return (
-      <Box sx={{ p: 3 }}>
-          {/* ✅ Header */}
-          <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              sx={{ bgcolor: "#1CA895" }}
-              onClick={() => setOpenCreate(true)}
-            >
-               Colours
-            </Button>
-         </Box>
-     
+    <Box sx={{ }}>
+      {/* ✅ Header */}
+
       {/* Services Table */}
       <CommonTable
         key={refreshKey} // 🔄 refresh on changes
@@ -110,27 +100,32 @@ const Layouts = ({ filters = [], query }) => {
         endpoint={ApiEndpoints.GET_COLOURS}
         filters={filters}
         queryParam={query}
-        Button = {Button}
+        Button={Button}
+        customHeader={
+          <ReButton
+            variant="contained"
+            label="Layout"
+            onClick={() => setOpenCreate(true)}
+          ></ReButton>
+        }
       />
 
-      <CreateLayouts 
-         open={openCreate}
+      <CreateLayouts
+        open={openCreate}
         handleClose={() => setOpenCreate(false)}
         handleSave={handleSaveCreate}
       />
 
-      <UpdateLayouts 
-         open={openUpdate}
-          row={selectedLayout}
-    handleClose={() => {
-      setOpenUpdate(false);
-      setSelectedColor(null);
-    }}
-    handleSave={handleSaveUpdate}
-    // selectedAccount={selectedAccount}
+      <UpdateLayouts
+        open={openUpdate}
+        row={selectedLayout}
+        handleClose={() => {
+          setOpenUpdate(false);
+          setSelectedColor(null);
+        }}
+        handleSave={handleSaveUpdate}
+        // selectedAccount={selectedAccount}
       />
-
-     
     </Box>
   );
 };
