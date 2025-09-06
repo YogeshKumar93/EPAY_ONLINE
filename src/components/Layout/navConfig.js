@@ -39,19 +39,14 @@ export const customer_nav = [
     icon2: "🛠️",
     to: "/customer/money-transfer",
   },
-  {
-    title: "Recharge and bill",
-    icon: "🛠️",
-    icon2: "🛠️",
-    to: "/customer/recharge-bill",
-  },
-    { title: "Banks", icon: "👥", icon2: "👥", to: "/customer/banks" },
-  {
-    title: "Notification",
-    icon: "💳",
-    icon2: "💳",
-    to: "/customer/notification",
-  },
+  // {
+  //   title: "Recharge and bill",
+  //   icon: "🛠️",
+  //   icon2: "🛠️",
+  //   to: "/customer/recharge-bill",
+  // },
+   
+
   {
     title: "Account Ledger",
     icon: "📒",

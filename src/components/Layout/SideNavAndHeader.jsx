@@ -39,12 +39,14 @@ import {
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { Admin_nav, customer_nav, nav } from "./navConfig";
 import AuthContext from "../../contexts/AuthContext";
+
 {
   /* App Bar with reduced height */
 }
 import RefreshIcon from "@mui/icons-material/Refresh";
 import Notification from "../Notification/Notification";
 import NotificationModal from "../Notification/NotificationModal";
+import { setTitleFunc } from "../../utils/HeaderTitleUtil";
 
 // Navigation configuration
 
@@ -85,7 +87,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
   const [expandedItems, setExpandedItems] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
-
+ const title = setTitleFunc(location.pathname, location.state);
 const MainContent = styled(Box)(({ theme }) => ({
   flexGrow: 1,
   padding: theme.spacing(3),
@@ -281,13 +283,13 @@ const MainContent = styled(Box)(({ theme }) => ({
             <MenuIcon />
           </IconButton> */}
           <Typography
-            variant="h6"
+            variant="h5"
             noWrap
             component="div"
             sx={{ flexGrow: 1 }}
             className="text-xl font-semibold"
           >
-            Dashboard
+            {title}
           </Typography>
           {/* ✅ Refresh icon button with black color */}
           <IconButton onClick={refreshUser}>
@@ -355,7 +357,6 @@ const MainContent = styled(Box)(({ theme }) => ({
                     navigate("/admin/profile");
                   } else if (user && user.role === "sadm") {
                     navigate("/admin/profile");
-                  } else if (user && user.role === "Zsm") {
                   } else if (user && user.role === "Asm") {
                     navigate("/asm/profile");
                   } else if (user && user.role === "Zsm") {
