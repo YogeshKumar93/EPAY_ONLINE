@@ -86,30 +86,18 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const MainContent = styled(Box)(({ theme }) => ({
-    flexGrow: 1,
-    padding: theme.spacing(3),
-    backgroundColor: theme.palette.background.default,
-    minHeight: "100vh",
-    marginLeft: 0,
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    [theme.breakpoints.down("sm")]: {
-      minWidth: "90%",
-      padding: theme.spacing(1.5),
-    },
-    [theme.breakpoints.between("sm", "md")]: {
-      minWidth: "768px",
-    },
-    [theme.breakpoints.up("md")]: {
-      minWidth: "1024px",
-    },
-    [theme.breakpoints.up("lg")]: {
-      minWidth: desktopOpen ? "1310px" : "1550px",
-    },
-  }));
+const MainContent = styled(Box)(({ theme }) => ({
+  flexGrow: 1,
+  padding: theme.spacing(3),
+  backgroundColor: theme.palette.background.default,
+  minHeight: "100vh",
+  marginLeft: 0,
+  transition: theme.transitions.create("margin", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+}));
+
 
   const navigationItems = roleNavigation[userRole] || nav;
 
@@ -283,7 +271,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
         className="header"
       >
         <Toolbar sx={{ minHeight: "64px !important" }}>
-          <IconButton
+          {/* <IconButton
             color="inherit"
             aria-label="open drawer"
             edge="start"
@@ -291,7 +279,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             sx={{ mr: 2 }}
           >
             <MenuIcon />
-          </IconButton>
+          </IconButton> */}
           <Typography
             variant="h6"
             noWrap
@@ -469,20 +457,26 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
       </Box>
 
       {/* Main Content */}
-      <MainContent
-        sx={{
-          width: {
-            md: desktopOpen
-              ? `calc(100% - ${themeSettings.drawerWidth}px)`
-              : "100%",
-          },
-        }}
-        className="content"
-      >
-        <Toolbar sx={{ minHeight: "64px !important" }} />{" "}
-        {/* Reduced toolbar spacing */}
-        <Outlet />
-      </MainContent>
+<MainContent
+  sx={{
+      width: {
+      xs: "100%",
+      md: desktopOpen
+        ? `calc(100% - ${themeSettings.drawerWidth}px)`
+        : "100%",
+    },
+    position: "fixed",
+    top: 0,
+    right: 0,
+    height: "100vh",
+    overflowY: "auto",
+  }}
+  className="content"
+>
+  <Toolbar sx={{ minHeight: "64px !important" }} />
+  <Outlet />
+</MainContent>
+
     </Box>
   );
 };

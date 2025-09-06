@@ -148,14 +148,19 @@
         }
 
         /* Content Area */
-        .content {
-            flex-grow: 1;
-            background: var(--surface-color);
-            border-radius: var(--border-radius-md);
-            padding: var(--spacing-lg);
-            box-shadow: var(--shadow-sm);
-        }
-
+       .content {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    overflow-y: auto;
+    /* Your existing properties */
+    flex-grow: 1;
+    background: var(--surface-color);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+}
         .section {
             margin-bottom: var(--spacing-xl);
         }

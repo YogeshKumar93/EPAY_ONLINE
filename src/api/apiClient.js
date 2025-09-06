@@ -21,7 +21,7 @@ const CACHE_TTL = 2000;
 
 // Helper to generate unique client_ref
 const generateClientRef = () =>
-  `${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+  `${Date.now()}${Math.random().toString(36).substring(2, 10)}`;
 
 apiClient.interceptors.request.use(
   (config) => {

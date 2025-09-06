@@ -130,9 +130,9 @@ const CommonTable = ({
   refreshInterval = 0,
   defaultPageSize = 15,
   defaultFilters,
-  title = "Data Table",
-
+  title = "",
   queryParam = "",
+    customHeader = null, // Add this line
 }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -586,21 +586,25 @@ const CommonTable = ({
       )}
 
       {/* Table Header with Refresh */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 2,
-        }}
-      >
-        <Typography variant="h5">{title}</Typography>
-        <Tooltip title="Refresh">
-          <IconButton onClick={handleManualRefresh} disabled={loading}>
-            {loading ? <CircularProgress size={24} /> : <RefreshIcon />}
-          </IconButton>
-        </Tooltip>
-      </Box>
+<Box
+  sx={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    mb: 2,
+  }}
+>
+  <Typography variant="h5">{title}</Typography>
+  
+  <Box sx={{ display: "flex", alignItems: "center" }}>
+    {customHeader} {/* Add custom header content here */}
+    <Tooltip title="Refresh">
+      <IconButton onClick={handleManualRefresh} disabled={loading} sx={{ ml: 1 }}>
+        {loading ? <CircularProgress size={24} /> : <RefreshIcon />}
+      </IconButton>
+    </Tooltip>
+  </Box>
+</Box>
 
       {/* Data Table */}
       <Paper sx={{ width: "100%", overflow: "hidden" }}>

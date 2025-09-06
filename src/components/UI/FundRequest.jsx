@@ -66,6 +66,24 @@ const handleOpen = (row, statusType) => {
   // ✅ Columns
   const columns = useMemo(
     () => [
+        {
+        name: "Created At",
+        selector: (row) => (
+          <div style={{ textAlign: "left" }}>
+            {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
+          </div>
+        ),
+        wrap: true,
+      },
+      {
+        name: "Updated At",
+        selector: (row) => (
+          <div style={{ textAlign: "left" }}>
+            {ddmmyy(row.updated_at)} {dateToTime(row.updated_at)}
+          </div>
+        ),
+        wrap: true,
+      },
       {
         name: "ID",
         selector: (row) => row?.id,
@@ -77,7 +95,7 @@ const handleOpen = (row, statusType) => {
         wrap: true,
       },
       {
-        name: "Bank Name",
+        name: "Bank",
         selector: (row) => <Typography>{row?.bank_name}</Typography>,
         wrap: true,
       },
@@ -100,18 +118,14 @@ const handleOpen = (row, statusType) => {
         ),
         grow: 2,
       },
-      {
-        name: "Ledger Balance",
-        selector: (row) => (
-          <Typography>
-            {currencySetter(parseFloat(row?.ledger_bal).toFixed(2))}
-          </Typography>
-        ),
-      },
-      {
-        name: "Date",
-        selector: (row) => ddmmyy(row?.date),
-      },
+      // {
+      //   name: "Ledger Balance",
+      //   selector: (row) => (
+      //     <Typography>
+      //       {currencySetter(parseFloat(row?.ledger_bal).toFixed(2))}
+      //     </Typography>
+      //   ),
+      // },
       {
         name: "Txn ID",
         selector: (row) => row?.txn_id,
@@ -143,51 +157,38 @@ const handleOpen = (row, statusType) => {
           </Box>
         ),
       },
-      {
-        name: "Created At",
-        selector: (row) => (
-          <div style={{ textAlign: "left" }}>
-            {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
-          </div>
-        ),
-        wrap: true,
-      },
-      {
-        name: "Updated At",
-        selector: (row) => (
-          <div style={{ textAlign: "left" }}>
-            {ddmmyy(row.updated_at)} {dateToTime(row.updated_at)}
-          </div>
-        ),
-        wrap: true,
-      },
+    
 
-      {
-  name: "Actions",
-  selector: (row) => (
-    <Box sx={{ display: "flex", gap: 1 }}>
-      <Tooltip title="approved">
-        <Button
-          color="success"
-          size="small"
-          onClick={() => handleOpen(row, "approved")}
-        >
-          <CheckCircleIcon fontSize="small" />
-        </Button>
-      </Tooltip>
-      <Tooltip title="reject">
-        <Button
-          color="error"
-          size="small"
-          onClick={() => handleOpen(row, "rejected")}
-        >
-          <CancelIcon fontSize="small" />
-        </Button>
-      </Tooltip>
-    </Box>
-  ),
-  width: "120px",
-}
+   ...(user?.role === "adm"
+    ? [
+        {
+          name: "Actions",
+          selector: (row) => (
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <Tooltip title="approved">
+                <Button
+                  color="success"
+                  size="small"
+                  onClick={() => handleOpen(row, "approved")}
+                >
+                  <CheckCircleIcon fontSize="small" />
+                </Button>
+              </Tooltip>
+              <Tooltip title="reject">
+                <Button
+                  color="error"
+                  size="small"
+                  onClick={() => handleOpen(row, "rejected")}
+                >
+                  <CancelIcon fontSize="small" />
+                </Button>
+              </Tooltip>
+            </Box>
+          ),
+          width: "120px",
+        },
+      ]
+    : []),
     ]
   );
    
@@ -220,9 +221,9 @@ const handleOpen = (row, statusType) => {
   );
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{  }}>
       {/* ✅ Header */}
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+      {/* <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
@@ -231,14 +232,24 @@ const handleOpen = (row, statusType) => {
         >
             Request
         </Button>
-      </Box>
+      </Box> */}
 
       {/* ✅ Table */}
-      <CommonTable
-        columns={columns}
-        endpoint={ApiEndpoints.GET_FUND_REQUESTS}
-        filters={filters}
-      />
+<CommonTable
+  columns={columns}
+  endpoint={ApiEndpoints.GET_FUND_REQUESTS}
+  filters={filters}
+  customHeader={
+    <Button
+      variant="contained"
+      startIcon={<AddIcon />}
+      sx={{ bgcolor: "#1CA895", mr: 2 }}
+      onClick={() => setOpenCreate(true)}
+    >
+      Request
+    </Button>
+  }
+/>
 
       {/* ✅ Create Fund Request Modal */}
       <CreateFundRequest

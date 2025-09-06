@@ -21,14 +21,26 @@ const payload = res?.data?.data || res?.data || res?.response?.data || res;
 console.log("📥 Normalized schema payload:", payload);
 
 if (payload?.fields) {
-  console.log("✅ Fields found:", payload.fields);
+  const normalizedFields = payload.fields.map((f) => {
+    if (f.name === "bank_name" && Array.isArray(f.options)) {
+      return {
+        ...f,
+        options: f.options.map((opt) => ({
+          value: opt.bank_name,   // ✅ send bank_name in payload
+          label: opt.bank_name,   // shown in UI
+          ...opt,                 // keep other info (acc_number, ifsc, etc.)
+        })),
+      };
+    }
+    return f;
+  });
 
   setFormName(payload.formName || "Form");
-  setSchema(payload.fields);
+  setSchema(normalizedFields);
 
   // initialize form data
   const initData = {};
-  payload.fields.forEach((f) => {
+  normalizedFields.forEach((f) => {
     initData[f.name] = "";
   });
   setFormData(initData);
