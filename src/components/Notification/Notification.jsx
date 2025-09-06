@@ -11,11 +11,8 @@ import UpdateNotification from "./UpdateNotification";
 import CommonTable from "../common/CommonTable";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteNotification from "./DeleteNotification";
-<<<<<<< HEAD
 import AddIcon from "@mui/icons-material/Add";
-=======
 import CommonStatus from "../common/CommonStatus";
->>>>>>> 30c4859b502102d4ac100e9965abd995b4a30dd9
 
 const Notification = ({ filters = [], query }) => {
   const authCtx = useContext(AuthContext);
