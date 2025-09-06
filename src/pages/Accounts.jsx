@@ -12,7 +12,6 @@ import ApiEndpoints from "../api/ApiEndpoints";
 import CommonTable from "../components/common/CommonTable";
 import ReButton from "../components/common/ReButton";
 
-
 const Accounts = () => {
   const [openCreate, setOpenCreate] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
@@ -90,9 +89,8 @@ const Accounts = () => {
   ];
 
   return (
-    <Box sx={{  }}>
+    <Box sx={{}}>
       {/* ✅ Header */}
-    
 
       {/* ✅ Table */}
       <CommonTable
@@ -105,12 +103,8 @@ const Accounts = () => {
           <ReButton
             variant="contained"
             label="Account"
-           
-         
             onClick={() => setOpenCreate(true)}
-          >
-        
-          </ReButton>
+          ></ReButton>
         }
       />
 
