@@ -6,7 +6,7 @@ const CommonStatus = ({ value }) => {
   let statusText = "";
   if (value === 1 || value === "1") statusText = "ACTIVE";
   else if (value === 0 || value === "0") statusText = "INACTIVE";
-  else statusText = value.toString().toUpperCase(); // convert any string to uppercase
+  else statusText = value?.toString()?.toUpperCase(); // convert any string to uppercase
 
   // Map each status to a color
   const statusColors = {
