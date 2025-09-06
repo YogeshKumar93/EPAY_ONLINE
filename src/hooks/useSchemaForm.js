@@ -16,27 +16,24 @@ export const useSchemaForm = (endpoint, open) => {
           setLoading(true);
           const res = await apiCall("post", endpoint);
 
-          // 👇 normalize response
           const payload =
             res?.data?.data || res?.data || res?.response?.data || res;
 
-          console.log("📥 Normalized schema payload:", payload);
+          console.log("📥 Schema structure:", payload);
 
           if (payload?.fields) {
             const normalizedFields = payload.fields.map((f) => {
-              // ✅ normalize service_name dropdown
               if (f.name === "service_name" && Array.isArray(f.options)) {
                 return {
                   ...f,
                   options: f.options.map((opt) => ({
-                    value: opt.name, // send the service name in payload
-                    label: opt.name, // show the service name in dropdown
-                    ...opt,          // keep all other info (id, code, etc.)
+                    value: opt.name,
+                    label: opt.name,
+                    ...opt,
                   })),
                 };
               }
 
-              // ✅ normalize bank_name dropdown (already working)
               if (f.name === "bank_name" && Array.isArray(f.options)) {
                 return {
                   ...f,
@@ -54,13 +51,14 @@ export const useSchemaForm = (endpoint, open) => {
             setFormName(payload.formName || "Form");
             setSchema(normalizedFields);
 
-            // initialize form data
+            // ✅ Initialize with empty form data only
+     // inside useSchemaForm
 const initData = {};
-         normalizedFields.forEach((f) => {
-  // if schema has default, keep it
-  initData[f.name] = f.default ?? "";
+normalizedFields.forEach((f) => {
+  initData[f.name] = formData[f.name] ?? "";  // keep existing value if present
 });
-setFormData(initData);
+setFormData((prev) => ({ ...initData, ...prev }));
+
             setErrors({});
           } else {
             console.warn("⚠️ No fields found in payload:", payload);

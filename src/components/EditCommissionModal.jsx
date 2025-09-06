@@ -6,7 +6,7 @@ import { CircularProgress } from "@mui/material";
 import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
 import { useSchemaForm } from "../hooks/useSchemaForm";
 
-const EditCommissionModal = ({ open, handleClose, row }) => {
+const EditCommissionModal = ({ open, onClose, commissionRule, onSuccess }) => {
   const {
     schema,
     formData,
@@ -18,35 +18,52 @@ const EditCommissionModal = ({ open, handleClose, row }) => {
   } = useSchemaForm(ApiEndpoints.GET_COMMISSION_SCHEMA, open);
 
   const [submitting, setSubmitting] = useState(false);
+console.log("commissionRule",commissionRule);
 
-  // ✅ Prefill row data when schema + modal opens
-useEffect(() => {
-  if (open && row && schema.length > 0) {
-    setFormData((prev) => {
-      const merged = {};
-      schema.forEach((field) => {
-        merged[field.name] =
-          row[field.name] !== undefined && row[field.name] !== null
-            ? row[field.name]
-            : prev[field.name] ?? "";
-      });
-      return merged;
-    });
-  }
-}, [open, row, schema, setFormData]);
+  // ✅ Directly populate form data from commissionRule when modal opens
+  useEffect(() => {
+    if (open && commissionRule) {
+      console.log("📋 Populating form from commission rule data:", commissionRule);
+      
+      // Create form data directly from commissionRule
+      const formDataFromRule = {
+        id: commissionRule.id || "", // Make sure to include the ID
+        service_name: commissionRule.service_name || "",
+        rule_type: commissionRule.rule_type || "",
+        comm_dd: commissionRule.comm_dd || "",
+        comm_ret: commissionRule.comm_ret || "",
+        comm_di: commissionRule.comm_di || "",
+        comm_md: commissionRule.comm_md || "",
+        min_amount: commissionRule.min_amount || "",
+        max_amount: commissionRule.max_amount || "",
+        plan_id: commissionRule.plan_id || "",
+        value_type: commissionRule.value_type || "",
+        // Add any other fields you need from commissionRule
+      };
 
-  // ✅ Validation (keep same as create for consistency)
+      setFormData(formDataFromRule);
+      setErrors({});
+    }
+  }, [open, commissionRule, setFormData]);
+
+  // ✅ Debug: Log current form data
+  useEffect(() => {
+    if (open) {
+      console.log("Current formData:", formData);
+    }
+  }, [formData, open]);
+
+  // ✅ Validation
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.service_name)
-      newErrors.service_name = "service_name is required";
-    if (!formData.rule_type) newErrors.rule_type = "rule_type is required";
-    if (!formData.comm_dd) newErrors.comm_dd = "comm_dd is required";
-    if (!formData.comm_ret) newErrors.comm_ret = "comm_ret is required";
-    if (!formData.comm_di) newErrors.comm_di = "comm_di is required";
-    if (!formData.comm_md) newErrors.comm_md = "comm_md is required";
-    if (!formData.min_amount) newErrors.min_amount = "min_amount is required";
-    if (!formData.max_amount) newErrors.max_amount = "max_amount is required";
+    if (!formData.service_name) newErrors.service_name = "Service name is required";
+    if (!formData.rule_type) newErrors.rule_type = "Rule type is required";
+    if (!formData.comm_dd) newErrors.comm_dd = "DD commission is required";
+    if (!formData.comm_ret) newErrors.comm_ret = "Retail commission is required";
+    if (!formData.comm_di) newErrors.comm_di = "DI commission is required";
+    if (!formData.comm_md) newErrors.comm_md = "MD commission is required";
+    if (!formData.min_amount) newErrors.min_amount = "Minimum amount is required";
+    if (!formData.max_amount) newErrors.max_amount = "Maximum amount is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -58,15 +75,22 @@ useEffect(() => {
     setSubmitting(true);
 
     try {
+      // Make sure to include the ID in the request
+      const payload = {
+        ...formData,
+        id: commissionRule.id // Ensure the ID is included
+      };
+
       const { response, error } = await apiCall(
-        "POST", // or PUT/PATCH if backend expects
+        "POST",
         ApiEndpoints.UPDATE_COMMISSION_RULE,
-        formData
+        payload
       );
 
       if (response) {
         okSuccessToast(response?.message || "Commission rule updated successfully!");
-        handleClose();
+        onSuccess(); // Call the success callback
+        onClose(); // Close the modal
       } else {
         apiErrorToast(error?.message || "Failed to update commission rule");
       }
@@ -75,6 +99,13 @@ useEffect(() => {
       apiErrorToast("Something went wrong while updating commission rule");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  // ✅ Handle modal close
+  const handleClose = () => {
+    if (!submitting) {
+      onClose();
     }
   };
 
