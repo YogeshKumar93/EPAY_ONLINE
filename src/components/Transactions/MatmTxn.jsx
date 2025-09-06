@@ -97,6 +97,7 @@ const MatmTxn = ({ filters = [], query }) => {
         wrap: true,
         right: true,
       },
+
       {
         name: "Charges & Comm",
         selector: (row) => (
@@ -113,13 +114,7 @@ const MatmTxn = ({ filters = [], query }) => {
         wrap: true,
         right: true,
       },
-      {
-        name: "Status",
-      selector: (row) => <CommonStatus value={row.status} />,
-      
-        center: true,
-      },
-      {
+       {
         name: "RRN",
         selector: (row) => (
           <div style={{ textAlign: "left", fontSize: "0.85rem" }}>
@@ -128,6 +123,13 @@ const MatmTxn = ({ filters = [], query }) => {
         ),
         wrap: true,
       },
+      {
+        name: "Status",
+      selector: (row) => <CommonStatus value={row.status} />,
+      
+        center: true,
+      },
+     
      
     ],
     []
