@@ -124,6 +124,8 @@ GET_WALLETLEDGER:"walletledger/getWalletLedgers",
   GET_NOTIFICATION: "notification/getNotification",
   MARK_READ_NOTI: "notification/updateNotification",
   ADMIN_NOTIFICATION: "notification/createNotification",
+  UPDATE_NOTIFICATION: "notification/updateNotification",
+   DELETE_NOTIFICATION: "notification/deleteNotification",
 
 
   CREATE_BANK: "bank/createBank",
