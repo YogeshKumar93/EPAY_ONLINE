@@ -258,7 +258,7 @@ const Login = () => {
                   Forgot Password?
                 </Button>
               </Box>
-              <ReButton
+              <Button
                 type="submit"
                 fullWidth
                 lable={"Login"}
@@ -268,7 +268,7 @@ const Login = () => {
                 disabled={loading}
               >
                 {loading ? <CircularProgress size={24} /> : "Login"}
-              </ReButton>
+              </Button>
               <Button
                 fullWidth
                 variant="outlined"

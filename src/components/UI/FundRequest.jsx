@@ -1,4 +1,4 @@
-import { useMemo, useState, useContext } from "react";
+import { useMemo, useState, useContext, useEffect } from "react";
 import { Box, Button, Tooltip, Typography } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
@@ -13,6 +13,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import ReButton from "../common/ReButton";
 import CommonStatus from "../common/CommonStatus";
+import CommonLoader from "../common/CommonLoader";
  
  
 
@@ -24,6 +25,16 @@ const FundRequest = () => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [status, setStatus] = useState("");
   const [openModal, setOpenModal] = useState(false);
+  const [loading, setLoading] = useState(true); // initially true
+
+  useEffect(() => {
+  const timer = setTimeout(() => {
+    setLoading(false); // stop loader after data is ready
+  }, 1000); // 1 second delay just as an example
+
+  return () => clearTimeout(timer);
+}, []);
+
 
   const handleOpen = (row, statusType) => {
     setSelectedRow(row);
@@ -31,22 +42,7 @@ const FundRequest = () => {
     setOpenModal(true);
   };
 
-  // const getStatusColor = useCallback((status) => {
-  //   switch (status?.toUpperCase()) {
-  //     case "SUCCESS":
-  //       return "#2e7d32"; // green
-  //     case "FAILED":
-  //       return "#d32f2f"; // red
-  //     case "REFUND":
-  //       return "#ed6c02"; // orange
-  //     case "PENDING":
-  //       return "#0288d1"; // blue
-  //     case "REJECTED":
-  //       return "#9e9e9e"; // grey
-  //     default:
-  //       return "#616161"; // default grey
-  //   }
-  // }, []);
+ 
 
   // ✅ After create
   const handleSaveCreate = () => {
@@ -206,7 +202,11 @@ const FundRequest = () => {
   );
 
   return (
-    <Box sx={{}}>
+<>
+  <CommonLoader loading={loading} text="Loading Fund Requests" />
+
+  {!loading && (
+    <Box>
       {/* ✅ Header */}
 
       {/* ✅ Table */}
@@ -215,12 +215,12 @@ const FundRequest = () => {
         endpoint={ApiEndpoints.GET_FUND_REQUESTS}
         filters={filters}
         customHeader={
-          (user?.role !== "sadm" || user?.role !== "adm") && (
+          (user?.role !== "sadm" && user?.role !== "adm") && (
             <ReButton
               variant="contained"
               label="Request"
               onClick={() => setOpenCreate(true)}
-            ></ReButton>
+            />
           )
         }
       />
@@ -242,6 +242,9 @@ const FundRequest = () => {
         />
       )}
     </Box>
+  )}
+</>
+
   );
 };
 
