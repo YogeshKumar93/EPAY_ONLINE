@@ -4,6 +4,7 @@ import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import AuthContext from "../../contexts/AuthContext";
 import { dateToTime1, ddmmyy, ddmmyyWithTime } from "../../utils/DateUtils";
+import CommonStatus from "../common/CommonStatus";
 
 const MatmTxn = ({ filters = [], query }) => {
   const authCtx = useContext(AuthContext);
@@ -114,22 +115,8 @@ const MatmTxn = ({ filters = [], query }) => {
       },
       {
         name: "Status",
-        selector: (row) => (
-          <div
-            style={{
-              color:
-                row.status === "SUCCESS"
-                  ? "green"
-                  : row.status === "PENDING"
-                  ? "orange"
-                  : "red",
-              fontWeight: 700,
-              textAlign: "center",
-            }}
-          >
-            {row.status}
-          </div>
-        ),
+      selector: (row) => <CommonStatus value={row.status} />,
+      
         center: true,
       },
       {

@@ -4,6 +4,7 @@ import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import AuthContext from "../../contexts/AuthContext";
 import { dateToTime1, ddmmyy, ddmmyyWithTime } from "../../utils/DateUtils";
+import CommonStatus from "../common/CommonStatus";
 
 const PayoutTxn = ({ filters = [], query }) => {
   const authCtx = useContext(AuthContext);
@@ -101,22 +102,8 @@ const PayoutTxn = ({ filters = [], query }) => {
       },
       {
         name: "Status",
-        selector: (row) => (
-          <div
-            style={{
-              color:
-                row.status === "SUCCESS"
-                  ? "green"
-                  : row.status === "PENDING"
-                  ? "orange"
-                  : "red",
-              fontWeight: 600,
-              textAlign: "center",
-            }}
-          >
-            {row.status}
-          </div>
-        ),
+        selector: (row) => <CommonStatus value={row.status} />,
+       
         center: true,
       },
     

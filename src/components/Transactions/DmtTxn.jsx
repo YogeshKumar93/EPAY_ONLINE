@@ -3,7 +3,8 @@ import { Box, Tooltip, Typography, Button } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import AuthContext from "../../contexts/AuthContext";
-import { dateToTime1, ddmmyy,ddmmyyWithTime } from "../../utils/DateUtils";
+import { dateToTime1, ddmmyy, ddmmyyWithTime } from "../../utils/DateUtils";
+import CommonStatus from "../common/CommonStatus";
 
 const DmtTxn = ({ filters = [], query }) => {
   const authCtx = useContext(AuthContext);
@@ -12,28 +13,26 @@ const DmtTxn = ({ filters = [], query }) => {
 
   const columns = useMemo(
     () => [
-      
-{
-  name: "Date",
-  selector: (row) => (
-    <div style={{ display: "flex", flexDirection: "column" }}>
-      <Tooltip title={`Created: ${ddmmyyWithTime(row.created_at)}`} arrow>
-        <span>
-          {ddmmyy(row.created_at)} {dateToTime1(row.created_at)}
-        </span>
-      </Tooltip>
+      {
+        name: "Date",
+        selector: (row) => (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Tooltip title={`Created: ${ddmmyyWithTime(row.created_at)}`} arrow>
+              <span>
+                {ddmmyy(row.created_at)} {dateToTime1(row.created_at)}
+              </span>
+            </Tooltip>
 
-      <Tooltip title={`Updated: ${ddmmyyWithTime(row.updated_at)}`} arrow>
-        <span>
-         {ddmmyy(row.updated_at)} {dateToTime1(row.updated_at)}
-        </span>
-      </Tooltip>
-    </div>
-  ),
-  wrap: true,
-  width: "140px", 
-},
-
+            <Tooltip title={`Updated: ${ddmmyyWithTime(row.updated_at)}`} arrow>
+              <span>
+                {ddmmyy(row.updated_at)} {dateToTime1(row.updated_at)}
+              </span>
+            </Tooltip>
+          </div>
+        ),
+        wrap: true,
+        width: "140px",
+      },
 
       {
         name: "Txn ID",
@@ -101,19 +100,9 @@ const DmtTxn = ({ filters = [], query }) => {
       },
       {
         name: "Status",
-        selector: (row) => row.status,
+       selector: (row) => <CommonStatus value={row.status} />,
         center: true,
-        style: (row) => ({
-          color:
-            row.status === "SUCCESS"
-              ? "green"
-              : row.status === "PENDING"
-              ? "orange"
-              : "red",
-          fontWeight: 600,
-        }),
-      },
-   
+      }
     ],
     []
   );
