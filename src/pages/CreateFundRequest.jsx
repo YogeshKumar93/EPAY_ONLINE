@@ -43,9 +43,9 @@ const CreateFundRequest = ({ open, handleClose, handleSave }) => {
   // ✅ Validation
   const validateForm = () => {
     const newErrors = {};
-    if (!isValid(PATTERNS.TXN_ID, formData.txn_id || "")) {
-      newErrors.txn_id = "Enter a valid TXN ID (6–20 alphanumeric chars)";
-    }
+    // if (!isValid(PATTERNS.TXN_ID, formData.txn_id || "")) {
+    //   newErrors.txn_id = "Enter a valid TXN ID (6–20 alphanumeric chars)";
+    // }
     if (!formData.bank_name) newErrors.bank_name = "Bank is required";
     if (!formData.mode) newErrors.mode = "Mode is required";
     if (!isValid(PATTERNS.IFSC, formData.bank_ref_id || "")) {
@@ -114,13 +114,37 @@ const CreateFundRequest = ({ open, handleClose, handleSave }) => {
       ? banks
       : [{ value: "", label: "No banks available" }],
   };
+// ✅ Override date field to use DatePicker
+const dateField = {
+  name: "date",
+  label: "Date",
+  type: "datepicker",
+  props: {
+    disableFuture: true, // optional: disallow future dates
+    format: "DD/MM/YYYY", // display format
+  },
+};
 
-  const hasBank = visibleFields.find((f) => f.name === "bank_name");
-  if (hasBank) {
-    visibleFields = visibleFields.map((f) => (f.name === "bank_name" ? bankField : f));
-  } else {
-    visibleFields.splice(1, 0, bankField);
-  }
+// Replace schema date with our date picker config
+visibleFields = visibleFields.map((f) =>
+  f.name === "date" ? dateField : f
+);
+
+ // ✅ Replace or insert bank_name field
+const hasBank = visibleFields.find((f) => f.name === "bank_name");
+if (hasBank) {
+  visibleFields = visibleFields.map((f) =>
+    f.name === "bank_name" ? bankField : f
+  );
+} else {
+  visibleFields.splice(1, 0, bankField);
+}
+
+// ✅ Replace schema "date" field with DatePicker
+visibleFields = visibleFields.map((f) =>
+  f.name === "date" ? dateField : f
+);
+
 
   return (
     <CommonModal

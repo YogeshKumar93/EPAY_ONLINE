@@ -249,26 +249,27 @@ useEffect(() => {
   switch (type) {
     case "datepicker":
       return (
-        <DatePicker
-          label={label}
-          value={formData[name] ? dayjs(Number(formData[name])) : null}
-          onChange={(newValue) =>
-            handleChange({
-              target: {
-                name,
-                value: newValue ? newValue.valueOf() : null,
-              },
-            })
-          }
-          slotProps={{
-            textField: {
-              fullWidth: true,
-              ...getErrorProps(),
-            },
-          }}
-          disabled={loading}
-          {...props}
-        />
+      <DatePicker
+  label={label}
+  value={formData[name] ? dayjs(formData[name]) : null}
+  onChange={(newValue) =>
+    handleChange({
+      target: {
+        name,
+        // ✅ send formatted date instead of timestamp
+        value: newValue ? dayjs(newValue).format("YYYY-MM-DD") : "",
+      },
+    })
+  }
+  slotProps={{
+    textField: {
+      fullWidth: true,
+      ...getErrorProps(),
+    },
+  }}
+  disabled={loading}
+  {...props}
+/>
       );
       
     case "select":
