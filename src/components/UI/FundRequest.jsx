@@ -3,7 +3,7 @@ import { Box, Button, Tooltip, Typography } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import { currencySetter } from "../../utils/Currencyutil";
-import { dateToTime, ddmmyy } from "../../utils/DateUtils";
+import { dateToTime, dateToTime1, ddmmyy, ddmmyyWithTime } from "../../utils/DateUtils";
 import AddIcon from "@mui/icons-material/Add";
 import CreateFundRequest from "../../pages/CreateFundRequest";
 
@@ -63,24 +63,27 @@ const FundRequest = () => {
   // ✅ Columns
   const columns = useMemo(
     () => [
+              
         {
-        name: "Created At",
-        selector: (row) => (
-          <div style={{ textAlign: "left" }}>
-            {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
-          </div>
-        ),
-        wrap: true,
-      },
-      {
-        name: "Updated At",
-        selector: (row) => (
-          <div style={{ textAlign: "left" }}>
-            {ddmmyy(row.updated_at)} {dateToTime(row.updated_at)}
-          </div>
-        ),
-        wrap: true,
-      },
+          name: "Date",
+          selector: (row) => (
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <Tooltip title={`Created: ${ddmmyyWithTime(row.created_at)}`} arrow>
+                <span>
+                  {ddmmyy(row.created_at)} {dateToTime1(row.created_at)}
+                </span>
+              </Tooltip>
+        
+              <Tooltip title={`Updated: ${ddmmyyWithTime(row.updated_at)}`} arrow>
+                <span>
+                 {ddmmyy(row.updated_at)} {dateToTime1(row.updated_at)}
+                </span>
+              </Tooltip>
+            </div>
+          ),
+          wrap: true,
+          width: "140px", 
+        },
       {
         name: "ID",
         selector: (row) => row?.id,
@@ -106,15 +109,7 @@ const FundRequest = () => {
         selector: (row) => <Typography>{row?.bank_ref_id}</Typography>,
         wrap: true,
       },
-      {
-        name: "Remark",
-        selector: (row) => (
-          <Tooltip title={row?.remark}>
-            <Typography noWrap>{row?.remark}</Typography>
-          </Tooltip>
-        ),
-        grow: 2,
-      },
+    
       // {
       //   name: "Ledger Balance",
       //   selector: (row) => (
@@ -134,6 +129,15 @@ const FundRequest = () => {
             {currencySetter(parseFloat(row?.amount).toFixed(2))}
           </Typography>
         ),
+      },
+        {
+        name: "Remark",
+        selector: (row) => (
+          <Tooltip title={row?.remark}>
+            <Typography noWrap>{row?.remark}</Typography>
+          </Tooltip>
+        ),
+        grow: 2,
       },
        {
   name: "Status",
