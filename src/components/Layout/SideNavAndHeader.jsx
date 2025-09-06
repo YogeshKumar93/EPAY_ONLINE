@@ -355,6 +355,7 @@ const MainContent = styled(Box)(({ theme }) => ({
                     navigate("/admin/profile");
                   } else if (user && user.role === "sadm") {
                     navigate("/admin/profile");
+                  } else if (user && user.role === "Zsm") {
                   } else if (user && user.role === "Asm") {
                     navigate("/asm/profile");
                   } else if (user && user.role === "Zsm") {
