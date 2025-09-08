@@ -16,11 +16,10 @@ export const Admin_nav = [
     icon2: "🛠️",
     to: "/admin/fund-request",
   },
- 
+
   { title: "Settings", icon: "👥", icon2: "👥", to: "/admin/settings" },
   { title: "Services", icon: "👥", icon2: "👥", to: "/admin/services" },
-   { title: "Bankings", icon: "👥", icon2: "👥", to: "/admin/bankings" },
-
+  { title: "Bankings", icon: "👥", icon2: "👥", to: "/admin/bankings" },
 ];
 
 export const customer_nav = [
@@ -43,8 +42,13 @@ export const customer_nav = [
   //   icon2: "🛠️",
   //   to: "/customer/recharge-bill",
   // },
-   
-{ title: "Notification", icon: "💳", icon2: "💳", to: "/customer/notification" },
+
+  {
+    title: "Notification",
+    icon: "💳",
+    icon2: "💳",
+    to: "/customer/notification",
+  },
   {
     title: "Account Ledger",
     icon: "📒",
