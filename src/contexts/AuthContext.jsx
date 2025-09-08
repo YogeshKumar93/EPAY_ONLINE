@@ -34,6 +34,7 @@ export const AuthProvider = ({ children }) => {
     JSON.parse(localStorage.getItem("location"))
   );
   const [theame, setTheame] = useState();
+  const [colours, setColours] = useState({}); // store all colors by element_type
   const [iconColor, setIconColor] = useState();
   const [currentView, setCurrentView] = useState(null);
   const [ip, setIp] = useState("");
@@ -70,7 +71,25 @@ const loadUserProfile = async () => {
     throw err;
   }
 };
+const loadColours = async () => {
+  try {
+    const { error, response } = await apiCall("post", ApiEndpoints.GET_COLOURS);
 
+    if (error) throw new Error(error.message || "Failed to load colours");
+
+    if (response?.data) {
+      const mappedColours = {};
+      response.data.forEach((item) => {
+        mappedColours[item.element_type] = item.color_code;
+      });
+
+      setColours(mappedColours);
+      localStorage.setItem("colours", JSON.stringify(mappedColours)); // optional cache
+    }
+  } catch (err) {
+    console.error("Failed to fetch colours:", err);
+  }
+}
 
   // Initialize auth state on app load
   useEffect(() => {
@@ -97,6 +116,7 @@ const loadUserProfile = async () => {
       setTokenState(token);
       localStorage.setItem("access_token", token);
       const userProfile = await loadUserProfile();
+            await loadColours();
       return userProfile;
     } catch (err) {
       clearToken();
@@ -206,6 +226,8 @@ const loadUserProfile = async () => {
     logout,
     saveUser,
     isAuthenticated: !!token,
+  colours,
+  loadColours,
 
     // New keys from second context
     token: token,

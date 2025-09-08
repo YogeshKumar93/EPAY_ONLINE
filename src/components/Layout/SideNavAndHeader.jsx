@@ -76,10 +76,12 @@ const themeSettings = {
 
 const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
   // console.log("inroute",userRole);
+  const { colours } = useContext(AuthContext);
 
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const refreshUser = authCtx.loadUserProfile;
+  const colour = authCtx.loadColours;
   const isMobile = useMediaQuery("(max-width: 900px)");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [desktopOpen, setDesktopOpen] = useState(true);
@@ -165,7 +167,7 @@ const MainContent = styled(Box)(({ theme }) => ({
                   ? themeSettings.palette.primary.main
                   : "action.hover",
               },
-              mb: 0.5,
+              mb: 0,
             }}
             className={isItemActive ? "nav-link active" : "nav-link"}
           >
@@ -178,7 +180,14 @@ const MainContent = styled(Box)(({ theme }) => ({
 
             {(desktopOpen || isMobile) && (
               <>
-                <ListItemText primary={item.title} />
+<ListItemText
+  primary={item.title}
+  primaryTypographyProps={{
+    fontSize: "18px",     // increase font size
+    fontWeight: 500,      // semi-bold
+    color: isItemActive ? "#fff" : "black", // white if active, black otherwise
+  }}
+/>
                 {hasSubmenus &&
                   (isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />)}
               </>
@@ -201,7 +210,7 @@ const MainContent = styled(Box)(({ theme }) => ({
   const drawerContent = (
     <Box
       className="side-nav"
-      sx={{ height: "100%", display: "flex", flexDirection: "column" ,}}
+      sx={{ height: "100%", display: "flex", flexDirection: "column" ,backgroundColor: colours?.sidenav || "#1976d2" ,}}
     >
       {/* Logo area with white background */}
       <Box
@@ -211,7 +220,7 @@ const MainContent = styled(Box)(({ theme }) => ({
           alignItems: "center",
           justifyContent: desktopOpen ? "center" : "center",
           p: 1.5, // Reduced padding to decrease height
-          backgroundColor: "#ffffff",
+backgroundColor:  "#fff" ,
           height: "64px",
           borderBottom: `1px solid rgba(0, 0, 0, 0.12)`,
           minHeight: "64px", // Matching the header height
@@ -254,7 +263,8 @@ const MainContent = styled(Box)(({ theme }) => ({
       <AppBar
         position="fixed"
         sx={{
-          backgroundColor:"#0037D7",
+          // backgroundColor:"#0037D7",
+          backgroundColor: colours?.header || "#1976d2" ,
           width: {
             md: desktopOpen
               ? `calc(100% - ${themeSettings.drawerWidth}px)`
@@ -295,6 +305,9 @@ const MainContent = styled(Box)(({ theme }) => ({
           {/* ✅ Refresh icon button with black color */}
           <IconButton onClick={refreshUser}>
             <RefreshIcon sx={{ color: "black" }} />
+          </IconButton>
+          <IconButton onClick={colour}>
+            <RefreshIcon sx={{ color: "#fff" }} />
           </IconButton>
           <IconButton color="inherit" onClick={handleUserMenuOpen}>
             <Avatar src={userAvatar} sx={{ width: 32, height: 32 }}>

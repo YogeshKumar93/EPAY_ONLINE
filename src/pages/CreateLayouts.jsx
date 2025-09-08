@@ -1,58 +1,49 @@
-
-import React, { useEffect, useState } from "react";
-import { Typography, CircularProgress } from "@mui/material";
+import React, { useState } from "react";
+import { Typography, CircularProgress, TextField, Box } from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CommonModal from "../components/common/CommonModal";
+import { useSchemaForm } from "../hooks/useSchemaForm";
+import { useToast } from "../utils/ToastContext";
 
 const CreateLayouts = ({ open, handleClose, handleSave }) => {
-  const [formData, setFormData] = useState({
-    name: "",
-    color_code: "",
-    element_type: "",
-     
- 
-  });
+  const {
+    schema,
+    formData,
+    handleChange,
+    setFormData,
+    errors,
+    loading,
+  } = useSchemaForm(ApiEndpoints.GET_COLOR_SCHEMA, open);
 
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [colorOptions, setColorOptions] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
+  const { showToast } = useToast();
 
-  useEffect(()=>{
-    if(open){
-        fetchColors();
+  // ✅ Auto sync element_type when name changes
+  const handleNameChange = (e) => {
+    const selectedName = e.target.value;
+
+    const nameField = schema.find((f) => f.name === "name");
+
+    if (nameField && Array.isArray(nameField.options)) {
+      const matched = nameField.options.find((opt) => opt.value === selectedName);
+
+      if (matched) {
+        setFormData((prev) => ({
+          ...prev,
+          name: matched.value,
+          element_type: matched.value,
+        }));
+        return;
+      }
     }
-  },[open]);
 
-  const fetchColors = async () =>{
-    try{
-        const{response,error} = await apiCall("POST", ApiEndpoints.GET_COLOR_SCHEMA);
-        if(response){
-            setColorOptions(response?.data?.data || []);
-
-        }else{
-            console.error('Error fetching colors: ', error);
-        }
-    }
-    catch(err){
-        console.error("Error fetching colors: ", err);
-    }
-  };
-
-
-  // ✅ Handle input change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    handleChange(e);
   };
 
   // ✅ API submit
   const onSubmit = async () => {
-    // if (!validate()) return;
-    setLoading(true);
+    setSubmitting(true);
     try {
       const { error, response } = await apiCall(
         "POST",
@@ -61,23 +52,17 @@ const CreateLayouts = ({ open, handleClose, handleSave }) => {
       );
 
       if (response) {
+        showToast(response?.message || "Colour created successfully", "success");
         handleSave(response.data);
         handleClose();
-        setFormData({
-          name: "",
-          color_code: "",
-          element_type: "",
-           
-          
-        });
       } else {
-        console.error("Failed to create account:", error || response);
+        showToast(error?.message || "Failed to create colour", "error");
       }
     } catch (err) {
-      console.error("Error creating account:", err);
-      alert("Something went wrong while creating account.");
+      console.error("Error creating colour:", err);
+      showToast("Something went wrong while creating colour.", "error");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -87,29 +72,22 @@ const CreateLayouts = ({ open, handleClose, handleSave }) => {
       text: "Cancel",
       variant: "outlined",
       onClick: handleClose,
-      disabled: loading,
+      disabled: submitting,
     },
     {
-      text: "Save",
+      text: submitting ? "Saving..." : "Save",
       variant: "contained",
       onClick: onSubmit,
-      disabled: loading,
-      startIcon: loading ? <CircularProgress size={20} color="inherit" /> : null,
+      disabled: submitting,
+      startIcon:
+        submitting ? <CircularProgress size={20} color="inherit" /> : null,
     },
   ];
 
-  // ✅ Field configuration
-  const fieldConfig = [
-    { name: "name", label: "Name", type: "text" },
-       { name: "element_type", label: "Element Type", type: "text" },
- {
-    name: "color_code",
-    label: "Color Picker",
-    type: "color",   // ✅ use color input instead of select
-  },
- 
-    
-  ];
+  // visible fields (without color_code → we’ll render it manually)
+  const visibleFields = schema.filter((field) =>
+    ["name", "element_type","color_code"].includes(field.name)
+  );
 
   return (
     <CommonModal
@@ -120,15 +98,30 @@ const CreateLayouts = ({ open, handleClose, handleSave }) => {
       size="medium"
       iconType="info"
       showCloseButton={true}
-      closeOnBackdropClick={!loading}
+      closeOnBackdropClick={!submitting}
       dividers={true}
-      fieldConfig={fieldConfig} // ✅ pass config
+      fieldConfig={visibleFields}
       formData={formData}
-      handleChange={handleChange}
+      handleChange={(e) =>
+        e.target.name === "name" ? handleNameChange(e) : handleChange(e)
+      }
       errors={errors}
-      loading={loading}
-      layout="two-column" // ✅ NEW: tell CommonModal to render 2 fields/row
+      loading={loading || submitting}
+      layout="two-column"
     >
+      {/* 👇 Custom color picker field */}
+      <Box sx={{ mt: 2 }}>
+        <TextField
+          fullWidth
+          label="Color Code"
+          name="color_code"
+          type="color"
+          value={formData.color_code || "#000000"}
+          onChange={handleChange}
+          InputLabelProps={{ shrink: true }}
+        />
+      </Box>
+
       <Typography
         variant="caption"
         color="text.secondary"

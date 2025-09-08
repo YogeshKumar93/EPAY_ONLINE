@@ -332,25 +332,72 @@ case "dropdown":
         />
       );
 
-      case "colorpicker":
+    case "colorpicker":
+case "color":
+case "color_code":
   return (
-    <input
-      type="color"
-      name={name}
-      value={formData[name] || "#000000"} // ✅ default to black if empty
-      onChange={(e) => handleChange(e)}
-      disabled={loading}
-      style={{
-        width: "100%",
-        height: "40px",
-        border: "1px solid #ccc",
-        borderRadius: "6px",
-        cursor: "pointer",
-        background: formData[name] || "#fff",
-      }}
-      {...props}
-    />
+    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+      {/* Color Picker */}
+      <input
+        type="color"
+        name={name}
+        value={formData[name] || "#000000"}
+        onChange={(e) => handleChange(e)}
+        disabled={loading}
+        style={{
+          width: "50px",
+          height: "40px",
+          border: "1px solid #ccc",
+          borderRadius: "6px",
+          cursor: "pointer",
+          padding: 0,
+        }}
+        {...props}
+      />
+
+      {/* Manual Hex Input */}
+      <ReTextField
+        label={label || "Color Code"}
+        name={name}
+        value={formData[name] || "#000000"}
+        onChange={handleChange}
+        disabled={loading}
+        placeholder="#000000"
+        sx={{ flex: 1 }}
+        {...getErrorProps()}
+      />
+    </Box>
   );
+
+  case "color":
+  case "color_code": // if schema only sends name= color_code but type=text
+    return (
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+          {label || "Color"}
+        </Typography>
+        <input
+          type="color"
+          name={name}
+          value={formData[name] || "#000000"} // default to black
+          onChange={(e) => handleChange(e)}
+          disabled={loading}
+          style={{
+            width: "100%",
+            height: "40px",
+            border: "1px solid #ccc",
+            borderRadius: "6px",
+            cursor: "pointer",
+            background: formData[name] || "#fff",
+          }}
+          {...props}
+        />
+        {/* optional hex code */}
+        <Typography variant="caption" color="text.secondary">
+          {formData[name] || "#000000"}
+        </Typography>
+      </Box>
+    );
 
 
     // Other field types remain the same

@@ -95,7 +95,7 @@ body {
 /* Side Navigation Styles */
 .side-nav {
   width: 240px;
-  background: var(--surface-color);
+  /* background: var(--surface-color); */
   border-radius: 20px;
   box-shadow: var(--shadow-sm);
   overflow: hidden;
@@ -143,8 +143,8 @@ body {
 
 .nav-icon {
  
-  width: 35px;
-  height: 35px;
+  width: 40px;
+  height: 40px;
 }
 
 /* Content Area */
