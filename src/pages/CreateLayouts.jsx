@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Typography, CircularProgress } from "@mui/material";
+import { Typography, CircularProgress, TextField, Box } from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CommonModal from "../components/common/CommonModal";
@@ -11,13 +11,35 @@ const CreateLayouts = ({ open, handleClose, handleSave }) => {
     schema,
     formData,
     handleChange,
+    setFormData,
     errors,
-    setErrors,
     loading,
-  } = useSchemaForm(ApiEndpoints.GET_COLOR_SCHEMA, open); // 👈 use schema API
+  } = useSchemaForm(ApiEndpoints.GET_COLOR_SCHEMA, open);
 
   const [submitting, setSubmitting] = useState(false);
   const { showToast } = useToast();
+
+  // ✅ Auto sync element_type when name changes
+  const handleNameChange = (e) => {
+    const selectedName = e.target.value;
+
+    const nameField = schema.find((f) => f.name === "name");
+
+    if (nameField && Array.isArray(nameField.options)) {
+      const matched = nameField.options.find((opt) => opt.value === selectedName);
+
+      if (matched) {
+        setFormData((prev) => ({
+          ...prev,
+          name: matched.value,
+          element_type: matched.value,
+        }));
+        return;
+      }
+    }
+
+    handleChange(e);
+  };
 
   // ✅ API submit
   const onSubmit = async () => {
@@ -62,9 +84,9 @@ const CreateLayouts = ({ open, handleClose, handleSave }) => {
     },
   ];
 
-  // Optional: filter only needed fields from schema
+  // visible fields (without color_code → we’ll render it manually)
   const visibleFields = schema.filter((field) =>
-    ["name", "element_type", "color_code"].includes(field.name)
+    ["name", "element_type","color_code"].includes(field.name)
   );
 
   return (
@@ -78,13 +100,28 @@ const CreateLayouts = ({ open, handleClose, handleSave }) => {
       showCloseButton={true}
       closeOnBackdropClick={!submitting}
       dividers={true}
-      fieldConfig={visibleFields} // 👈 schema-driven fields
+      fieldConfig={visibleFields}
       formData={formData}
-      handleChange={handleChange}
+      handleChange={(e) =>
+        e.target.name === "name" ? handleNameChange(e) : handleChange(e)
+      }
       errors={errors}
       loading={loading || submitting}
       layout="two-column"
     >
+      {/* 👇 Custom color picker field */}
+      <Box sx={{ mt: 2 }}>
+        <TextField
+          fullWidth
+          label="Color Code"
+          name="color_code"
+          type="color"
+          value={formData.color_code || "#000000"}
+          onChange={handleChange}
+          InputLabelProps={{ shrink: true }}
+        />
+      </Box>
+
       <Typography
         variant="caption"
         color="text.secondary"

@@ -60,6 +60,15 @@ const Layouts = ({ filters = [], query }) => {
         wrap: true,
       },
       {
+        name: "Element Type",
+        selector: (row) => (
+          <Tooltip title={row?.element_type}>
+            <div style={{ textAlign: "left" }}>{row?.element_type}</div>
+          </Tooltip>
+        ),
+        wrap: true,
+      },
+      {
         name: "Colour",
         selector: (row) => (
           <Tooltip title={row?.color_code}>

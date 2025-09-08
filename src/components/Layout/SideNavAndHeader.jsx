@@ -210,7 +210,7 @@ const MainContent = styled(Box)(({ theme }) => ({
   const drawerContent = (
     <Box
       className="side-nav"
-      sx={{ height: "100%", display: "flex", flexDirection: "column" ,}}
+      sx={{ height: "100%", display: "flex", flexDirection: "column" ,backgroundColor: colours?.sidenav || "#1976d2" ,}}
     >
       {/* Logo area with white background */}
       <Box
@@ -220,7 +220,7 @@ const MainContent = styled(Box)(({ theme }) => ({
           alignItems: "center",
           justifyContent: desktopOpen ? "center" : "center",
           p: 1.5, // Reduced padding to decrease height
-backgroundColor: colours?.header_color || "#1976d2" ,
+backgroundColor:  "#fff" ,
           height: "64px",
           borderBottom: `1px solid rgba(0, 0, 0, 0.12)`,
           minHeight: "64px", // Matching the header height
@@ -263,7 +263,8 @@ backgroundColor: colours?.header_color || "#1976d2" ,
       <AppBar
         position="fixed"
         sx={{
-          backgroundColor:"#0037D7",
+          // backgroundColor:"#0037D7",
+          backgroundColor: colours?.header || "#1976d2" ,
           width: {
             md: desktopOpen
               ? `calc(100% - ${themeSettings.drawerWidth}px)`
