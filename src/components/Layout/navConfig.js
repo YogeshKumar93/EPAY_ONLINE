@@ -16,13 +16,11 @@ export const Admin_nav = [
     icon2: "🛠️",
     to: "/admin/fund-request",
   },
-  { title: "Accounts", icon: "👥", icon2: "👥", to: "/admin/accounts" },
-  { title: "Banks", icon: "👥", icon2: "👥", to: "/admin/banks" },
+ 
+  { title: "Settings", icon: "👥", icon2: "👥", to: "/admin/settings" },
   { title: "Services", icon: "👥", icon2: "👥", to: "/admin/services" },
-  { title: "Commission Rules", icon: "👥", icon2: "👥", to: "/admin/commissionrule" },
-  { title: "Templates", icon: "👥", icon2: "👥", to: "/admin/templates" },
-  { title: "Logs", icon: "👥", icon2: "👥", to: "/admin/logs" },
-  { title: "Layout", icon: "👥", icon2: "👥", to: "/admin/layout" },
+   { title: "Bankings", icon: "👥", icon2: "👥", to: "/admin/bankings" },
+
 ];
 
 export const customer_nav = [

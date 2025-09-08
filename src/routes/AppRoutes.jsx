@@ -23,6 +23,8 @@ import Banks from "../pages/Banks";
 import { Transaction } from "../pages/Transaction";
 import Layouts from "../pages/Layouts";
 import CommissionRule from "../pages/CommissionRule";
+import { Banking } from "../pages/Banking";
+import { Settings } from "../pages/Settings";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useContext(AuthContext);
@@ -68,6 +70,8 @@ export default function AppRoutes() {
               <Route path="admin/fund-request" element={<FundRequest />} />
               <Route path="admin/accounts" element={<Accounts />} />
               <Route path="admin/services" element={<Services />} />
+                <Route path="admin/bankings" element={<Banking />} />
+                  <Route path="admin/settings" element={<Settings />} />
               <Route path="admin/templates" element={<Templates />} />
               <Route path="admin/logs" element={<Logs />} />
               <Route path="admin/profile" element={<ProfilePage />} />
