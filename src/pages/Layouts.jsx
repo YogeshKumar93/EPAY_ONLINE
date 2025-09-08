@@ -91,9 +91,6 @@ const Layouts = ({ filters = [], query }) => {
 
   return (
     <Box sx={{ }}>
-      {/* ✅ Header */}
-
-      {/* Services Table */}
       <CommonTable
         key={refreshKey} // 🔄 refresh on changes
         columns={columns}
