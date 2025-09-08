@@ -201,7 +201,7 @@ const MainContent = styled(Box)(({ theme }) => ({
   const drawerContent = (
     <Box
       className="side-nav"
-      sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+      sx={{ height: "100%", display: "flex", flexDirection: "column" ,}}
     >
       {/* Logo area with white background */}
       <Box
@@ -209,7 +209,7 @@ const MainContent = styled(Box)(({ theme }) => ({
         sx={{
           display: "flex",
           alignItems: "center",
-          justifyContent: desktopOpen ? "space-between" : "center",
+          justifyContent: desktopOpen ? "center" : "center",
           p: 1.5, // Reduced padding to decrease height
           backgroundColor: "#ffffff",
           height: "64px",
@@ -235,12 +235,12 @@ const MainContent = styled(Box)(({ theme }) => ({
             className="text-primary"
             size="small"
           >
-            <ChevronLeftIcon />
+            {/* <ChevronLeftIcon /> */}
           </IconButton>
         )}
       </Box>
 
-      <List className="nav-list" sx={{ flexGrow: 1, overflowY: "auto" }}>
+      <List className="nav-list" sx={{  overflowY: "auto" }}>
         {renderNavItems(navigationItems)}
       </List>
     </Box>
@@ -268,6 +268,7 @@ const MainContent = styled(Box)(({ theme }) => ({
               duration: theme.transitions.duration.leavingScreen,
             }),
           height: "64px", // Reduced header height
+          
           justifyContent: "center",
         }}
         className="header"
@@ -435,19 +436,23 @@ const MainContent = styled(Box)(({ theme }) => ({
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: themeSettings.drawerWidth,
+              
               transition: (theme) =>
                 theme.transitions.create("width", {
                   easing: theme.transitions.easing.sharp,
                   duration: theme.transitions.duration.enteringScreen,
                 }),
+               overflow: "auto",
+scrollbarWidth: "none",
               ...(!desktopOpen && {
                 overflowX: "hidden",
+             
                 transition: (theme) =>
                   theme.transitions.create("width", {
                     easing: theme.transitions.easing.sharp,
                     duration: theme.transitions.duration.leavingScreen,
                   }),
-                width: (theme) => theme.spacing(7),
+                width: (theme) => theme.spacing(),
               }),
             },
           }}

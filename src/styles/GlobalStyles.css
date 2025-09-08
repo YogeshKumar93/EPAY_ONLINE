@@ -94,23 +94,23 @@ body {
 
 /* Side Navigation Styles */
 .side-nav {
-  width: 290px;
+  width: 240px;
   background: var(--surface-color);
-  border-radius: var(--border-radius-md);
+  border-radius: 20px;
   box-shadow: var(--shadow-sm);
   overflow: hidden;
   flex-shrink: 0;
 }
 
 .nav-header {
-  padding: var(--spacing-lg);
+ 
   border-bottom: 1px solid var(--border-color);
   background: var(--background-color);
   color: rgb(21, 7, 7);
 }
 
 .nav-title {
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   font-weight: 600;
 }
 
@@ -125,7 +125,7 @@ body {
 .nav-link {
   display: flex;
   align-items: center;
-  padding: var(--spacing-md);
+ justify-content: center;
   color: var(--text-primary);
   text-decoration: none;
   transition: all 0.3s ease;
@@ -142,9 +142,9 @@ body {
 }
 
 .nav-icon {
-  margin-right: var(--spacing-sm);
-  width: 20px;
-  height: 20px;
+ 
+  width: 35px;
+  height: 35px;
 }
 
 /* Content Area */

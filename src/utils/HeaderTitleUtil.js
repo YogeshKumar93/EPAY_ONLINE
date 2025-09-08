@@ -19,10 +19,12 @@ export const setTitleFunc = (path, states) => {
     ? "Fund Requests"
     : path === "/admin/accounts"
     ? "Accounts"
-  
+  : path === "/admin/bankings"
+    ? "Bankings"
     : path === "/admin/banks"
     ? "Banks"
-  
+    : path === "/admin/settings"
+    ? "Settings"
     : path === "/admin/messages"
     ? "Messages"
      : path === "/admin/services"
