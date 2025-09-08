@@ -3,7 +3,7 @@ import { Tooltip } from "@mui/material";
 import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
 import AuthContext from "../contexts/AuthContext";
-import { dateToTime1, ddmmyy } from "../utils/DateUtils";
+import { dateToTime1, ddmmyy, ddmmyyWithTime } from "../utils/DateUtils";
 import CreateBankModal from "../components/Bank/CreateBanks";
 import ReButton from "../components/common/ReButton";
 import CommonStatus from "../components/common/CommonStatus";
@@ -25,6 +25,27 @@ const Banks = ({ filters = [] }) => {
   // memoized columns
   const columns = useMemo(
     () => [
+             
+            {
+              name: "Date",
+              selector: (row) => (
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <Tooltip title={`Created: ${ddmmyyWithTime(row.created_at)}`} arrow>
+                    <span>
+                      {ddmmyy(row.created_at)} {dateToTime1(row.created_at)}
+                    </span>
+                  </Tooltip>
+            
+                  <Tooltip title={`Updated: ${ddmmyyWithTime(row.updated_at)}`} arrow>
+                    <span>
+                     {ddmmyy(row.updated_at)} {dateToTime1(row.updated_at)}
+                    </span>
+                  </Tooltip>
+                </div>
+              ),
+              wrap: true,
+              width: "140px", 
+            },
       {
         name: "Bank Name",
         selector: (row) => (
@@ -63,24 +84,7 @@ const Banks = ({ filters = [] }) => {
         ),
         wrap: true,
       },
-      {
-        name: "Created At",
-        selector: (row) => (
-          <div style={{ textAlign: "left" }}>
-            {ddmmyy(row.created_at)} {dateToTime1(row.created_at)}
-          </div>
-        ),
-        wrap: true,
-      },
-      {
-        name: "Updated At",
-        selector: (row) => (
-          <div style={{ textAlign: "left" }}>
-            {ddmmyy(row.updated_at)} {dateToTime1(row.updated_at)}
-          </div>
-        ),
-        wrap: true,
-      },
+    
       {
         name: "Status",
         selector: (row) => <CommonStatus value={row.status} />,

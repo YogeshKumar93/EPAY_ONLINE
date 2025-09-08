@@ -23,7 +23,7 @@ const CreateNotification = ({ open, onClose }) => {
   useEffect(() => {
     if (!open) return;
     const fetchUsers = async () => {
-      const { response, error } = await apiCall("get", ApiEndpoints.GET_USERS);
+      const { response, error } = await apiCall("POST", ApiEndpoints.GET_USERS);
       if (response?.data) {
         const userList = Array.isArray(response.data)
           ? response.data
