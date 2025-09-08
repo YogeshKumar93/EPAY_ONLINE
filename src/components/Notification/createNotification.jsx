@@ -55,7 +55,7 @@ const CreateNotification = ({ open, onClose }) => {
 
     const payload = {
       title: formData.title,
-      info: formData.info,
+      type: formData.type,
       message: formData.message,
       user_id: formData.user_id === "all" ? "all" : formData.user_id,
     };

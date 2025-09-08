@@ -4,8 +4,8 @@ import { Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
 // Default colors for the button
-const DEFAULT_BG = "#1CA895"; 
-const DEFAULT_TEXT = "#ffffff";
+const DEFAULT_BG = "orange"; 
+const DEFAULT_TEXT = "#000";
 
 const ReButton = ({
   label,

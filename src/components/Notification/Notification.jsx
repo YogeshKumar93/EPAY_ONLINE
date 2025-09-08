@@ -97,7 +97,7 @@ const [loading, setLoading] = useState(true); // initially true
       },
       {
         name: "Status",
-        selector: (row) => <CommonStatus value={row.status} />,
+        selector: (row) => <CommonStatus is_read={row.is_read}  />,
         center: true,
       },
       {

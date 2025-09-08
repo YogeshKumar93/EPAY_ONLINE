@@ -1,14 +1,15 @@
 import React from "react";
 import { Button } from "@mui/material";
 
-const CommonStatus = ({ value }) => {
-  // Convert numeric or string statuses to display text
+const CommonStatus = ({ value, is_read }) => {
   let statusText = "";
+
+  // Handle main status
   if (value === 1 || value === "1") statusText = "ACTIVE";
   else if (value === 0 || value === "0") statusText = "INACTIVE";
-  else statusText = value?.toString()?.toUpperCase(); // convert any string to uppercase
+  else statusText = value?.toString()?.toUpperCase();
 
-  // Map each status to a color
+  // Status-to-color mapping
   const statusColors = {
     ACTIVE: "green",
     INACTIVE: "gray",
@@ -16,10 +17,23 @@ const CommonStatus = ({ value }) => {
     PENDING: "orange",
     APPROVED: "green",
     FAILED: "red",
-    REJECTED: "ORANGE",
+    REJECTED: "orange",
   };
 
-  const bgColor = statusColors[statusText] || "lightgray";
+  let bgColor = statusColors[statusText] || "lightgray";
+
+  // Override with is_read
+if (typeof is_read !== "undefined") {
+  if (is_read === 0 || is_read === "0") {
+    statusText = "UNREAD";
+    bgColor = "#ff9800"; // Vibrant Orange
+  } else if (is_read === 1 || is_read === "1") {
+    statusText = "READ";
+    bgColor = "#fdd835"; // Bright Yellow
+  }
+}
+
+
 
   return (
     <Button
@@ -27,7 +41,7 @@ const CommonStatus = ({ value }) => {
       sx={{
         backgroundColor: bgColor,
         color: "white",
-        textTransform: "uppercase", // ensures button text is uppercase
+        textTransform: "uppercase",
         fontWeight: "bold",
         "&:hover": {
           backgroundColor: bgColor,
