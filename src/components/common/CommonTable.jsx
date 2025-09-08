@@ -133,6 +133,7 @@ const CommonTable = ({
   defaultFilters,
   title = "",
   queryParam = "",
+  onFetchRef,
     customHeader = null, // Add this line
 }) => {
   const [data, setData] = useState([]);
@@ -372,7 +373,14 @@ const CommonTable = ({
   const handleManualRefresh = useCallback(() => {
     fetchData(true);
   }, [fetchData]);
+  useEffect(() => {
+    if (onFetchRef) onFetchRef(fetchData);
+  }, [fetchData, onFetchRef]);
 
+  // Initial fetch
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
   // Memoized filter inputs renderer
   const renderFilterInputs = useCallback(
     () =>

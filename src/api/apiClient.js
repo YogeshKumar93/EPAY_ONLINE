@@ -20,8 +20,11 @@ const cache = new Map();
 const CACHE_TTL = 2000;
 
 // Helper to generate unique client_ref
-const generateClientRef = () =>
-  `${Date.now()}${Math.random().toString(36).substring(2, 10)}`;
+const generateClientRef = () => {
+  const timestampPart = String(Date.now()).slice(-8); // last 8 digits of timestamp
+  const randomPart = Math.floor(Math.random() * 1e6); // 6-digit random number
+  return `${timestampPart}${randomPart}`; // total <= 14 digits
+};
 
 apiClient.interceptors.request.use(
   (config) => {

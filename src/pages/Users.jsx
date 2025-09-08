@@ -1,22 +1,42 @@
-import { useMemo, useContext, useState } from "react";
-import { Box, Button, Tooltip, Chip, IconButton } from "@mui/material";
-import { Edit } from "@mui/icons-material";
+import { useMemo, useContext, useState, useRef } from "react";
+import { Box, Tooltip, Button, IconButton } from "@mui/material";
 import AuthContext from "../contexts/AuthContext";
 import { dateToTime, ddmmyy } from "../utils/DateUtils";
 import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
-import CreateServiceModal from "../components/CreateServiceModal";
-import EditServiceModal from "../components/EditServiceModaL";
 import CommonStatus from "../components/common/CommonStatus";
+import PermissionsModal from "./PermissionsModal";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 const Users = ({ filters = [], query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
+  const fetchUsersRef = useRef(null);
 
-  const [openCreate, setOpenCreate] = useState(false);
-  const [openEdit, setOpenEdit] = useState(false);
-  const [selectedService, setSelectedService] = useState(null);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [openPermissions, setOpenPermissions] = useState(false);
+
+  const handleOpenPermissions = (user) => {
+    setSelectedUser(user);
+    setOpenPermissions(true);
+  };
+
+  const handleClosePermissions = () => {
+    setOpenPermissions(false);
+    setSelectedUser(null);
+  };
+
+  // Expose fetchData from CommonTable
+  const handleFetchRef = (fetchFn) => {
+    fetchUsersRef.current = fetchFn;
+  };
+
+  // Trigger refresh after permissions update
+  const refreshUsers = () => {
+    if (fetchUsersRef.current) {
+      fetchUsersRef.current();
+    }
+  };
 
   const columns = useMemo(
     () => [
@@ -27,16 +47,14 @@ const Users = ({ filters = [], query }) => {
             {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
           </div>
         ),
-        wrap: true,
       },
-         {
+      {
         name: "Id",
         selector: (row) => (
           <Tooltip title={row?.id}>
             <div style={{ textAlign: "left" }}>{row?.id}</div>
           </Tooltip>
         ),
-        wrap: true,
       },
       {
         name: "Name",
@@ -45,7 +63,6 @@ const Users = ({ filters = [], query }) => {
             <div style={{ textAlign: "left" }}>{row?.name}</div>
           </Tooltip>
         ),
-        wrap: true,
       },
       {
         name: "Mobile",
@@ -58,28 +75,46 @@ const Users = ({ filters = [], query }) => {
       },
       {
         name: "Status",
-        selector: (row) =>
-         <CommonStatus value={row.is_active} />
+        selector: (row) => <CommonStatus value={row.is_active} />,
       },
-
+ {
+  name: "Permissions",
+  selector: (row) =>
+      <Tooltip title="Edit Permissions">
+        <IconButton
+          size="small"
+          color="primary"
+          onClick={() => handleOpenPermissions(row)}
+        >
+          <SettingsIcon />
+        </IconButton>
+      </Tooltip>
+}
     ],
     []
   );
 
   return (
     <Box>
-
-      {/* Services Table */}
       <CommonTable
-        key={refreshKey} // 🔄 refresh on changes
         columns={columns}
         endpoint={ApiEndpoints.GET_USERS}
         filters={filters}
         queryParam={query}
-       
+        onFetchRef={handleFetchRef} // ✅ pass setter, not function
       />
+
+      {selectedUser && (
+        <PermissionsModal
+          open={openPermissions}
+          handleClose={handleClosePermissions}
+          user={selectedUser}
+          onFetchRef={refreshUsers} // ✅ trigger fetch after update
+        />
+      )}
     </Box>
   );
 };
+
 
 export default Users;

@@ -138,6 +138,17 @@ GET_COMMISSION_RULE:"commission/getCommissions",
   CREATE_COMMISSION_RULE:"commission/createCommissionRule",
   GET_COMMISSION_SCHEMA:"commission/getCommissionSchema",
   UPDATE_COMMISSION_RULE:"commission/updateCommissionRule",
+  GET_SENDER:"payout/getSender",
+  REGISTER_SENDER:"payout/registerSender",
+  REGISTER_SENDER_SCHEMA:"payout/registerSenderSchema",
+  VERIFY_SENDER_SCHEMA:"payout/verifySenderSchema",
+  VERIFY_SENDER:"payout/verifySender",
+  ADD_BENEFICIARY_SCHEMA:"payout/getBeneficiarySchema",
+  CREATE_BENEFICIARY:"payout/createBeneficiary",
+  DELETE_BENEFICIARY:"payout/deleteBeneficiary",
+  PAYOUT:"payments/v2/userPayOut",
+  PAYOUT_SCHEMA:"payments/v2/getPayoutSchema",
+  UPDATE_USER_PERMISSIONS:"user/updateUserPermissions",
   // ****************************** NEW API'S ABOVE ******************************
 
 

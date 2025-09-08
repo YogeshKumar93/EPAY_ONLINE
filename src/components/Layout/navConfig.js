@@ -39,6 +39,12 @@ export const customer_nav = [
     icon2: "🛠️",
     to: "/customer/money-transfer",
   },
+  {
+    title: "Super transfer",
+    icon: "🛠️",
+    icon2: "🛠️",
+    to: "/customer/super-transfer",
+  },
   // {
   //   title: "Recharge and bill",
   //   icon: "🛠️",

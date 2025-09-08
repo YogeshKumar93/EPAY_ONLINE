@@ -23,6 +23,7 @@ import Banks from "../pages/Banks";
 import { Transaction } from "../pages/Transaction";
 import Layouts from "../pages/Layouts";
 import CommissionRule from "../pages/CommissionRule";
+import SuperTransfer from "../pages/SuperTransfer";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useContext(AuthContext);
@@ -97,6 +98,10 @@ export default function AppRoutes() {
               <Route
                 path="customer/money-transfer"
                 element={<DmtContainer />}
+              />
+              <Route
+                path="customer/super-transfer"
+                element={<SuperTransfer />}
               />
               {/* <Route
                 path="customer/recharge-bill"
