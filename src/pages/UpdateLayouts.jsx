@@ -1,34 +1,56 @@
 import React, { useEffect, useState } from "react";
-import CommonModal from "../components/common/CommonModal";
+import { Typography, CircularProgress } from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
-import { CircularProgress } from "@mui/material";
-import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
+import CommonModal from "../components/common/CommonModal";
 
-const UpdateLayouts = ({ open, handleClose, row }) => {
+const UpdateLayouts = ({ open, handleClose, handleSave, row }) => {
   const [formData, setFormData] = useState({
-    id: "",
     name: "",
-    color_code: "",
+    color_code: "#000000", // ✅ default valid hex
     element_type: "",
   });
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [colorOptions, setColorOptions] = useState([]);
 
-  // ✅ Prefill data when modal opens
- useEffect(() => {
-  if (open && row) {
-    setFormData({
-      id: row?.id || "",
-      name: row?.name || "",
-      color_code: row?.color_code || "",
-      element_type: row?.element_type || "",
-    });
-  }
-}, [open, row]);
+  // ✅ Prefill form when editing
+  useEffect(() => {
+    if (open && row) {
+      setFormData({
+        name: row?.name || "",
+        color_code: row?.color_code?.startsWith("#")
+          ? row.color_code
+          : `#${row?.color_code || "000000"}`, // ✅ ensure valid hex
+        element_type: row?.element_type || "",
+      });
+    }
+  }, [open, row]);
 
-  // ✅ Handle input changes
+  useEffect(() => {
+    if (open) {
+      fetchColors();
+    }
+  }, [open]);
+
+  const fetchColors = async () => {
+    try {
+      const { response, error } = await apiCall(
+        "POST",
+        ApiEndpoints.GET_COLOR_SCHEMA
+      );
+      if (response) {
+        setColorOptions(response?.data?.data || []);
+      } else {
+        console.error("Error fetching colors: ", error);
+      }
+    } catch (err) {
+      console.error("Error fetching colors: ", err);
+    }
+  };
+
+  // ✅ Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -37,38 +59,31 @@ const UpdateLayouts = ({ open, handleClose, row }) => {
     }));
   };
 
-  // ✅ Submit update
+  // ✅ API submit (Update)
   const onSubmit = async () => {
     setLoading(true);
     try {
-      const payload = {
-        id: formData.id,
-        name: formData.name,
-        color_code: formData.color_code,
-        element_type: formData.element_type,
-      };
-
-      const response = await apiCall(
-        "POST", // change to PUT/PATCH if backend expects
-        ApiEndpoints.UPDATE_COLOUR,
-        payload
+      const { error, response } = await apiCall(
+        "POST",
+        ApiEndpoints.UPDATE_COLOUR, // 🔑 update endpoint
+        { id: row?.id, ...formData }
       );
 
       if (response) {
-        okSuccessToast("Layout updated successfully!");
+        handleSave(response.data);
         handleClose();
       } else {
-        apiErrorToast("Failed to update layout");
+        console.error("Failed to update layout:", error || response);
       }
     } catch (err) {
-      console.error(err);
-      apiErrorToast("Something went wrong while updating layout");
+      console.error("Error updating layout:", err);
+      alert("Something went wrong while updating layout.");
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ Footer Buttons
+  // ✅ Footer buttons
   const footerButtons = [
     {
       text: "Cancel",
@@ -85,25 +100,14 @@ const UpdateLayouts = ({ open, handleClose, row }) => {
     },
   ];
 
-  // ✅ Field Config
+  // ✅ Field configuration
   const fieldConfig = [
-    {
-      name: "name",
-      label: "Name",
-      type: "text",
-      validation: { required: true, maxLength: 100 },
-    },
+    { name: "name", label: "Name", type: "text" },
+    { name: "element_type", label: "Element Type", type: "text" },
     {
       name: "color_code",
-      label: "Colour Code",
-      type: "color",
-      validation: { required: true },
-    },
-    {
-      name: "element_type",
-      label: "Element Type",
-      type: "text",
-      validation: { required: true },
+      label: "Color Picker",
+      type: "color", // ✅ color input
     },
   ];
 
@@ -111,11 +115,10 @@ const UpdateLayouts = ({ open, handleClose, row }) => {
     <CommonModal
       open={open}
       onClose={handleClose}
-      title="Update Layout"
+      title="Update Colours"
       footerButtons={footerButtons}
       size="medium"
       iconType="info"
-      layout="two-column"
       showCloseButton={true}
       closeOnBackdropClick={!loading}
       dividers={true}
@@ -124,7 +127,16 @@ const UpdateLayouts = ({ open, handleClose, row }) => {
       handleChange={handleChange}
       errors={errors}
       loading={loading}
-    />
+      layout="two-column"
+    >
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ mt: 2, display: "block" }}
+      >
+        * Status remains unchanged unless explicitly modified
+      </Typography>
+    </CommonModal>
   );
 };
 
