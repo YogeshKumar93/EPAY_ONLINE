@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Box, Button, IconButton, Tooltip } from "@mui/material";
+import { Box, IconButton, Tooltip } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -12,6 +12,7 @@ import ApiEndpoints from "../api/ApiEndpoints";
 import CommonTable from "../components/common/CommonTable";
 import ReButton from "../components/common/ReButton";
 import CommonStatus from "../components/common/CommonStatus";
+import CommonLoader from "../components/common/CommonLoader";
 
 const Accounts = () => {
   const [openCreate, setOpenCreate] = useState(false);
@@ -21,47 +22,22 @@ const Accounts = () => {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(false);
 
- const fetchUsersRef = useRef(null);
+  const fetchUsersRef = useRef(null);
 
   const handleFetchRef = (fetchFn) => {
     fetchUsersRef.current = fetchFn;
   };
+
   const refreshUsers = () => {
     if (fetchUsersRef.current) {
       fetchUsersRef.current();
     }
   };
- 
-
 
   // ✅ Add new account
   const handleSaveCreate = (newAccount) => {
     setAccounts((prev) => [newAccount, ...prev]);
-  
     setOpenCreate(false);
-  };
-
-  // ✅ Update existing account
-  const handleSaveUpdate = (updatedAccount) => {
-    setAccounts((prev) =>
-      prev.map((acc) => (acc.id === updatedAccount.id ? updatedAccount : acc))
-    );
-
-    // handleManualRefresh();
-    // setOpenUpdate(false);
-    // setSelectedAccount(null);
-  };
-
-  // ✅ Handle edit
-  const handleEdit = (row) => {
-    setSelectedAccount(row);
-    setOpenUpdate(true);
-  };
-
-  // ✅ Handle delete
-  const handleDelete = (row) => {
-    setSelectedAccount(row);
-    setOpenDelete(true);
   };
 
   // ✅ Columns definition
@@ -76,19 +52,31 @@ const Accounts = () => {
     { name: "Balance", selector: (row) => row.balance },
     {
       name: "Status",
-      selector: (row) =>  <CommonStatus value={row.status} />,
+      selector: (row) => <CommonStatus value={row.status} />,
     },
     {
       name: "Actions",
       selector: (row) => (
         <Box sx={{ display: "flex", gap: 1 }}>
           <Tooltip title="Edit">
-            <IconButton color="primary" onClick={() => handleEdit(row)}>
+            <IconButton
+              color="primary"
+              onClick={() => {
+                setSelectedAccount(row);
+                setOpenUpdate(true);
+              }}
+            >
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
           <Tooltip title="Delete">
-            <IconButton color="error" onClick={() => handleDelete(row)}>
+            <IconButton
+              color="error"
+              onClick={() => {
+                setSelectedAccount(row);
+                setOpenDelete(true);
+              }}
+            >
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Tooltip>
@@ -98,63 +86,63 @@ const Accounts = () => {
   ];
 
   return (
-    <Box sx={{}}>
-      {/* ✅ Header */}
+    <>
+      <CommonLoader loading={loading} text="Loading Fund Requests" />
 
-      {/* ✅ Table */}
-      <CommonTable
-       
-        columns={columns}
-        loading={loading}
-        endpoint={ApiEndpoints.GET_ACCOUNTS}
-        onFetchRef={handleFetchRef} 
-        customHeader={
-          <ReButton
-            variant="contained"
-            label="Account"
-            onClick={() => setOpenCreate(true)}
-          ></ReButton>
-        }
-      />
+      {!loading && (
+        <Box>
+          {/* ✅ Table */}
+          <CommonTable
+            columns={columns}
+            loading={loading}
+            endpoint={ApiEndpoints.GET_ACCOUNTS}
+            onFetchRef={handleFetchRef}
+            customHeader={
+              <ReButton
+                variant="contained"
+                label="Account"
+                startIcon={<AddIcon />}
+                onClick={() => setOpenCreate(true)}
+              />
+            }
+          />
 
-      {/* ✅ Create Account Modal */}
-      <CreateAccount
-        open={openCreate}
-        handleClose={() => setOpenCreate(false)}
-        handleSave={handleSaveCreate}
-                  onFetchRef={refreshUsers} // ✅ trigger fetch after update
+          {/* ✅ Create Account Modal */}
+          <CreateAccount
+            open={openCreate}
+            handleClose={() => setOpenCreate(false)}
+            handleSave={handleSaveCreate}
+            onFetchRef={refreshUsers} // ✅ trigger fetch after create
+          />
 
-      />
+          {/* ✅ Update Account Modal */}
+          {openUpdate && selectedAccount && (
+            <UpdateAccount
+              open={openUpdate}
+              handleClose={() => {
+                setOpenUpdate(false);
+                setSelectedAccount(null);
+              }}
+              selectedAccount={selectedAccount}
+              onFetchRef={refreshUsers} // ✅ trigger fetch after update
+            />
+          )}
 
-      {/* ✅ Update Account Modal */}
-      {openUpdate && selectedAccount && (
-        <UpdateAccount
-          open={openUpdate}
-          handleClose={() => {
-            setOpenUpdate(false);
-            setSelectedAccount(null);
-          }}
-          handleSave={handleSaveUpdate}
-          selectedAccount={selectedAccount}
-                    onFetchRef={refreshUsers} // ✅ trigger fetch after update
-
-        />
+          {/* ✅ Delete Account Modal */}
+          {openDelete && selectedAccount && (
+            <DeleteAccount
+              open={openDelete}
+              handleClose={() => {
+                setOpenDelete(false);
+                setSelectedAccount(null);
+              }}
+              selectedAccount={selectedAccount}
+              onFetchRef={refreshUsers} // ✅ trigger fetch after delete
+            />
+          )}
+        </Box>
       )}
-
-      {/* ✅ Delete Account Modal */}
-      {selectedAccount && (
-        <DeleteAccount
-          open={openDelete}
-          handleClose={() => {
-            setOpenDelete(false);
-            setSelectedAccount(null);
-          }}
-          selectedAccount={selectedAccount}
-                    onFetchRef={refreshUsers} // ✅ trigger fetch after update
-
-        />
-      )}
-    </Box>
+    </>
   );
 };
 

@@ -1,38 +1,32 @@
-import React, { useState, useEffect } from "react";
-import {
-  MenuItem,
-  Typography,
-  CircularProgress,
-  Box,
-} from "@mui/material";
-import { apiCall } from "../api/apiClient";
+// src/components/accounts/UpdateAccount.js
+import React, { useEffect, useState } from "react";
+import { Button, CircularProgress } from "@mui/material";
+
 import ApiEndpoints from "../api/ApiEndpoints";
-
-import { ReTextField } from "../components/common/ReTextField";
+import { apiCall } from "../api/apiClient";
 import CommonModal from "../components/common/CommonModal";
+import { useSchemaForm } from "../hooks/useSchemaForm";
+import { isValid, PATTERNS } from "../utils/validators";
+import { useToast } from "../utils/ToastContext";
+import { ReTextField } from "../components/common/ReTextField"; // ✅ Assuming you have reusable text field
 
-const accountTypes = ["Current", "Savings", "Credit"];
+const UpdateAccount = ({ open, onClose, handleClose, onFetchRef,selectedAccount }) => {
+  const {
+    schema,
+    formData,
+    setFormData,
+    handleChange,
+    errors,
+    setErrors,
+    loading,
+  } = useSchemaForm(ApiEndpoints.GET_ACCOUNT_SCHEMA, open);
 
-const UpdateAccount = ({ open, handleClose, handleSave, selectedAccount,onFetchRef }) => {
-  const [formData, setFormData] = useState({
-    id: "",
-    name: "",
-    user_id: "",
-    establishment: "",
-    mobile: "",
-    type: "",
-    asm: "",
-    credit_limit: "",
-    balance: "",
-    status: "1",
-  });
+  const [submitting, setSubmitting] = useState(false);
+  const { showToast } = useToast();
 
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
-
-  // ✅ Prefill data when modal opens
+  // ✅ Pre-fill with selected account data
   useEffect(() => {
-    if (selectedAccount) {
+    if (open && selectedAccount) {
       setFormData({
         id: selectedAccount.id || "",
         name: selectedAccount.name || "",
@@ -46,207 +40,114 @@ const UpdateAccount = ({ open, handleClose, handleSave, selectedAccount,onFetchR
         status: selectedAccount.status || "1",
       });
     }
-  }, [selectedAccount]);
+  }, [open, selectedAccount, setFormData]);
 
-  const validate = () => {
-    let newErrors = {};
+  // ✅ Validation logic
+  const validateForm = () => {
+    const newErrors = {};
 
-    if (!formData.name.trim()) newErrors.name = "Name is required";
-    if (!formData.user_id) newErrors.user_id = "User ID is required";
-    if (!formData.establishment.trim())
+    if (!formData.name?.trim()) {
+      newErrors.name = "Name is required";
+    }
+
+    if (!formData.user_id) {
+      newErrors.user_id = "User ID is required";
+    }
+
+    if (!formData.establishment?.trim()) {
       newErrors.establishment = "Establishment is required";
-    // if (!formData.asm.trim()) newErrors.asm = "ASM is required";
-    if (!/^[0-9]{10}$/.test(formData.mobile))
+    }
+
+    if (!isValid(PATTERNS.MOBILE, formData.mobile || "")) {
       newErrors.mobile = "Enter a valid 10-digit mobile number";
-    if (formData.credit_limit < 0)
+    }
+
+    if (formData.credit_limit !== "" && Number(formData.credit_limit) < 0) {
       newErrors.credit_limit = "Credit limit cannot be negative";
-    if (formData.balance < 0)
+    }
+
+    if (formData.balance !== "" && Number(formData.balance) < 0) {
       newErrors.balance = "Balance cannot be negative";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  // ✅ Submit update
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
 
-  const onSubmit = async () => {
-    if (!validate()) return;
+    setSubmitting(true);
 
-    setLoading(true);
     try {
       const { error, response } = await apiCall(
-        "POST", // update method
+        "POST",
         ApiEndpoints.UPDATE_ACCOUNT,
-        formData
+        formData // must include id
       );
 
       if (response) {
-        // handleSave(response.data); // ✅ update parent state
-      onFetchRef();
-    handleClose();
+        showToast(response?.message || "Account updated successfully", "success");
+        onFetchRef?.();
+        onClose();
       } else {
-        console.error("Failed to update account:", error || response);
+        showToast(error?.message || "Failed to update account", "error");
       }
     } catch (err) {
-      console.error("Error updating account:", err);
-      alert("Something went wrong while updating account.");
+      showToast("Something went wrong while updating account", "error");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
-  const footerButtons = [
-    {
-      text: "Cancel",
-      variant: "outlined",
-      onClick: handleClose,
-      disabled: loading,
-    },
-    {
-      text: "Update",
-      variant: "contained",
-      onClick: onSubmit,
-      disabled: loading,
-      startIcon: loading ? <CircularProgress size={20} color="inherit" /> : null,
-    },
-  ];
+  // ✅ Show only relevant fields from schema
+  const visibleFields = schema.filter((field) =>
+    [
+      "name",
+      "user_id",
+      "establishment",
+      "mobile",
+      "type",
+      "asm",
+      "credit_limit",
+      "balance",
+    ].includes(field.name)
+  );
+
+ 
+   
 
   return (
     <CommonModal
-      open={open}
+     open={open}
       onClose={handleClose}
       title="Update Account"
-      footerButtons={footerButtons}
-      size="medium"
-      iconType="info"
-      showCloseButton={true}
-      closeOnBackdropClick={!loading}
-      dividers={true}
-    >
-      {/* Row 1 */}
-      <Box display="flex" gap={2} mb={2}>
-        <ReTextField
-          label="Name"
-          name="name"
-          fullWidth
-          value={formData.name}
-          onChange={handleChange}
-          error={!!errors.name}
-          helperText={errors.name}
-          disabled={loading}
+      iconType="edit"
+      size="small"
+      dividers
+      fieldConfig={visibleFields}
+      formData={formData}
+      handleChange={handleChange}
+      errors={errors}
+      loading={loading || submitting}
+      footerButtons={[
+        {
+          text: "Cancel",
+          variant: "outlined",
+          onClick: handleClose,
+          disabled: submitting,
+        },
+        {
+          text: submitting ? "Updating..." : "Update",
+          variant: "contained",
+          color: "primary",
+          onClick: handleSubmit,
+          disabled: submitting,
+        },
+      ]}
         />
-
-        <ReTextField
-          label="User ID"
-          name="user_id"
-          type="number"
-          fullWidth
-          value={formData.user_id}
-          onChange={handleChange}
-          error={!!errors.user_id}
-          helperText={errors.user_id}
-          disabled={loading}
-        />
-      </Box>
-
-      {/* Row 2 */}
-      <Box display="flex" gap={2} mb={2}>
-        <ReTextField
-          label="Establishment"
-          name="establishment"
-          fullWidth
-          value={formData.establishment}
-          onChange={handleChange}
-          error={!!errors.establishment}
-          helperText={errors.establishment}
-          disabled={loading}
-        />
-
-        <ReTextField
-          label="Mobile"
-          name="mobile"
-          fullWidth
-          value={formData.mobile}
-          onChange={handleChange}
-          error={!!errors.mobile}
-          helperText={errors.mobile}
-          disabled={loading}
-        />
-      </Box>
-
-      {/* Row 3 */}
-      <Box display="flex" gap={2} mb={2}>
-        <ReTextField
-          select
-          label="Type"
-          name="type"
-          fullWidth
-          value={formData.type}
-          onChange={handleChange}
-          error={!!errors.type}
-          helperText={errors.type}
-          disabled={loading}
-        >
-          {accountTypes.map((option, idx) => (
-            <MenuItem key={idx} value={option}>
-              {option}
-            </MenuItem>
-          ))}
-        </ReTextField>
-
-        <ReTextField
-          label="ASM"
-          name="asm"
-          fullWidth
-          value={formData.asm}
-          onChange={handleChange}
-          error={!!errors.asm}
-          helperText={errors.asm}
-          disabled={loading}
-        />
-      </Box>
-
-      {/* Row 4 */}
-      <Box display="flex" gap={2} mb={2}>
-        <ReTextField
-          label="Credit Limit"
-          name="credit_limit"
-          type="number"
-          fullWidth
-          value={formData.credit_limit}
-          onChange={handleChange}
-          error={!!errors.credit_limit}
-          helperText={errors.credit_limit}
-          disabled={loading}
-        />
-
-        <ReTextField
-          label="Balance"
-          name="balance"
-          type="number"
-          fullWidth
-          value={formData.balance}
-          onChange={handleChange}
-          error={!!errors.balance}
-          helperText={errors.balance}
-          disabled={loading}
-        />
-      </Box>
-
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        sx={{ mt: 2, display: "block" }}
-      >
-        * Status will be preserved from existing account
-      </Typography>
-    </CommonModal>
+     
   );
 };
 
