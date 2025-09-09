@@ -1,4 +1,4 @@
-import { useMemo, useContext, useState, useEffect } from "react";
+import { useMemo, useContext, useState, useEffect, useRef } from "react";
 import {
   Box,
   Button,
@@ -29,16 +29,22 @@ const CommissionRule = ({ query }) => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [plans, setPlans] = useState([]);
-  console.log("====================================");
-  console.log("plans", plans);
-  console.log("====================================");
-  // ✅ fetch plans (only when dropdown is clicked)
+  
+  const fetchUsersRef = useRef(null);
+  
+    const handleFetchRef = (fetchFn) => {
+      fetchUsersRef.current = fetchFn;
+    };
+    const refreshUsers = () => {
+      if (fetchUsersRef.current) {
+        fetchUsersRef.current();
+      }
+    };
+   
 
   // ✅ Fetch plans only once (lazy load)
   const fetchPlans = async () => {
-    console.log("====================================");
-    console.log("jsdghsjgdjh");
-    console.log("====================================");
+
     // if (plansLoaded) return;
     try {
       const { response } = await apiCall(
@@ -222,7 +228,7 @@ const CommissionRule = ({ query }) => {
     <Box sx={{ p: 2 }}>
       {/* Services Table */}
       <CommonTable
-        key={refreshKey}
+       onFetchRef={handleFetchRef} 
         columns={columns}
         endpoint={ApiEndpoints.GET_COMMISSION_RULE}
         filters={filters}
@@ -241,6 +247,7 @@ const CommissionRule = ({ query }) => {
         open={openCreate}
         handleClose={() => setOpenCreate(false)}
         handleSave={handleSaveCreate}
+         onFetchRef={refreshUsers}
       />
 
       {/* Edit Commission Rule Modal */}
@@ -249,6 +256,7 @@ const CommissionRule = ({ query }) => {
         onClose={() => setOpenEdit(false)}
         commissionRule={selectedRow} // Pass the selected row data
         onSuccess={handleEditSuccess}
+         onFetchRef={refreshUsers}
       />
     </Box>
   );

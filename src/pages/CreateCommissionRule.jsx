@@ -6,7 +6,7 @@ import { useSchemaForm } from "../hooks/useSchemaForm";
 import { PATTERNS, isValid } from "../utils/validators";
 import { useToast } from "../utils/ToastContext";
 
-const CreateCommissionRule = ({ open, handleClose, handleSave }) => {
+const CreateCommissionRule = ({ open, handleClose, handleSave,onFetchRef }) => {
   const { schema, formData, handleChange, errors, setErrors, loading } =
     useSchemaForm(ApiEndpoints.GET_COMMISSION_SCHEMA, open);
 
@@ -47,6 +47,7 @@ const CreateCommissionRule = ({ open, handleClose, handleSave }) => {
           response?.message || "Fund request created successfully",
           "success"
         );
+        onFetchRef();
         handleClose();
       } else {
         showToast(error?.message || "Failed to create fund request", "error");
