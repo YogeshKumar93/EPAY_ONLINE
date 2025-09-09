@@ -1,5 +1,5 @@
 import { useMemo, useContext, useState, useEffect, useRef } from "react";
-import { Tooltip, IconButton } from "@mui/material";
+import { Tooltip, IconButton, Box } from "@mui/material";
 import { Edit } from "@mui/icons-material";
 import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
@@ -9,15 +9,18 @@ import CreateBankModal from "../components/Bank/CreateBanks";
 import ReButton from "../components/common/ReButton";
 import CommonStatus from "../components/common/CommonStatus";
 import CommonLoader from "../components/common/CommonLoader";
-
+import DeleteIcon from "@mui/icons-material/Delete";
 import UpdateBanks from "../components/Bank/UpdateBanks";
+import DeleteBank from "./DeleteBank";
 
 const Banks = ({ filters = [] }) => {
   const authCtx = useContext(AuthContext);
    const user = authCtx?.user;
   const [openCreate, setOpenCreate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
+   const [openDelete, setOpenDelete] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedBank, setSelectedBank] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // ✅ keep a ref to CommonTable for refreshing
@@ -31,6 +34,10 @@ const Banks = ({ filters = [] }) => {
         fetchUsersRef.current();
       }
     };
+     const handleDelete = (row) => {
+    setSelectedBank(row);
+    setOpenDelete(true);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -108,6 +115,7 @@ const Banks = ({ filters = [] }) => {
       {
         name: "Actions",
         selector: (row) => (
+                 <Box sx={{ display: "flex", gap: 1 }}>
           <IconButton
             size="small"
             color="primary"
@@ -118,6 +126,12 @@ const Banks = ({ filters = [] }) => {
           >
             <Edit fontSize="small" />
           </IconButton>
+           <Tooltip title="Delete">
+            <IconButton color="error" onClick={() => handleDelete(row)}>
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          </Box>
         ),
         center: true,
         width: "80px",
@@ -166,6 +180,18 @@ const Banks = ({ filters = [] }) => {
              onFetchRef={refreshUsers}
             />
           )}
+              {selectedBank && (
+        <DeleteBank
+          open={openDelete}
+          handleClose={() => {
+            setOpenDelete(false);
+            setSelectedBank(null);
+          }}
+          selectedBank={selectedBank}
+                    onFetchRef={refreshUsers} // ✅ trigger fetch after update
+
+        />
+      )}
         </>
       )}
     </>

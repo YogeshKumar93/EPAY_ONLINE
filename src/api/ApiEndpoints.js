@@ -97,7 +97,7 @@ const ApiEndpoints = {
   UPDATE_FUND_REQUEST: "fundrequest/updateFundRequest",
   DELETE_FUND_REQUEST: "fundrequest/deleteFundRequest",
   GET_BANKS: "bank/getBanks",
-
+GET_PLANS: "plan/getPlans",
   // ****************************** NEW API'S ABOVE ******************************
   GET_COMMISSION_RULE: "commission/getCommissions",
   GET_NOTIFICATION: "notification/getNotification",
@@ -160,7 +160,7 @@ const ApiEndpoints = {
   GET_STATUS: "admin/checkTxnStatus",
   CHANGE_STATUS: "admin/changeTxnStatus",
 
-  GET_PLANS: "plan/getPlans",
+  
   BLOCK_UNBLOCK_PLANS: "",
   ADD_PLAN: "admin/createPlan",
   DELETE_PLAN: "admin/deletePlan",
