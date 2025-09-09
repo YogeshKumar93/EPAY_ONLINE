@@ -134,6 +134,7 @@ const ApiEndpoints = {
   REGISTER_SENDER_SCHEMA: "payout/registerSenderSchema",
   VERIFY_SENDER_SCHEMA: "payout/verifySenderSchema",
   VERIFY_SENDER: "payout/verifySender",
+  PAYOUT_OTP: "payout/otpExp",
   ADD_BENEFICIARY_SCHEMA: "payout/getBeneficiarySchema",
   CREATE_BENEFICIARY: "payout/createBeneficiary",
   DELETE_BENEFICIARY: "payout/deleteBeneficiary",
@@ -142,6 +143,7 @@ const ApiEndpoints = {
   UPDATE_USER_PERMISSIONS: "user/updateUserPermissions",
   GET_PLANS_BY_OPERATOR: "recharge/getPlansByOperator",
   RECHARGE: "recharge/recharge",
+  GET_SIDENAV: "layout/getSideNav",
   // ****************************** NEW API'S ABOVE ******************************
 
   GET_ACC_ACCOUNTS: "",

@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(initialUser);
   const [nepalUser, setNepalUser] = useState(initialNepalUser);
   const [ifDocsUploaded, setIfDocsUploaded] = useState(docsData);
+    const [sideNavs, setSideNavs] = useState([]);
   const [location, setLocation] = useState(
     JSON.parse(localStorage.getItem("location"))
   );
@@ -74,6 +75,33 @@ const loadUserProfile = async () => {
     throw err;
   }
 };
+  const getSideNavs = async () => {
+    try {
+      const { error, response } = await apiCall("GET", ApiEndpoints.GET_SIDENAV);
+
+      if (error) {
+        console.error("Failed to fetch side navs:", error);
+        return [];
+      }
+
+      if (response?.status && response?.data) {
+        // map only required fields
+        const mappedNavs = response.data.map((item) => ({
+          name: item.name,
+          url: item.url,
+          title: item.title,
+        }));
+
+        setSideNavs(mappedNavs);
+        return mappedNavs;
+      }
+      return [];
+    } catch (err) {
+      console.error("Error fetching side navs:", err);
+      return [];
+    }
+  };
+
 const loadColours = async () => {
   try {
     const { error, response } = await apiCall("post", ApiEndpoints.GET_COLOURS);
@@ -120,6 +148,7 @@ const loadColours = async () => {
       localStorage.setItem("access_token", token);
       const userProfile = await loadUserProfile();
             await loadColours();
+                await getSideNavs();          // Fetch side navs AFTER login
       return userProfile;
     } catch (err) {
       clearToken();
@@ -257,6 +286,8 @@ const loadColours = async () => {
     dmt2Doc: dmt2Doc,
     loadUserProfile,
     loadUserProfile,
+    sideNavs,
+    getSideNavs,
   };
 
   return (

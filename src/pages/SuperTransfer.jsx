@@ -86,7 +86,7 @@ const SuperTransfer = () => {
           <Box flex={isMobile ? "1 1 100%" : "0 0 30%"}>
             <SenderDetails sender={sender} />
 
-            {selectedBeneficiary && <BeneficiaryDetails beneficiary={selectedBeneficiary} />}
+            {selectedBeneficiary && <BeneficiaryDetails beneficiary={selectedBeneficiary}     senderMobile={mobile}  />}
           </Box>
 
           {/* Right: Beneficiary List */}

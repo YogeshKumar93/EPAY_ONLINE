@@ -16,7 +16,7 @@ import { ExpandMore, ExpandLess } from "@mui/icons-material";
 const SenderDetails = ({ sender }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // small screens
-  const [open, setOpen] = useState(false); // collapsed state
+  const [open, setOpen] = useState(true); // collapsed state
 
   const getKycColor = (status) => {
     switch (status?.toLowerCase()) {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Grid,
   Card,
@@ -13,6 +13,7 @@ import {
 import { apiCall } from "../../../api/apiClient";
 import ApiEndpoints from "../../../api/ApiEndpoints";
 import { apiErrorToast, okSuccessToast } from "../../../utils/ToastUtil";
+import AuthContext from "../../../contexts/AuthContext";
 
 const Prepaid = () => {
   const [services, setServices] = useState([]);
@@ -22,6 +23,7 @@ const Prepaid = () => {
   const [plans, setPlans] = useState([]);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [mobileNumber, setMobileNumber] = useState("");
+  const { location } = useContext(AuthContext);
 
   const fetchServices = async () => {
     setLoading(true);
@@ -76,8 +78,10 @@ const handleRecharge = async () => {
   try {
     const payload = {
       mobile_number: mobileNumber,
-      operator: selectedService.name,
+      operator: selectedPlan.id,
       amount: selectedPlan.price,
+        latitude: location?.lat || "",   // ✅ add latitude
+        longitude: location?.long || "", // ✅ add longitude
     };
 
     const { error, response } = await apiCall(
