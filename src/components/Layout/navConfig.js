@@ -10,6 +10,7 @@ export const Admin_nav = [
   { title: "Users", icon: "👥", icon2: "👥", to: "/admin/users" },
   { title: "Notification", icon: "💳", icon2: "💳", to: "/admin/notification" },
   { title: "Transactions", icon: "💳", icon2: "💳", to: "/admin/transactions" },
+  { title: "Side Nav", icon: "💳", icon2: "💳", to: "/admin/sidenav" },
   {
     title: "Fund Request",
     icon: "🛠️",
@@ -30,6 +31,8 @@ export const customer_nav = [
     icon2: "🛠️",
     to: "/customer/fund-request",
   },
+    { title: "Transactions", icon: "💳", icon2: "💳", to: "/customer/transactions" },
+
   {
     title: "Money transfer",
     icon: "🛠️",
@@ -37,24 +40,24 @@ export const customer_nav = [
     to: "/customer/money-transfer",
   },
   {
-    title: "Super transfer",
+    title: "Fund Transfer",
     icon: "🛠️",
     icon2: "🛠️",
-    to: "/customer/super-transfer",
+    to: "/customer/fund-transfer",
   },
-  // {
-  //   title: "Recharge and bill",
-  //   icon: "🛠️",
-  //   icon2: "🛠️",
-  //   to: "/customer/recharge-bill",
-  // },
-
   {
-    title: "Notification",
-    icon: "💳",
-    icon2: "💳",
-    to: "/customer/notification",
+    title: "Recharge and bill",
+    icon: "🛠️",
+    icon2: "🛠️",
+    to: "/customer/recharge-bill",
   },
+
+  // {
+  //   title: "Notification",
+  //   icon: "💳",
+  //   icon2: "💳",
+  //   to: "/customer/notification",
+  // },
   {
     title: "Account Ledger",
     icon: "📒",

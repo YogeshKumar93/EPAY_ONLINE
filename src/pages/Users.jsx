@@ -65,6 +65,22 @@ const Users = ({ filters = [], query }) => {
         ),
       },
       {
+        name: "W1",
+        selector: (row) => (
+          <Tooltip title={row?.w1}>
+            <div style={{ textAlign: "left" }}>{row?.w1}</div>
+          </Tooltip>
+        ),
+      },
+      {
+        name: "W2",
+        selector: (row) => (
+          <Tooltip title={row?.w2}>
+            <div style={{ textAlign: "left" }}>{row?.w2}</div>
+          </Tooltip>
+        ),
+      },
+      {
         name: "Mobile",
         selector: (row) => (
           <Tooltip title={row?.mobile}>

@@ -163,8 +163,8 @@ const ElectricityForm = ({ type = "ELECTRICITY", resetView, name, image, dataCat
     setLoading(true);
     try {
       const response = await apiCall(
-        "GET", 
-        `${ApiEndpoints.GET_OPERATOR}?sub_type=${operatorType || type}`
+        "POST", 
+        `${ApiEndpoints.GET_SERVICES}?sub_type=${operatorType || type}`
       );
       
       if (response.error) {

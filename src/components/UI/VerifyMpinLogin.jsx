@@ -15,11 +15,13 @@ import { apiCall } from '../../api/apiClient';
 
 import ApiEndpoints from '../../api/ApiEndpoints';
 import AuthContext from '../../contexts/AuthContext';
+import { okSuccessToast } from '../../utils/ToastUtil';
+import { useToast } from '../../utils/ToastContext';
 
 const VerifyMpinLogin = ({
   username,
   password,
-  otpRef,
+  otpRef: initialOtpRef,   // ✅ receive initial otpRef
   secureValidate,
   setIsOtpField,
   onVerificationSuccess,
@@ -28,19 +30,20 @@ const VerifyMpinLogin = ({
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-   const authCtx=useContext(AuthContext)
+  const [otpRef, setOtpRef] = useState(initialOtpRef); // ✅ keep otpRef in state
+const {showToast} = useToast();
+
+  const authCtx = useContext(AuthContext);
   const navigate = useNavigate();
-const user = authCtx?.user
-console.log("user",user);
+  const user = authCtx?.user;
+  console.log("user", user);
 
   const handleInputChange = (index, value) => {
-    if (!/^\d*$/.test(value)) return; // Only allow numbers
-    
+    if (!/^\d*$/.test(value)) return;
     const newCode = [...code];
     newCode[index] = value;
     setCode(newCode);
-    
-    // Auto-focus to next input
+
     if (value && index < 5) {
       document.getElementById(`pin-input-${index + 1}`).focus();
     }
@@ -71,24 +74,23 @@ console.log("user",user);
 
     setLoading(true);
     setError('');
-    
+
     try {
       let endpoint, payload;
-      
+
+      endpoint = ApiEndpoints.LOGIN_OTP_VALIDATE;
       if (secureValidate === 'MPIN') {
-        endpoint = ApiEndpoints.LOGIN_OTP_VALIDATE;
         payload = {
           username,
           password,
-          otp_ref:otpRef,
+          otp_ref: otpRef,   // ✅ always use state otpRef
           mpin: fullCode
         };
-      } else {  
-         endpoint = ApiEndpoints.LOGIN_OTP_VALIDATE;  
+      } else {
         payload = {
           username,
           otp: fullCode,
-          otp_ref:otpRef,
+          otp_ref: otpRef,   // ✅ always use state otpRef
           password
         };
       }
@@ -101,43 +103,30 @@ console.log("user",user);
       }
 
       if (response) {
-        console.log("loge response",response);
-        
+        console.log("login response", response);
+
         const token = response.data;
-     
-         authCtx.login(token);
+        authCtx.login(token);
+
         const userResult = await apiCall("get", ApiEndpoints.GET_ME_USER);
         if (userResult.response) {
           const userData = userResult.response.data;
           authCtx.saveUser(userData);
           localStorage.setItem("user", JSON.stringify(userData));
-          response.message;
-          if (userData.role === "adm") {
-            navigate("/admin/dashboard");
-          } else if (userData.role === "sadm") {
+
+          if (userData.role === "adm" || userData.role === "sadm") {
             navigate("/admin/dashboard");
           } else if (userData.role === "asm") {
             navigate("/asm/dashboard");
-          }
-           else if (userData.role === "di") {
+          } else if (userData.role === "di") {
             navigate("/ad/dashboard");
-          }
-           else if (userData.role === "ret") {
+          } else if (userData.role === "ret" || userData.role === "dd") {
             navigate("/customer/dashboard");
-          }
-           else if (userData.role === "dd") {
-            navigate("/customer/dashboard");
-          }
-         else {
+          } else {
             navigate("/other/dashboard");
           }
-        } else {
-          // showToast(userResult.error || "Failed to fetch user details","error");
         }
-      } else {
-        // showToast(error?.message || "Invalid MPIN","error");
-      }    
-      // #0037D7
+      }
     } catch (err) {
       setError(err.message || "Verification failed");
     } finally {
@@ -147,21 +136,32 @@ console.log("user",user);
 
   const handleResendCode = async () => {
     setLoading(true);
-    setError('');
-    
+    setError("");
+
     try {
-      const { error: apiError } = await apiCall("POST", "/auth/resend-code", {
-        username,
-        type: secureValidate
-      });
+      let endpoint, payload;
+
+      if (secureValidate === "MPIN") {
+        endpoint = ApiEndpoints.RESET_MPIN;
+        payload = { username, type: "MPIN" };
+      } else {
+        endpoint = ApiEndpoints.RESEND_OTP;
+        payload = { username, type: "OTP" };
+      }
+
+      const { error: apiError, response } = await apiCall("POST", endpoint, payload);
 
       if (apiError) {
         setError(apiError.message || "Failed to resend code");
         return;
       }
-      
-      // Show success message
-      alert(`${secureValidate === 'MPIN' ? 'MPIN' : 'OTP'} sent successfully`);
+
+      // ✅ Save new otpRef if present in response.message
+      if (response?.message) {
+        showToast(`${secureValidate === "MPIN" ? "MPIN" : "OTP"} sent successfully`,"success");
+        setOtpRef(response.message);
+        console.log("Updated otpRef:", response.message);
+      }
     } catch (err) {
       setError(err.message || "Failed to resend code");
     } finally {
@@ -187,7 +187,7 @@ console.log("user",user);
       </Box>
 
       <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
-        Enter the 6-digit {secureValidate === 'MPIN' ? 'MPIN' : 'OTP'} sent to 
+        Enter the 6-digit {secureValidate === 'MPIN' ? 'MPIN' : 'OTP'} sent to
         <Box component="span" fontWeight="bold"> *******{username.slice(-3)}</Box>
         <IconButton size="small" onClick={() => setIsOtpField(false)} sx={{ ml: 1 }}>
           <Edit fontSize="small" />
@@ -211,7 +211,7 @@ console.log("user",user);
               onPaste={index === 0 ? handlePaste : undefined}
               inputProps={{
                 maxLength: 1,
-                style: { 
+                style: {
                   textAlign: 'center',
                   padding: '8px',
                   width: '40px',

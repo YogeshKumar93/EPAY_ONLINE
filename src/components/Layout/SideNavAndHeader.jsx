@@ -210,7 +210,7 @@ const MainContent = styled(Box)(({ theme }) => ({
   const drawerContent = (
     <Box
       className="side-nav"
-      sx={{ height: "100%", display: "flex", flexDirection: "column" ,backgroundColor: colours?.sidenav || "#1976d2" ,}}
+      sx={{ height: "100%", display: "flex", flexDirection: "column" ,backgroundColor: colours?.sidenav}}
     >
       {/* Logo area with white background */}
       <Box
@@ -264,7 +264,7 @@ backgroundColor:  "#fff" ,
         position="fixed"
         sx={{
           // backgroundColor:"#0037D7",
-          backgroundColor: colours?.header || "#1976d2" ,
+          backgroundColor: colours?.header,
           width: {
             md: desktopOpen
               ? `calc(100% - ${themeSettings.drawerWidth}px)`
@@ -373,6 +373,10 @@ backgroundColor:  "#fff" ,
                     navigate("/admin/profile");
                   } else if (user && user.role === "Asm") {
                     navigate("/asm/profile");
+                  } else if (user && user.role === "dd") {
+                    navigate("/customer/profile");
+                  } else if (user && user.role === "ret") {
+                    navigate("/customer/profile");
                   } else if (user && user.role === "Zsm") {
                     navigate("/zsm/profile");
                   } else if (user && user.role === "Ad") {

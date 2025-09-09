@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Typography, CircularProgress } from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CommonModal from "../components/common/CommonModal";
+import AuthContext from "../contexts/AuthContext"; // ✅ import context
 
 const UpdateLayouts = ({ open, handleClose, handleSave, row,onFetchRef }) => {
+    const { loadColours } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     name: "",
     color_code: "#000000", // ✅ default valid hex
@@ -73,6 +75,7 @@ const UpdateLayouts = ({ open, handleClose, handleSave, row,onFetchRef }) => {
       if (response) {
         handleSave(response.data);
         onFetchRef();
+        await loadColours(); // ✅ refresh global colours
         handleClose();
       } else {
         console.error("Failed to update layout:", error || response);

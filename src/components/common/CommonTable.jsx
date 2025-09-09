@@ -545,8 +545,6 @@ const tableHeaders = useMemo(
           fontSize: "15px",
           width: column.width || "auto",
           minWidth: column.width || "auto",
-          backgroundColor: "#000",
-          color: "#fff",
           letterSpacing: "0.5px",
           borderBottom: "2px solid #e2e8f0",
           fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif",
