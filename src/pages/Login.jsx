@@ -25,7 +25,8 @@ import AuthContext from "../contexts/AuthContext";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { apiCall } from "../api/apiClient";
 import { ReTextField } from "../components/common/ReTextField";
-
+import backImg from "../assets/Images/BackgroundLogin4.png"
+import backImg2 from "../assets/Images/BackgroundLogin2.jpg"
 import VerifyMpinLogin from "../components/UI/VerifyMpinLogin";
 import { getGeoLocation } from "../utils/GeoLocationUtil";
 import { okErrorToast } from "../utils/ToastUtil";
@@ -151,131 +152,137 @@ const Login = () => {
   };
 
   return (
-       <Grid container sx={{ height: "100vh", width: "100vw" }}>
-      {/* <Grid
-        container
-        sx={{
-          minHeight: "100vh",
-          p: 2,
-        }}
-        justifyContent="center"
-        alignItems="center"
-      > */}
+<Grid container sx={{ height: "100vh", width: "100vw" }}>
+  {/* Left Side - Login Form */}
+  <Grid
+    item
+    xs={12}
+    md={6}
+    sx={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      p: 6,
+      width:900,
+      backgroundColor:"#f6f7e9ff"
+      
+    }}
+  >
+    {/* 🔹 Your existing Paper + Login form stays the same */}
+    <Paper
+      sx={{
+        p: 4,
+        borderRadius: 3,
+        maxWidth: 700,
+        height:  500,
+        backgroundImage: `url(${backImg2})`,
+        width: "100%",
+        backgroundColor: "rgba(223, 228, 236, 0.9)", // translucent bg
+        boxShadow: 5,
+      }}
+    >
+      {/* ✅ keep your login form here exactly as before */}
+      <Typography variant="h3" align="center" fontWeight={600} gutterBottom sx={{color:"#112957ff", fontFamily:"serif"}}>
+        Login !
+      </Typography>
 
-{/* Left Side with Image */}
-      <Grid
-        item
-        xs={12}
-        md={6}
-        sx={{
-          backgroundImage:
-            "url('https://source.unsplash.com/1600x900/?t",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          height: "80%",
-          width:"900px"
-        }}
-      />
+      {loginError && (
+        <Typography color="error" align="center" sx={{ mb: 2 }}>
+          {loginError}
+        </Typography>
+      )}
 
+      <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+        {/* UserId Field */}
+        <ReTextField
+          fullWidth
+           sx={{ mt: 3, py: 2 }}
+          label="User Id"
+          {...register("mobile", {
+            onChange: (e) => setUsername(e.target.value),
+          })}
+          margin="normal"
+          error={!!errors.mobile}
+          helperText={errors.mobile?.message}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <PhoneAndroid color="action" />
+              </InputAdornment>
+            ),
+          }}
+        />
 
-    {/* Right Side with Login Form */}
-      <Grid
-        item
-        xs={12}
-        md={6}
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        sx={{ p: 4, height: "100%" }}
-      >
-          <Paper sx={{ p: 4, borderRadius: 3 }}>
-            <Typography
-              variant="h5"
-              align="center"
-              fontWeight={600}
-              gutterBottom
-            >
-              Login
-            </Typography>
-
-            {loginError && (
-              <Typography color="error" align="center" sx={{ mb: 2 }}>
-                {loginError}
-              </Typography>
-            )}
-
-            <Box component="form" onSubmit={handleSubmit(onSubmit)}>
-              <ReTextField
-                fullWidth
-                label="User Id"
-                {...register("mobile", {
-                  onChange: (e) => setUsername(e.target.value), // 🔹 keep username state updated
-                })}
-                margin="normal"
-                error={!!errors.mobile}
-                helperText={errors.mobile?.message}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <PhoneAndroid color="action" />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <ReTextField
-                fullWidth
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                {...register("password")}
-                margin="normal"
-                error={!!errors.password}
-                helperText={errors.password?.message}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Lock color="action" />
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowPassword(!showPassword)}
-                        edge="end"
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />{" "}
-              <Box display="flex" justifyContent="flex-end" mt={1} mb={2}>
-                <Button
-                  variant="text"
-                  size="small"
-                  sx={{ textTransform: "none", color: "primary.main" }}
-                  onClick={() => handleForgotPassword()}
+        {/* Password Field */}
+        <ReTextField
+          fullWidth
+           sx={{ mt: 3, py: 2 }}
+          label="Password"
+          type={showPassword ? "text" : "password"}
+          {...register("password")}
+          margin="normal"
+          error={!!errors.password}
+          helperText={errors.password?.message}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Lock color="action" />
+              </InputAdornment>
+            ),
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={() => setShowPassword(!showPassword)}
+                  edge="end"
                 >
-                  Forgot Password?
-                </Button>
-              </Box>
-              <Button
-                type="submit"
-                fullWidth
-                lable={"Login"}
-                variant="contained"
-                size="large"
-                sx={{ mt: 3, py: 1.5 }}
-                disabled={loading}
-              >
-                {loading ? <CircularProgress size={24} /> : "Login"}
-              </Button>
-              
-            </Box>
-          </Paper>
-        </Grid>
-      {/* </Grid> */}
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
 
-      {/* MPIN/OTP Verification Modal */}
+        <Box display="flex" justifyContent="flex-end" mt={1} mb={2}>
+          <Button
+            variant="text"
+            size="small"
+            sx={{ textTransform: "none", color: "primary.main" }}
+            onClick={() => handleForgotPassword()}
+          >
+            Forgot Password?
+          </Button>
+        </Box>
+
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          size="large"
+          sx={{ mt: 3, py: 2 }}
+          disabled={loading}
+        >
+          {loading ? <CircularProgress size={24} /> : "Login"}
+        </Button>
+      </Box>
+    </Paper>
+  </Grid>
+
+  {/* Right Side - Background Image */}
+  <Grid
+    item
+    xs={false}   // hidden on extra-small
+    md={6}
+    sx={{
+      backgroundImage: `url(${backImg})`,
+      backgroundRepeat: "no-repeat",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundColor:"#7e93f3ff",
+      width:900
+    }}
+  />
+
+{/* MPIN/OTP Verification Modal */}
       <Modal
         open={isMpinRequired}
         onClose={handleMpinVerificationClose}
@@ -310,7 +317,11 @@ const Login = () => {
         onClose={() => setForgotModalOpen(false)}
         initialUsername={username}
       />
- </Grid>
+
+</Grid>
+
+
+
   );
 };
 
