@@ -4,7 +4,7 @@ import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CommonModal from "./common/CommonModal";
 
-const UpdateTemplateModal = ({ open, onClose, template, onSuccess }) => {
+const UpdateTemplateModal = ({ open, onClose, template, onFetchRef }) => {
   const [form, setForm] = useState({
     id: "",
     vendor: "",
@@ -52,7 +52,7 @@ const UpdateTemplateModal = ({ open, onClose, template, onSuccess }) => {
     );
 
     if (!error && response?.status) {
-      onSuccess?.();
+      onFetchRef();
       onClose();
     } else {
       alert("Update failed: " + (error?.message || response?.message));

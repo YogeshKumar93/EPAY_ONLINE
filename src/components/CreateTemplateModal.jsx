@@ -4,7 +4,7 @@ import CommonModal from "./common/CommonModal";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { apiCall } from "../api/apiClient";
 
-const CreateTemplateModal = ({ open, onClose, onSuccess }) => {
+const CreateTemplateModal = ({ open, onClose, onFetchRef }) => {
   const [form, setForm] = useState({
     vendor: "",
     name: "",
@@ -26,7 +26,7 @@ const CreateTemplateModal = ({ open, onClose, onSuccess }) => {
       );
 
       if (!error && response?.status) {
-        onSuccess?.(); // refresh parent table
+        onFetchRef(); // refresh parent table
         onClose();
         setForm({ vendor: "", name: "", message: "", temp_id: "", status: 1 });
       } else {
