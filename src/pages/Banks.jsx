@@ -1,5 +1,6 @@
-import { useMemo, useContext, useState, useEffect } from "react";
-import { Tooltip } from "@mui/material";
+import { useMemo, useContext, useState, useEffect, useRef } from "react";
+import { Tooltip, IconButton } from "@mui/material";
+import { Edit } from "@mui/icons-material";
 import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
 import AuthContext from "../contexts/AuthContext";
@@ -9,43 +10,58 @@ import ReButton from "../components/common/ReButton";
 import CommonStatus from "../components/common/CommonStatus";
 import CommonLoader from "../components/common/CommonLoader";
 
+import UpdateBanks from "../components/Bank/UpdateBanks";
+
 const Banks = ({ filters = [] }) => {
   const authCtx = useContext(AuthContext);
+   const user = authCtx?.user;
   const [openCreate, setOpenCreate] = useState(false);
-  const [loading, setLoading] = useState(true); // initially true
+  const [openEdit, setOpenEdit] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // ✅ keep a ref to CommonTable for refreshing
+   const fetchUsersRef = useRef(null);
+  
+    const handleFetchRef = (fetchFn) => {
+      fetchUsersRef.current = fetchFn;
+    };
+    const refreshUsers = () => {
+      if (fetchUsersRef.current) {
+        fetchUsersRef.current();
+      }
+    };
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setLoading(false); // stop loader after data is ready
-    }, 1000); // 1 second delay just as an example
-
+      setLoading(false);
+    }, 1000);
     return () => clearTimeout(timer);
   }, []);
 
   // memoized columns
   const columns = useMemo(
     () => [
-             
-            {
-              name: "Date",
-              selector: (row) => (
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <Tooltip title={`Created: ${ddmmyyWithTime(row.created_at)}`} arrow>
-                    <span>
-                      {ddmmyy(row.created_at)} {dateToTime1(row.created_at)}
-                    </span>
-                  </Tooltip>
-            
-                  <Tooltip title={`Updated: ${ddmmyyWithTime(row.updated_at)}`} arrow>
-                    <span>
-                     {ddmmyy(row.updated_at)} {dateToTime1(row.updated_at)}
-                    </span>
-                  </Tooltip>
-                </div>
-              ),
-              wrap: true,
-              width: "140px", 
-            },
+      {
+        name: "Date",
+        selector: (row) => (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Tooltip title={`Created: ${ddmmyyWithTime(row.created_at)}`} arrow>
+              <span>
+                {ddmmyy(row.created_at)} {dateToTime1(row.created_at)}
+              </span>
+            </Tooltip>
+
+            <Tooltip title={`Updated: ${ddmmyyWithTime(row.updated_at)}`} arrow>
+              <span>
+                {ddmmyy(row.updated_at)} {dateToTime1(row.updated_at)}
+              </span>
+            </Tooltip>
+          </div>
+        ),
+        wrap: true,
+        width: "140px",
+      },
       {
         name: "Bank Name",
         selector: (row) => (
@@ -84,11 +100,27 @@ const Banks = ({ filters = [] }) => {
         ),
         wrap: true,
       },
-    
       {
         name: "Status",
         selector: (row) => <CommonStatus value={row.status} />,
         center: true,
+      },
+      {
+        name: "Actions",
+        selector: (row) => (
+          <IconButton
+            size="small"
+            color="primary"
+            onClick={() => {
+              setSelectedRow(row);
+              setOpenEdit(true);
+            }}
+          >
+            <Edit fontSize="small" />
+          </IconButton>
+        ),
+        center: true,
+        width: "80px",
       },
     ],
     []
@@ -103,6 +135,7 @@ const Banks = ({ filters = [] }) => {
       {!loading && (
         <>
           <CommonTable
+             onFetchRef={handleFetchRef} 
             columns={columns}
             endpoint={ApiEndpoints.GET_BANKS}
             filters={filters}
@@ -117,6 +150,20 @@ const Banks = ({ filters = [] }) => {
             <CreateBankModal
               open={openCreate}
               onClose={() => setOpenCreate(false)}
+                onFetchRef={refreshUsers}
+            />
+          )}
+
+          {/* Edit Bank Modal */}
+          {openEdit && selectedRow && (
+            <UpdateBanks
+              open={openEdit}
+              onClose={() => {
+                setOpenEdit(false);
+                setSelectedRow(null);
+              }}
+              bankData={selectedRow} // ✅ correct prop
+             onFetchRef={refreshUsers}
             />
           )}
         </>

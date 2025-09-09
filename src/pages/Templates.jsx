@@ -1,4 +1,4 @@
-import { useMemo, useContext, useState } from "react";
+import { useMemo, useContext, useState, useRef } from "react";
 import {
   Box,
   Button,
@@ -29,11 +29,22 @@ const Templates = ({ filters = [], query }) => {
   const [openCreate, setOpenCreate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
-  const [refreshKey, setRefreshKey] = useState(0);
+ 
 
   // delete modal states
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+
+   const fetchUsersRef = useRef(null);
+  
+    const handleFetchRef = (fetchFn) => {
+      fetchUsersRef.current = fetchFn;
+    };
+    const refreshUsers = () => {
+      if (fetchUsersRef.current) {
+        fetchUsersRef.current();
+      }
+    };
 
   const handleDelete = async () => {
     if (!deletingId) return;
@@ -45,7 +56,7 @@ const Templates = ({ filters = [], query }) => {
     );
 
     if (!error && response?.status) {
-      setRefreshKey((prev) => prev + 1);
+      refreshUsers();
       setDeleteConfirm(false);
       setDeletingId(null);
     } else {
@@ -140,7 +151,7 @@ const Templates = ({ filters = [], query }) => {
     <Box>
       {/* Templates Table */}
       <CommonTable
-        key={refreshKey} // 🔄 refresh on changes
+         onFetchRef={handleFetchRef} // 🔄 refresh on changes
         columns={columns}
         endpoint={ApiEndpoints.GET_TEMPLATES}
         filters={filters}
@@ -160,7 +171,7 @@ const Templates = ({ filters = [], query }) => {
       <CreateTemplateModal
         open={openCreate}
         onClose={() => setOpenCreate(false)}
-        onSuccess={() => setRefreshKey((prev) => prev + 1)}
+        onFetchRef={refreshUsers} 
       />
 
       {/* Edit Template Modal */}
@@ -168,7 +179,7 @@ const Templates = ({ filters = [], query }) => {
         open={openEdit}
         onClose={() => setOpenEdit(false)}
         template={selectedTemplate}
-        onSuccess={() => setRefreshKey((prev) => prev + 1)}
+        onFetchRef={refreshUsers} 
       />
 
       {/* Delete Confirmation Modal */}

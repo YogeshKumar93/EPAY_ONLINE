@@ -6,7 +6,7 @@ import { useSchemaForm } from "../hooks/useSchemaForm";
 import { PATTERNS, isValid } from "../utils/validators";
 import { useToast } from "../utils/ToastContext";
 
-const CreateFundRequest = ({ open, handleClose, handleSave }) => {
+const CreateFundRequest = ({ open, handleClose, handleSave,onFetchRef }) => {
   const { schema, formData, handleChange, errors, setErrors, loading } =
     useSchemaForm(ApiEndpoints.GET_FUNDREQUEST_SCHEMA, open);
 
@@ -49,10 +49,12 @@ const CreateFundRequest = ({ open, handleClose, handleSave }) => {
 
       if (response) {
         handleSave(response.data);
+
         showToast(
           response?.message || "Fund request created successfully",
           "success"
         );
+        onFetchRef();
         handleClose();
       } else {
         showToast(error?.message || "Failed to create fund request", "error");

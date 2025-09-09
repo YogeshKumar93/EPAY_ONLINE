@@ -6,7 +6,7 @@ import CommonModal from "../components/common/CommonModal";
 import { useSchemaForm } from "../hooks/useSchemaForm";
 import { useToast } from "../utils/ToastContext";
 
-const CreateLayouts = ({ open, handleClose, handleSave }) => {
+const CreateLayouts = ({ open, handleClose, handleSave,onFetchRef }) => {
   const {
     schema,
     formData,
@@ -54,6 +54,7 @@ const CreateLayouts = ({ open, handleClose, handleSave }) => {
       if (response) {
         showToast(response?.message || "Colour created successfully", "success");
         handleSave(response.data);
+        onFetchRef();
         handleClose();
       } else {
         showToast(error?.message || "Failed to create colour", "error");

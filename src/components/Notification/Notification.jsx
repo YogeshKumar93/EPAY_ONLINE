@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useContext, useState, useEffect } from "react";
+import { useMemo, useCallback, useContext, useState, useEffect, useRef } from "react";
 import { Box, Button, IconButton, Tooltip, Typography } from "@mui/material";
 import AuthContext from "../../contexts/AuthContext";
 import { dateToTime, ddmmyy } from "../../utils/DateUtils";
@@ -22,6 +22,17 @@ const Notification = ({ filters = [], query }) => {
   const [selectedNotification, setSelectedNotification] = useState([])
 
 const [loading, setLoading] = useState(true); // initially true
+
+ const fetchUsersRef = useRef(null);
+
+  const handleFetchRef = (fetchFn) => {
+    fetchUsersRef.current = fetchFn;
+  };
+  const refreshUsers = () => {
+    if (fetchUsersRef.current) {
+      fetchUsersRef.current();
+    }
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -134,6 +145,7 @@ const [loading, setLoading] = useState(true); // initially true
         columns={columns}
         endpoint={ApiEndpoints.GET_NOTIFICATION}
         filters={filters}
+           onFetchRef={handleFetchRef} 
         customHeader={
           (user?.role === "sadm" || user?.role === "adm") && (
             <ReButton
@@ -142,8 +154,7 @@ const [loading, setLoading] = useState(true); // initially true
             />
           )
         }
-        // queryParam={query}
-        // refreshInterval={30000}
+        
       />
 
       {/* Create Notification Modal */}
@@ -151,6 +162,7 @@ const [loading, setLoading] = useState(true); // initially true
         <CreateNotification
           open={openCreate}
           onClose={() => setOpenCreate(false)}
+           onFetchRef={refreshUsers} 
         />
       )}
       {/* Create Notification Modal */}
@@ -160,6 +172,7 @@ const [loading, setLoading] = useState(true); // initially true
           row = {selectedNotification}
           onClose={() => setOpenUpdate(false)}
           notification={selectedId}
+           onFetchRef={refreshUsers} 
         />
       )}
       {openDelete && (
@@ -167,6 +180,7 @@ const [loading, setLoading] = useState(true); // initially true
           open={openDelete}
           onClose={() => setOpenDelete(false)}
           notificationId={selectedId}
+           onFetchRef={refreshUsers} 
         />
       )}
     </Box>

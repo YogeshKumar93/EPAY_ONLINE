@@ -6,7 +6,7 @@ import { CircularProgress } from "@mui/material";
 import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
 import { useSchemaForm } from "../hooks/useSchemaForm";
 
-const EditCommissionModal = ({ open, onClose, commissionRule, onSuccess }) => {
+const EditCommissionModal = ({ open, onClose, commissionRule, onSuccess,onFetchRef }) => {
   const {
     schema,
     formData,
@@ -89,7 +89,8 @@ console.log("commissionRule",commissionRule);
 
       if (response) {
         okSuccessToast(response?.message || "Commission rule updated successfully!");
-        onSuccess(); // Call the success callback
+        onSuccess();
+        onFetchRef(); 
         onClose(); // Close the modal
       } else {
         apiErrorToast(error?.message || "Failed to update commission rule");

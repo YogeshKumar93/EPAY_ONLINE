@@ -6,7 +6,7 @@ import { useSchemaForm } from "../../hooks/useSchemaForm";
 import { PATTERNS, isValid } from "../../utils/validators"; // 👈 import validators
 import { useToast } from "../../utils/ToastContext";
 
-const CreateBankModal = ({ open, onClose }) => {
+const CreateBankModal = ({ open, onClose,onFetchRef }) => {
   const {
     schema,
     formData,
@@ -49,6 +49,7 @@ const handleSubmit = () => {
   setSubmitting(true);
 
   apiCall("post", ApiEndpoints.CREATE_BANK, formData).then(({ error, response }) => {
+    onFetchRef();
     onClose();
 
     if (response) {

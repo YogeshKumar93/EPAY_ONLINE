@@ -1,4 +1,4 @@
-import { useMemo, useState, useContext, useEffect } from "react";
+import { useMemo, useState, useContext, useEffect, useRef } from "react";
 import { Box, Button, Tooltip, Typography } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
@@ -26,6 +26,18 @@ const FundRequest = () => {
   const [status, setStatus] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(true); // initially true
+
+
+   const fetchUsersRef = useRef(null);
+  
+    const handleFetchRef = (fetchFn) => {
+      fetchUsersRef.current = fetchFn;
+    };
+    const refreshUsers = () => {
+      if (fetchUsersRef.current) {
+        fetchUsersRef.current();
+      }
+    };
 
   useEffect(() => {
   const timer = setTimeout(() => {
@@ -218,6 +230,7 @@ const FundRequest = () => {
         columns={columns}
         endpoint={ApiEndpoints.GET_FUND_REQUESTS}
         filters={filters}
+        onFetchRef={handleFetchRef} 
         customHeader={
           (user?.role !== "sadm" && user?.role !== "adm") && (
             <ReButton
@@ -234,6 +247,7 @@ const FundRequest = () => {
         open={openCreate}
         handleClose={() => setOpenCreate(false)}
         handleSave={handleSaveCreate}
+        onFetchRef={refreshUsers} 
       />
 
       {/* Render modal outside table */}
@@ -243,6 +257,7 @@ const FundRequest = () => {
           handleClose={() => setOpenModal(false)}
           row={selectedRow}
           status={status}
+          onFetchRef={refreshUsers} 
         />
       )}
     </Box>

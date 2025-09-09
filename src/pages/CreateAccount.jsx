@@ -260,7 +260,8 @@ import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CommonModal from "../components/common/CommonModal";
 
-const CreateAccount = ({ open, handleClose, handleSave }) => {
+const CreateAccount = ({ open, handleClose, handleSave,onFetchRef,
+ }) => {
   const [formData, setFormData] = useState({
     name: "",
     user_id: "",
@@ -300,6 +301,7 @@ const CreateAccount = ({ open, handleClose, handleSave }) => {
 
       if (response) {
         handleSave(response.data);
+        onFetchRef();
         handleClose();
         setFormData({
           name: "",

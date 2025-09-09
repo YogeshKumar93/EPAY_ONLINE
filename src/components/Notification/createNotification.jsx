@@ -5,7 +5,7 @@ import CommonModal from "../common/CommonModal";
 import { useSchemaForm } from "../../hooks/useSchemaForm";
 import { useToast } from "../../utils/ToastContext";
 
-const CreateNotification = ({ open, onClose }) => {
+const CreateNotification = ({ open, onClose, onFetchRef}) => {
   const {
     schema,
     formData,
@@ -69,6 +69,7 @@ const CreateNotification = ({ open, onClose }) => {
 
       if (response) {
         showToast(response.message || "Notification created successfully", "success");
+        onFetchRef();
         onClose();
       } else {
         showToast(error?.message || "Failed to create notification", "error");

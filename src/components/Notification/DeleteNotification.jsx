@@ -6,7 +6,7 @@ import { useToast } from "../../utils/ToastContext";
 import CommonModal from "../common/CommonModal";
 import { Box, Typography } from "@mui/material";
 
-const DeleteNotification = ({ open, onClose, notificationId }) => {
+const DeleteNotification = ({ open, onClose, notificationId ,onFetchRef}) => {
   const { showToast } = useToast();
   const [submitting, setSubmitting] = useState(false);
 
@@ -27,6 +27,7 @@ const DeleteNotification = ({ open, onClose, notificationId }) => {
 
       if (response) {
         showToast(response.message || "Notification deleted successfully", "success");
+        onFetchRef();
         onClose();
       } else {
         showToast(error?.message || "Failed to delete notification", "error");

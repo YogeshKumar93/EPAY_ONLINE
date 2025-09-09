@@ -5,7 +5,7 @@ import ApiEndpoints from "../api/ApiEndpoints";
 import { apiCall } from "../api/apiClient";
 import { useToast } from "../utils/ToastContext";
 
-const CreateServiceModal = ({ open, onClose, onSuccess }) => {
+const CreateServiceModal = ({ open, onClose,onFetchRef}) => {
   const [form, setForm] = useState({
     name: "",
     code: "",
@@ -25,10 +25,12 @@ const {showToast} = useToast();
         form
         
       );
-        onClose();
+       
       if (response) {
-        onSuccess?.(); 
+       
         showToast(response?.message || "Service created successfully", "success");
+         onFetchRef(); 
+         onClose();
         setForm({ name: "", code: "", route: "", is_active: 1 });
       } else {
       showToast(error?.message || "Failed to create Service", "error");

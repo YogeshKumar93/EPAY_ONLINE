@@ -4,7 +4,7 @@ import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CommonModal from "./common/CommonModal";
 
-const EditServiceModal = ({ open, onClose, service, onSuccess }) => {
+const EditServiceModal = ({ open, onClose, service,onFetchRef }) => {
   const [form, setForm] = useState({
     id: "",
     name: "",
@@ -40,7 +40,7 @@ const EditServiceModal = ({ open, onClose, service, onSuccess }) => {
     );
 
     if (!error && response?.status) {
-      onSuccess?.();
+      onFetchRef();
       onClose();
     } else {
       alert("Update failed: " + (error?.message || response?.message));

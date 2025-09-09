@@ -13,7 +13,7 @@ import CommonModal from "../components/common/CommonModal";
 
 const accountTypes = ["Current", "Savings", "Credit"];
 
-const UpdateAccount = ({ open, handleClose, handleSave, selectedAccount }) => {
+const UpdateAccount = ({ open, handleClose, handleSave, selectedAccount,onFetchRef }) => {
   const [formData, setFormData] = useState({
     id: "",
     name: "",
@@ -88,7 +88,7 @@ const UpdateAccount = ({ open, handleClose, handleSave, selectedAccount }) => {
 
       if (response) {
         // handleSave(response.data); // ✅ update parent state
-      
+      onFetchRef();
     handleClose();
       } else {
         console.error("Failed to update account:", error || response);

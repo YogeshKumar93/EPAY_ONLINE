@@ -6,7 +6,7 @@ import { CircularProgress } from "@mui/material";
 import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
 import numWords from "num-words";
 
-const FundRequestModal = ({ open, handleClose, row, status }) => {
+const FundRequestModal = ({ open, handleClose, row, status,onFetchRef }) => {
   const [formData, setFormData] = useState({
     amount: "",
     amountInWords: "",
@@ -57,6 +57,7 @@ const FundRequestModal = ({ open, handleClose, row, status }) => {
 
       if (response) {
         okSuccessToast("Fund Request updated successfully!");
+        onFetchRef();
         handleClose();
       } else {
         apiErrorToast("Failed to update Fund Request");

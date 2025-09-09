@@ -1,4 +1,4 @@
-import { useMemo, useContext, useState } from "react";
+import { useMemo, useContext, useState, useRef } from "react";
 import { Box, Button, Tooltip, Chip, IconButton } from "@mui/material";
 import { Edit } from "@mui/icons-material";
 import AuthContext from "../contexts/AuthContext";
@@ -17,7 +17,18 @@ const Services = ({ filters = [], query }) => {
   const [openCreate, setOpenCreate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
-  const [refreshKey, setRefreshKey] = useState(0);
+ 
+
+   const fetchUsersRef = useRef(null);
+  
+    const handleFetchRef = (fetchFn) => {
+      fetchUsersRef.current = fetchFn;
+    };
+    const refreshUsers = () => {
+      if (fetchUsersRef.current) {
+        fetchUsersRef.current();
+      }
+    };
 
   const columns = useMemo(
     () => [
@@ -87,7 +98,7 @@ const Services = ({ filters = [], query }) => {
 
       {/* Services Table */}
       <CommonTable
-        key={refreshKey} // 🔄 refresh on changes
+        onFetchRef={handleFetchRef} 
         columns={columns}
         endpoint={ApiEndpoints.GET_SERVICES}
         filters={filters}
@@ -111,7 +122,7 @@ const Services = ({ filters = [], query }) => {
       <CreateServiceModal
         open={openCreate}
         onClose={() => setOpenCreate(false)}
-        onSuccess={() => setRefreshKey((prev) => prev + 1)}
+       onFetchRef={refreshUsers} 
       />
 
       {/* Edit Service Modal */}
@@ -119,7 +130,7 @@ const Services = ({ filters = [], query }) => {
         open={openEdit}
         onClose={() => setOpenEdit(false)}
         service={selectedService}
-        onSuccess={() => setRefreshKey((prev) => prev + 1)}
+       onFetchRef={refreshUsers} 
       />
     </Box>
   );

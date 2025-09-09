@@ -15,6 +15,7 @@ const DrawerDetails = ({
   onClose,
   title = "Other Details", // ✅ Common default title
   rowData,
+  
   fields = [],
 }) => {
   if (!rowData) return null;

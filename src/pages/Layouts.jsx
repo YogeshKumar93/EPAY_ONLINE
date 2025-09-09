@@ -1,4 +1,4 @@
-import { useMemo, useContext, useState } from "react";
+import { useMemo, useContext, useState, useRef } from "react";
 import { Box, Button, Tooltip, Chip, IconButton } from "@mui/material";
 import { Edit } from "@mui/icons-material";
 import AuthContext from "../contexts/AuthContext";
@@ -23,8 +23,17 @@ const Layouts = ({ filters = [], query }) => {
   const user = authCtx?.user;
   // const [openEdit, setOpenEdit] = useState(false);
   // const [selectedService, setSelectedService] = useState(null);
-  const [refreshKey, setRefreshKey] = useState(0);
+ 
+ const fetchUsersRef = useRef(null);
 
+  const handleFetchRef = (fetchFn) => {
+    fetchUsersRef.current = fetchFn;
+  };
+  const refreshUsers = () => {
+    if (fetchUsersRef.current) {
+      fetchUsersRef.current();
+    }
+  };
   const handleSaveCreate = () => {
     setOpenCreate(false);
   };
@@ -101,7 +110,7 @@ const Layouts = ({ filters = [], query }) => {
   return (
     <Box sx={{ }}>
       <CommonTable
-        key={refreshKey} // 🔄 refresh on changes
+     onFetchRef={handleFetchRef} 
         columns={columns}
         endpoint={ApiEndpoints.GET_COLOURS}
         filters={filters}
@@ -120,6 +129,7 @@ const Layouts = ({ filters = [], query }) => {
         open={openCreate}
         handleClose={() => setOpenCreate(false)}
         handleSave={handleSaveCreate}
+        onFetchRef={refreshUsers} 
       />
 
       <UpdateLayouts
@@ -131,6 +141,7 @@ const Layouts = ({ filters = [], query }) => {
         }}
         handleSave={handleSaveUpdate}
         // selectedAccount={selectedAccount}
+        onFetchRef={refreshUsers} 
       />
     </Box>
   );

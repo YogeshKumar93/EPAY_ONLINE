@@ -7,7 +7,7 @@ import { apiCall } from "../../api/apiClient";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import { apiErrorToast, okSuccessToast } from "../../utils/ToastUtil";
 
-const UpdateNotification = ({ open, onClose,  row }) => {
+const UpdateNotification = ({ open, onClose,  row,onFetchRef }) => {
   const [formData, setFormData] = useState({
     id: "",
     title: "",
@@ -92,6 +92,7 @@ const UpdateNotification = ({ open, onClose,  row }) => {
 
       if (response) {
         okSuccessToast(response.message || "Notification updated successfully!");
+        onFetchRef();
         onClose();
       } else {
         apiErrorToast(error?.message || "Failed to update notification");

@@ -1,4 +1,4 @@
-import { useMemo, useContext, useState, useEffect } from "react";
+import { useMemo, useContext, useState, useEffect, useRef } from "react";
 import { Box, Tooltip, Chip, IconButton } from "@mui/material";
 import { Delete, Info as InfoIcon } from "@mui/icons-material";
 import AuthContext from "../contexts/AuthContext";
@@ -13,7 +13,7 @@ import CommonLoader from "../components/common/CommonLoader";
 const Logs = ({ filters = [], query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
-  const [refreshKey, setRefreshKey] = useState(0);
+ 
 
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedLogId, setSelectedLogId] = useState(null);
@@ -21,6 +21,17 @@ const Logs = ({ filters = [], query }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
  const [loading, setLoading] = useState(true); // initially true
+
+ const fetchUsersRef = useRef(null);
+ 
+   const handleFetchRef = (fetchFn) => {
+     fetchUsersRef.current = fetchFn;
+   };
+   const refreshUsers = () => {
+     if (fetchUsersRef.current) {
+       fetchUsersRef.current();
+     }
+   };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -91,7 +102,7 @@ const Logs = ({ filters = [], query }) => {
   {!loading && (
     <Box>
       <CommonTable
-        key={refreshKey}
+        onFetchRef={handleFetchRef} 
         columns={columns}
         endpoint={ApiEndpoints.GET_LOGS}
         filters={filters}
@@ -103,7 +114,7 @@ const Logs = ({ filters = [], query }) => {
         open={openDelete}
         onClose={() => setOpenDelete(false)}
         logId={selectedLogId}
-        onSuccess={() => setRefreshKey((prev) => prev + 1)}
+        onFetchRef={refreshUsers} 
       />
 
       {/* Drawer Details */}
@@ -111,6 +122,7 @@ const Logs = ({ filters = [], query }) => {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         rowData={selectedRow}
+        
         fields={[
           { label: "IP Address", key: "ip_address" },
           { label: "Request Data", key: "request_data" },

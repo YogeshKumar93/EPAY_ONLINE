@@ -4,7 +4,7 @@ import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CommonModal from "../components/common/CommonModal";
 
-const UpdateLayouts = ({ open, handleClose, handleSave, row }) => {
+const UpdateLayouts = ({ open, handleClose, handleSave, row,onFetchRef }) => {
   const [formData, setFormData] = useState({
     name: "",
     color_code: "#000000", // ✅ default valid hex
@@ -42,6 +42,7 @@ const UpdateLayouts = ({ open, handleClose, handleSave, row }) => {
       );
       if (response) {
         setColorOptions(response?.data?.data || []);
+        
       } else {
         console.error("Error fetching colors: ", error);
       }
@@ -71,6 +72,7 @@ const UpdateLayouts = ({ open, handleClose, handleSave, row }) => {
 
       if (response) {
         handleSave(response.data);
+        onFetchRef();
         handleClose();
       } else {
         console.error("Failed to update layout:", error || response);
