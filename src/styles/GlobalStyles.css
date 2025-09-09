@@ -142,9 +142,10 @@ body {
 }
 
 .nav-icon {
- 
+ margin-left: 5px;
   width: 40px;
   height: 40px;
+  
 }
 
 /* Content Area */

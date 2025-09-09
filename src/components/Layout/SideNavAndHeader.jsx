@@ -157,7 +157,7 @@ const MainContent = styled(Box)(({ theme }) => ({
             button
             onClick={() => handleNavigation(item.to, hasSubmenus)}
             sx={{
-              pl: 2 + level * 2,
+             
               backgroundColor: isItemActive
                 ? themeSettings.palette.primary.main
                 : "transparent",
@@ -270,7 +270,7 @@ backgroundColor:  "#fff" ,
               ? `calc(100% - ${themeSettings.drawerWidth}px)`
               : "100%",
           },
-          ml: { md: desktopOpen ? `${themeSettings.drawerWidth}px` : 0 },
+          ml: { md: desktopOpen ? `${themeSettings.drawerWidth}px` :0 },
           zIndex: (theme) => theme.zIndex.drawer + 1,
           transition: (theme) =>
             theme.transitions.create(["width", "margin"], {
