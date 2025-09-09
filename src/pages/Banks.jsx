@@ -180,17 +180,18 @@ const Banks = ({ filters = [] }) => {
              onFetchRef={refreshUsers}
             />
           )}
-              {selectedBank && (
-        <DeleteBank
-          open={openDelete}
-          handleClose={() => {
-            setOpenDelete(false);
-            setSelectedBank(null);
-          }}
-          selectedBank={selectedBank}
-                    onFetchRef={refreshUsers} // ✅ trigger fetch after update
+         {selectedBank && user?.role === "adm" && (
+  <DeleteBank
+    open={openDelete}
+    handleClose={() => {
+      setOpenDelete(false);
+      setSelectedBank(null);
+    }}
+    selectedBank={selectedBank}
+    onFetchRef={refreshUsers} // ✅ trigger fetch after update
+  />
 
-        />
+
       )}
         </>
       )}
