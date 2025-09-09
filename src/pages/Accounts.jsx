@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Box, Button, IconButton, Tooltip } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
@@ -21,15 +21,23 @@ const Accounts = () => {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Manual refresh trigger
-  const handleManualRefresh = () => {
-    // CommonTable will handle fetch since endpoint is passed
+ const fetchUsersRef = useRef(null);
+
+  const handleFetchRef = (fetchFn) => {
+    fetchUsersRef.current = fetchFn;
   };
+  const refreshUsers = () => {
+    if (fetchUsersRef.current) {
+      fetchUsersRef.current();
+    }
+  };
+ 
+
 
   // ✅ Add new account
   const handleSaveCreate = (newAccount) => {
     setAccounts((prev) => [newAccount, ...prev]);
-    handleManualRefresh();
+  
     setOpenCreate(false);
   };
 
@@ -99,7 +107,7 @@ const Accounts = () => {
         columns={columns}
         loading={loading}
         endpoint={ApiEndpoints.GET_ACCOUNTS}
-        handleManualRefresh={handleManualRefresh}
+        onFetchRef={handleFetchRef} 
         customHeader={
           <ReButton
             variant="contained"
@@ -114,6 +122,8 @@ const Accounts = () => {
         open={openCreate}
         handleClose={() => setOpenCreate(false)}
         handleSave={handleSaveCreate}
+                  onFetchRef={refreshUsers} // ✅ trigger fetch after update
+
       />
 
       {/* ✅ Update Account Modal */}
@@ -126,6 +136,8 @@ const Accounts = () => {
           }}
           handleSave={handleSaveUpdate}
           selectedAccount={selectedAccount}
+                    onFetchRef={refreshUsers} // ✅ trigger fetch after update
+
         />
       )}
 
@@ -138,6 +150,8 @@ const Accounts = () => {
             setSelectedAccount(null);
           }}
           selectedAccount={selectedAccount}
+                    onFetchRef={refreshUsers} // ✅ trigger fetch after update
+
         />
       )}
     </Box>

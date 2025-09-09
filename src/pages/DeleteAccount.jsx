@@ -13,7 +13,7 @@ import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CommonModal from "../components/common/CommonModal";
 
-const DeleteAccount = ({ open, handleClose, selectedAccount}) => {
+const DeleteAccount = ({ open, handleClose, selectedAccount,onFetchRef}) => {
   const [loading, setLoading] = useState(false);
 
   const handleConfirmDelete = async () => {
@@ -26,6 +26,7 @@ const DeleteAccount = ({ open, handleClose, selectedAccount}) => {
       );
 
       if  (response) {
+        onFetchRef();
         handleClose();
       } else {
         console.error("Delete failed:", error || response);
@@ -58,7 +59,7 @@ const DeleteAccount = ({ open, handleClose, selectedAccount}) => {
       ]}
     >
       <Box sx={{ p: 2 }}>
-        <Typography sx={{ mb: 3 }}>
+        <Typography sx={{ mt: 3 }}>
           Are you sure you want to delete account{" "}
           <b>{selectedAccount?.name}</b>?
         </Typography>
