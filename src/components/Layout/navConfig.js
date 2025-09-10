@@ -10,7 +10,8 @@ export const Admin_nav = [
   { title: "Users", icon: "👥", icon2: "👥", to: "/admin/users" },
   { title: "Notification", icon: "💳", icon2: "💳", to: "/admin/notification" },
   { title: "Transactions", icon: "💳", icon2: "💳", to: "/admin/transactions" },
-  { title: "Side Nav", icon: "💳", icon2: "💳", to: "/admin/sidenav" },
+  { title: "Statement", icon: "💳", icon2: "💳", to: "/admin/statement" },
+  // { title: "Side Nav", icon: "💳", icon2: "💳", to: "/admin/sidenav" },
   {
     title: "Fund Request",
     icon: "🛠️",
@@ -46,6 +47,13 @@ export const customer_nav = [
     icon2: "🛠️",
     to: "/customer/fund-transfer",
   },
+    {
+    title: "Upi Transer",
+    icon: "🛠️",
+    icon2: "🛠️",
+    to: "/customer/upi-transfer",
+  },
+
   {
     title: "Recharge and bill",
     icon: "🛠️",

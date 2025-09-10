@@ -5,6 +5,7 @@ import CommissionRule from "./CommissionRule";
 import Layouts from "./Layouts";
 import Logs from "./Logs";
 import WebHooks from "./WebHooks";
+import Plans from "./Plans";
 
 
 const TabPanel = ({ children, value, index }) => {
@@ -38,6 +39,7 @@ export const Settings = () => {
         {/* <Tab label="Layout" /> */}
         <Tab label="WebHooks" />
         <Tab label="Logs" />
+        <Tab label="Plans" />
        
       </Tabs>
 
@@ -47,14 +49,14 @@ export const Settings = () => {
       <TabPanel value={tab} index={1}>
         <CommissionRule />
       </TabPanel>
-      {/* <TabPanel value={tab} index={2}>
-        <Layouts />
-      </TabPanel> */}
-      <TabPanel value={tab} index={3}>
+      <TabPanel value={tab} index={2}>
         <WebHooks />
       </TabPanel>
-      <TabPanel value={tab} index={4}>
+      <TabPanel value={tab} index={3}>
         <Logs />
+      </TabPanel>
+      <TabPanel value={tab} index={4}>
+        <Plans />
       </TabPanel>
     
     </Box>

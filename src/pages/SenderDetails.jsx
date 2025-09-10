@@ -10,13 +10,15 @@ import {
   Collapse,
   useMediaQuery,
   useTheme,
+  Stack,
+  Grid,
 } from "@mui/material";
-import { ExpandMore, ExpandLess } from "@mui/icons-material";
+import { ExpandMore, ExpandLess, Person, Phone, AccountBalance } from "@mui/icons-material";
 
 const SenderDetails = ({ sender }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // small screens
-  const [open, setOpen] = useState(true); // collapsed state
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [open, setOpen] = useState(true);
 
   const getKycColor = (status) => {
     switch (status?.toLowerCase()) {
@@ -31,24 +33,40 @@ const SenderDetails = ({ sender }) => {
     }
   };
 
-  // toggle function
   const handleToggle = () => setOpen((prev) => !prev);
 
   return (
-    <Card sx={{ borderRadius: 1, width: "100%" }}>
-      {/* Header with toggle button on mobile */}
+    <Card 
+      sx={{ 
+        borderRadius: 2, 
+        width: "100%",
+        background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+        border: "1px solid #e0e4ec",
+        overflow: "hidden"
+      }}
+    >
+      {/* Header with toggle button */}
       <Box
         display="flex"
         alignItems="center"
         justifyContent="space-between"
-        sx={{ p: 1, cursor: isMobile ? "pointer" : "default" }}
+        sx={{ 
+          p: 1.5, 
+          cursor: isMobile ? "pointer" : "default",
+          background: "#0078B6 ",
+          color: "#ffff"
+        }}
         onClick={isMobile ? handleToggle : undefined}
       >
-        <Typography variant="subtitle1" fontWeight="medium">
-          Sender Details
-        </Typography>
+        <Box display="flex" alignItems="center">
+          <Person sx={{ mr: 1, fontSize: 18 }} />
+          <Typography variant="subtitle1" fontWeight="medium">
+            Sender Details
+          </Typography>
+        </Box>
         {isMobile && (
-          <IconButton size="small">
+          <IconButton size="small" sx={{ color: "white" }}>
             {open ? <ExpandLess /> : <ExpandMore />}
           </IconButton>
         )}
@@ -56,54 +74,128 @@ const SenderDetails = ({ sender }) => {
 
       {/* Collapsible content */}
       <Collapse in={open} timeout="auto" unmountOnExit>
-        <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
-          <Box
-            display="flex"
-            flexDirection={isMobile ? "column" : "row"}
-            alignItems={isMobile ? "flex-start" : "center"}
-            mb={1}
-            gap={isMobile ? 1.5 : 2}
-          >
-            <Avatar
-              sx={{
-                bgcolor: "primary.main",
-                width: 32,
-                height: 32,
-                fontSize: 16,
-              }}
-            >
-              {sender.sender_name?.charAt(0) || "S"}
-            </Avatar>
+        {sender ? (
 
-            <Box flexGrow={1} minWidth={0}>
-              <Typography
-                variant="subtitle1"
-                fontWeight="medium"
-                noWrap={!isMobile}
-              >
-                {sender.sender_name}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {sender.mobile_number}
-              </Typography>
-            </Box>
+        <CardContent sx={{ p: 2.5, "&:last-child": { pb: 2 } }}>
+          <Grid container spacing={2}>
+            {/* Sender Information */}
+            <Grid item xs={12} sm={6}>
+              <Stack spacing={1.5}>
+                <Box display="flex" alignItems="center">
+                  <Avatar
+                    sx={{
+                      bgcolor: "primary.main",
+                      width: 40,
+                      height: 40,
+                      fontSize: 16,
+                      fontWeight: "medium",
+                      mr: 1.5
+                    }}
+                  >
+                    {sender?.sender_name?.charAt(0) || "S"}
+                  </Avatar>
+                  <Box>
+                    <Typography variant="body2" color="text.secondary" fontWeight="medium">
+                      Name
+                    </Typography>
+                    <Typography variant="body1" fontWeight="medium">
+                      {sender?.sender_name || "N/A"}
+                    </Typography>
+                  </Box>
+                </Box>
 
-            <Box
-              textAlign={isMobile ? "left" : "right"}
-              mt={isMobile ? 1 : 0}
-            >
-              <Chip
-                label={sender.kyc_status}
-                size="small"
-                color={getKycColor(sender.kyc_status)}
-                sx={{ height: 20, fontSize: "0.7rem", mb: 0.5 }}
-              />
-              <Typography variant="caption" display="block" fontWeight="medium">
-                ₹{sender.rem_limit?.toLocaleString()}
-              </Typography>
-            </Box>
-          </Box>
+                <Box display="flex" alignItems="center">
+                  <Box 
+                    sx={{ 
+                      width: 40, 
+                      height: 40, 
+                      display: "flex", 
+                      alignItems: "center", 
+                      justifyContent: "center",
+                      mr: 1.5,
+                      color: "primary.main"
+                    }}
+                  >
+                    <Phone sx={{ fontSize: 20 }} />
+                  </Box>
+                  <Box>
+                    <Typography variant="body2" color="text.secondary" fontWeight="medium">
+                      Number
+                    </Typography>
+                    <Typography variant="body1">
+                      {sender?.mobile_number || "N/A"}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Stack>
+            </Grid>
+
+            {/* Status and Limit */}
+            <Grid item xs={12} sm={6}>
+              <Stack spacing={1.5}>
+                <Box display="flex" alignItems="center">
+                  <Box 
+                    sx={{ 
+                      width: 40, 
+                      height: 40, 
+                      display: "flex", 
+                      alignItems: "center", 
+                      justifyContent: "center",
+                      mr: 1.5
+                    }}
+                  >
+                  
+                  </Box>
+                  <Box>
+                    <Typography variant="body2" color="text.secondary" fontWeight="medium">
+                      KYC Status
+                    </Typography>
+                    <Typography variant="body1" textTransform="capitalize">
+                      {sender?.kyc_status || "N/A"}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Box display="flex" alignItems="center">
+                  <Box 
+                    sx={{ 
+                      width: 40, 
+                      height: 40, 
+                      display: "flex", 
+                      alignItems: "center", 
+                      justifyContent: "center",
+                      mr: 1.5,
+                      color: "primary.main"
+                    }}
+                  >
+                    <AccountBalance sx={{ fontSize: 20 }} />
+                  </Box>
+                  <Box>
+                    <Typography variant="body2" color="text.secondary" fontWeight="medium">
+                      Remaining Limit
+                    </Typography>
+                    <Typography variant="body1" fontWeight="medium" color="primary.main">
+                      ₹{sender?.rem_limit?.toLocaleString() || "N/A"}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Stack>
+            </Grid>
+          </Grid>
         </CardContent>
+        ) : (
+    // Show clean placeholder if no sender
+    <Box
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      minHeight={120}
+    >
+      <Typography variant="body2" color="text.secondary">
+        Enter Mobile Number to view sender details
+      </Typography>
+    </Box>
+        )}
       </Collapse>
     </Card>
   );

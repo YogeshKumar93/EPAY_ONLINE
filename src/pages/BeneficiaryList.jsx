@@ -6,24 +6,51 @@ import {
   Typography,
   List,
   ListItem,
-  ListItemText,
   Button,
   IconButton,
-  Alert,
   Divider,
   Collapse,
   useTheme,
   useMediaQuery,
+  Chip,
+  Avatar,
+  Stack,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import CommonModal from "../components/common/CommonModal";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
 import { useSchemaForm } from "../hooks/useSchemaForm";
+import {
+  abhy2,
+  airtel2,
+  axis2,
+  bandhan2,
+  bob2,
+  bom2,
+  canara2,
+  cbi2,
+  dbs2,
+  hdfc2,
+  icici2,
+  idbi2,
+  idib2,
+  indus2,
+  jk2,
+  kotak2,
+  pnb2,
+  rbl2,
+  sbi2,
+  stand2,
+  union2,
+  yes2,
+} from "../utils/iconsImports";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
   const theme = useTheme();
@@ -31,12 +58,12 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
 
   const [openModal, setOpenModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [openList, setOpenList] = useState(true); // collapse state
+  const [openList, setOpenList] = useState(true);
 
   // load schema
   const { schema, formData, handleChange, errors, setErrors, loading } =
     useSchemaForm(ApiEndpoints.ADD_BENEFICIARY_SCHEMA, openModal, {
-      sender_id: sender.id,
+      sender_id: sender?.id,
     });
 
   const handleAddBeneficiary = async () => {
@@ -44,7 +71,11 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
     setErrors({});
     try {
       const payload = { ...formData, sender_id: sender.id };
-      const res = await apiCall("post", ApiEndpoints.CREATE_BENEFICIARY, payload);
+      const res = await apiCall(
+        "post",
+        ApiEndpoints.CREATE_BENEFICIARY,
+        payload
+      );
 
       if (res) {
         okSuccessToast(res?.message || "Beneficiary added successfully");
@@ -79,131 +110,280 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
     }
   };
 
+  const bankImageMapping = {
+    SBI: sbi2,
+    IBKL: idbi2,
+    UTIB: axis2,
+    HDFC: hdfc2,
+    ICIC: icici2,
+    KKBK: kotak2,
+    BARB: bob2,
+    PUNB: pnb2,
+    MAHB: bom2,
+    UBIN: union2,
+    DBSS: dbs2,
+    RATN: rbl2,
+    YESB: yes2,
+    INDB: indus2,
+    AIRP: airtel2,
+    ABHY: abhy2,
+    CNRB: canara2,
+    BDBL: bandhan2,
+    CBIN: cbi2,
+    IDIB: idib2,
+    SCBL: stand2,
+    JAKA: jk2,
+  };
+
+  // show actual list or placeholder N/A
+  const beneficiaries =
+    sender?.beneficiary?.length > 0
+      ? sender.beneficiary
+      : [
+          {
+            id: "na",
+            beneficiary_name: "No beneficiaries added",
+            ifsc_code: "N/A",
+            account_number: "N/A",
+            is_verified: 0,
+            bank_name: null,
+          },
+        ];
+
   return (
-    <Card sx={{ borderRadius: 2 }}>
+    <Card 
+      sx={{ 
+        borderRadius: 2,
+        boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+        border: "1px solid",
+        borderColor: "divider",
+        overflow: "hidden",
+      }}
+    >
       {/* Header */}
       <Box
         display="flex"
-        justifyContent="space-between"
+  justifyContent={isMobile ? "flex-start" : "space-between"}
         alignItems="center"
-        sx={{ p: 1 }}
+        sx={{ 
+          p: 1.5,
+          background: "#0078B6",
+          borderBottom: openList ? "1px solid" : "none",
+          borderColor: "divider"
+        }}
       >
         <Box display="flex" alignItems="center" gap={1} flexGrow={1}>
-          {/* Title */}
-          <Typography variant="subtitle2" fontWeight="bold">
-            Beneficiaries
+          <Typography variant="subtitle1" fontWeight="600" color="#fff">
+            Beneficiary List
           </Typography>
 
-          {/* Add Button */}
-          <Button
-            variant="contained"
-            size="small"
-            onClick={() => setOpenModal(true)}
-            startIcon={<PersonAddIcon sx={{ fontSize: 16 }} />}
-            sx={{ minWidth: "auto", px: 1, py: 0.5, fontSize: "0.75rem" }}
-          >
-            Add
-          </Button>
+       <Box ml={isMobile ? 2 : "auto"}>
+    <Button
+      variant="contained"
+      size="small"
+      onClick={() => setOpenModal(true)}
+      startIcon={<PersonAddIcon sx={{ fontSize: 16 }} />}
+      sx={{ 
+        minWidth: "auto", 
+        px: 1.5, 
+        backgroundColor:"#1AB1FF",
+        py: 0.5, 
+        fontSize: "0.75rem",
+        borderRadius: 1,
+        textTransform: "none",
+        fontWeight: "500",
+        boxShadow: "none",
+       
+      }}
+    >
+      Add Beneficiary
+    </Button>
+  </Box>
+
         </Box>
 
-        {/* Collapse Icon for mobile */}
         {isMobile && (
-          <IconButton
-            onClick={() => setOpenList((prev) => !prev)}
-            size="small"
-            sx={{
-              transform: openList ? "rotate(180deg)" : "rotate(0deg)",
-              transition: "transform 0.3s",
-            }}
-          >
-            <ExpandMoreIcon />
-          </IconButton>
-        )}
+    <IconButton
+      onClick={() => setOpenList((prev) => !prev)}
+      size="small"
+      sx={{
+        transform: openList ? "rotate(180deg)" : "rotate(0deg)",
+        transition: "transform 0.3s",
+        color: "text.secondary",
+        ml: 1
+      }}
+    >
+      <ExpandMoreIcon />
+    </IconButton>
+  )}
       </Box>
 
       <Collapse in={openList}>
-        <Divider sx={{ mb: 1 }} />
         <CardContent sx={{ p: 2 }}>
-          {sender.beneficiary?.length > 0 ? (
-            <List dense sx={{ py: 0, maxHeight: 300, overflowY: "auto" }}>
-              {sender.beneficiary.map((b) => (
-                <ListItem
-                  key={b.id}
-                  button
-                  onClick={() => onSelect?.(b)}
-                  sx={{
-                    py: 0.5,
-                    px: 1,
-                    mb: 0.5,
-                    borderRadius: 1,
-                    border: "1px solid",
-                    borderColor: "divider",
-                  }}
-                  secondaryAction={
-                    <IconButton
-                      edge="end"
-                      size="small"
-                      color="error"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteBeneficiary(b.id);
-                      }}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  }
-                >
-                  <ListItemText
-                    primary={
-                      <Box display="flex" alignItems="center">
-                        <AccountBalanceIcon
-                          sx={{ mr: 0.5, color: "primary.main", fontSize: 16 }}
-                        />
-                        <Typography
-                          component="div"
-                          variant="body2"
-                          fontWeight="medium"
-                          noWrap
-                          sx={{ maxWidth: 120, display: "flex", alignItems: "center" }}
-                        >
-                          {b.beneficiary_name}
-                        </Typography>
-                      </Box>
-                    }
-                    secondary={
-                      <Box>
-                        <Typography
-                          variant="caption"
-                          display="block"
-                          color="text.secondary"
-                          noWrap
-                        >
-                          A/C: {b.account_number}
-                        </Typography>
-                        <Typography variant="caption" display="block" color="text.secondary">
-                          {b.bank_name} • {b.ifsc_code}
-                        </Typography>
-                      </Box>
-                    }
-                    sx={{ my: 0 }}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          ) : (
-            <Alert severity="info" sx={{ borderRadius: 1, py: 0.5 }}>
-              <Typography variant="caption">No beneficiaries found</Typography>
-            </Alert>
-          )}
+    <List dense sx={{ py: 0, maxHeight: 300, overflowY: "auto" }}>
+  {beneficiaries.map((b) => (
+    <ListItem
+      key={b.id}
+      sx={{
+        py: 1.5,
+        px: 1.5,
+        mb: 1,
+        borderRadius: 2,
+        border: "1px solid",
+        borderColor: b.id === "na" ? "transparent" : "divider",
+        backgroundColor: b.id === "na" ? "transparent" : "background.paper",
+        boxShadow: b.id !== "na" ? "0 2px 6px rgba(0,0,0,0.04)" : "none",
+        opacity: b.id === "na" ? 0.7 : 1,
+      }}
+      secondaryAction={
+        
+        b.id !== "na" && (
+       <Stack direction="row" spacing={4} alignItems="center">
+  {/* Verified text with tick */}
+  {b.is_verified === 1 && (
+    <Box display="flex" alignItems="center" gap={0.3}>
+      <CheckCircleIcon sx={{ fontSize: 16, color: "success.main" }} />
+      <Typography
+        variant="caption"
+        color="success.main"
+        fontWeight="500"
+        sx={{ fontSize: "0.75rem" }}
+      >
+        Verified
+      </Typography>
+    </Box>
+  )}
+
+  {/* Pay button */}
+  <Button
+    size="small"
+    variant="contained"
+    color="primary"
+    onClick={() => onSelect?.(b)}
+    sx={{
+      borderRadius: 1,
+      textTransform: "none",
+      fontSize: "0.75rem",
+      px: 1,
+      py: 0.2,
+    }}
+  >
+    Pay
+  </Button>
+
+  {/* Delete button */}
+  <IconButton
+    edge="end"
+    size="small"
+    color="error"
+    onClick={(e) => {
+      e.stopPropagation();
+      handleDeleteBeneficiary(b.id);
+    }}
+    sx={{
+      backgroundColor: "error.light",
+      "&:hover": { backgroundColor: "error.main" },
+      color: "white",
+    }}
+  >
+    <DeleteIcon fontSize="small" />
+  </IconButton>
+</Stack>
+        )
+      }
+    >
+      <Box display="flex" alignItems="flex-start" gap={1.5} width="100%">
+        {/* Bank logo */}
+        {bankImageMapping[b.bank_name] ? (
+          <Box
+            component="img"
+            src={bankImageMapping[b.bank_name]}
+            alt={b.bank_name}
+            sx={{
+              width: 36,
+              height: 36,
+              objectFit: "contain",
+              borderRadius: 1,
+              border: "1px solid",
+              borderColor: "divider",
+              p: 0.5,
+              backgroundColor: "white",
+            }}
+          />
+        ) : (
+          <Avatar
+            sx={{
+              width: 36,
+              height: 36,
+              bgcolor: "primary.light",
+              fontSize: 16,
+            }}
+          >
+            <AccountBalanceIcon sx={{ fontSize: 20 }} />
+          </Avatar>
+        )}
+
+        {/* Details */}
+        <Box flexGrow={1} minWidth={0}>
+          <Box display="flex" alignItems="center" gap={1} mb={0.5}>
+            <Typography
+              variant="body1"
+              fontWeight="500"
+              noWrap
+              sx={{
+                fontSize: isMobile ? "0.9rem" : "1rem",
+                color: b.id === "na" ? "text.secondary" : "text.primary",
+              }}
+            >
+              {b.beneficiary_name}
+            </Typography>
+
+        
+          </Box>
+
+          <Stack
+            direction={isMobile ? "column" : "row"}
+            spacing={isMobile ? 0.5 : 2}
+          >
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              display="flex"
+              alignItems="center"
+              sx={{ fontSize: "0.75rem" }}
+            >
+              <Box component="span" fontWeight="500" mr={0.5}>
+                IFSC:
+              </Box>
+              {b.ifsc_code}
+            </Typography>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              display="flex"
+              alignItems="center"
+              sx={{ fontSize: "0.75rem" }}
+            >
+              <Box component="span" fontWeight="500" mr={0.5}>
+                A/C:
+              </Box>
+              {b.account_number}
+            </Typography>
+          </Stack>
+        </Box>
+      </Box>
+    </ListItem>
+  ))}
+</List>
+
         </CardContent>
       </Collapse>
 
-      {/* Add Beneficiary Modal */}
       {openModal && (
         <CommonModal
           open={openModal}
           onClose={() => setOpenModal(false)}
-          title="Add Beneficiary"
+          title="Add New Beneficiary"
           iconType="info"
           size="small"
           dividers
@@ -218,13 +398,15 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
               variant: "outlined",
               onClick: () => setOpenModal(false),
               disabled: submitting,
+              sx: { borderRadius: 1 }
             },
             {
-              text: submitting ? "Saving..." : "Save",
+              text: submitting ? "Saving..." : "Save Beneficiary",
               variant: "contained",
               color: "primary",
               onClick: handleAddBeneficiary,
               disabled: submitting,
+              sx: { borderRadius: 1 }
             },
           ]}
         />

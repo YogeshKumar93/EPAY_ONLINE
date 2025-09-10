@@ -15,6 +15,7 @@ import ApiEndpoints from "../api/ApiEndpoints";
 import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
 import AuthContext from "../contexts/AuthContext";
 import OTPInput from "react-otp-input";
+import { useToast } from "../utils/ToastContext";
 
 const BeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
   const [transferMode, setTransferMode] = useState("IMPS");
@@ -24,6 +25,7 @@ const BeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
   const [otp, setOtp] = useState("");
   const [mpin, setMpin] = useState("");
   const { location } = useContext(AuthContext);
+  const { showToast } = useToast();
 
   if (!beneficiary) return null;
 
@@ -47,7 +49,7 @@ const BeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
       if (error) {
         apiErrorToast(error);
       } else {
-        okSuccessToast("OTP sent successfully!");
+        showToast("OTP sent successfully!", "success");
         setOtpRef(response?.data?.otp_ref || null);
       }
     } catch (err) {
@@ -77,7 +79,7 @@ const BeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
         ifsc_code: beneficiary.ifsc_code,
         bank_name: beneficiary.bank_name,
         mobile_number: beneficiary.mobile_number,
-        operator: 11, // keep as you set
+        operator: 11,
         latitude: location?.lat || "",
         longitude: location?.long || "",
         amount,
@@ -87,7 +89,11 @@ const BeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
         mpin,
       };
 
-      const { error, response } = await apiCall("post", ApiEndpoints.PAYOUT, payload);
+      const { error, response } = await apiCall(
+        "post",
+        ApiEndpoints.PAYOUT,
+        payload
+      );
 
       if (response) {
         okSuccessToast("Payout successful!");
@@ -105,30 +111,79 @@ const BeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
     }
   };
 
-
-
+  // --- UI Section ---
   return (
-    <Paper sx={{ p: 2, mt: 2, borderRadius: 2 }}>
-      <Typography variant="subtitle2" fontWeight="bold" mb={1}>
-        Selected Beneficiary
-      </Typography>
-      <Typography variant="body2">Name: {beneficiary.beneficiary_name}</Typography>
-      <Typography variant="body2">Account Number: {beneficiary.account_number}</Typography>
-      <Typography variant="body2">Bank: {beneficiary.bank_name}</Typography>
-      <Typography variant="body2">IFSC: {beneficiary.ifsc_code}</Typography>
+    <Paper sx={{ p: 0, mt: 2, borderRadius: 2, overflow: "hidden" }}>
+      {/* Header */}
+      <Box
+        sx={{
+          bgcolor: "#0078B6",
+          color: "#fff",
+          textAlign: "center",
+          py: 1.5,
+        }}
+      >
+        <Typography variant="subtitle1" fontWeight="bold">
+          Selected Beneficiary
+        </Typography>
+      </Box>
 
-      <Box mt={2}>
-        <Typography variant="body2" fontWeight="medium" mb={0.5}>
+   {/* Beneficiary Details */}
+<Box sx={{ mx: 2, my: 2, p: 2, bgcolor: "#f0f8ff", borderRadius: 2 }}>
+  <Box display="flex" justifyContent="space-between" mb={1}>
+    <Typography variant="body2" fontWeight="500" color="#4B5563">
+      Name
+    </Typography>
+    <Typography variant="body2" color="#111827">
+      {beneficiary.beneficiary_name}
+    </Typography>
+  </Box>
+  <Box display="flex" justifyContent="space-between" mb={1}>
+    <Typography variant="body2" fontWeight="500" color="#4B5563">
+      Account Number
+    </Typography>
+    <Typography variant="body2" color="#111827">
+      {beneficiary.account_number}
+    </Typography>
+  </Box>
+  <Box display="flex" justifyContent="space-between" mb={1}>
+    <Typography variant="body2" fontWeight="500" color="#4B5563">
+      Bank
+    </Typography>
+    <Typography variant="body2" color="#111827">
+      {beneficiary.bank_name}
+    </Typography>
+  </Box>
+  <Box display="flex" justifyContent="space-between">
+    <Typography variant="body2" fontWeight="500" color="#4B5563">
+      IFSC
+    </Typography>
+    <Typography variant="body2" color="#111827">
+      {beneficiary.ifsc_code}
+    </Typography>
+  </Box>
+</Box>
+
+
+      {/* Transfer Mode */}
+      <Box mt={2} textAlign="center">
+        <Typography variant="body2" fontWeight="bold" mb={0.5} color="#4B5563">
           Transfer Mode
         </Typography>
-        <RadioGroup row value={transferMode} onChange={(e) => setTransferMode(e.target.value)}>
+        <RadioGroup
+          row
+          value={transferMode}
+          onChange={(e) => setTransferMode(e.target.value)}
+          sx={{ justifyContent: "center" }}
+        >
           <FormControlLabel value="IMPS" control={<Radio />} label="IMPS" />
           <FormControlLabel value="NEFT" control={<Radio />} label="NEFT" />
         </RadioGroup>
       </Box>
 
-      {!otpRef && (
-        <Box mt={2}>
+      {/* Amount + OTP / M-PIN */}
+      {!otpRef ? (
+        <Box mt={2} px={2} pb={2}>
           <TextField
             label="Amount"
             type="number"
@@ -140,7 +195,12 @@ const BeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <Button variant="contained" size="small" onClick={handleGetOtp} disabled={loading}>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={handleGetOtp}
+                    disabled={loading}
+                  >
                     {loading ? "Sending..." : "Get OTP"}
                   </Button>
                 </InputAdornment>
@@ -148,60 +208,63 @@ const BeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
             }}
           />
         </Box>
-      )}
-
-      {otpRef && (
-        <Box mt={2} display="flex" flexDirection="column" gap={2}>
-          {/* OTP (visible digits) */}
+      ) : (
+        <Box mt={2} px={2} pb={2} display="flex" flexDirection="column" gap={2}>
+          {/* OTP Input */}
           <Box>
             <Typography variant="body2" mb={0.5}>
               Enter OTP
             </Typography>
-            <OTPInput
+        <OTPInput
   value={otp}
   onChange={setOtp}
   numInputs={6}
   inputType="tel"
-                isInputSecure={true}
-              renderInput={(props) => <input {...props} />}
-inputStyle={{
-                width: "40px",
-                height: "40px",
-                margin: "0 5px",
-                fontSize: "18px",
-                borderBottom: "2px solid #000",
-                outline: "none",
-                textAlign: "center",
-              }}
-              />
+  renderInput={(props) => <input {...props} />}
+  inputStyle={{
+    width: "40px",
+    height: "40px",
+    margin: "0 5px",
+    fontSize: "18px",
+    border: "1px solid #D0D5DD", // ✅ uniform border
+    borderRadius: "6px",          // optional for rounded look
+    outline: "none",
+    textAlign: "center",
+  }}
+/>
 
           </Box>
 
-          {/* M-PIN (masked) */}
+          {/* M-PIN Input */}
           <Box>
             <Typography variant="body2" mb={0.5}>
               Enter M-PIN
             </Typography>
-        
-<OTPInput
-  value={mpin}
-  onChange={setMpin}
-  numInputs={6}
-  inputType="password"
-                isInputSecure={true}
+            <OTPInput
+              value={mpin}
+              onChange={setMpin}
+              numInputs={6}
+              inputType="password"
               renderInput={(props) => <input {...props} />}
-inputStyle={{
+              inputStyle={{
                 width: "40px",
                 height: "40px",
                 margin: "0 5px",
                 fontSize: "18px",
-                borderBottom: "2px solid #000",
+    border: "1px solid #D0D5DD", // ✅ uniform border
                 outline: "none",
+                borderRadius:"6px",
                 textAlign: "center",
-              }}/>
+              }}
+            />
           </Box>
 
-          <Button variant="contained" color="success" onClick={handleProceed} disabled={loading}>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={handleProceed}
+            disabled={loading}
+          >
             {loading ? "Processing..." : "Proceed"}
           </Button>
         </Box>

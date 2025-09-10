@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Tabs, Tab } from "@mui/material";
 import Layouts from "./Layouts";
-import SideLayout from "./SideLayout";
+import Navs from "./Navs";
 
 
  
@@ -42,7 +42,7 @@ const SelectLayout = () => {
         <Layouts />
       </TabPanel>
       <TabPanel value={tab} index={1}>
-    <SideLayout />
+    <Navs />
       </TabPanel>
     </Box>
   );

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Box, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
@@ -11,7 +11,7 @@ import BeneficiaryDetails from "./BeneficiaryDetails";
 
 const SuperTransfer = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // small screen
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [mobile, setMobile] = useState("");
   const [sender, setSender] = useState(null);
@@ -31,7 +31,8 @@ const SuperTransfer = () => {
 
       const data = response?.data || response?.response?.data;
 
-      if (response?.status) okSuccessToast(response.message || "Sender fetched successfully");
+      if (response?.status)
+        okSuccessToast(response.message || "Sender fetched successfully");
 
       if (data && data?.is_active === 1) {
         setSender(data);
@@ -61,44 +62,46 @@ const SuperTransfer = () => {
 
   return (
     <Box p={3}>
-      {!sender && (
-        <Typography variant="h5" gutterBottom>
-          Fund Transfer
-        </Typography>
-      )}
+      {/* Always show mobile input */}
+      <TextField
+        label="Mobile Number"
+        variant="outlined"
+        fullWidth
+        value={mobile}
+          autoComplete="on"   // <-- enable autocomplete for phone numbers
+        onChange={handleChange}
+        inputProps={{ maxLength: 10 }}
+        sx={{ mb: 2 }}
+      />
 
-      {!sender ? (
-        <TextField
-          label="Mobile Number"
-          variant="outlined"
-          fullWidth
-          value={mobile}
-          onChange={handleChange}
-          inputProps={{ maxLength: 10 }}
-        />
-      ) : (
-        <Box
-          display="flex"
-          flexDirection={isMobile ? "column" : "row"} // stack vertically on mobile
-          gap={2}
-        >
-          {/* Left: Sender Details + Selected Beneficiary */}
-          <Box flex={isMobile ? "1 1 100%" : "0 0 30%"}>
+      {/* Main Content (Sender + Beneficiaries) */}
+      <Box
+        display="flex"
+        flexDirection={isMobile ? "column" : "row"}
+        gap={1}
+      >
+        {/* Left: Sender Details + Selected Beneficiary */}
+        <Box flex={isMobile ? "1 1 100%" : "0 0 30%"}>
             <SenderDetails sender={sender} />
 
-            {selectedBeneficiary && <BeneficiaryDetails beneficiary={selectedBeneficiary}     senderMobile={mobile}  />}
-          </Box>
+          {selectedBeneficiary && (
+            <BeneficiaryDetails
+              beneficiary={selectedBeneficiary}
+              senderMobile={mobile}
+            />
+          )}
+        </Box>
 
-          {/* Right: Beneficiary List */}
-          <Box flex={isMobile ? "1 1 100%" : "0 0 70%"}>
+        {/* Right: Beneficiary List */}
+        <Box flex={isMobile ? "1 1 100%" : "0 0 70%"}>
             <BeneficiaryList
               sender={sender}
               onSuccess={() => handleFetchSender()}
               onSelect={(b) => setSelectedBeneficiary(b)}
             />
-          </Box>
+  
         </Box>
-      )}
+      </Box>
 
       {/* Register Modal */}
       {openRegisterModal && (

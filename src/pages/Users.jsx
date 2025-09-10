@@ -8,7 +8,7 @@ import CommonStatus from "../components/common/CommonStatus";
 import PermissionsModal from "./PermissionsModal";
 import SettingsIcon from "@mui/icons-material/Settings";
 
-const Users = ({ filters = [], query }) => {
+const Users = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const fetchUsersRef = useRef(null);
@@ -30,6 +30,18 @@ const Users = ({ filters = [], query }) => {
   const handleFetchRef = (fetchFn) => {
     fetchUsersRef.current = fetchFn;
   };
+  const filters = useMemo(
+    () => [
+      {
+        id: "mobile",
+        label: "Mobile Number",
+        type: "textfield",
+      },
+      { id: "id", label: "User Id", type: "textfield" },
+      { id: "Parent", label: "Parent", type: "textfield" },
+    ],
+    []
+  );
 
   // Trigger refresh after permissions update
   const refreshUsers = () => {
@@ -77,6 +89,14 @@ const Users = ({ filters = [], query }) => {
         selector: (row) => (
           <Tooltip title={row?.w2}>
             <div style={{ textAlign: "left" }}>{row?.w2}</div>
+          </Tooltip>
+        ),
+      },
+      {
+        name: "Lien Amount",
+        selector: (row) => (
+          <Tooltip title={row?.lien}>
+            <div style={{ textAlign: "left" }}>{row?.lien}</div>
           </Tooltip>
         ),
       },

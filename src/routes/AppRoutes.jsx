@@ -27,9 +27,9 @@ import { Banking } from "../pages/Banking";
 import { Settings } from "../pages/Settings";
 import SuperTransfer from "../pages/SuperTransfer";
 import SelectLayout from "../pages/SelectLayout";
-import SideLayout from "../pages/SideLayout";
 import { Recharge } from "../pages/Recharge";
 import Navs from "../pages/Navs";
+import AccountStatement from "../pages/AccountStatement";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useContext(AuthContext);
@@ -85,7 +85,7 @@ export default function AppRoutes() {
               <Route path="admin/commissionrule" element={<CommissionRule />} />
               <Route path="admin/sidenav" element={<Navs />} />
                 <Route path="admin/selectlayout" element={<SelectLayout />} />
-                 <Route path="admin/sidelayout" element={<SideLayout/>} />
+                <Route path="admin/statement" element={<AccountStatement />} />
               <Route
                 path="admin/*"
                 element={<Navigate to="/admin/dashboard" replace />}
@@ -112,6 +112,10 @@ export default function AppRoutes() {
               />
               <Route
                 path="customer/fund-transfer"
+                element={<SuperTransfer />}
+              />
+              <Route
+                path="customer/upi-transfer"
                 element={<SuperTransfer />}
               />
               <Route
