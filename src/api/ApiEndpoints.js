@@ -105,6 +105,21 @@ const ApiEndpoints = {
   UPDATE_NOTIFICATION: "notification/updateNotification",
   DELETE_NOTIFICATION: "notification/deleteNotification",
 
+
+  GET_BANK_STATEMENTS: "bankStatement/getBankStatement",
+  CREATE_BANK_STATEMENT: "bankStatement/createBankStatement",
+  UPDATE_BANK_STATEMENT: "bankStatement/updateBankStatement",
+ DELETE_BANK_STATEMENT: "bankStatement/deleteBankStatement",
+GET_BANK_STATEMENT_SCHEMA: "bankStatement/getBankStatementSchema",
+
+
+ GET_ACCOUNT_STATEMENTS: "accountStatement/getAccountStatement",
+ CREATE_ACCOUNT_STATEMENT: "accountStatement/createAccountStatement",
+ UPDATE_ACCOUNT_STATEMENT: "accountStatement/updateAccountStatement",
+ DELETE_ACCOUNT_STATEMENT: "accountStatement/deleteAccountStatement",
+GET_ACCOUNT_STATEMENT_SCHEMA: "accountStatement/getAccountStatementSchema",
+
+
   CREATE_BANK: "bank/createBank",
   UPDATE_BANK: "bank/updateBank",
   DELETE_BANK: "bank/deleteBank",

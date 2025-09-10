@@ -534,3 +534,154 @@ th::after {
 th:last-child::after {
   display: none;
 }
+
+
+/* ************Landing pages *********** */
+
+/* Navbar Container */
+.navbar {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background-color: #1a0468 !important;
+  color: white;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+  /* display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px; */
+}
+
+
+/* Inner container */
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.8rem 1.5rem;
+  display: flex;
+  align-items: center;   
+  justify-content: space-between;
+
+}
+
+/* Logo */
+.navbar-logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  /* letter-spacing: 1px; */
+  cursor: pointer;
+}
+
+/* Links */
+.navbar-links {
+  text-decoration: none;
+  color: white;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+
+}
+
+.navbar-links .nav-link {
+  color: white;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+    
+}
+
+.navbar-links .nav-link:hover {
+  color: #ffeb3b;
+  border-bottom: 2px solid #ffeb3b;
+  padding-bottom: 2px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .navbar-links {
+    margin-top: 0.5rem;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .navbar-links .nav-link {
+    padding: .5rem 0;
+  }
+}
+
+
+
+
+.landing-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 100vh;
+  width: 1800px;
+  font-family: "Arial", sans-serif;
+  text-align: center;
+  padding: 2px;
+}
+
+.landing-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.landing-subtitle {
+  font-size: 1.2rem;
+  margin-bottom: 25px;
+  max-width: 600px;
+}
+
+.landing-button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #fff;
+}
+
+/* Navbar styles */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1ca895;
+  padding: 15px 40px;
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.nav-links a {
+  margin-left: 25px;
+  text-decoration: none;
+  color: #fff;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #ffd700;
+}
+
+
+
+/* ******************************************************* */
