@@ -63,19 +63,17 @@ export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-                  <Route path="/" element={<LandingPage />} >
+        <Route path="" element={<LandingPage />}/>
+          <Route path="navbar" element={<NavBar />} />
+          <Route path="footer" element={<Footer />} />
+          <Route path="landingservices" element={<LandingServices />} />
+          <Route path="landingaboutus" element={<LandingAboutUs />} />
+          <Route path="landingcontactus" element={<LandingContactUs />} />
+          <Route path="landingpageintro" element={<LandingPageIntro />} />
+          <Route path="landingpageintro1" element={<LandingPageIntro1 />} />
+          <Route path="landingpageintro2" element={<LandingPageIntro2 />} />
+          <Route path="landingpageintro3" element={<LandingPageIntro3 />} />
 
-          <Route path="navbar" element={<NavBar /> } />
-           <Route path="footer" element={<Footer /> } />
-             <Route path="landingservices" element={<LandingServices /> } />
-            <Route path="landingaboutus" element={<LandingAboutUs /> } />
-            <Route path="landingcontactus" element={<LandingContactUs /> } />
-            <Route path="landingpageintro" element={<LandingPageIntro /> } />
-             <Route path="landingpageintro1" element={<LandingPageIntro1 /> } />
-              <Route path="landingpageintro2" element={<LandingPageIntro2 /> } />
-               <Route path="landingpageintro3" element={<LandingPageIntro3 /> } />
-</Route>
-           
         <Route path="/login" element={<Login />} />
 
         {/* Protected layout */}
@@ -101,8 +99,8 @@ export default function AppRoutes() {
               <Route path="admin/fund-request" element={<FundRequest />} />
               <Route path="admin/accounts" element={<Accounts />} />
               <Route path="admin/services" element={<Services />} />
-                <Route path="admin/bankings" element={<Banking />} />
-                  <Route path="admin/settings" element={<Settings />} />
+              <Route path="admin/bankings" element={<Banking />} />
+              <Route path="admin/settings" element={<Settings />} />
               <Route path="admin/templates" element={<Templates />} />
               <Route path="admin/logs" element={<Logs />} />
               <Route path="admin/profile" element={<ProfilePage />} />
@@ -110,9 +108,9 @@ export default function AppRoutes() {
               <Route path="admin/layout" element={<Layouts />} />
               <Route path="admin/commissionrule" element={<CommissionRule />} />
               <Route path="admin/sidenav" element={<Navs />} />
-                <Route path="admin/selectlayout" element={<SelectLayout />} />
-               
-                <Route path="admin/statements" element={<Statements />} />
+              <Route path="admin/selectlayout" element={<SelectLayout />} />
+
+              <Route path="admin/statements" element={<Statements />} />
               <Route
                 path="admin/*"
                 element={<Navigate to="/admin/dashboard" replace />}
@@ -141,24 +139,15 @@ export default function AppRoutes() {
                 path="customer/fund-transfer"
                 element={<SuperTransfer />}
               />
-              <Route
-                path="customer/upi-transfer"
-                element={<UpiTransfer />}
-              />
-              <Route
-                path="customer/transactions"
-                element={<Transaction />}
-              />
-              <Route
-                path="customer/recharge-bill"
-                element={<Recharge />}
-              />
+              <Route path="customer/upi-transfer" element={<UpiTransfer />} />
+              <Route path="customer/transactions" element={<Transaction />} />
+              <Route path="customer/recharge-bill" element={<Recharge />} />
               <Route path="customer/purchase" element={<MyPurchase />} />
               <Route path="customer/fund-request" element={<FundRequest />} />
               <Route path="customer/sale" element={<MySale />} />
-              
+
               <Route path="customer/profile" element={<ProfilePage />} />
-            
+
               <Route
                 path="customer/*"
                 element={<Navigate to="/customer/dashboard" replace />}
@@ -168,10 +157,7 @@ export default function AppRoutes() {
           )}
           {isDi && (
             <>
-              <Route
-                path="di/dashboard"
-                element={<AdminTransactions />}
-              />
+              <Route path="di/dashboard" element={<AdminTransactions />} />
               <Route path="di/services" element={<Dashboard />} />
               <Route
                 path="customer/account-ledger"
@@ -189,9 +175,9 @@ export default function AppRoutes() {
               <Route path="customer/purchase" element={<MyPurchase />} />
               <Route path="customer/fund-request" element={<FundRequest />} />
               <Route path="customer/sale" element={<MySale />} />
-         
+
               <Route path="customer/profile" element={<ProfilePage />} />
-        
+
               <Route
                 path="customer/*"
                 element={<Navigate to="/customer/dashboard" replace />}
