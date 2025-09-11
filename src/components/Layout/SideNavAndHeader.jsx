@@ -37,7 +37,7 @@ import {
   AccountCircle,
 } from "@mui/icons-material";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
-import { Admin_nav, customer_nav, nav } from "./navConfig";
+import { Admin_nav, customer_nav, nav, service_nav } from "./navConfig";
 import AuthContext from "../../contexts/AuthContext";
 
 {
@@ -56,6 +56,7 @@ const roleNavigation = {
   sadm: Admin_nav,
   ret: customer_nav,
   dd: customer_nav,
+  service_nav: service_nav,
 };
 
 const themeSettings = {
@@ -80,6 +81,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
 
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
+  const userLayout = user?.is_layout;
   const refreshUser = authCtx.loadUserProfile;
   const colour = authCtx.loadColours;
   const isMobile = useMediaQuery("(max-width: 900px)");
@@ -89,21 +91,29 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
   const [expandedItems, setExpandedItems] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
- const title = setTitleFunc(location.pathname, location.state);
-const MainContent = styled(Box)(({ theme }) => ({
-  flexGrow: 1,
-  padding: theme.spacing(3),
-  backgroundColor: theme.palette.background.default,
-  minHeight: "100vh",
-  marginLeft: 0,
-  transition: theme.transitions.create("margin", {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-}));
+  const title = setTitleFunc(location.pathname, location.state);
+  const MainContent = styled(Box)(({ theme }) => ({
+    flexGrow: 1,
+    padding: theme.spacing(3),
+    backgroundColor: theme.palette.background.default,
+    minHeight: "100vh",
+    marginLeft: 0,
+    transition: theme.transitions.create("margin", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  }));
 
+  const getNavigationItems = () => {
+    if ((userRole === "ret" || userRole === "dd") && userLayout === 2) {
+      return service_nav; // Show service nav for layout 2
+    }
 
-  const navigationItems = roleNavigation[userRole] || nav;
+    // Default navigation based on role
+    return roleNavigation[userRole] || nav;
+  };
+
+  const navigationItems = getNavigationItems();
 
   const handleDrawerToggle = () => {
     if (isMobile) {
@@ -157,7 +167,6 @@ const MainContent = styled(Box)(({ theme }) => ({
             button
             onClick={() => handleNavigation(item.to, hasSubmenus)}
             sx={{
-             
               backgroundColor: isItemActive
                 ? themeSettings.palette.primary.main
                 : "transparent",
@@ -180,14 +189,14 @@ const MainContent = styled(Box)(({ theme }) => ({
 
             {(desktopOpen || isMobile) && (
               <>
-<ListItemText
-  primary={item.title}
-  primaryTypographyProps={{
-    fontSize: "18px",     // increase font size
-    fontWeight: 500,      // semi-bold
-    color: isItemActive ? "#fff" : "black", // white if active, black otherwise
-  }}
-/>
+                <ListItemText
+                  primary={item.title}
+                  primaryTypographyProps={{
+                    fontSize: "18px", // increase font size
+                    fontWeight: 500, // semi-bold
+                    color: isItemActive ? "#fff" : "black", // white if active, black otherwise
+                  }}
+                />
                 {hasSubmenus &&
                   (isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />)}
               </>
@@ -210,7 +219,12 @@ const MainContent = styled(Box)(({ theme }) => ({
   const drawerContent = (
     <Box
       className="side-nav"
-      sx={{ height: "100%", display: "flex", flexDirection: "column" ,backgroundColor: colours?.sidenav}}
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: colours?.sidenav,
+      }}
     >
       {/* Logo area with white background */}
       <Box
@@ -220,7 +234,7 @@ const MainContent = styled(Box)(({ theme }) => ({
           alignItems: "center",
           justifyContent: desktopOpen ? "center" : "center",
           p: 1.5, // Reduced padding to decrease height
-backgroundColor:  "#fff" ,
+          backgroundColor: "#fff",
           height: "64px",
           borderBottom: `1px solid rgba(0, 0, 0, 0.12)`,
           minHeight: "64px", // Matching the header height
@@ -249,7 +263,7 @@ backgroundColor:  "#fff" ,
         )}
       </Box>
 
-      <List className="nav-list" sx={{  overflowY: "auto" }}>
+      <List className="nav-list" sx={{ overflowY: "auto" }}>
         {renderNavItems(navigationItems)}
       </List>
     </Box>
@@ -270,7 +284,7 @@ backgroundColor:  "#fff" ,
               ? `calc(100% - ${themeSettings.drawerWidth}px)`
               : "100%",
           },
-          ml: { md: desktopOpen ? `${themeSettings.drawerWidth}px` :0 },
+          ml: { md: desktopOpen ? `${themeSettings.drawerWidth}px` : 0 },
           zIndex: (theme) => theme.zIndex.drawer + 1,
           transition: (theme) =>
             theme.transitions.create(["width", "margin"], {
@@ -278,7 +292,7 @@ backgroundColor:  "#fff" ,
               duration: theme.transitions.duration.leavingScreen,
             }),
           height: "64px", // Reduced header height
-          
+
           justifyContent: "center",
         }}
         className="header"
@@ -453,17 +467,17 @@ backgroundColor:  "#fff" ,
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: themeSettings.drawerWidth,
-              
+
               transition: (theme) =>
                 theme.transitions.create("width", {
                   easing: theme.transitions.easing.sharp,
                   duration: theme.transitions.duration.enteringScreen,
                 }),
-               overflow: "auto",
-scrollbarWidth: "none",
+              overflow: "auto",
+              scrollbarWidth: "none",
               ...(!desktopOpen && {
                 overflowX: "hidden",
-             
+
                 transition: (theme) =>
                   theme.transitions.create("width", {
                     easing: theme.transitions.easing.sharp,
@@ -480,26 +494,25 @@ scrollbarWidth: "none",
       </Box>
 
       {/* Main Content */}
-<MainContent
-  sx={{
-      width: {
-      xs: "100%",
-      md: desktopOpen
-        ? `calc(100% - ${themeSettings.drawerWidth}px)`
-        : "100%",
-    },
-    position: "fixed",
-    top: 0,
-    right: 0,
-    height: "100vh",
-    overflowY: "auto",
-  }}
-  className="content"
->
-  <Toolbar sx={{ minHeight: "64px !important" }} />
-  <Outlet />
-</MainContent>
-
+      <MainContent
+        sx={{
+          width: {
+            xs: "100%",
+            md: desktopOpen
+              ? `calc(100% - ${themeSettings.drawerWidth}px)`
+              : "100%",
+          },
+          position: "fixed",
+          top: 0,
+          right: 0,
+          height: "100vh",
+          overflowY: "auto",
+        }}
+        className="content"
+      >
+        <Toolbar sx={{ minHeight: "64px !important" }} />
+        <Outlet />
+      </MainContent>
     </Box>
   );
 };

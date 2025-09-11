@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { Box, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
@@ -49,22 +55,21 @@ const UpiTransfer = () => {
     }
   };
 
-const handleChange = (e) => {
-  const value = e.target.value.replace(/\D/g, ""); // only digits allowed
+  const handleChange = (e) => {
+    const value = e.target.value.replace(/\D/g, ""); // only digits allowed
 
-  if (value.length <= 10) {
-    setMobile(value);
+    if (value.length <= 10) {
+      setMobile(value);
 
-    if (value.length === 10) {
-      handleFetchSender(value);
-    } else {
-      // clear data if input is not 10 digits
-      setSender(null);
-      setSelectedBeneficiary(null);
+      if (value.length === 10) {
+        handleFetchSender(value);
+      } else {
+        // clear data if input is not 10 digits
+        setSender(null);
+        setSelectedBeneficiary(null);
+      }
     }
-  }
-};
-
+  };
 
   const handleSenderRegistered = ({ mobile_number, otp_ref, sender_id }) => {
     setOtpData({ mobile_number, otp_ref, sender_id });
@@ -79,21 +84,17 @@ const handleChange = (e) => {
         variant="outlined"
         fullWidth
         value={mobile}
-          autoComplete="on"   // <-- enable autocomplete for phone numbers
+        autoComplete="on" // <-- enable autocomplete for phone numbers
         onChange={handleChange}
         inputProps={{ maxLength: 10 }}
         sx={{ mb: 2 }}
       />
 
       {/* Main Content (Sender + Beneficiaries) */}
-      <Box
-        display="flex"
-        flexDirection={isMobile ? "column" : "row"}
-        gap={1}
-      >
+      <Box display="flex" flexDirection={isMobile ? "column" : "row"} gap={1}>
         {/* Left: Sender Details + Selected Beneficiary */}
         <Box flex={isMobile ? "1 1 100%" : "0 0 30%"}>
-            <SenderDetails sender={sender} />
+          <SenderDetails sender={sender} />
 
           {selectedBeneficiary && (
             <UpiBeneficiaryDetails
@@ -105,12 +106,11 @@ const handleChange = (e) => {
 
         {/* Right: Beneficiary List */}
         <Box flex={isMobile ? "1 1 100%" : "0 0 70%"}>
-            <UpiBeneficiaryList
-              sender={sender}
-              onSuccess={() => handleFetchSender()}
-              onSelect={(b) => setSelectedBeneficiary(b)}
-            />
-  
+          <UpiBeneficiaryList
+            sender={sender}
+            onSuccess={() => handleFetchSender()}
+            onSelect={(b) => setSelectedBeneficiary(b)}
+          />
         </Box>
       </Box>
 

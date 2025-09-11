@@ -45,6 +45,7 @@ import Statements from "../pages/Statements";
 import UpiTransfer from "../pages/UpiTransfer";
 import BankStatements from "../pages/BankStatements";
 import AccountStatement from "../pages/AccountStatement";
+import AllServices from "../pages/AllServices";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useContext(AuthContext);
@@ -157,6 +158,7 @@ export default function AppRoutes() {
                 element={<Navigate to="/customer/dashboard" replace />}
               />
               <Route path="customer/accounts" element={<Accounts />} />
+              <Route path="customer/allServices" element={<AllServices/>} />
             </>
           )}
           {isDi && (

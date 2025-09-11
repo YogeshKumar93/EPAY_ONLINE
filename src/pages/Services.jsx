@@ -17,18 +17,17 @@ const Services = ({ filters = [], query }) => {
   const [openCreate, setOpenCreate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
- 
 
-   const fetchUsersRef = useRef(null);
-  
-    const handleFetchRef = (fetchFn) => {
-      fetchUsersRef.current = fetchFn;
-    };
-    const refreshUsers = () => {
-      if (fetchUsersRef.current) {
-        fetchUsersRef.current();
-      }
-    };
+  const fetchUsersRef = useRef(null);
+
+  const handleFetchRef = (fetchFn) => {
+    fetchUsersRef.current = fetchFn;
+  };
+  const refreshUsers = () => {
+    if (fetchUsersRef.current) {
+      fetchUsersRef.current();
+    }
+  };
 
   const columns = useMemo(
     () => [
@@ -70,8 +69,7 @@ const Services = ({ filters = [], query }) => {
       },
       {
         name: "Status",
-        selector: (row) =>
- <CommonStatus value={row.is_active} />
+        selector: (row) => <CommonStatus value={row.is_active} />,
       },
       {
         name: "Actions",
@@ -94,35 +92,29 @@ const Services = ({ filters = [], query }) => {
 
   return (
     <Box>
-     
-
       {/* Services Table */}
       <CommonTable
-        onFetchRef={handleFetchRef} 
+        onFetchRef={handleFetchRef}
         columns={columns}
         endpoint={ApiEndpoints.GET_SERVICES}
         filters={filters}
         queryParam={query}
-         customHeader={
-               (user?.role !== "sadm" || user?.role !== "adm") && (
-    <ReButton
-      variant="contained"
-     label="Services"
-     
-      onClick={() => setOpenCreate(true)}
-    >
-  
-    </ReButton>
-               )
-  }
-/>
-      
+        customHeader={
+          (user?.role !== "sadm" || user?.role !== "adm") && (
+            <ReButton
+              variant="contained"
+              label="Services"
+              onClick={() => setOpenCreate(true)}
+            ></ReButton>
+          )
+        }
+      />
 
       {/* Create Service Modal */}
       <CreateServiceModal
         open={openCreate}
         onClose={() => setOpenCreate(false)}
-       onFetchRef={refreshUsers} 
+        onFetchRef={refreshUsers}
       />
 
       {/* Edit Service Modal */}
@@ -130,7 +122,7 @@ const Services = ({ filters = [], query }) => {
         open={openEdit}
         onClose={() => setOpenEdit(false)}
         service={selectedService}
-       onFetchRef={refreshUsers} 
+        onFetchRef={refreshUsers}
       />
     </Box>
   );

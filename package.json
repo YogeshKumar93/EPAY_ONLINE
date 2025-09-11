@@ -21,6 +21,7 @@
     "axios": "^1.11.0",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.18",
+    "framer-motion": "^12.23.12",
     "num-words": "^1.2.3",
     "react": "^19.1.1",
     "react-data-table-component": "^7.7.0",
