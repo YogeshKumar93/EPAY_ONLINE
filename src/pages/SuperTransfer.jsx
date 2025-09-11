@@ -31,8 +31,9 @@ const SuperTransfer = () => {
 
       const data = response?.data || response?.response?.data;
 
-      if (response?.status)
+      if (response)
         okSuccessToast(response.message || "Sender fetched successfully");
+console.log("response----",response?.response?.message);
 
       if (data && data?.is_active === 1) {
         setSender(data);

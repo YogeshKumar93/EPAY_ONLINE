@@ -1,5 +1,5 @@
 import { useMemo, useContext, useState, useEffect, useRef } from "react";
-import { Box, Tooltip, Chip, IconButton } from "@mui/material";
+import { Box, Tooltip, Chip, IconButton, Typography } from "@mui/material";
 import { Delete, Info as InfoIcon } from "@mui/icons-material";
 import AuthContext from "../contexts/AuthContext";
 import { dateToTime, ddmmyy } from "../utils/DateUtils";
@@ -9,6 +9,9 @@ import DeleteLogModal from "../components/DeleteLogModal";
 import DrawerDetails from "../components/common/DrawerDetails";
 import CommonStatus from "../components/common/CommonStatus";
 import CommonLoader from "../components/common/CommonLoader";
+import { android2, linux2, macintosh2, okhttp, windows2 } from "../utils/iconsImports";
+import LaptopIcon from "@mui/icons-material/Laptop";
+
 
 const Logs = ({ filters = [], query }) => {
   const authCtx = useContext(AuthContext);
@@ -57,6 +60,76 @@ const Logs = ({ filters = [], query }) => {
       { name: "Service Name", selector: (row) => row?.service_name, wrap: true },
       { name: "Role", selector: (row) => row?.role, wrap: true },
       { name: "Action", selector: (row) => row?.action, width: "100px" },
+      // { name: "User Agent", selector: (row) => row?.user_agent, width: "100px" },
+       {
+      name: "User Agent",
+      selector: (row) => {
+        let icon;
+
+        if (row.user_agent.toLowerCase().includes("windows")) {
+          icon = (
+            <img
+              src={windows2}
+              style={{ width: "22px" }}
+              alt="description of image"
+            />
+          );
+        } else if (row.user_agent.toLowerCase().includes("android")) {
+          icon = (
+            <img
+              src={android2}
+              style={{ width: "22px" }}
+              alt="description of image"
+            />
+          );
+        } else if (row.user_agent.toLowerCase().includes("mac")) {
+          icon = (
+            <img
+              src={macintosh2}
+              style={{ width: "22px" }}
+              alt="description of image"
+            />
+          );
+        } else if (row.user_agent.toLowerCase().includes("linux")) {
+          icon = (
+            <img
+              src={linux2}
+              style={{ width: "22px" }}
+              alt="description of image"
+            />
+          );
+        }
+        else if (row.user_agent.toLowerCase().includes("okhttp")) {
+          icon = (
+            <img
+              src={okhttp}
+              style={{ width: "22px" }}
+              alt="description of image"
+            />
+          );
+        } else {
+          icon = <LaptopIcon sx={{ color: "blue", width: "22px" }} />;
+        }
+
+        return (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              fontSize: "13px",
+              textAlign: "justify",
+              gap: 2,
+            }}
+          >
+            {icon}
+            {/* <Typography>{row.user_agent}</Typography> */}
+          </Box>
+        );
+      },
+      width: "20px",
+      wrap: true,
+      left: true,
+    },
       {
   name: "Status",
   selector: (row) => <CommonStatus value={row.status} />,
@@ -127,7 +200,7 @@ const Logs = ({ filters = [], query }) => {
           { label: "IP Address", key: "ip_address" },
           { label: "Request Data", key: "request_data" },
           { label: "Response Data", key: "response_data" },
-          { label: "User Agent", key: "user_agent" },
+          // { label: "User Agent", key: "user_agent" },
         ]}
       />
     </Box>

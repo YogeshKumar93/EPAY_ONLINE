@@ -1,20 +1,25 @@
 import { useMemo, useContext, useState, useRef } from "react";
-import { Box, Tooltip, Button, IconButton } from "@mui/material";
+import { Box, Tooltip, IconButton } from "@mui/material";
 import AuthContext from "../contexts/AuthContext";
 import { dateToTime, ddmmyy } from "../utils/DateUtils";
 import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
-import CommonStatus from "../components/common/CommonStatus";
 import PermissionsModal from "./PermissionsModal";
 import SettingsIcon from "@mui/icons-material/Settings";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import BlockUnblockUser from "./BlockUnblockUser";
 
 const Users = ({ query }) => {
   const authCtx = useContext(AuthContext);
-  const user = authCtx?.user;
   const fetchUsersRef = useRef(null);
 
   const [selectedUser, setSelectedUser] = useState(null);
   const [openPermissions, setOpenPermissions] = useState(false);
+
+  // 🔐 Lock/Unlock Modal
+  const [lockModalOpen, setLockModalOpen] = useState(false);
+  const [userToToggle, setUserToToggle] = useState(null);
 
   const handleOpenPermissions = (user) => {
     setSelectedUser(user);
@@ -22,33 +27,38 @@ const Users = ({ query }) => {
   };
 
   const handleClosePermissions = () => {
-    setOpenPermissions(false);
     setSelectedUser(null);
+    setOpenPermissions(false);
   };
 
-  // Expose fetchData from CommonTable
   const handleFetchRef = (fetchFn) => {
     fetchUsersRef.current = fetchFn;
   };
-  const filters = useMemo(
-    () => [
-      {
-        id: "mobile",
-        label: "Mobile Number",
-        type: "textfield",
-      },
-      { id: "id", label: "User Id", type: "textfield" },
-      { id: "Parent", label: "Parent", type: "textfield" },
-    ],
-    []
-  );
 
-  // Trigger refresh after permissions update
   const refreshUsers = () => {
     if (fetchUsersRef.current) {
       fetchUsersRef.current();
     }
   };
+
+  const handleOpenLockModal = (user) => {
+    setUserToToggle(user);
+    setLockModalOpen(true);
+  };
+
+  const handleCloseLockModal = () => {
+    setUserToToggle(null);
+    setLockModalOpen(false);
+  };
+
+  const filters = useMemo(
+    () => [
+      { id: "mobile", label: "Mobile Number", type: "textfield" },
+      { id: "id", label: "User Id", type: "textfield" },
+      { id: "Parent", label: "Parent", type: "textfield" },
+    ],
+    []
+  );
 
   const columns = useMemo(
     () => [
@@ -111,21 +121,35 @@ const Users = ({ query }) => {
       },
       {
         name: "Status",
-        selector: (row) => <CommonStatus value={row.is_active} />,
+        selector: (row) =>
+          row.is_active === 1 ? (
+            <Tooltip title="Click to Block">
+              <IconButton onClick={() => handleOpenLockModal(row)}>
+                <LockOpenIcon color="success" />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <Tooltip title="Click to Unblock">
+              <IconButton onClick={() => handleOpenLockModal(row)}>
+                <LockOutlinedIcon color="error" />
+              </IconButton>
+            </Tooltip>
+          ),
       },
- {
-  name: "Permissions",
-  selector: (row) =>
-      <Tooltip title="Edit Permissions">
-        <IconButton
-          size="small"
-          color="primary"
-          onClick={() => handleOpenPermissions(row)}
-        >
-          <SettingsIcon />
-        </IconButton>
-      </Tooltip>
-}
+      {
+        name: "Permissions",
+        selector: (row) => (
+          <Tooltip title="Edit Permissions">
+            <IconButton
+              size="small"
+              color="primary"
+              onClick={() => handleOpenPermissions(row)}
+            >
+              <SettingsIcon />
+            </IconButton>
+          </Tooltip>
+        ),
+      },
     ],
     []
   );
@@ -137,20 +161,30 @@ const Users = ({ query }) => {
         endpoint={ApiEndpoints.GET_USERS}
         filters={filters}
         queryParam={query}
-        onFetchRef={handleFetchRef} // ✅ pass setter, not function
+        onFetchRef={handleFetchRef}
       />
 
+      {/* Permissions Modal */}
       {selectedUser && (
         <PermissionsModal
           open={openPermissions}
           handleClose={handleClosePermissions}
           user={selectedUser}
-          onFetchRef={refreshUsers} // ✅ trigger fetch after update
+          onFetchRef={refreshUsers}
+        />
+      )}
+
+      {/* Lock/Unlock Modal */}
+      {userToToggle && (
+        <BlockUnblockUser
+          open={lockModalOpen}
+          handleClose={handleCloseLockModal}
+          user={userToToggle}
+          onSuccess={refreshUsers}
         />
       )}
     </Box>
   );
 };
-
 
 export default Users;

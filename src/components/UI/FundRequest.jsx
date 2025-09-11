@@ -130,10 +130,10 @@ const FundRequest = () => {
       //     </Typography>
       //   ),
       // },
-      {
-        name: "Txn ID",
-        selector: (row) => row?.txn_id,
-      },
+      // {
+      //   name: "Txn ID",
+      //   selector: (row) => row?.txn_id,
+      // },
       {
         name: "Amount",
         selector: (row) => (

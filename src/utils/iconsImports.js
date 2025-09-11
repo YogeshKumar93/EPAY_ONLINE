@@ -32,6 +32,14 @@ import jk1 from "../assets/bankicons/jandk.jpg";
 
 import lock_icon from "../assets/lock.png";
 import phone_login from "../assets/mobile.png";
+
+import android_1 from "../assets/android1.png";
+import macintosh_1 from "../assets/macintosh.png";
+import windows_1 from "../assets/windows1.png";
+import linux_1 from "../assets/linux.png";
+import okhttp_1 from "../assets/okhttp.png";
+
+
 export const sbi2 = sbi1;
 export const pnb2 = pnb1;
 export const rbl2 = rbl1;
@@ -60,3 +68,8 @@ export const smLogo = biggpayLogo;
 
 export const mobilelogin = phone_login;
 export const lockicon = lock_icon;
+export const android2 = android_1;
+export const macintosh2 = macintosh_1;
+export const windows2 = windows_1;
+export const linux2 = linux_1;
+export const okhttp = okhttp_1;

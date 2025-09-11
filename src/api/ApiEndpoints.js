@@ -161,9 +161,9 @@ GET_ACCOUNT_STATEMENT_SCHEMA: "accountStatement/getAccountStatementSchema",
   GET_PLANS: "plan/getPlans",
   CREATE_PLAN: "plan/createPlan",
   UPDATE_PLAN: "plan/updatePlan",
-  UPDATE_USER: "user/updateUserPermissions",
   GET_PLAN_SCHEMA: "plan/getPlanSchema",
   GET_UPI_SCHEMA: "payout/getBeneficiarySchemaUpi",
+  UPDATE_USER_STATUS: "user/blockAndUnblock",
   // ****************************** NEW API'S ABOVE ******************************
 
   GET_ACC_ACCOUNTS: "",

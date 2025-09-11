@@ -38,10 +38,20 @@ const AccountLadger = ({ filters=[], query }) => {
       wrap: true,
     },
     {
-      name: "Particular",
+      name: "Narration",
       selector: (row) => (
-        <Tooltip title={row?.operator}>
-          <div style={{ textAlign: "left" }}>{capitalize1(row?.operator)}</div>
+        <Tooltip title={row?.narration}>
+          <div style={{ textAlign: "left" }}>{capitalize1(row?.narration)}</div>
+        </Tooltip>
+      ),
+      width: "185px",
+      wrap: true,
+    },
+    {
+      name: "Transaction Id",
+      selector: (row) => (
+        <Tooltip title={row?.txn_id}>
+          <div style={{ textAlign: "left" }}>{capitalize1(row?.txn_id)}</div>
         </Tooltip>
       ),
       width: "185px",
@@ -53,6 +63,26 @@ const AccountLadger = ({ filters=[], query }) => {
         <Tooltip title={row?.amount}>
           <div style={{ textAlign: "left" }}>
             {parseFloat(row?.amount).toFixed(2)}
+          </div>
+        </Tooltip>
+      ),
+    },
+    {
+      name: "Opening Balance",
+      selector: (row) => (
+        <Tooltip title={row?.opening_balance}>
+          <div style={{ textAlign: "left" }}>
+            {parseFloat(row?.opening_balance).toFixed(2)}
+          </div>
+        </Tooltip>
+      ),
+    },
+    {
+      name: "Closing Balance",
+      selector: (row) => (
+        <Tooltip title={row?.closing_balance}>
+          <div style={{ textAlign: "left" }}>
+            {parseFloat(row?.closing_balance).toFixed(2)}
           </div>
         </Tooltip>
       ),
@@ -78,9 +108,9 @@ const AccountLadger = ({ filters=[], query }) => {
               </div>
             )}
             
-            {(user.role === "Ret" || user.role === "Dd") && row.txn_type === "DR" && (
+            {(user.role === "ret" || user.role === "dd") && row.txn_type === "DR" && (
               <div style={{ color: "red", textAlign: "left" }}>
-                -{currencySetter(parseFloat(row.net_amount).toFixed(2))}
+                -{currencySetter(parseFloat(row.amount).toFixed(2))}
               </div>
             )}
           </Box>
@@ -110,9 +140,9 @@ const AccountLadger = ({ filters=[], query }) => {
               </div>
             )}
     
-            {(user.role === "Ret" || user.role === "Dd") && row.txn_type === "CR" && (
+            {(user.role === "ret" || user.role === "dd") && row.txn_type === "CR" && (
               <div style={{ color: "green", textAlign: "left" }}>
-                + {currencySetter(parseFloat(row.net_amount).toFixed(2))}
+                + {currencySetter(parseFloat(row.amount).toFixed(2))}
               </div>
             )}
           </Box>
@@ -121,30 +151,30 @@ const AccountLadger = ({ filters=[], query }) => {
       wrap: true,
       center: false,
     },
-    {
-      name: "Closing Balance",
-      selector: (row) => {
-        return (
-          <Tooltip title={row.ip}>
-            {(user.role === "Ad" || user.role === "Md") && (
-              <Typography>
-                {row.user_id === user.id
-                  ? currencySetter(parseFloat(row.w1).toFixed(2))
-                  : currencySetter(parseFloat(row.ad_closing).toFixed(2))}
-              </Typography>
-            )}
+    // {
+    //   name: "Closing Balance",
+    //   selector: (row) => {
+    //     return (
+    //       <Tooltip title={row.ip}>
+    //         {(user.role === "Ad" || user.role === "Md") && (
+    //           <Typography>
+    //             {row.user_id === user.id
+    //               ? currencySetter(parseFloat(row.w1).toFixed(2))
+    //               : currencySetter(parseFloat(row.ad_closing).toFixed(2))}
+    //           </Typography>
+    //         )}
             
-            {(user.role === "Dd" || user.role === "Ret") && (
-              <>
-                <Typography align="left">{currencySetter(parseFloat(row.w1).toFixed(2))}</Typography>
-                <Typography align="left">{currencySetter(parseFloat(row.w2).toFixed(2))}</Typography>
-              </>
-            )}
-          </Tooltip>
-        );
-      },
-      width: "190px",
-    },
+    //         {(user.role === "Dd" || user.role === "Ret") && (
+    //           <>
+    //             <Typography align="left">{currencySetter(parseFloat(row.w1).toFixed(2))}</Typography>
+    //             <Typography align="left">{currencySetter(parseFloat(row.w2).toFixed(2))}</Typography>
+    //           </>
+    //         )}
+    //       </Tooltip>
+    //     );
+    //   },
+    //   width: "190px",
+    // },
   {
   name: "Status",
   selector: (row) => <CommonStatus value={row.status} />,
