@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Box, IconButton, Tooltip } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
@@ -16,7 +16,7 @@ import CommonLoader from "../components/common/CommonLoader";
 import AuthContext from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-const Accounts = () => {
+const Accounts = ({filters = []}) => {
   const [openCreate, setOpenCreate] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -44,6 +44,13 @@ const Accounts = () => {
     state: { account_id: row.id },  
   });
   }
+
+   useEffect(() => {
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }, []);
 
   // ✅ Add new account
   const handleSaveCreate = (newAccount) => {
@@ -117,6 +124,7 @@ const queryParam = "";
             loading={loading}
             endpoint={ApiEndpoints.GET_ACCOUNTS}
             onFetchRef={handleFetchRef}
+              filters={filters}
             queryParam={queryParam}
             customHeader={
               <ReButton

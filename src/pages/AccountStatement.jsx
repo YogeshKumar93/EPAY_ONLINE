@@ -1,4 +1,4 @@
-import { useMemo, useContext, useState, useRef } from "react";
+import { useMemo, useContext, useState, useRef, useEffect } from "react";
 import { Box, Button, Tooltip, Chip, IconButton } from "@mui/material";
 import { Edit } from "@mui/icons-material";
 import { dateToTime, ddmmyy } from "../utils/DateUtils";
@@ -18,6 +18,7 @@ const AccountStatement = ({ filters = [], query }) => {
   const [openCreate, setOpenCreate] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState(null);
+   const [loading, setLoading] = useState(true);
  const authCtx = useContext(AuthContext);
  const user = authCtx?.user;
 
@@ -45,40 +46,73 @@ const AccountStatement = ({ filters = [], query }) => {
       setOpenUpdate(false);
     }
 
+     useEffect(() => {
+        if (account_id) {
+          setLoading(false);
+        }
+      }, [account_id]);
+
   const columns = useMemo(
     () => [
       {
-        name: "Date/Time",
+        name: "Account Id",
         selector: (row) => (
-          <div style={{ textAlign: "left" }}>
-            {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
-          </div>
-        ),
-        wrap: true,
-      },
-      {
-        name: "Service Name",
-        selector: (row) => (
-          <Tooltip title={row?.name}>
-            <div style={{ textAlign: "left" }}>{row?.name}</div>
+          <Tooltip title={row?.account_id}>
+            <div style={{ textAlign: "left" }}>{row?.account_id}</div>
           </Tooltip>
         ),
         wrap: true,
       },
       {
-        name: "Code",
+        name: "Remarks",
         selector: (row) => (
-          <Tooltip title={row?.code}>
-            <div style={{ textAlign: "left" }}>{row?.code}</div>
+          <Tooltip title={row?.remarks}>
+            <div style={{ textAlign: "left" }}>{row?.remarks}</div>
+          </Tooltip>
+        ),
+        wrap: true,
+      },
+      {
+        name: "Bank Id",
+        selector: (row) => (
+          <Tooltip title={row?.bank_id}>
+            <div style={{ textAlign: "left" }}>{row?.bank_id}</div>
           </Tooltip>
         ),
         width: "150px",
       },
       {
-        name: "Route",
+        name: "Credit",
         selector: (row) => (
-          <Tooltip title={row?.route}>
-            <div style={{ textAlign: "left" }}>{row?.route || "-"}</div>
+          <Tooltip title={row?.credit}>
+            <div style={{ textAlign: "left" }}>{row?.credit || "-"}</div>
+          </Tooltip>
+        ),
+        width: "150px",
+      },
+       {
+        name: "Debit",
+        selector: (row) => (
+          <Tooltip title={row?.debit}>
+            <div style={{ textAlign: "left" }}>{row?.debit || "-"}</div>
+          </Tooltip>
+        ),
+        width: "150px",
+      },
+       {
+        name: "Balance",
+        selector: (row) => (
+          <Tooltip title={row?.balance}>
+            <div style={{ textAlign: "left" }}>{row?.balance || "-"}</div>
+          </Tooltip>
+        ),
+        width: "150px",
+      },
+       {
+        name: "Particulars",
+        selector: (row) => (
+          <Tooltip title={row?.particulars}>
+            <div style={{ textAlign: "left" }}>{row?.particulars || "-"}</div>
           </Tooltip>
         ),
         width: "150px",
@@ -113,6 +147,14 @@ const AccountStatement = ({ filters = [], query }) => {
        <h2>Account Statements for Bank ID: {id}</h2>
          <p>Account ID: {account_id}</p>
 
+         <CreateAccountStatement 
+open={openCreate}
+      handleClose={()=> setOpenCreate(false)}
+      handleSave={handleSaveCreate}
+      onFetchRef={refreshUsers}
+      accountId={account_id}
+/>
+
       {/* Services Table */}
       <CommonTable
         onFetchRef={handleFetchRef} 
@@ -121,26 +163,21 @@ const AccountStatement = ({ filters = [], query }) => {
         filters={filters}
         Button= {Button}
         queryParam={`account_id=${account_id}`}
-         customHeader={
-               (user?.role !== "sadm" || user?.role !== "adm") && (
-    <ReButton
-      variant="contained"
-     label="Create"
+  //        customHeader={
+  //              (user?.role !== "sadm" || user?.role !== "adm") && (
+  //   <ReButton
+  //     variant="contained"
+  //    label="Create"
      
-      onClick={() => setOpenCreate(true)}
-    >
+  //     onClick={() => setOpenCreate(true)}
+  //   >
   
-    </ReButton>
-               )
-  }
+  //   </ReButton>
+  //              )
+  // }
 />
 
-<CreateAccountStatement 
-open={openCreate}
-      handleClose={()=> setOpenCreate(false)}
-      handleSave={handleSaveCreate}
-      onFetchRef={refreshUsers}
-/>
+
 
 <UpdateAccountStatement 
  open={openUpdate}

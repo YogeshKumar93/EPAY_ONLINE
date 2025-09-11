@@ -1,93 +1,124 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
-import CommonModal from "../components/common/CommonModal";
 import { useSchemaForm } from "../hooks/useSchemaForm";
 import { useToast } from "../utils/ToastContext";
+import {
+  Box,
+  Button,
+  Grid,
+  TextField,
+  Typography,
+  MenuItem,
+} from "@mui/material";
 
-const CreateBankStatement = ({ open, handleClose,onFetchRef }) => {
-  const { schema, formData, handleChange, errors, setErrors, loading } =
-    useSchemaForm(ApiEndpoints.GET_BANK_STATEMENT_SCHEMA, open);
+const CreateBankStatement = ({ onFetchRef, bankId, balance }) => {
+  const { schema, errors, loading } =
+    useSchemaForm(ApiEndpoints.GET_BANK_STATEMENT_SCHEMA, true);
 
   const [submitting, setSubmitting] = useState(false);
   const { showToast } = useToast();
+  const [formData, setFormData] = useState({});
 
-  // ✅ Submit
-  const handleSubmit = async () => {
+  // Set default values when bankId or balance changes
+  useEffect(() => {
+    if (bankId) {
+      setFormData((prev) => ({
+        ...prev,
+        bank_id: bankId,
+        balance: balance || 0,
+        date: new Date().toISOString().split("T")[0], // default today in YYYY-MM-DD
+      }));
+    }
+  }, [bankId, balance]);
 
-    setSubmitting(true);
-      const { error, response } = await apiCall(
-        "POST",
-        ApiEndpoints.CREATE_BANK_STATEMENT,
-        formData
-      );
-
-      if (response) {
-        showToast(
-          response?.message || "Account Statement Created successfully",
-          "success"
-        );
-        onFetchRef();
-        handleClose();
-      } else {
-        showToast(error?.message || "Failed to create Account Statement", "error");
-        handleClose();
-      }
-
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  // ✅ Required fields
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    const { error, response } = await apiCall(
+      "POST",
+      ApiEndpoints.CREATE_BANK_STATEMENT,
+      formData
+    );
+
+    if (response) {
+      showToast(response?.message || "Statement Created", "success");
+      onFetchRef?.();
+    } else {
+      showToast(error?.message || "Failed to create Statement", "error");
+    }
+    setSubmitting(false);
+  };
+
+  // Only show required fields from schema
   const requiredFields = [
-    
-    "account_id",
-    "remarks",
-    "claimed_by",
-    "bank_id",
+    "mop",
     "credit",
     "status",
     "date",
     "debit",
     "balance",
-    "particulars"
-
-  
+    "particulars",
   ];
-
-  // ✅ Pick only required fields from schema
-  let visibleFields = schema.filter((field) =>
-    requiredFields.includes(field.name)
+  const visibleFields = schema.filter((f) =>
+    requiredFields.includes(f.name)
   );
 
   return (
-    <CommonModal
-      open={open}
-      onClose={handleClose}
-      title="Create Bank Statement"
-      iconType="info"
-      size="medium"
-      layout="two-column"
-      dividers
-      fieldConfig={visibleFields}
-      formData={formData}
-      handleChange={handleChange}
-      errors={errors}
-      loading={loading || submitting}
-      footerButtons={[
-        {
-          text: "Cancel",
-          variant: "outlined",
-          onClick: handleClose,
-          disabled: submitting,
-        },
-        {
-          text: submitting ? "Saving..." : "Save",
-          variant: "contained",
-          color: "primary",
-          onClick: handleSubmit,
-          disabled: submitting,
-        },
-      ]}
-    />
+    <Box sx={{  }}>
+       
+
+      <Grid container spacing={2}>
+        {visibleFields.map((field) => (
+          <Grid item xs={12} sm={6} md={3} key={field.name}>
+           <TextField
+  select={field.type === "dropdown"} // handle dropdown dynamically
+  label={field.label || field.name}
+  name={field.name}
+  value={formData[field.name] || ""}
+  onChange={handleChange}
+  size="small"
+  error={Boolean(errors[field.name])}
+  helperText={errors[field.name]}
+  disabled={field.name === "balance"} // only disable balance
+  type={
+    field.type === "date"
+      ? "date"
+      : field.type === "number"
+      ? "number"
+      : "text"
+  } // handle type
+  sx={{ width: 200 }} // fixed width in px, adjust as needed
+>
+  {field.type === "dropdown" &&
+    field.options?.map((opt) => (
+      <MenuItem key={opt} value={opt}>
+        {opt}
+      </MenuItem>
+    ))}
+</TextField>
+
+          </Grid>
+        ))}
+      </Grid>
+
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleSubmit}
+        disabled={submitting || loading}
+        sx={{ mt: 2 }}
+      >
+        {submitting ? "Submitting..." : "Create Statement"}
+      </Button>
+    </Box>
   );
 };
 

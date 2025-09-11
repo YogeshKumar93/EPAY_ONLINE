@@ -62,6 +62,10 @@ const ApiEndpoints = {
   CHANGE_OPERATOR_PIPE: "admin/changePipe",
   GET_ROUTE: "admin/getRoutes",
   GET_CATEGORIES: "admin/getCategories",
+BBPS_GET_CATEGORIES:"bbps/getCategories",
+BBPS_GET_BILLERS:"bbps/getBillers",
+BBPS_GET_BILLERS_DETAILS:"bbps/getBillerDetails",
+BBPS_FETCH_BILL:"bbps/fetchBill",
 
   // ****************************** NEW API'S ******************************
   SIGN_IN: "auth/signIn",
@@ -90,6 +94,7 @@ const ApiEndpoints = {
   DELETE_LOG: "auditlog/deleteAuditLog",
   GET_LOG: "auditlog/getAuditLog",
   GET_WALLETLEDGER: "walletledger/getWalletLedgers",
+  
   // ****************************** NEW API'S ABOVE ******************************
 
   GET_FUND_REQUESTS: "fundrequest/getFundRequests",
@@ -168,6 +173,8 @@ const ApiEndpoints = {
 
   CREATE_USER: "signup/createUser",
   GET_SIGNUP_SCHEMA: "signup/getSignupSchema",
+  DMT1:"dmt1/remitterStatus",
+  DMT1_REGISTER:"dmt1/registerRemitter",
   // ****************************** NEW API'S ABOVE ******************************
 
   GET_ACC_ACCOUNTS: "",
@@ -264,10 +271,10 @@ const ApiEndpoints = {
   DMT2_MT: "dmr/transactionDmt2",
 
   BBPS_CATEGORIES: "prepaid/getCategories",
-  BBPS_GET_BILLERS: "prepaid/getBillers",
-  BBPS_GET_BILLERS_DETAILS: "prepaid/getBillerDetails",
-  BBPS_FETCH_BILL: "prepaid/fetchBillInst",
-  BBPS_PAY_BILL: "prepaid/payBillInst",
+  // BBPS_GET_BILLERS: "prepaid/getBillers",
+  // BBPS_GET_BILLERS_DETAILS: "prepaid/getBillerDetails",
+  // BBPS_FETCH_BILL: "prepaid/fetchBillInst",
+  // BBPS_PAY_BILL: "prepaid/payBillInst",
 
   //recharges and bill payment
   RECH_FETCH_BILL: "prepaid/fetchBill",

@@ -48,7 +48,7 @@ const Banks = ({ filters = [] }) => {
 const handleStatement = (row) => {
  
   navigate(`/admin/bankstatements/${row.id}`, {
-    state: { bank_id: row.id },  
+    state: { bank_id: row.id, bank_name:row.bank_name, balance: row.balance },  
   });
 };
 

@@ -1,136 +1,75 @@
-import { useMemo, useContext, useState, useRef } from "react";
-import { Box, Button, Tooltip, Chip, IconButton } from "@mui/material";
-import { Edit } from "@mui/icons-material";
-import AuthContext from "../contexts/AuthContext";
-import { dateToTime, ddmmyy } from "../utils/DateUtils";
+import { useEffect, useState, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
-
-import ReButton from "../components/common/ReButton";
-import CommonStatus from "../components/common/CommonStatus";
 import CreateBankStatement from "./CreateBankStatement";
-import { useLocation, useParams } from "react-router-dom";
+import CommonLoader from "../components/common/CommonLoader";
+import { Typography, Box } from "@mui/material";
 
-const BankStatements = ({ filters = [] }) => {
-  const authCtx = useContext(AuthContext);
-  const user = authCtx?.user;
+const BankStatements = () => {
+  const location = useLocation();
+  const { bank_id, bank_name, balance } = location.state || {};
   
+  // const [openCreate, setOpenCreate] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-const { id} = useParams();
- const location = useLocation();
-  const bank_id = location.state?.bank_id || id;
+  // ✅ keep a ref for table refresh
+  const fetchStatementsRef = useRef(null);
+  const handleFetchRef = (fetchFn) => {
+    fetchStatementsRef.current = fetchFn;
+  };
+  const refreshStatements = () => {
+    if (fetchStatementsRef.current) {
+      fetchStatementsRef.current();
+    }
+  };
 
-  const [openCreate, setOpenCreate] = useState(false);
-  // const [openEdit, setOpenEdit] = useState(false);
-  // const [selectedService, setSelectedService] = useState(null);
- 
-
-   const fetchUsersRef = useRef(null);
-  
-    const handleFetchRef = (fetchFn) => {
-      fetchUsersRef.current = fetchFn;
-    };
-    const refreshUsers = () => {
-      if (fetchUsersRef.current) {
-        fetchUsersRef.current();
-      }
-    };
-
-  const columns = useMemo(
-    () => [
-      {
-        name: "Date/Time",
-        selector: (row) => (
-          <div style={{ textAlign: "left" }}>
-            {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
-          </div>
-        ),
-        wrap: true,
-      },
-      {
-        name: "Service Name",
-        selector: (row) => (
-          <Tooltip title={row?.name}>
-            <div style={{ textAlign: "left" }}>{row?.name}</div>
-          </Tooltip>
-        ),
-        wrap: true,
-      },
-      {
-        name: "Code",
-        selector: (row) => (
-          <Tooltip title={row?.code}>
-            <div style={{ textAlign: "left" }}>{row?.code}</div>
-          </Tooltip>
-        ),
-        width: "150px",
-      },
-      {
-        name: "Route",
-        selector: (row) => (
-          <Tooltip title={row?.route}>
-            <div style={{ textAlign: "left" }}>{row?.route || "-"}</div>
-          </Tooltip>
-        ),
-        width: "150px",
-      },
-      {
-        name: "Status",
-        selector: (row) =>
- <CommonStatus value={row.is_active} />
-      },
-      // {
-      //   name: "Actions",
-      //   selector: (row) => (
-      //     <IconButton
-      //       color="primary"
-      //       // onClick={() => {
-      //       //   setSelectedService(row);
-      //       //   setOpenEdit(true);
-      //       // }}
-      //     >
-      //       <Edit />
-      //     </IconButton>
-      //   ),
-      //   width: "100px",
-      // },
-    ],
-    []
-  );
+  useEffect(() => {
+    if (bank_id, balance) {
+      setLoading(false);
+    }
+  }, [bank_id,balance]);
 
   return (
-    <Box>
-        <h2>Bank Statements for Bank ID: {id}</h2>
-         <p>Bank ID: {bank_id}</p>
+    <>
+      <CommonLoader loading={loading} text="Loading Statements..." />
 
-      {/* Services Table */}
-      <CommonTable
-        onFetchRef={handleFetchRef} 
-        columns={columns}
-        endpoint={ApiEndpoints.GET_BANK_STATEMENTS}
-        filters={filters}
-        queryParam={`bank_id=${bank_id}`}
-         customHeader={
-               (user?.role !== "sadm" || user?.role !== "adm") && (
-    <ReButton
-      variant="contained"
-     label="Create"
-     
-      onClick={() => setOpenCreate(true)}
-    >
-  
-    </ReButton>
-               )
-  }
-/>
-<CreateBankStatement 
-open={openCreate}
-      handleClose={()=> setOpenCreate(false)}
-      onFetchRef={refreshUsers}
-/>
-      
+      {!loading && (
+        <Box sx={{ p: 0.5 }}>
+          <Typography variant="h6">
+            Bank Statements for {bank_name?.toUpperCase()}
+          </Typography>
 
-    </Box>
+          {/* Create Statement Form */}
+          <CreateBankStatement
+            open={true} // always visible on top of table
+            handleClose={() => {}}
+            onFetchRef={refreshStatements}
+              bankId={bank_id}
+  balance={balance} 
+          />
+
+          {/* Statements Table */}
+          <Box sx={{ mt: 1 }}>
+            <CommonTable
+              onFetchRef={handleFetchRef}
+              endpoint={`${ApiEndpoints.GET_BANK_STATEMENTS}?bank_id=${bank_id}&balance=${balance
+
+              }`}
+              columns={[
+                { name: "Date", selector: (row) => row.date },
+                { name: "Particulars", selector: (row) => row.particulars },
+                { name: "Credit", selector: (row) => row.credit },
+                   { name: "MOP", selector: (row) => row.mop },
+                { name: "Debit", selector: (row) => row.debit },
+                { name: "Balance", selector: (row) => row.balance },
+                { name: "Status", selector: (row) => row.status },
+              ]}
+            />
+          </Box>
+        </Box>
+      )}
+    </>
   );
 };
 

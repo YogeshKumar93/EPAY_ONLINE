@@ -71,6 +71,7 @@ export const customer_nav = [
   },
   { title: "My Purchase", icon: "🛠️", icon2: "🛠️", to: "/customer/purchase" },
   { title: "My Sale", icon: "📒", icon2: "📒", to: "/customer/sale" },
+   { title: "Bbps", icon: "📒", icon2: "📒", to: "/customer/bbps" },
   { title: "Logs", icon: "📒", icon2: "📒", to: "/customer/logs" },
 ];
 export const di_nav = [

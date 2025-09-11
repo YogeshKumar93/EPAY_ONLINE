@@ -98,6 +98,8 @@ const ProfilePage = () => {
               p: { xs: 2, sm: 3, md: 4 },
               borderRadius: 3,
               mb: { xs: 2, sm: 3, md: 4 },
+              // mb: 4,
+             
               background: "#1E3A8A",
               color: "white",
               textAlign: { xs: "center", sm: "left" },
