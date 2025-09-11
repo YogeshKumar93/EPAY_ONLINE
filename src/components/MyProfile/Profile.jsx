@@ -92,7 +92,7 @@ const ProfilePage = () => {
               p: 4,
               borderRadius: 3,
               mb: 4,
-              // background: "linear-gradient(135deg, #778cebff, #b785eaff)",
+             
               background: "#1E3A8A",
 
               color: "white",
