@@ -74,7 +74,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: 5 }}>
+    <Container maxWidth="xl" sx={{ py: 5 }}>
       <Slide in={true} direction="up" timeout={500}>
         <Paper
           elevation={isMobile ? 0 : 10}
@@ -92,7 +92,7 @@ const ProfilePage = () => {
               p: 4,
               borderRadius: 3,
               mb: 4,
-              background: "linear-gradient(135deg, #667eea, #764ba2)",
+              background: "linear-gradient(135deg, #778cebff, #b785eaff)",
               color: "white",
               textAlign: isMobile ? "center" : "left",
             }}
@@ -101,9 +101,9 @@ const ProfilePage = () => {
               <Grid item xs={12} sm="auto">
                 <Avatar
                   sx={{
-                    width: 110,
-                    height: 110,
-                    border: "5px solid rgba(255,255,255,0.4)",
+                    width: 130,
+                    height: 130,
+                    border: "5px solid rgba(235, 232, 9, 0.4)",
                     bgcolor: "rgba(255,255,255,0.2)",
                     mx: isMobile ? "auto" : 0,
                   }}
@@ -113,7 +113,7 @@ const ProfilePage = () => {
               </Grid>
               <Grid item xs>
                 <Typography
-                  variant="h4"
+                  variant="h3"
                   fontWeight="bold"
                   sx={{ letterSpacing: "0.5px" }}
                 >
@@ -122,11 +122,11 @@ const ProfilePage = () => {
                 <Typography variant="body1" sx={{ opacity: 0.9, mt: 1 }}>
                   {user?.email}
                 </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                <Typography variant="body1" sx={{ opacity: 0.8 }}>
                   📱 {user?.mobile}
                 </Typography>
                 <Typography
-                  variant="caption"
+                  variant="body1"
                   sx={{ display: "block", mt: 0.5, opacity: 0.7 }}
                 >
                   Username: <strong>{username}</strong>
@@ -158,7 +158,7 @@ const ProfilePage = () => {
           )}
 
           {/* Actions Section */}
-          <Grid container spacing={3}>
+          <Grid container spacing={2}>
             {/* Reset MPIN */}
             <Grid item xs={12} sm={4}>
               <Card
@@ -173,7 +173,7 @@ const ProfilePage = () => {
               >
                 <CardContent sx={{ textAlign: "center" }}>
                   <Typography
-                    variant="h6"
+                    variant="h5"
                     gutterBottom
                     color="primary"
                     fontWeight="600"
@@ -181,7 +181,7 @@ const ProfilePage = () => {
                     Reset MPIN
                   </Typography>
                   <Typography
-                    variant="body2"
+                    variant="body1"
                     color="textSecondary"
                     sx={{ mb: 2 }}
                   >
@@ -196,7 +196,7 @@ const ProfilePage = () => {
                       borderRadius: 2,
                       textTransform: "none",
                       fontWeight: "bold",
-                      fontSize: "0.95rem",
+                         fontSize: "1.05rem",
                       background: "linear-gradient(135deg, #43cea2, #185a9d)",
                       "&:hover": {
                         background: "linear-gradient(135deg, #36d1dc, #5b86e5)",
@@ -224,7 +224,7 @@ const ProfilePage = () => {
               >
                 <CardContent sx={{ textAlign: "center" }}>
                   <Typography
-                    variant="h6"
+                    variant="h5"
                     gutterBottom
                     color="secondary"
                     fontWeight="600"
@@ -232,7 +232,7 @@ const ProfilePage = () => {
                     Change Password
                   </Typography>
                   <Typography
-                    variant="body2"
+                    variant="body1"
                     color="textSecondary"
                     sx={{ mb: 2 }}
                   >
@@ -248,7 +248,7 @@ const ProfilePage = () => {
                       borderRadius: 2,
                       textTransform: "none",
                       fontWeight: "bold",
-                      fontSize: "0.95rem",
+                      fontSize: "1.05rem",
                       "&:hover": { bgcolor: "secondary.dark" },
                     }}
                     fullWidth
@@ -273,7 +273,7 @@ const ProfilePage = () => {
               >
                 <CardContent sx={{ textAlign: "center" }}>
                   <Typography
-                    variant="h6"
+                    variant="h5"
                     gutterBottom
                     color="info.main"
                     fontWeight="600"
@@ -281,7 +281,7 @@ const ProfilePage = () => {
                     New Number
                   </Typography>
                   <Typography
-                    variant="body2"
+                    variant="body1"
                     color="textSecondary"
                     sx={{ mb: 2 }}
                   >
@@ -296,7 +296,7 @@ const ProfilePage = () => {
                       borderRadius: 2,
                       textTransform: "none",
                       fontWeight: "bold",
-                      fontSize: "0.95rem",
+                         fontSize: "1.05rem",
                       background: "linear-gradient(135deg, #4facfe, #00f2fe)",
                       "&:hover": {
                         background: "linear-gradient(135deg, #43e97b, #38f9d7)",
@@ -324,7 +324,7 @@ const ProfilePage = () => {
               >
                 <CardContent sx={{ textAlign: "center" }}>
                   <Typography
-                    variant="h6"
+                    variant="h5"
                     gutterBottom
                     color="warning.main"
                     fontWeight="600"
@@ -332,7 +332,7 @@ const ProfilePage = () => {
                     Change MPIN
                   </Typography>
                   <Typography
-                    variant="body2"
+                    variant="body1"
                     color="textSecondary"
                     sx={{ mb: 2 }}
                   >
@@ -347,7 +347,7 @@ const ProfilePage = () => {
                       borderRadius: 2,
                       textTransform: "none",
                       fontWeight: "bold",
-                      fontSize: "0.95rem",
+                        fontSize: "1.05rem",
                       background: "linear-gradient(135deg, #ff9a9e, #f6416c)",
                       "&:hover": {
                         background: "linear-gradient(135deg, #ff758c, #ff7eb3)",

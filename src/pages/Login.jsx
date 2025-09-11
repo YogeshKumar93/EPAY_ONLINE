@@ -1,5 +1,5 @@
 // Login.js (Updated Layout - Image Left, Login Right, Full Functionality, Scrollbar Hidden)
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   Paper,
   Typography,
@@ -31,6 +31,7 @@ import ForgotPassword from "../components/common/ForgotPassword";
 import biggpayLogo from "../assets/logo(1).png";
 import lockicon from "../assets/lock.png";
 import mobilelogin from "../assets/mobile.png";
+import ReCAPTCHA from "react-google-recaptcha";
 
 const validationSchema = Yup.object({
   mobile: Yup.string()
@@ -50,7 +51,8 @@ const Login = () => {
   const [otpRef, setOtpRef] = useState("");
   const [forgotModal, setForgotModalOpen] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
-
+  const [captchaChecked, setCaptchaChecked] = useState(false);
+    const captchaRef = useRef(null);
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext);
   const user = authCtx.user;
@@ -74,7 +76,9 @@ const Login = () => {
     if (!agreedToTerms) {
       setLoginError("You must agree to the Terms and Conditions");
       return;
-    }
+    }else if (!captchaChecked) {
+      return true;
+    } 
 
     setLoading(true);
     setLoginError("");
@@ -120,7 +124,13 @@ const Login = () => {
   const handleMpinVerificationSuccess = () => setIsMpinRequired(false);
   const handleMpinVerificationClose = () => setIsMpinRequired(false);
   const handleForgotPassword = () => setForgotModalOpen(true);
-  // InputProps for Mobile Number
+
+  
+  const captchaclickApi = () => {
+    setCaptchaChecked(true);
+    console.log("Clicked Captcha");
+  };
+
 const mobileInputProps = {
   style: { padding: 0, borderRadius: "10px" },
   endAdornment: (
@@ -169,7 +179,7 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
   sx={{
     backgroundImage: `url(${backImg})`,
     backgroundRepeat: "no-repeat",
-    backgroundSize: "auto 90%", // <-- height is 50% of container
+    backgroundSize: "auto 88%", // <-- height is 50% of container
     backgroundPosition: "center",
     display: { xs: "none", md: "block" },
     backgroundColor: "#0052CC",
@@ -189,7 +199,7 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          p: { xs: 4, sm: 3, md: 3 },
+          px: { xs: 4, sm: 3, md: 3 },
          
           height: "100vh",
           boxSizing: "border-box",
@@ -197,7 +207,7 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
         }}
       >
         <Box sx={{ width: "100%", maxWidth: 500 }}>
-          <a href="https://impsguru.com">
+          {/* <a href="https://impsguru.com"> */}
             <Box
               component="img"
               src={biggpayLogo}
@@ -205,14 +215,15 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
               sx={{
                 width: "100%",
                 maxWidth: 330,
-                mb: 4,
+                mb: 3,
                 objectFit: "contain",
                 cursor: "pointer",
                 display: "block",
                 mx: "auto",
               }}
+              onClick={() => navigate("/")} 
             />
-          </a>
+          {/* </a> */}
 
       
         {loginError && (
@@ -226,7 +237,7 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
           <ReTextField
             fullWidth
             size="medium"
-            sx={{ mt: 5 }}
+            sx={{ mt: 4 }}
             label="User ID"
             {...register("mobile", { onChange: (e) => setUsername(e.target.value) })}
             margin="normal"
@@ -271,7 +282,7 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
           />
 
           {/* Forgot Password */}
-          <Box display="flex" justifyContent="flex-end" mt={1} >
+          <Box display="flex" justifyContent="flex-end" mt={1.3} >
             <Button
               variant="text"
               size="small"
@@ -281,6 +292,20 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
               Forgot Password?
             </Button>
           </Box>
+             <ReCAPTCHA
+                    sitekey={import.meta.env.VITE_SITE_KEY}
+
+                    ref={captchaRef}
+                    onExpired={() => setCaptchaChecked(false)}
+                    onChange={captchaclickApi}
+                    style={{
+                      width: "100%",
+                      justifyContent: "center",
+                      display: "flex",
+                      alignItems:"center",
+                      mb:2,
+                    }}
+                  />
 
           {/* Terms & Conditions */}
           <FormControlLabel
@@ -320,8 +345,7 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
             left: "50%",
             transform: "translate(-50%, -50%)",
             width: { xs: "90%", sm: 500, md: 600 },
-            bgcolor: "background.paper",
-            boxShadow: 24,
+            // boxShadow: 24,
             p: 4,
             borderRadius: 3,
           }}
