@@ -74,7 +74,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: 5 }}>
+    <Container maxWidth="xl" sx={{ py: 1 }}>
       <Slide in={true} direction="up" timeout={500}>
         <Paper
           elevation={isMobile ? 0 : 10}
@@ -93,7 +93,7 @@ const ProfilePage = () => {
               borderRadius: 3,
               mb: 4,
               // background: "linear-gradient(135deg, #778cebff, #b785eaff)",
-              background: "linear-gradient(135deg, #1E3A8A 60%, #FACC15 100%)",
+              background: "#1E3A8A",
 
               color: "white",
               textAlign: isMobile ? "center" : "left",
