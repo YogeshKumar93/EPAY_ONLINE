@@ -21,42 +21,13 @@ const CreateAccount = ({ open, handleClose, onFetchRef }) => {
   const [submitting, setSubmitting] = useState(false);
   const { showToast } = useToast();
 
-  // ✅ Validation using validators.js
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!isValid(PATTERNS.NAME, formData.name || "")) {
-      newErrors.name = "Enter a valid account name";
-    }
-    if (!formData.user_id) {
-      newErrors.user_id = "User ID is required";
-    }
-    if (!isValid(PATTERNS.MOBILE, formData.mobile || "")) {
-      newErrors.mobile = "Enter a valid mobile number";
-    }
-    if (!formData.type) {
-      newErrors.type = "Select account type";
-    }
-    if (formData.credit_limit && isNaN(formData.credit_limit)) {
-      newErrors.credit_limit = "Credit limit must be a number";
-    }
-    if (formData.balance && isNaN(formData.balance)) {
-      newErrors.balance = "Balance must be a number";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   // ✅ Submit handler
   const handleSubmit = () => {
-    if (!validateForm()) return;
-
     setSubmitting(true);
 
     apiCall("post", ApiEndpoints.CREATE_ACCOUNT, {
       ...formData,
-      status: "1", // default Active
     }).then(({ error, response }) => {
       if (response) {
         showToast(response?.message || "Account created successfully", "success");
@@ -72,14 +43,8 @@ const CreateAccount = ({ open, handleClose, onFetchRef }) => {
   // ✅ Optional: pick only visible fields from schema
   const visibleFields = schema.filter((field) =>
     [
-      "name",
-      "user_id",
-      "establishment",
-      "mobile",
-      "type",
-      "asm",
+      "user_id",      
       "credit_limit",
-      "balance",
     ].includes(field.name)
   );
 

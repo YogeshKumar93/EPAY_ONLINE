@@ -46,6 +46,7 @@ import UpiTransfer from "../pages/UpiTransfer";
 import BankStatements from "../pages/BankStatements";
 import AccountStatement from "../pages/AccountStatement";
 import AllServices from "../pages/AllServices";
+import Dmt from "../pages/Dmt";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useContext(AuthContext);
@@ -138,7 +139,7 @@ export default function AppRoutes() {
               <Route path="customer/logs" element={<RetailerLogs />} />
               <Route
                 path="customer/money-transfer"
-                element={<DmtContainer />}
+                element={<Dmt />}
               />
               <Route
                 path="customer/fund-transfer"

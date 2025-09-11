@@ -715,7 +715,8 @@ const tableHeaders = useMemo(
     {customHeader} {/* Add custom header content here */}
     <Tooltip title="Refresh">
       <IconButton onClick={handleManualRefresh} disabled={loading} sx={{ ml: 1 }}>
-        {loading ? <CircularProgress size={24} /> : <CachedIcon />}
+        <CachedIcon />
+        {/* {loading ? <CircularProgress size={24} /> : <CachedIcon />} */}
       </IconButton>
     </Tooltip>
   </Box>

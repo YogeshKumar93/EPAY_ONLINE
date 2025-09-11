@@ -76,9 +76,10 @@ const Login = () => {
     if (!agreedToTerms) {
       setLoginError("You must agree to the Terms and Conditions");
       return;
-    }else if (!captchaChecked) {
-      return true;
-    } 
+    }
+    // else if (!captchaChecked) {
+    //   return true;
+    // } 
 
     setLoading(true);
     setLoginError("");
@@ -292,7 +293,7 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
               Forgot Password?
             </Button>
           </Box>
-             <ReCAPTCHA
+             {/* <ReCAPTCHA
                     sitekey={import.meta.env.VITE_SITE_KEY}
 
                     ref={captchaRef}
@@ -305,7 +306,7 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
                       alignItems:"center",
                       mb:2,
                     }}
-                  />
+                  /> */}
 
           {/* Terms & Conditions */}
           <FormControlLabel

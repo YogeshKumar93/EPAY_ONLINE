@@ -2,7 +2,7 @@
 // export const BASE_URL = "https://uat.impsguru.com/";
 // export const BASE_URL = "https://api.dillipay.com/";
 // export const BASE_URL = "http://192.168.1.14/impsguru-php/";
-export const BASE_URL = "https://newapi.impsguru.com";
+export const BASE_URL = "https://newapi.impsguru.com/";
 
 const ApiEndpoints = {
   COOKIE: "sanctum/csrf-cookie",
@@ -164,6 +164,7 @@ const ApiEndpoints = {
 
   CHANGE_USER_LAYOUT: "user/changeLayout",
 
+  DMT1:"dmt1/remitterStatus",
   // ****************************** NEW API'S ABOVE ******************************
 
   GET_ACC_ACCOUNTS: "",

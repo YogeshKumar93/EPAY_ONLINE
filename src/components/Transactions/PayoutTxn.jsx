@@ -41,17 +41,11 @@ const PayoutTxn = ({ filters = [], query }) => {
         ),
         wrap: true,
       },
+
       {
-        name: "Client Ref",
+        name: "Mobile Number",
         selector: (row) => (
-          <div style={{ textAlign: "left" }}>{row.client_ref}</div>
-        ),
-        wrap: true,
-      },
-      {
-        name: "Sender Mobile",
-        selector: (row) => (
-          <div style={{ textAlign: "left" }}>{row.sender_mobile}</div>
+          <div style={{ textAlign: "left" }}>{row.mobile_number}</div>
         ),
         wrap: true,
       },
@@ -69,7 +63,7 @@ const PayoutTxn = ({ filters = [], query }) => {
         selector: (row) => (
           <div style={{ textAlign: "left" }}>
             {row.bank_name?.toUpperCase()} <br />
-            ****{row.account_number.slice(-4)} <br />
+            {row.account_number} <br />
             {row.ifsc_code}
           </div>
         ),
@@ -88,15 +82,39 @@ const PayoutTxn = ({ filters = [], query }) => {
         right: true,
       },
       {
-        name: "Charges",
+        name: "CCF",
         selector: (row) => (
-          <div style={{ textAlign: "right" }}>
-            CCF: ₹{parseFloat(row.ccf).toFixed(2)} <br />
-            GST: ₹{parseFloat(row.gst).toFixed(2)} <br />
-            Comm: ₹{parseFloat(row.comm).toFixed(2)} <br />
-            TDS: ₹{parseFloat(row.tds).toFixed(2)}
-          </div>
+          <>
+        ₹{parseFloat(row.ccf).toFixed(2)}
+       </>
         ),
+        wrap: true,
+        right: true,
+      },
+      {
+        name: "GST",
+        selector: (row) => (
+          <>
+            ₹{parseFloat(row.gst).toFixed(2)}
+                </>  ),
+        wrap: true,
+        right: true,
+      },
+      {
+        name: "Comm",
+        selector: (row) => (
+          <>
+            ₹{parseFloat(row.comm).toFixed(2)}
+                </>  ),
+        wrap: true,
+        right: true,
+      },
+      {
+        name: "TDS",
+        selector: (row) => (
+          <>
+            ₹{parseFloat(row.tds).toFixed(2)}
+                </>  ),
         wrap: true,
         right: true,
       },

@@ -9,7 +9,7 @@ import SenderRegisterModal from "./SenderRegisterModal";
 import VerifySenderModal from "./VerifySenderModal";
 import BeneficiaryDetails from "./BeneficiaryDetails";
 
-const SuperTransfer = () => {
+const Dmt = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -24,7 +24,7 @@ const SuperTransfer = () => {
 const handleFetchSender = async (number = mobile) => {
   if (!number || number.length !== 10) return;
 
-  const { error, response } = await apiCall("post", ApiEndpoints.GET_SENDER, {
+  const { error, response } = await apiCall("post", ApiEndpoints.DMT1, {
     mobile_number: number,
   });
 
@@ -152,4 +152,4 @@ const handleChange = (e) => {
   );
 };
 
-export default SuperTransfer;
+export default Dmt;
