@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { apiCall } from "../../api/apiClient";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import CommonModal from "../common/CommonModal";
 import { useSchemaForm } from "../../hooks/useSchemaForm";
-import { PATTERNS, isValid } from "../../utils/validators"; // 👈 import validators
+import { PATTERNS, isValid } from "../../utils/validators";
 import { useToast } from "../../utils/ToastContext";
 
-const CreateBankModal = ({ open, onClose,onFetchRef }) => {
+const CreateBankModal = ({ open, onClose, onFetchRef }) => {
   const {
     schema,
     formData,
@@ -17,13 +17,21 @@ const CreateBankModal = ({ open, onClose,onFetchRef }) => {
   } = useSchemaForm(ApiEndpoints.GET_BANK_SCHEMA, open);
 
   const [submitting, setSubmitting] = useState(false);
-const {showToast} = useToast();
+  const { showToast } = useToast();
+
+  // ✅ Reset errors when modal opens fresh
+  useEffect(() => {
+    if (open) {
+      setErrors({});
+    }
+  }, [open, setErrors]);
+
   // ✅ Validation using validators.js
   const validateForm = () => {
     const newErrors = {};
 
     if (!isValid(PATTERNS.BANK_NAME, formData.bank_name || "")) {
-      newErrors.bank_name = "Enter a valid bank name (min 9 characters)";
+      newErrors.bank_name = "Bank name must be at least 9 characters";
     }
 
     if (!isValid(PATTERNS.IFSC, formData.ifsc || "")) {
@@ -31,7 +39,8 @@ const {showToast} = useToast();
     }
 
     if (!isValid(PATTERNS.ACCOUNT_NUMBER, formData.acc_number || "")) {
-      newErrors.acc_number = "Account number must be 6–18 alphanumeric characters";
+      newErrors.acc_number =
+        "Account number must be 6–18 alphanumeric characters";
     }
 
     if (!formData.balance || isNaN(formData.balance)) {
@@ -43,58 +52,71 @@ const {showToast} = useToast();
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-const handleSubmit = () => {
-  if (!validateForm()) return;
 
-  setSubmitting(true);
+  // ✅ Submit handler
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
 
-  apiCall("post", ApiEndpoints.CREATE_BANK, formData).then(({ error, response }) => {
-    onFetchRef();
-    onClose();
+    setSubmitting(true);
+    try {
+      const { error, response } = await apiCall(
+        "POST",
+        ApiEndpoints.CREATE_BANK,
+        formData
+      );
 
-    if (response) {
-      showToast(response?.message || "Bank created successfully", "success");
-    } else {
-      showToast(error?.message || "Failed to create bank", "error");
+      if (response) {
+        showToast(response?.message || "Bank created successfully", "success");
+        onFetchRef?.(); // refresh list if callback exists
+        onClose();
+      } else {
+        showToast(error?.message || "Failed to create bank", "error");
+        // ❌ don’t auto-close on error
+      }
+    } catch (err) {
+      console.error("Error creating bank:", err);
+      showToast("Something went wrong while creating bank", "error");
+    } finally {
+      setSubmitting(false);
     }
+  };
 
-    setSubmitting(false);
-  });
-};
+  // ✅ Pick only required fields from schema
   const visibleFields = schema.filter((field) =>
     ["bank_name", "ifsc", "acc_number", "balance"].includes(field.name)
   );
 
-  return (
-    <CommonModal
-      open={open}
-      onClose={onClose}
-      title="Create New Bank"
-      iconType="info"
-      size="small"
-      dividers
+ return (
+  <CommonModal
+    open={open}
+    onClose={onClose}
+    title="Create New Bank"
+    iconType="info"
+    size="small"
+    dividers
       fieldConfig={visibleFields}
-      formData={formData}
-      handleChange={handleChange}
-      errors={errors}
-      loading={loading || submitting}
-      footerButtons={[
-        {
-          text: "Cancel",
-          variant: "outlined",
-          onClick: onClose,
-          disabled: submitting,
-        },
-        {
-          text: submitting ? "Saving..." : "Save",
-          variant: "contained",
-          color: "primary",
-          onClick: handleSubmit,
-          disabled: submitting,
-        },
-      ]}
-    />
-  );
+    formData={formData}
+    handleChange={handleChange}
+    errors={errors}
+      loading={loading}
+    footerButtons={[
+      {
+        text: "Cancel",
+        variant: "outlined",
+        onClick: onClose,
+        disabled: submitting,
+      },
+      {
+        text: submitting ? "Saving..." : "Save",
+        variant: "contained",
+        color: "primary",
+        onClick: handleSubmit,
+        disabled: submitting || loading || !schema.length, // disable until schema ready
+      },
+    ]}
+  />
+);
+
 };
 
 export default CreateBankModal;

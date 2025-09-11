@@ -1,30 +1,46 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CommonModal from "../components/common/CommonModal";
 import { useSchemaForm } from "../hooks/useSchemaForm";
-import { PATTERNS, isValid } from "../utils/validators";
 import { useToast } from "../utils/ToastContext";
 
-const CreateCommissionRule = ({ open, handleClose, handleSave,onFetchRef }) => {
+const CreateCommissionRule = ({ open, handleClose, handleSave, onFetchRef }) => {
   const { schema, formData, handleChange, errors, setErrors, loading } =
     useSchemaForm(ApiEndpoints.GET_COMMISSION_SCHEMA, open);
 
   const [submitting, setSubmitting] = useState(false);
   const { showToast } = useToast();
 
+  // ✅ Required fields
+  const requiredFields = [
+    "plan_id",
+    "service_name",
+    "rule_type",
+    "value_type",
+    "comm_dd",
+    "comm_ret",
+    "comm_di",
+    "comm_md",
+    "min_amount",
+    "max_amount",
+  ];
+
+  // ✅ Clear errors whenever modal opens fresh
+  useEffect(() => {
+    if (open) {
+      setErrors({});
+    }
+  }, [open, setErrors]);
+
   // ✅ Validation
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.service_name) newErrors.service_name = "service_name is required";
-        if (!formData.rule_type) newErrors.rule_type = "rule_type is required";
-    if (!formData.comm_dd) newErrors.comm_dd = "comm_dd is required";
-    if (!formData.comm_ret) newErrors.comm_ret = "comm_ret is required";
-    if (!formData.comm_di) newErrors.comm_di = "comm_di is required";
-    if (!formData.comm_md) newErrors.comm_md = "comm_md is required";
-    if (!formData.min_amount) newErrors.min_amount = "min_amount is required";
-    if (!formData.max_amount) newErrors.max_amount = "max_amount is required";
-
+    requiredFields.forEach((field) => {
+      if (!formData[field] || formData[field].toString().trim() === "") {
+        newErrors[field] = `${field} is required`;
+      }
+    });
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -42,40 +58,27 @@ const CreateCommissionRule = ({ open, handleClose, handleSave,onFetchRef }) => {
       );
 
       if (response) {
-        handleSave(response.data);
+        handleSave?.(response.data);
         showToast(
-          response?.message || "Fund request created successfully",
+          response?.message || "Commission rule created successfully",
           "success"
         );
-        onFetchRef();
+        onFetchRef?.();
         handleClose();
       } else {
-        showToast(error?.message || "Failed to create fund request", "error");
+        showToast(error?.message || "Failed to create commission rule", "error");
+        // ❌ don't close modal on error
       }
     } catch (err) {
-      console.error("Error creating fund request:", err);
-      showToast("Something went wrong while creating fund request", "error");
+      console.error("Error creating commission rule:", err);
+      showToast("Something went wrong while creating commission rule", "error");
     } finally {
       setSubmitting(false);
     }
   };
 
-  // ✅ Required fields
-  const requiredFields = [
-    "plan_id",
-    "service_name",
-    "rule_type",
-    "value_type",
-    "comm_dd",
-    "comm_ret",
-    "comm_di",
-    "comm_md",
-    "min_amount",
-    "max_amount",
-  ];
-
   // ✅ Pick only required fields from schema
-  let visibleFields = schema.filter((field) =>
+  const visibleFields = schema.filter((field) =>
     requiredFields.includes(field.name)
   );
 
