@@ -30,7 +30,7 @@ export const useSchemaForm = (endpoint, open) => {
           const res = await apiCall("post", endpoint);
 
           const payload =
-            res?.data?.data || res?.data || res?.response?.data || res;
+            res?.data?.data || res?.data || res?.response?.data || res || res?.response?.data?.data;
 
           console.log("📥 Schema structure:", payload);
 

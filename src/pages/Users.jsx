@@ -1,5 +1,5 @@
 import { useMemo, useContext, useState, useRef } from "react";
-import { Box, Tooltip, IconButton } from "@mui/material";
+import { Box, Tooltip, IconButton, Button } from "@mui/material";
 import AuthContext from "../contexts/AuthContext";
 import { dateToTime, ddmmyy } from "../utils/DateUtils";
 import CommonTable from "../components/common/CommonTable";
@@ -9,6 +9,8 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import BlockUnblockUser from "./BlockUnblockUser";
+import ReButton from "../components/common/ReButton";
+import CreateUser from "../components/User/createUser";
 
 const Users = ({ query }) => {
   const authCtx = useContext(AuthContext);
@@ -20,7 +22,7 @@ const Users = ({ query }) => {
   // 🔐 Lock/Unlock Modal
   const [lockModalOpen, setLockModalOpen] = useState(false);
   const [userToToggle, setUserToToggle] = useState(null);
-
+  const [openCreateUser, setOpenCreateUser] = useState(false);
   const handleOpenPermissions = (user) => {
     setSelectedUser(user);
     setOpenPermissions(true);
@@ -162,7 +164,17 @@ const Users = ({ query }) => {
         filters={filters}
         queryParam={query}
         onFetchRef={handleFetchRef}
+        customHeader={
+          <ReButton label="User" onClick={() => setOpenCreateUser(true)} />
+        }
       />
+      {openCreateUser && (
+        <CreateUser
+          open={openCreateUser}
+          onClose={() => setOpenCreateUser(false)}
+          onFetchRef={refreshUsers}
+        />
+      )}
 
       {/* Permissions Modal */}
       {selectedUser && (

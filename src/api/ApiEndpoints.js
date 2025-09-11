@@ -164,7 +164,10 @@ const ApiEndpoints = {
 
   CHANGE_USER_LAYOUT: "user/changeLayout",
 
-  DMT1:"dmt1/remitterStatus",
+  DMT1: "dmt1/remitterStatus",
+
+  CREATE_USER: "signup/createUser",
+  GET_SIGNUP_SCHEMA: "signup/getSignupSchema",
   // ****************************** NEW API'S ABOVE ******************************
 
   GET_ACC_ACCOUNTS: "",

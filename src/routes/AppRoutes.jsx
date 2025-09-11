@@ -41,7 +41,7 @@ import LandingContactUs from "../components/LandingPages/LandingContactUs";
 import Navs from "../pages/Navs";
 
 import Statements from "../pages/Statements";
- 
+
 import UpiTransfer from "../pages/UpiTransfer";
 import BankStatements from "../pages/BankStatements";
 import AccountStatement from "../pages/AccountStatement";
@@ -67,16 +67,16 @@ export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="" element={<LandingPage />}/>
-          <Route path="navbar" element={<NavBar />} />
-          <Route path="footer" element={<Footer />} />
-          <Route path="landingservices" element={<LandingServices />} />
-          <Route path="landingaboutus" element={<LandingAboutUs />} />
-          <Route path="landingcontactus" element={<LandingContactUs />} />
-          <Route path="landingpageintro" element={<LandingPageIntro />} />
-          <Route path="landingpageintro1" element={<LandingPageIntro1 />} />
-          <Route path="landingpageintro2" element={<LandingPageIntro2 />} />
-          <Route path="landingpageintro3" element={<LandingPageIntro3 />} />
+        <Route path="" element={<LandingPage />} />
+        <Route path="navbar" element={<NavBar />} />
+        <Route path="footer" element={<Footer />} />
+        <Route path="landingservices" element={<LandingServices />} />
+        <Route path="landingaboutus" element={<LandingAboutUs />} />
+        <Route path="landingcontactus" element={<LandingContactUs />} />
+        <Route path="landingpageintro" element={<LandingPageIntro />} />
+        <Route path="landingpageintro1" element={<LandingPageIntro1 />} />
+        <Route path="landingpageintro2" element={<LandingPageIntro2 />} />
+        <Route path="landingpageintro3" element={<LandingPageIntro3 />} />
 
         <Route path="/login" element={<Login />} />
 
@@ -109,8 +109,14 @@ export default function AppRoutes() {
               <Route path="admin/logs" element={<Logs />} />
               <Route path="admin/profile" element={<ProfilePage />} />
               <Route path="admin/banks" element={<Banks />} />
-               <Route path="admin/bankstatements/:id" element={<BankStatements />} />
-               <Route path="admin/accountstatements/:id" element={<AccountStatement />} />
+              <Route
+                path="admin/bankstatements/:id"
+                element={<BankStatements />}
+              />
+              <Route
+                path="admin/accountstatements/:id"
+                element={<AccountStatement />}
+              />
               <Route path="admin/layout" element={<Layouts />} />
               <Route path="admin/commissionrule" element={<CommissionRule />} />
               <Route path="admin/sidenav" element={<Navs />} />
@@ -137,10 +143,7 @@ export default function AppRoutes() {
                 element={<AccountLadger />}
               />
               <Route path="customer/logs" element={<RetailerLogs />} />
-              <Route
-                path="customer/money-transfer"
-                element={<Dmt />}
-              />
+              <Route path="customer/money-transfer" element={<Dmt />} />
               <Route
                 path="customer/fund-transfer"
                 element={<SuperTransfer />}
@@ -159,13 +162,15 @@ export default function AppRoutes() {
                 element={<Navigate to="/customer/dashboard" replace />}
               />
               <Route path="customer/accounts" element={<Accounts />} />
-              <Route path="customer/allServices" element={<AllServices/>} />
+              <Route path="customer/allServices" element={<AllServices />} />
             </>
           )}
           {isDi && (
             <>
               <Route path="di/dashboard" element={<AdminTransactions />} />
+              <Route path="di/users" element={<Users />} />
               <Route path="di/services" element={<Dashboard />} />
+
               <Route
                 path="customer/account-ledger"
                 element={<AccountLadger />}

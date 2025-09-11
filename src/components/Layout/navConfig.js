@@ -73,7 +73,10 @@ export const customer_nav = [
   { title: "My Sale", icon: "📒", icon2: "📒", to: "/customer/sale" },
   { title: "Logs", icon: "📒", icon2: "📒", to: "/customer/logs" },
 ];
-
+export const di_nav = [
+  { title: "Dashboard", icon: "📊", icon2: "📊", to: "/di/dashboard" },
+  { title: "Users", icon: "👥", icon2: "👥", to: "/di/users" },
+];
 
 export const service_nav = [
   { title: "Dashboard", icon: "📊", icon2: "📊", to: "/customer/dashboard" },

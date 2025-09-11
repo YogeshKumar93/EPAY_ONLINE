@@ -379,7 +379,7 @@ const VerifyMpinLogin = ({
           } else if (userData.role === "asm") {
             navigate("/asm/dashboard");
           } else if (userData.role === "di") {
-            navigate("/ad/dashboard");
+            navigate("/di/dashboard");
           } else if (userData.role === "ret" || userData.role === "dd") {
             navigate("/customer/dashboard");
           } else {
