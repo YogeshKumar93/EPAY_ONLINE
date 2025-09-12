@@ -303,7 +303,7 @@ export const AuthProvider = ({ children }) => {
     ip: ip,
     setDmt2Doc: setDmt2Doc,
     dmt2Doc: dmt2Doc,
-    loadUserProfile,
+
     loadUserProfile,
   };
 

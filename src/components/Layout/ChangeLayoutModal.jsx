@@ -21,6 +21,7 @@ import { apiCall } from "../../api/apiClient";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import CommonMpinModal from "../common/CommonMpinModal";
 import Loader from "../common/Loader";
+import CommonLoader from "../common/CommonLoader";
 
 const style = {
   position: "absolute",
@@ -45,7 +46,8 @@ const ChangeLayoutModal = ({ open, onClose, onSuccess, username }) => {
 
   const authCtx = useContext(AuthContext);
   const user = authCtx.user;
-  const layout = user?.is_layout;
+  const loadUserProfile = authCtx?.loadUserProfile;
+
   const [value, setValue] = React.useState(user?.layout * 1);
   const navigate = useNavigate();
 
@@ -74,6 +76,8 @@ const changeSwitch = useCallback(
         const userData = response?.data?.data;
         showToast(response?.data?.message || "Layout changed successfully", "success");
         // authCtx.saveUser(userData);
+        
+         loadUserProfile(); // Refresh user profile to get updated layout
         onClose();
         setMpinCallBackVal(false);
       
@@ -110,7 +114,7 @@ const changeSwitch = useCallback(
 
   return (
     <>
-      <Loader loading={request} />
+      <CommonLoader loading={request} text="Changing Layout..." />
 
       <CommonModal
         open={open}
