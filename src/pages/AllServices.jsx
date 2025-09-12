@@ -596,7 +596,7 @@ export default function AllServices() {
             mt: 2,
             backgroundColor: "#FFF",
             borderRadius: 3,
-            p: 3,
+            p: 1,
             boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
             border: "1px solid #E9E8F5",
           }}
@@ -605,9 +605,10 @@ export default function AllServices() {
             sx={{
               display: "flex",
               alignItems: "center",
-              mb: 3,
+                backgroundColor: "#FFF",
+              // mb: 3,
               borderBottom: "1px solid #F5F4FA",
-              pb: 2,
+              pb: 1,
             }}
           >
             <IconButton
