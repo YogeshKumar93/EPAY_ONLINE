@@ -77,7 +77,7 @@ const Bbps = () => {
     value={search}
     onChange={(e) => setSearch(e.target.value)}
     size="medium"
-    sx={{ width: "81%" }} // adjust as needed
+    sx={{ width: "82%" }} // adjust as needed
     InputProps={{
       startAdornment: (
         <InputAdornment position="start">
@@ -130,7 +130,7 @@ const Bbps = () => {
                             sx={{ width: 40, height: 40, mb: 1 }}
                           />
                         )}
-                        <Typography variant="subtitle1" fontWeight="600" noWrap>
+                        <Typography variant="subtitle1" fontWeight="600" Wrap>
                           {cat.category_name}
                         </Typography>
                       </CardContent>

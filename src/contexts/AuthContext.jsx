@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
+import axios from "axios";
 
 // import useSessionTimeout from "../hooks/useSessionTimeout";
 
@@ -30,16 +31,16 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(initialUser);
   const [nepalUser, setNepalUser] = useState(initialNepalUser);
   const [ifDocsUploaded, setIfDocsUploaded] = useState(docsData);
-    const [sideNavs, setSideNavs] = useState([]);
+  const [sideNavs, setSideNavs] = useState([]);
   const [location, setLocation] = useState(
     JSON.parse(localStorage.getItem("location"))
   );
   const [theame, setTheame] = useState();
-const [colours, setColours] = useState(() => {
-  const stored = localStorage.getItem("colours");
-  return stored ? JSON.parse(stored) : {};
-}); 
- const [iconColor, setIconColor] = useState();
+  const [colours, setColours] = useState(() => {
+    const stored = localStorage.getItem("colours");
+    return stored ? JSON.parse(stored) : {};
+  });
+  const [iconColor, setIconColor] = useState();
   const [currentView, setCurrentView] = useState(null);
   const [ip, setIp] = useState("");
   const [dmt2Doc, setDmt2Doc] = useState("");
@@ -48,33 +49,37 @@ const [colours, setColours] = useState(() => {
   const isUserNavigatingAway = useRef(false);
   const userIsLoggedIn = !!token;
 
-const loadUserProfile = async () => {
-  try {
-    const { error, response } = await apiCall("GET", ApiEndpoints.GET_ME_USER);
+  const loadUserProfile = async () => {
+    try {
+      const { error, response } = await apiCall(
+        "GET",
+        ApiEndpoints.GET_ME_USER
+      );
 
-    if (error) throw new Error(error.message || "Failed to load user profile");
+      if (error)
+        throw new Error(error.message || "Failed to load user profile");
 
-    if (response) {
-      const latestUser = response.data;
-      const savedUser = JSON.parse(localStorage.getItem("user"));
+      if (response) {
+        const latestUser = response.data;
+        const savedUser = JSON.parse(localStorage.getItem("user"));
 
-      // 🚨 Compare critical fields like role, status, etc.
-      if (savedUser && savedUser.role !== latestUser.role) {
-        console.warn("User role has changed, logging out...");
-        await logout(); // logout API + clear storage
-        return null;
+        // 🚨 Compare critical fields like role, status, etc.
+        if (savedUser && savedUser.role !== latestUser.role) {
+          console.warn("User role has changed, logging out...");
+          await logout(); // logout API + clear storage
+          return null;
+        }
+
+        // ✅ Keep user updated
+        setUser(latestUser);
+        localStorage.setItem("user", JSON.stringify(latestUser));
+        return latestUser;
       }
-
-      // ✅ Keep user updated
-      setUser(latestUser);
-      localStorage.setItem("user", JSON.stringify(latestUser));
-      return latestUser;
+    } catch (err) {
+      console.error("Failed to load user profile:", err);
+      throw err;
     }
-  } catch (err) {
-    console.error("Failed to load user profile:", err);
-    throw err;
-  }
-};
+  };
   // const getSideNavs = async () => {
   //   try {
   //     const { error, response } = await apiCall("post", ApiEndpoints.GET_SIDENAV);
@@ -102,26 +107,40 @@ const loadUserProfile = async () => {
   //   }
   // };
 
-const loadColours = async () => {
-  try {
-    const { error, response } = await apiCall("post", ApiEndpoints.GET_COLOURS);
+  const loadColours = async () => {
+    try {
+      const { error, response } = await apiCall(
+        "post",
+        ApiEndpoints.GET_COLOURS
+      );
 
-    if (error) throw new Error(error.message || "Failed to load colours");
+      if (error) throw new Error(error.message || "Failed to load colours");
 
-    if (response?.data) {
-      const mappedColours = {};
-      response.data.forEach((item) => {
-        mappedColours[item.element_type] = item.color_code;
-      });
+      if (response?.data) {
+        const mappedColours = {};
+        response.data.forEach((item) => {
+          mappedColours[item.element_type] = item.color_code;
+        });
 
-      setColours(mappedColours);
-      localStorage.setItem("colours", JSON.stringify(mappedColours)); // optional cache
+        setColours(mappedColours);
+        localStorage.setItem("colours", JSON.stringify(mappedColours)); // optional cache
+      }
+    } catch (err) {
+      console.error("Failed to fetch colours:", err);
     }
-  } catch (err) {
-    console.error("Failed to fetch colours:", err);
-  }
-}
+  };
+  useEffect(() => {
+    const fetchIp = async () => {
+      try {
+        const response = await axios.get("https://api.ipify.org?format=json");
+        setIp(response.data.ip);
+      } catch (error) {
+        console.error("Error fetching the IP address:", error);
+      }
+    };
 
+    fetchIp();
+  }, []);
   // Initialize auth state on app load
   useEffect(() => {
     const initializeAuth = async () => {
@@ -147,8 +166,8 @@ const loadColours = async () => {
       setTokenState(token);
       localStorage.setItem("access_token", token);
       const userProfile = await loadUserProfile();
-            await loadColours();
-                // await getSideNavs();          // Fetch side navs AFTER login
+      await loadColours();
+      // await getSideNavs();          // Fetch side navs AFTER login
       return userProfile;
     } catch (err) {
       clearToken();
@@ -258,8 +277,8 @@ const loadColours = async () => {
     logout,
     saveUser,
     isAuthenticated: !!token,
-  colours,
-  loadColours,
+    colours,
+    loadColours,
 
     // New keys from second context
     token: token,

@@ -23,18 +23,24 @@ const BbpsBillers = ({ category, onBack }) => {
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [selectedBillerId, setSelectedBillerId] = useState(null);
+  const [selectedBillerIdImage, setSelectedBillerIdImage] = useState(null);
 
   // Fetch billers by category
   const fetchBillers = async () => {
     setLoading(true);
     try {
-      const { error, response } = await apiCall("post", ApiEndpoints.BBPS_GET_BILLERS, {
-        category_code: category.category_code,
-        category_key: category.category_key,
-      });
+      const { error, response } = await apiCall(
+        "post",
+        ApiEndpoints.BBPS_GET_BILLERS,
+        {
+          category_code: category.category_code,
+          category_key: category.category_key,
+        }
+      );
 
       if (response) {
-        const data = response?.data?.records || response?.response?.data?.records || [];
+        const data =
+          response?.data?.records || response?.response?.data?.records || [];
         setBillers(data);
       } else if (error) {
         apiErrorToast(error?.message || "Failed to fetch billers");
@@ -68,7 +74,12 @@ const BbpsBillers = ({ category, onBack }) => {
         <IconButton onClick={onBack}>
           <ArrowBackIcon />
         </IconButton>
-        <Typography variant="h5" fontWeight="bold" noWrap sx={{ flexShrink: 0 }}>
+        <Typography
+          variant="h5"
+          fontWeight="bold"
+          noWrap
+          sx={{ flexShrink: 0 }}
+        >
           {category?.category_name}
         </Typography>
         <TextField
@@ -98,26 +109,32 @@ const BbpsBillers = ({ category, onBack }) => {
       {selectedBillerId && !loading ? (
         <BbpsBillerDetails
           billerId={selectedBillerId}
+          selectedBillerIdImage={selectedBillerIdImage}
           onBack={() => setSelectedBillerId(null)}
         />
       ) : null}
 
       {/* Billers list */}
       {!selectedBillerId && !loading && filteredBillers.length > 0 && (
-        <Box display="flex" flexWrap="wrap" gap={2.5}>
+        <Box display="flex" flexWrap="wrap" gap={2.7}>
           {filteredBillers.map((biller) => (
             <Card
               key={biller.billerId}
               sx={{
                 borderRadius: 3,
                 boxShadow: 3,
-                width: 300,
+                width: 305,
                 height: 150,
                 opacity: isBillerDisabled(biller) ? 0.6 : 1,
               }}
             >
               <CardActionArea
-                onClick={() => !isBillerDisabled(biller) && setSelectedBillerId(biller.billerId)}
+                onClick={() => {
+                  if (!isBillerDisabled(biller)) {
+                    setSelectedBillerId(biller.billerId);
+                    setSelectedBillerIdImage(biller.iconUrl);
+                  }
+                }}
                 sx={{
                   height: "100%",
                   display: "flex",
@@ -133,15 +150,20 @@ const BbpsBillers = ({ category, onBack }) => {
                       component="img"
                       src={biller.iconUrl}
                       alt={biller.billerName}
-                      sx={{ width: 55, height: 55, objectFit: "contain", mb: 1 }}
+                      sx={{
+                        width: 55,
+                        height: 55,
+                        objectFit: "contain",
+                        mb: 1,
+                      }}
                     />
                   )}
-                  <Typography variant="subtitle2" fontWeight="600" noWrap>
+                  <Typography variant="subtitle2" fontWeight="600" Wrap>
                     {biller.billerName}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" noWrap>
+                  {/* <Typography variant="body2" color="text.secondary" noWrap>
                     {biller.categoryName} | {biller.type}
-                  </Typography>
+                  </Typography> */}
                   <Typography
                     variant="caption"
                     sx={{
@@ -160,7 +182,9 @@ const BbpsBillers = ({ category, onBack }) => {
 
       {/* No billers found */}
       {!selectedBillerId && !loading && filteredBillers.length === 0 && (
-        <Typography color="text.secondary">No billers found for this category.</Typography>
+        <Typography color="text.secondary">
+          No billers found for this category.
+        </Typography>
       )}
     </Box>
   );
