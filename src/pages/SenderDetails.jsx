@@ -1,3 +1,27 @@
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  Typography,
+  Avatar,
+  Chip,
+  Box,
+  IconButton,
+  Collapse,
+  useMediaQuery,
+  useTheme,
+  Stack,
+  Grid,
+} from "@mui/material";
+import {
+  ExpandMore,
+  ExpandLess,
+  Person,
+  Phone,
+  AccountBalance,
+  VerifiedUser,
+} from "@mui/icons-material";
+
 const SenderDetails = ({ sender }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -169,3 +193,5 @@ const SenderDetails = ({ sender }) => {
     </Card>
   );
 };
+
+export default SenderDetails;
