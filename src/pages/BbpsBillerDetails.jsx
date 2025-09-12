@@ -158,7 +158,7 @@ const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
       py={{ xs: 2, sm: 4, md: 0 }}
     >
       {/* Back Button + Header */}
-      <Box display="flex" alignItems="center"  gap={2}>
+      <Box display="flex" alignItems="center"mb={(1)}  gap={2}>
         <IconButton
           onClick={onBack}
           sx={{
@@ -175,8 +175,8 @@ const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
             src={selectedBillerIdImage}
             alt={billerDetails?.billerInfo?.name || "Biller"}
             sx={{
-              width: 70,
-              height: 70,
+              width: 55,
+              height: 55,
               objectFit: "contain",
               borderRadius: "8px",
             
@@ -207,6 +207,7 @@ const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
     justifyContent: billData ? "flex-start" : "center", // <-- Center before fetch
    alignItems: billData ? "flex-start" : "center", // <-- center horizontally
     gap: { xs: 2, md: 3 },
+    
   }}
 >
 
@@ -228,6 +229,7 @@ const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
               color="primary"
               gutterBottom
               textAlign="center"
+              
               sx={{ fontSize: { xs: "1.1rem", sm: "1.5rem" } }}
             >
               Enter Details

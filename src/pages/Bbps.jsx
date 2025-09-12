@@ -8,6 +8,7 @@ import {
   CardActionArea,
   CircularProgress,
   InputAdornment,
+  Grid,
 } from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
@@ -94,55 +95,109 @@ const Bbps = () => {
               <CircularProgress />
             </Box>
           ) : (
-            <Box display="flex" flexWrap="wrap" gap={2.8}>
-              {filtered.length > 0 ? (
-                filtered.map((cat) => (
-                  <Card
-                    key={cat.id}
-                    sx={{
-                      borderRadius: 3,
-                      boxShadow: 3,
-                      "&:hover": { boxShadow: 6 },
-                      width: 240,
-                      height: 120,
-                      cursor: "pointer",
-                    }}
-                  >
-                    <CardActionArea
-                      sx={{ height: "100%" }}
-                      onClick={() => setSelectedCategory(cat)}
-                    >
-                      <CardContent
-                        sx={{
-                          textAlign: "center",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          height: "100%",
-                        }}
-                      >
-                        {(cat.icon_url || cat.icon) && (
-                          <Box
-                            component="img"
-                            src={cat.icon_url || cat.icon}
-                            alt={cat.category_name}
-                            sx={{ width: 40, height: 40, mb: 1 }}
-                          />
-                        )}
-                        <Typography variant="subtitle1" fontWeight="600" Wrap>
-                          {cat.category_name}
-                        </Typography>
-                      </CardContent>
-                    </CardActionArea>
-                  </Card>
-                ))
-              ) : (
-                <Typography textAlign="center" color="text.secondary" width="100%">
-                  No categories found.
-                </Typography>
+            
+<Grid container spacing={2.2}>
+  {filtered.length > 0 ? (
+    filtered.map((cat) => (
+      <Grid item key={cat.id} xs={12} sm={6} md={2} lg={2} xl={3}>
+        <Card
+          sx={{
+            borderRadius: 3,
+            boxShadow: 3,
+            "&:hover": { boxShadow: 6 },
+            width: 212,
+            height: 120,
+            cursor: "pointer",
+          }}
+        >
+          <CardActionArea
+            sx={{ height: "100%" }}
+            onClick={() => setSelectedCategory(cat)}
+          >
+            <CardContent
+              sx={{
+                textAlign: "center",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100%",
+              }}
+            >
+              {(cat.icon_url || cat.icon) && (
+                <Box
+                  component="img"
+                  src={cat.icon_url || cat.icon}
+                  alt={cat.category_name}
+                  sx={{ width: 40, height: 40, mb: 1 }}
+                />
               )}
-            </Box>
+              <Typography variant="subtitle1" fontWeight="600" Wrap>
+                {cat.category_name}
+              </Typography>
+            </CardContent>
+          </CardActionArea>
+        </Card>
+      </Grid>
+    ))
+  ) : (
+    <Grid item xs={12}>
+      <Typography textAlign="center" color="text.secondary">
+        No categories found.
+      </Typography>
+    </Grid>
+  )}
+</Grid>
+
+            // <Box display="flex" flexWrap="wrap" gap={2.8}>
+            //   {filtered.length > 0 ? (
+            //     filtered.map((cat) => (
+            //       <Card
+            //         key={cat.id}
+            //         sx={{
+            //           borderRadius: 3,
+            //           boxShadow: 3,
+            //           "&:hover": { boxShadow: 6 },
+            //           width: 240,
+            //           height: 120,
+            //           cursor: "pointer",
+            //         }}
+            //       >
+            //         <CardActionArea
+            //           sx={{ height: "100%" }}
+            //           onClick={() => setSelectedCategory(cat)}
+            //         >
+            //           <CardContent
+            //             sx={{
+            //               textAlign: "center",
+            //               display: "flex",
+            //               flexDirection: "column",
+            //               alignItems: "center",
+            //               justifyContent: "center",
+            //               height: "100%",
+            //             }}
+            //           >
+            //             {(cat.icon_url || cat.icon) && (
+            //               <Box
+            //                 component="img"
+            //                 src={cat.icon_url || cat.icon}
+            //                 alt={cat.category_name}
+            //                 sx={{ width: 40, height: 40, mb: 1 }}
+            //               />
+            //             )}
+            //             <Typography variant="subtitle1" fontWeight="600" Wrap>
+            //               {cat.category_name}
+            //             </Typography>
+            //           </CardContent>
+            //         </CardActionArea>
+            //       </Card>
+            //     ))
+            //   ) : (
+            //     <Typography textAlign="center" color="text.secondary" width="100%">
+            //       No categories found.
+            //     </Typography>
+            //   )}
+            // </Box>
           )}
         </>
       ) : (
