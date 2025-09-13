@@ -161,7 +161,15 @@ const CommonTable = ({
   const initialFilterValues = useMemo(() => {
     const values = {};
     availableFilters?.forEach((filter) => {
-      values[filter.id] = filter.type === "dropdown" ? "All" : "";
+      if (filter.type === "dropdown") {
+        values[filter.id] = "All";
+      } else if (filter.type === "date") {
+        values[filter.id] = "";
+      } else if (filter.type === "daterange") {
+        values[filter.id] = { start: "", end: "" };
+      } else {
+        values[filter.id] = "";
+      }
     });
     return values;
   }, [availableFilters]);
@@ -310,15 +318,44 @@ const CommonTable = ({
   }, []);
 
   const applyFilters = useCallback(() => {
-    setAppliedFilters({ ...filterValues });
-    appliedFiltersRef.current = { ...filterValues };
+    // Format dates before applying filters
+    const formattedFilters = { ...filterValues };
+
+    Object.keys(formattedFilters).forEach((key) => {
+      const filterConfig = availableFilters.find((f) => f.id === key);
+
+      if (filterConfig?.type === "date" && formattedFilters[key]) {
+        // Format date to YYYY-MM-DD for API
+        formattedFilters[key] = new Date(formattedFilters[key])
+          .toISOString()
+          .split("T")[0];
+      } else if (filterConfig?.type === "daterange" && formattedFilters[key]) {
+        // Format date range
+        if (formattedFilters[key].start) {
+          formattedFilters[`${key}_start`] = new Date(
+            formattedFilters[key].start
+          )
+            .toISOString()
+            .split("T")[0];
+        }
+        if (formattedFilters[key].end) {
+          formattedFilters[`${key}_end`] = new Date(formattedFilters[key].end)
+            .toISOString()
+            .split("T")[0];
+        }
+        delete formattedFilters[key]; // Remove the original daterange object
+      }
+    });
+
+    setAppliedFilters(formattedFilters);
+    appliedFiltersRef.current = formattedFilters;
     setPage(0);
     pageRef.current = 0;
     if (isSmallScreen) {
       setFilterModalOpen(false);
     }
     fetchData();
-  }, [filterValues, isSmallScreen, fetchData]);
+  }, [filterValues, isSmallScreen, fetchData, availableFilters]);
 
   const resetFilters = useCallback(() => {
     setFilterValues(initialFilterValues);
@@ -328,13 +365,18 @@ const CommonTable = ({
     pageRef.current = 0;
     fetchData();
   }, [initialFilterValues, fetchData]);
-
   const removeFilter = useCallback(
     (filterId) => {
-      const resetValue =
-        availableFilters.find((f) => f.id === filterId)?.type === "dropdown"
-          ? "All"
-          : "";
+      const filterConfig = availableFilters.find((f) => f.id === filterId);
+      let resetValue;
+
+      if (filterConfig?.type === "dropdown") {
+        resetValue = "All";
+      } else if (filterConfig?.type === "daterange") {
+        resetValue = { start: "", end: "" };
+      } else {
+        resetValue = "";
+      }
 
       setFilterValues((prev) => ({ ...prev, [filterId]: resetValue }));
       setAppliedFilters((prev) => ({ ...prev, [filterId]: resetValue }));
@@ -404,6 +446,57 @@ const CommonTable = ({
                   ))}
               </TextField>
             </FormControl>
+          ) : filter.type === "date" ? (
+            <TextField
+              fullWidth
+              size="small"
+              label={filter.label}
+              type="date"
+              value={filterValues[filter.id] || ""}
+              onChange={(e) => handleFilterChange(filter.id, e.target.value)}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          ) : filter.type === "daterange" ? (
+            <Box>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                {filter.label}
+              </Typography>
+              <TextField
+                fullWidth
+                size="small"
+                label="Start Date"
+                type="date"
+                value={filterValues[filter.id]?.start || ""}
+                onChange={(e) =>
+                  handleFilterChange(filter.id, {
+                    ...filterValues[filter.id],
+                    start: e.target.value,
+                  })
+                }
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                sx={{ mb: 1 }}
+              />
+              <TextField
+                fullWidth
+                size="small"
+                label="End Date"
+                type="date"
+                value={filterValues[filter.id]?.end || ""}
+                onChange={(e) =>
+                  handleFilterChange(filter.id, {
+                    ...filterValues[filter.id],
+                    end: e.target.value,
+                  })
+                }
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+            </Box>
           ) : (
             <TextField
               fullWidth
@@ -422,9 +515,38 @@ const CommonTable = ({
   const appliedFiltersChips = useMemo(
     () =>
       Object.entries(appliedFilters)
-        .filter(([key, value]) => value && value !== "All" && value !== "")
+        .filter(([key, value]) => {
+          // Skip date range sub-filters (they're handled separately)
+          if (key.includes("_start") || key.includes("_end")) return false;
+
+          const filterConfig = availableFilters.find((f) => f.id === key);
+
+          if (filterConfig?.type === "daterange") {
+            return value && (value.start || value.end);
+          }
+
+          return value && value !== "All" && value !== "";
+        })
         .map(([key, value]) => {
           const filterConfig = availableFilters.find((f) => f.id === key);
+
+          if (filterConfig?.type === "daterange") {
+            if (!value.start && !value.end) return null;
+
+            const label = `${filterConfig.label}: ${
+              value.start || "Start"
+            } to ${value.end || "End"}`;
+            return (
+              <Chip
+                key={key}
+                label={label}
+                onDelete={() => removeFilter(key)}
+                size="small"
+                sx={{ m: 0.5 }}
+              />
+            );
+          }
+
           return (
             <FilterChip
               key={key}
@@ -436,6 +558,94 @@ const CommonTable = ({
           );
         }),
     [appliedFilters, availableFilters, removeFilter]
+  );
+
+  const renderDesktopFilters = useCallback(
+    () =>
+      availableFilters.map((filter) => (
+        <Box key={filter.id} sx={{ minWidth: 120 }}>
+          {filter.type === "dropdown" ? (
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <TextField
+                select
+                label={filter.label}
+                value={filterValues[filter.id] || "All"}
+                onChange={(e) => handleFilterChange(filter.id, e.target.value)}
+                size="small"
+              >
+                <MenuItem value="All">All</MenuItem>
+                {filter.options &&
+                  filter.options.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+              </TextField>
+            </FormControl>
+          ) : filter.type === "date" ? (
+            <TextField
+              size="small"
+              label={filter.label}
+              type="date"
+              value={filterValues[filter.id] || ""}
+              onChange={(e) => handleFilterChange(filter.id, e.target.value)}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              sx={{ minWidth: 140 }}
+            />
+          ) : filter.type === "daterange" ? (
+            <Box
+              sx={{ display: "flex", flexDirection: "column", minWidth: 280 }}
+            >
+              <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
+                {filter.label}
+              </Typography>
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <TextField
+                  size="small"
+                  label="Start"
+                  type="date"
+                  value={filterValues[filter.id]?.start || ""}
+                  onChange={(e) =>
+                    handleFilterChange(filter.id, {
+                      ...filterValues[filter.id],
+                      start: e.target.value,
+                    })
+                  }
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <TextField
+                  size="small"
+                  label="End"
+                  type="date"
+                  value={filterValues[filter.id]?.end || ""}
+                  onChange={(e) =>
+                    handleFilterChange(filter.id, {
+                      ...filterValues[filter.id],
+                      end: e.target.value,
+                    })
+                  }
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+              </Box>
+            </Box>
+          ) : (
+            <TextField
+              size="small"
+              label={filter.label}
+              value={filterValues[filter.id] || ""}
+              onChange={(e) => handleFilterChange(filter.id, e.target.value)}
+              sx={{ minWidth: 120 }}
+            />
+          )}
+        </Box>
+      )),
+    [availableFilters, filterValues, handleFilterChange]
   );
 
   // Memoized table rows
@@ -595,7 +805,7 @@ const CommonTable = ({
             {/* <FilterListIcon sx={{ mr: 1 }} /> */}
             {/* <Typography variant="h6">Filters</Typography> */}
             {/* </Box> */}
-
+           
             <Box
               sx={{
                 display: "flex",
@@ -605,42 +815,7 @@ const CommonTable = ({
                 // mb: 2
               }}
             >
-              {availableFilters.map((filter) => (
-                <Box key={filter.id} sx={{ minWidth: 120 }}>
-                  {filter.type === "dropdown" ? (
-                    <FormControl size="small" sx={{ minWidth: 120 }}>
-                      <TextField
-                        select
-                        label={filter.label}
-                        value={filterValues[filter.id] || "All"}
-                        onChange={(e) =>
-                          handleFilterChange(filter.id, e.target.value)
-                        }
-                        size="small"
-                      >
-                        <MenuItem value="All">All</MenuItem>
-                        {filter.options &&
-                          filter.options.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                              {option.label}
-                            </MenuItem>
-                          ))}
-                      </TextField>
-                    </FormControl>
-                  ) : (
-                    <TextField
-                      size="small"
-                      label={filter.label}
-                      value={filterValues[filter.id] || ""}
-                      onChange={(e) =>
-                        handleFilterChange(filter.id, e.target.value)
-                      }
-                      sx={{ minWidth: 120 }}
-                    />
-                  )}
-                </Box>
-              ))}
-
+            {renderDesktopFilters()}
               {/* Apply and Reset buttons */}
               <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                 {/* Left side buttons */}
@@ -764,18 +939,17 @@ const CommonTable = ({
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
           {/* ✅ Show Refresh only if no filters are used */}
-          {availableFilters.length === 0 &&
-            (refresh && (
-              <Tooltip title="Refresh">
-                <IconButton
-                  onClick={handleManualRefresh}
-                  disabled={loading}
-                  sx={{ ml: 1 }}
-                >
-                  {loading ? <CircularProgress size={24} /> : <CachedIcon />}
-                </IconButton>
-              </Tooltip>
-            ))}
+          {availableFilters.length === 0 && refresh && (
+            <Tooltip title="Refresh">
+              <IconButton
+                onClick={handleManualRefresh}
+                disabled={loading}
+                sx={{ ml: 1 }}
+              >
+                {loading ? <CircularProgress size={24} /> : <CachedIcon />}
+              </IconButton>
+            </Tooltip>
+          )}
         </Box>
       </Box>
 

@@ -24,14 +24,30 @@ export const Admin_nav = [
     icon2: "🛠️",
     to: "/admin/wallet-transfer",
   },
+    {
+    title: "Wallet Ledger",
+    icon: "🛠️",
+    icon2: "🛠️",
+    to: "/admin/wallet-ledger",
+  },
   { title: "Settings", icon: "👥", icon2: "👥", to: "/admin/settings" },
   { title: "Services", icon: "👥", icon2: "👥", to: "/admin/services" },
   { title: "Bankings", icon: "👥", icon2: "👥", to: "/admin/bankings" },
   { title: "Layouts", icon: "👥", icon2: "👥", to: "/admin/selectlayout" },
   { title: "Complaint", icon: "👥", icon2: "👥", to: "/admin/selectlayout" },
   { title: "Risk", icon: "👥", icon2: "👥", to: "/admin/selectlayout" },
-  { title: "Virtual Accounts", icon: "👥", icon2: "👥", to: "/admin/selectlayout" },
-  { title: "Login History", icon: "👥", icon2: "👥", to: "/admin/selectlayout" },
+  {
+    title: "Virtual Accounts",
+    icon: "👥",
+    icon2: "👥",
+    to: "/admin/selectlayout",
+  },
+  {
+    title: "Login History",
+    icon: "👥",
+    icon2: "👥",
+    to: "/admin/selectlayout",
+  },
 ];
 
 // Customer Navigation
@@ -67,7 +83,7 @@ export const customer_nav = [
     icon2: "🛠️",
     to: "/customer/w2w-transfer",
   },
-    {
+  {
     title: "Wallet Transfer",
     icon: "🛠️",
     icon2: "🛠️",
@@ -117,15 +133,16 @@ export const service_nav = [
     to: "/customer/allServices",
   },
     {
-    title: "W2W Transfer",
-    icon: "🛠️",
-    icon2: "🛠️",
-    to: "/customer/w2w-transfer",
-  },
-    {
     title: "Wallet Transfer",
     icon: "🛠️",
     icon2: "🛠️",
     to: "/customer/wallet-transfer",
   },
+  {
+    title: "Wallet Ledger",
+    icon: "🛠️",
+    icon2: "🛠️",
+    to: "/customer/wallet-ledger",
+  },
+
 ];

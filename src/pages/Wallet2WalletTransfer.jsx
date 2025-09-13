@@ -148,14 +148,12 @@ const Wallet2WalletTransfer = ({ filters = [] }) => {
   );
 
   return (
-    <Box
-    
-    >
+    <Box>
       {/* LEFT: W2W Transfer Form */}
       <Box
         sx={{
           flex: 1, // chhota portion
-           mb: -3,
+          mb: -3,
           borderRadius: 3,
           display: "flex",
         }}
@@ -164,8 +162,6 @@ const Wallet2WalletTransfer = ({ filters = [] }) => {
       </Box>
 
       <Box sx={{}}>
-     
-
         {loading ? (
           <CommonLoader loading={loading} text="Loading Wallet Transfers" />
         ) : (
