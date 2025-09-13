@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -16,13 +16,15 @@ import { apiErrorToast } from "../utils/ToastUtil";
 import SearchIcon from "@mui/icons-material/Search";
 
 import BbpsBillers from "./BbpsBillers";
+import AuthContext from "../contexts/AuthContext";
 
 const Bbps = () => {
   const [categories, setCategories] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const authCtx = useContext(AuthContext);
+  const user = authCtx.user;
   const [selectedCategory, setSelectedCategory] = useState(null);
 
   // Fetch categories
@@ -54,9 +56,7 @@ const Bbps = () => {
     } else {
       const q = search.toLowerCase();
       setFiltered(
-        categories.filter((c) =>
-          c.category_name?.toLowerCase().includes(q)
-        )
+        categories.filter((c) => c.category_name?.toLowerCase().includes(q))
       );
     }
   }, [search, categories]);
@@ -65,34 +65,125 @@ const Bbps = () => {
     <Box>
       {!selectedCategory ? (
         <>
-         <Box display="flex" alignItems="center" gap={4} sx={{ mb: 2 }}>
-  {/* Page Title */}
-  <Typography variant="h5" fontWeight="bold">
-    BBPS Categories
-  </Typography>
+          {/* 🔹 Header */}
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+            sx={{ mb: 2 }}
+          >
+            <Typography
+              variant="h6"
+              fontWeight="700"
+              sx={{ color: "#2B1A4C", flexShrink: 0 }}
+            >
+              BBPS Categories
+            </Typography>
 
-  {/* Search Bar with Icon */}
-  <TextField
-    placeholder="Search categories..."
-    variant="outlined"
-    value={search}
-    onChange={(e) => setSearch(e.target.value)}
-    size="medium"
-    sx={{ width: "82%" }} // adjust as needed
-    InputProps={{
-      startAdornment: (
-        <InputAdornment position="start">
-          <SearchIcon />
-        </InputAdornment>
-      ),
-    }}
-  />
-</Box>
+            <TextField
+              placeholder="Search categories..."
+              variant="outlined"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              size="small"
+              sx={{
+                width: { xs: "60%", sm: "300px" },
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  height: 40,
+                },
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
 
-
+          {/* 🔹 Loader */}
           {loading ? (
             <Box display="flex" justifyContent="center" mt={4}>
               <CircularProgress />
+            </Box>
+          ) : user?.is_layout === 2 ? (
+            // ✅ Layout 2: sleek scrollable row
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                overflowX: "auto",
+                pb: 1.5,
+                "&::-webkit-scrollbar": { height: 6 },
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "#bbb",
+                  borderRadius: 3,
+                },
+              }}
+            >
+              {filtered.length > 0 ? (
+                filtered.map((cat) => (
+                  <Card
+                    key={cat.id}
+                    sx={{
+                      borderRadius: 2,
+                      boxShadow: 2,
+                      minWidth: 120,
+                      height: 90,
+                      cursor: "pointer",
+                      flex: "0 0 auto",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      transition: "all 0.2s ease",
+                      "&:hover": {
+                        boxShadow: 4,
+                        transform: "translateY(-2px)",
+                      },
+                    }}
+                    onClick={() => setSelectedCategory(cat)}
+                  >
+                    <CardContent
+                      sx={{
+                        textAlign: "center",
+                        p: 1,
+                      }}
+                    >
+                      {(cat.icon_url || cat.icon) && (
+                        <Box
+                          component="img"
+                          src={cat.icon_url || cat.icon}
+                          alt={cat.category_name}
+                          sx={{ width: 28, height: 28, mb: 0.5 }}
+                        />
+                      )}
+                      <Typography
+                        variant="caption"
+                        fontWeight="600"
+                        sx={{
+                          display: "block",
+                          textOverflow: "ellipsis",
+                          overflow: "hidden",
+                          whiteSpace: "nowrap",
+                          maxWidth: 90,
+                        }}
+                      >
+                        {cat.category_name}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <Typography
+                  textAlign="center"
+                  color="text.secondary"
+                  width="100%"
+                >
+                  No categories found.
+                </Typography>
+              )}
             </Box>
           ) : (
             
@@ -201,8 +292,10 @@ const Bbps = () => {
           )}
         </>
       ) : (
-        // ✅ Show Billers when category selected
-        <BbpsBillers category={selectedCategory} onBack={() => setSelectedCategory(null)} />
+        <BbpsBillers
+          category={selectedCategory}
+          onBack={() => setSelectedCategory(null)}
+        />
       )}
     </Box>
   );
