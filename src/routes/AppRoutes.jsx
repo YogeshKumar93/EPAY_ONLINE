@@ -155,8 +155,8 @@ export default function AppRoutes() {
               <Route path="customer/purchase" element={<MyPurchase />} />
               <Route path="customer/fund-request" element={<FundRequest />} />
               <Route path="customer/sale" element={<MySale />} />
- <Route path="customer/bbps" element={<Bbps />} />     
-          <Route path="customer/profile" element={<ProfilePage />} />
+              <Route path="customer/bbps" element={<Bbps />} />
+              <Route path="customer/profile" element={<ProfilePage />} />
 
               <Route
                 path="customer/*"
@@ -171,7 +171,7 @@ export default function AppRoutes() {
               <Route path="di/dashboard" element={<AdminTransactions />} />
               <Route path="di/users" element={<Users />} />
               <Route path="di/services" element={<Dashboard />} />
-
+              <Route path="di/allServices" element={<AllServices />} />
               <Route
                 path="customer/account-ledger"
                 element={<AccountLadger />}

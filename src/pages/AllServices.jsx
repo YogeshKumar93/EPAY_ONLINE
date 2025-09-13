@@ -72,7 +72,7 @@ import Bbps from "./Bbps";
 
 const MenuCard = ({ icon, label, onClick, isActive, user }) => {
   return (
-    <Zoom in={true} style={{ transitionDelay: Math.random() * 100 + "ms" }}>
+    <Zoom in={true} style={{ transitionDelay: Math.random() * 80 + "ms" }}>
       <Box
         onClick={onClick}
         sx={{
@@ -80,62 +80,49 @@ const MenuCard = ({ icon, label, onClick, isActive, user }) => {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          height: { xs: 90, sm: 100 },
-          width: { xs: 90, sm: 100 },
+          height: 85,
+          width: 85,
           borderRadius: 3,
           background: isActive
-            ? "linear-gradient(135deg, #5210c1 0%, #7b3fe3 100%)"
-            : "linear-gradient(135deg, #F5F4FA 0%, #FFFFFF 100%)",
-          color: isActive ? "#FFF" : "#2B1A4C",
+            ? "linear-gradient(135deg, #2563EB 0%, #1E40AF 100%)"
+            : "#F9FAFB",
+          color: isActive ? "#FFF" : "#1E3C72",
           cursor: "pointer",
           transition: "all 0.3s ease",
           boxShadow: isActive
-            ? "0 8px 16px rgba(82, 16, 193, 0.25)"
-            : "0 4px 12px rgba(0,0,0,0.08)",
+            ? "0 6px 14px rgba(37, 99, 235, 0.4)"
+            : "0 2px 6px rgba(0,0,0,0.08)",
           "&:hover": {
-            transform: "translateY(-4px)",
-            boxShadow: isActive
-              ? "0 12px 20px rgba(82, 16, 193, 0.3)"
-              : "0 8px 16px rgba(0,0,0,0.12)",
+            transform: "translateY(-4px) scale(1.04)",
+            boxShadow: "0 8px 16px rgba(37, 99, 235, 0.35)",
             background: isActive
-              ? "linear-gradient(135deg, #5210c1 0%, #7b3fe3 100%)"
-              : "linear-gradient(135deg, #E9E8F5 0%, #F5F4FA 100%)",
+              ? "linear-gradient(135deg, #2563EB 0%, #1E40AF 100%)"
+              : "linear-gradient(135deg, #EFF6FF 0%, #FFFFFF 100%)",
           },
           p: 1.5,
           position: "relative",
           overflow: "hidden",
-          "&::before": isActive
-            ? {
-                content: '""',
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 4,
-                // background: "linear-gradient(90deg, #FF9A8B 0%, #FF6A88 55%, #FF99AC 100%)",
-                borderRadius: "3px 3px 0 0",
-              }
-            : {},
         }}
       >
+        {/* Icon Container */}
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            width: 50,
-            height: 50,
+            width: 42,
+            height: 42,
             mb: 1,
-            borderRadius: "50%",
+            borderRadius: "12px",
             backgroundColor: isActive
-              ? "rgba(255,255,255,0.2)"
-              : "rgba(82, 16, 193, 0.08)",
+              ? "rgba(255,255,255,0.25)"
+              : "rgba(37, 99, 235, 0.08)",
+            transition: "all 0.3s ease",
             "& img": {
-              width: "60%",
-              height: "60%",
+              width: "55%",
+              height: "55%",
               objectFit: "contain",
             },
-            transition: "all 0.3s ease",
           }}
         >
           {typeof icon === "string" ? (
@@ -143,20 +130,27 @@ const MenuCard = ({ icon, label, onClick, isActive, user }) => {
           ) : (
             React.createElement(icon, {
               sx: {
-                fontSize: 24,
-                color: isActive ? "#FFF" : "#5210c1",
+                fontSize: 22,
+                color: isActive ? "#FFF" : "#2563EB",
               },
             })
           )}
         </Box>
+
+        {/* Label */}
         <Typography
-          variant="caption"
           sx={{
-            fontWeight: 600,
-            fontSize: "0.7rem",
+            fontWeight: 500,
+            fontSize: "0.60rem",
             textAlign: "center",
-            lineHeight: 1.2,
+            lineHeight: 1,
+            letterSpacing: "0.3px",
+            color: isActive ? "#FFF" : "#1E3C72",
             transition: "all 0.3s ease",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            maxWidth: "80px",
           }}
         >
           {label}
@@ -165,6 +159,7 @@ const MenuCard = ({ icon, label, onClick, isActive, user }) => {
     </Zoom>
   );
 };
+
 
 const SubMenuCard = ({ icon, label, onClick, isActive, user }) => {
   return (
@@ -413,17 +408,20 @@ export default function AllServices() {
   ].filter(Boolean);
 
   const handleMenuClick = (menu) => {
-    if (menu.component && !menu.subMenu) {
-      // Agar direct component hai toh currentView me mat bhejo
-      setActiveMenu(menu.key);
-      setActiveSubMenu(null);
-      setCurrentView(null);
-    } else {
-      // Normal submenu wala case
-      setActiveMenu(menu.key === activeMenu ? null : menu.key);
-      setActiveSubMenu(null);
-      setCurrentView(null);
-    }
+    setActiveMenu(menu.key);
+    setActiveSubMenu(null);
+    setCurrentView(null); // reset hamesha
+  };
+
+  const handleSubMenuClick = (sub, parentMenu) => {
+    setActiveSubMenu(sub.key);
+    setCurrentView({
+      component: sub.component,
+      menuLabel: parentMenu.label,
+      subMenuLabel: sub.label,
+      type: sub.type,
+      title: sub.title,
+    });
   };
 
   const resetView = () => {
@@ -438,193 +436,115 @@ export default function AllServices() {
       sx={{
         p: { xs: 1, md: 2 },
         backgroundColor: "#F5F4FA",
-        minHeight: "100vh",
+        //  minHeight: "100vh",
       }}
     >
-      {/* Show only when no component is selected */}
-      {!currentView && (
-        <>
-          {/* Main Menu */}
-          <Grid container spacing={2} sx={{ mb: 2 }}>
-            {menuData.map((menu) => (
-              <Grid
-                item
-                key={menu.key}
-                xs={4}
-                sm={3}
-                md={2.4}
-                lg={2}
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                <MenuCard
-                  icon={menu.icon}
-                  user={user}
-                  label={menu.label}
-                  onClick={() => handleMenuClick(menu)}
-                  isActive={activeMenu === menu.key}
-                />
-              </Grid>
-            ))}
+      {/* ✅ Main Menu - hamesha dikhega */}
+      <Grid container spacing={2} sx={{ mb: 2 }}>
+        {menuData.map((menu) => (
+          <Grid
+            item
+            key={menu.key}
+            xs={4}
+            sm={3}
+            md={2.4}
+            lg={2}
+            sx={{ display: "flex", justifyContent: "center" }}
+          >
+            <MenuCard
+              icon={menu.icon}
+              user={user}
+              label={menu.label}
+              onClick={() => handleMenuClick(menu)}
+              isActive={activeMenu === menu.key}
+            />
           </Grid>
+        ))}
+      </Grid>
 
-          {activeMenuData && (
-            <Box
-              sx={{
-                mb: 4,
-                p: 3,
-                borderRadius: 3,
-                backgroundColor: "#FFF",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                border: "1px solid #E9E8F5",
-              }}
-            >
-              <Typography
-                variant="h6"
-                sx={{
-                  mb: 3,
-                  fontWeight: 600,
-                  color: "#2B1A4C",
-                  display: "flex",
-                  alignItems: "center",
-                  position: "relative",
-                  paddingLeft: "16px",
-                  "&:before": {
-                    content: '""',
-                    position: "absolute",
-                    left: 0,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    width: "4px",
-                    height: "20px",
-                    backgroundColor: "#5210c1",
-                    borderRadius: "2px",
-                  },
-                }}
-              >
-                {activeMenuData.label}
-              </Typography>
-
-              {/* 👇 yahan condition laga do */}
-              {activeMenuData.subMenu ? (
-                <Grid container spacing={2}>
-                  {activeMenuData.subMenu.map((sub) => (
-                    <Grid
-                      item
-                      xs={6}
-                      sm={4}
-                      md={3}
-                      lg={2.4}
-                      key={sub.key}
-                      sx={{ display: "flex", justifyContent: "center" }}
-                    >
-                      <SubMenuCard
-                        icon={sub.icon}
-                        user={user}
-                        label={sub.label}
-                        onClick={() => handleSubMenuClick(sub)}
-                        isActive={activeSubMenu === sub.key}
-                      />
-                    </Grid>
-                  ))}
-                </Grid>
-              ) : (
-                <activeMenuData.component /> // 👈 agar submenu nahi hai toh direct render
-              )}
-            </Box>
-          )}
-        </>
-      )}
-
-      {currentView && (
+      {/* ✅ Neeche wala section */}
+      {activeMenuData && (
         <Box
           sx={{
-            mt: 2,
-            backgroundColor: "#FFF",
-            borderRadius: 3,
+            mb: 4,
             p: 1,
+            borderRadius: 3,
+            backgroundColor: "#FFF",
             boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
             border: "1px solid #E9E8F5",
           }}
         >
-          <Box
+          {/* Heading */}
+          <Typography
+            variant="h6"
             sx={{
+              mb: 1,
+              fontWeight: 600,
+              color: "#2B1A4C",
               display: "flex",
               alignItems: "center",
-              backgroundColor: "#FFF",
-              // mb: 3,
-              borderBottom: "1px solid #F5F4FA",
-              pb: 1,
+              position: "relative",
+              paddingLeft: "16px",
+              "&:before": {
+                content: '""',
+                position: "absolute",
+                left: 0,
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: "4px",
+                height: "20px",
+                backgroundColor: "#5210c1",
+                borderRadius: "2px",
+              },
             }}
           >
-            <IconButton
-              onClick={resetView}
-              sx={{
-                mr: 1,
-                color: "#5210c1",
-                backgroundColor: "#F5F4FA",
-                "&:hover": {
-                  backgroundColor: "#E9E8F5",
-                },
-              }}
-            >
-              <ArrowBackIcon />
-            </IconButton>
-            <Typography variant="h6" sx={{ fontWeight: 600, color: "#2B1A4C" }}>
-              {currentView.menuLabel} / {currentView.subMenuLabel}
-            </Typography>
-          </Box>
-          <currentView.component
-            type={currentView.type}
-            title={currentView.title}
-            resetView={resetView}
-          />
-        </Box>
-      )}
+            {activeMenuData.label}
+            {currentView?.subMenuLabel && ` / ${currentView.subMenuLabel}`}
+          </Typography>
 
-      {!currentView && (
-        <Card
-          sx={{
-            borderRadius: 2,
-            boxShadow: 3,
-            mb: 3,
-            backgroundColor: "#FFF",
-            border: "1px solid #E9E8F5",
-          }}
-        >
-          <CardContent>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: { xs: "column", md: "row" },
-                justifyContent: "space-between",
-                alignItems: "center",
-                width: "100%",
-                p: 2,
-              }}
-            >
-              <Box
-                sx={{
-                  flex: 1,
-                  mr: { md: 2 },
-                  mb: { xs: 2, md: 0 },
-                }}
-              >
-                <img
-                  src={broadband_1}
-                  alt="Banner"
-                  style={{
-                    width: "100%",
-                    objectFit: "contain",
-                    borderRadius: 8,
-                  }}
-                />
-              </Box>
+          {/* 👇 Agar submenu hai aur abhi koi component select nahi hua */}
+          {activeMenuData.subMenu && !currentView && (
+            <Grid container spacing={2}>
+              {activeMenuData.subMenu.map((sub) => (
+                <Grid
+                  item
+                  xs={6}
+                  sm={4}
+                  md={3}
+                  lg={2.4}
+                  key={sub.key}
+                  sx={{ display: "flex", justifyContent: "center" }}
+                >
+                  <SubMenuCard
+                    icon={sub.icon}
+                    user={user}
+                    label={sub.label}
+                    onClick={() => handleSubMenuClick(sub, activeMenuData)}
+                    isActive={activeSubMenu === sub.key}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          )}
+
+          {/* 👇 Agar submenu me se koi component select ho gaya */}
+          {currentView && (
+            <Box sx={{ mt: 1 }}>
+              <currentView.component
+                type={currentView.type}
+                title={currentView.title}
+                resetView={resetView}
+              />
             </Box>
-          </CardContent>
-        </Card>
+          )}
+
+          {/* 👇 Agar submenu hi nahi tha (direct component menu tha) */}
+          {!activeMenuData.subMenu && activeMenuData.component && (
+            <Box sx={{ mt: 1 }}>
+              <activeMenuData.component />
+            </Box>
+          )}
+        </Box>
       )}
     </Box>
   );

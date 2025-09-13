@@ -77,6 +77,12 @@ export const customer_nav = [
 export const di_nav = [
   { title: "Dashboard", icon: "📊", icon2: "📊", to: "/di/dashboard" },
   { title: "Users", icon: "👥", icon2: "👥", to: "/di/users" },
+    {
+    title: "All Services",
+    icon: "🛠️",
+    icon2: "🛠️",
+    to: "/di/allServices",
+  },
 ];
 
 export const service_nav = [

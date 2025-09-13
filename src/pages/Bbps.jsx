@@ -13,7 +13,7 @@ import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { apiErrorToast } from "../utils/ToastUtil";
 import SearchIcon from "@mui/icons-material/Search";
-
+import { Tooltip } from "@mui/material";
 import BbpsBillers from "./BbpsBillers";
 import AuthContext from "../contexts/AuthContext";
 
@@ -61,7 +61,7 @@ const Bbps = () => {
   }, [search, categories]);
 
   return (
-    <Box>
+    <>
       {!selectedCategory ? (
         <>
           {/* 🔹 Header */}
@@ -109,6 +109,7 @@ const Bbps = () => {
             </Box>
           ) : user?.is_layout === 2 ? (
             // ✅ Layout 2: sleek scrollable row
+
             <Box
               sx={{
                 display: "flex",
@@ -124,55 +125,70 @@ const Bbps = () => {
             >
               {filtered.length > 0 ? (
                 filtered.map((cat) => (
-                  <Card
-                    key={cat.id}
-                    sx={{
-                      borderRadius: 2,
-                      boxShadow: 2,
-                      minWidth: 120,
-                      height: 90,
-                      cursor: "pointer",
-                      flex: "0 0 auto",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      transition: "all 0.2s ease",
-                      "&:hover": {
-                        boxShadow: 4,
-                        transform: "translateY(-2px)",
-                      },
-                    }}
-                    onClick={() => setSelectedCategory(cat)}
-                  >
-                    <CardContent
+                  <Tooltip key={cat.id} title={cat.category_name} arrow>
+                    <Card
                       sx={{
-                        textAlign: "center",
-                        p: 1,
+                        borderRadius: 3,
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
+                        minWidth: 110,
+                        height: 90,
+                        cursor: "pointer",
+                        flex: "0 0 auto",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background:
+                          "linear-gradient(135deg, #F9FAFB 0%, #FFFFFF 100%)",
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          transform: "translateY(-4px) scale(1.03)",
+                          boxShadow: "0 6px 14px rgba(37, 99, 235, 0.25)",
+                          background:
+                            "linear-gradient(135deg, #EFF6FF 0%, #FFFFFF 100%)",
+                        },
                       }}
+                      onClick={() => setSelectedCategory(cat)}
                     >
-                      {(cat.icon_url || cat.icon) && (
-                        <Box
-                          component="img"
-                          src={cat.icon_url || cat.icon}
-                          alt={cat.category_name}
-                          sx={{ width: 28, height: 28, mb: 0.5 }}
-                        />
-                      )}
-                      <Typography
-                        variant="caption"
-                        fontWeight="600"
+                      <CardContent
                         sx={{
-                          display: "block",
-                          textOverflow: "ellipsis",
-                          overflow: "hidden",
-                          whiteSpace: "nowrap",
-                          maxWidth: 90,
+                          textAlign: "center",
+                          p: 1,
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          justifyContent: "center",
                         }}
                       >
-                        {cat.category_name}
-                      </Typography>
-                    </CardContent>
-                  </Card>
+                        {(cat.icon_url || cat.icon) && (
+                          <Box
+                            component="img"
+                            src={cat.icon_url || cat.icon}
+                            alt={cat.category_name}
+                            sx={{
+                              width: 32,
+                              height: 32,
+                              mb: 1,
+                              objectFit: "contain",
+                            }}
+                          />
+                        )}
+                        <Typography
+                          variant="caption"
+                          fontWeight="600"
+                          sx={{
+                            textOverflow: "ellipsis",
+                            overflow: "hidden",
+                            whiteSpace: "nowrap",
+                            maxWidth: 90,
+                            color: "#1E3C72",
+                            fontSize: "0.72rem",
+                          }}
+                        >
+                          {cat.category_name}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Tooltip>
                 ))
               ) : (
                 <Typography
@@ -247,7 +263,7 @@ const Bbps = () => {
           onBack={() => setSelectedCategory(null)}
         />
       )}
-    </Box>
+    </>
   );
 };
 
