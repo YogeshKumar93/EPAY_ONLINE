@@ -764,7 +764,7 @@ const CommonTable = ({
         <Box sx={{ display: "flex", alignItems: "center" }}>
           {/* ✅ Show Refresh only if no filters are used */}
           {availableFilters.length === 0 ||
-            (refresh && (
+            (refresh    && (
               <Tooltip title="Refresh">
                 <IconButton
                   onClick={handleManualRefresh}

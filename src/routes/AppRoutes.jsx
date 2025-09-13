@@ -160,6 +160,7 @@ export default function AppRoutes() {
                 path="customer/wallet-transfer"
                 element={<Wallet2WalletTransfer />}
               />
+                <Route path="customer/wallet-ledger" element={<AccountLadger />} />
               <Route path="customer/w2w-transfer" element={<W2wTransfer />} />
               <Route path="customer/upi-transfer" element={<UpiTransfer />} />
               <Route path="customer/transactions" element={<Transaction />} />
@@ -185,10 +186,8 @@ export default function AppRoutes() {
               <Route path="di/users" element={<Users />} />
               <Route path="di/services" element={<Dashboard />} />
               <Route path="di/allServices" element={<AllServices />} />
-              <Route
-                path="customer/account-ledger"
-                element={<AccountLadger />}
-              />
+              <Route path="customer/wallet-ledger" element={<AccountLadger />} />
+
               <Route path="customer/logs" element={<RetailerLogs />} />
               <Route
                 path="customer/money-transfer"
