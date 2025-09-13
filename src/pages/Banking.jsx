@@ -1,52 +1,19 @@
-import React, { useState } from "react";
-import { Box, Tabs, Tab } from "@mui/material";
 
+import React from "react";
+import CommonTabs from "../components/common/CommonTabs";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import ReceiptIcon from "@mui/icons-material/Receipt";
+import CreditCardIcon from "@mui/icons-material/CreditCard";
 import Banks from "./Banks";
 import Accounts from "./Accounts";
 import Unclaimed from "./Unclaimed";
 
-const TabPanel = ({ children, value, index }) => {
-  return (
-    <div role="tabpanel" hidden={value !== index}>
-      {value === index && <Box sx={{  }}>{children}</Box>}
-    </div>
-  );
-};
-
 export const Banking = () => {
-  const [tab, setTab] = useState(0);
+  const tabItems = [
+    { label: "BANKS", icon: <SwapHorizIcon />, component: <Banks /> },
+    { label: "Accounts", icon: <ReceiptIcon />, component: <Accounts /> },
+    { label: "Unclaimed", icon: <CreditCardIcon />, component: <Unclaimed /> },
+  ];
 
-  const handleChange = (event, newValue) => {
-    setTab(newValue);
-  };
-
-  return (
-    <Box sx={{ width: "100%" }}>
-      {/* Tab Header */}
-      <Tabs
-        value={tab}
-        onChange={handleChange}
-        variant="fullWidth"
-        textColor="primary"
-        indicatorColor="primary"
-        sx={{ borderBottom: 1, borderColor: "divider" }}
-      >
-        <Tab label="BANKS" />
-        <Tab label="ACCOUNTS" />
-        <Tab label="UNCLAIMED" />
-    
-      </Tabs>
-
-      <TabPanel value={tab} index={0}>
-        <Banks />
-      </TabPanel>
-      <TabPanel value={tab} index={1}>
-        <Accounts />
-      </TabPanel>
-      <TabPanel value={tab} index={2}>
-        <Unclaimed />
-      </TabPanel>
-     
-    </Box>
-  );
+  return <CommonTabs tabs={tabItems} defaultTab={0} />;
 };
