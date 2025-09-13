@@ -194,6 +194,13 @@ const ApiEndpoints = {
   KYC_SCHEMA: "business/kycSchema",
   STATUS_SCHEMA: "business/statusSchema",
 
+  WALLET_LIST: "wallet/getW2WTransactions",
+  WALLET_GET_RECEIVER: "wallet/getReceiver",
+  WALLET_GET_W2W_TRANSACTION: "wallet/getW2WTransaction",
+  WALLET_CREATE: "wallet/createW2W",
+  // WALLET_UPDATE: "wallet/update",
+  // WALLET_DELETE: "wallet/delete",
+
   // ****************************** NEW API'S ABOVE ******************************
 
   GET_ACC_BANKS: "",

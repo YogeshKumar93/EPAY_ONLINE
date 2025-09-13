@@ -35,7 +35,7 @@ import {
   KeyboardArrowRight,
   LastPage as LastPageIcon,
 } from "@mui/icons-material";
-import CachedIcon from '@mui/icons-material/Cached';
+import CachedIcon from "@mui/icons-material/Cached";
 import { apiCall } from "../../api/apiClient";
 import Loader from "./Loader";
 
@@ -134,7 +134,8 @@ const CommonTable = ({
   title = "",
   queryParam = "",
   onFetchRef,
-    customHeader = null, // Add this line
+  refresh = true,
+  customHeader = null, // Add this line
 }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -438,208 +439,223 @@ const CommonTable = ({
   );
 
   // Memoized table rows
-const tableRows = useMemo(() => {
-  if (loading) {
-    return (
-      <tr>
-        <td
-          colSpan={initialColumns.length}
-          style={{ 
-            textAlign: "center", 
-            padding: "40px 20px",
-            fontStyle: "inter",
-            color: "#666",
-            backgroundColor:"#fff"
-          }}
-        >
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-            <CircularProgress size={30} />
-            <Typography variant="body2">Loading data...</Typography>
-          </Box>
-        </td>
-      </tr>
-    );
-  }
-
-  if (data.length === 0) {
-    return (
-      <tr>
-        <td
-          colSpan={initialColumns.length}
-          style={{ 
-            textAlign: "center", 
-            padding: "40px 20px",
-            fontStyle: "inter",
-            color: "#666"
-          }}
-        >
-          <Typography variant="body1">
-            No data available
-          </Typography>
-        </td>
-      </tr>
-    );
-  }
-
-  return data.map((row, rowIndex) => (
-    <tr 
-      key={rowIndex} 
-      style={{ 
-        borderBottom: "1px solid #e0e0e0",
-        transition: "background-color 0.2s ease",
-        "&:hover": {
-          backgroundColor: "#f8f9fa"
-        }
-      }}
-      className="table-row"
-    >
-      {initialColumns.map((column, colIndex) => (
-        <td
-          key={colIndex}
-          style={{
-            padding: "14px 12px",
-            verticalAlign: "middle",
-            width: column.width || "auto",
-            textAlign: "left",
-            fontSize: "14px",
-            lineHeight: "1",
-              borderBottom: "1px solid #e2e8f0", // ✅ horizontal line
-            fontFamily: "inter",
-            fontWeight:400,
-            color: "#000"
-          }}
-        >
-          {column.selector ? (
-            <Box sx={{ 
-              display: "flex", 
-              alignItems: "center",
-              textAlign: "left",
-              justifyContent: "flex-start"
-            }}>
-              {column.selector(row)}
-            </Box>
-          ) : (
-            <Typography 
-              variant="body2" 
-              sx={{ 
-                textAlign: "left",
-                fontWeight: column.name === "Amount" ? 600 : 400,
-                color: column.name === "Status" ? "transparent" : "inherit" // Status will be handled by its selector
+  const tableRows = useMemo(() => {
+    if (loading) {
+      return (
+        <tr>
+          <td
+            colSpan={initialColumns.length}
+            style={{
+              textAlign: "center",
+              padding: "40px 20px",
+              fontStyle: "inter",
+              color: "#666",
+              backgroundColor: "#fff",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 2,
               }}
             >
-              {row[column.name] || "—"}
-            </Typography>
-          )}
-        </td>
-      ))}
-    </tr>
-  ));
-}, [loading, data, initialColumns]);
-  // Memoized table headers
-const tableHeaders = useMemo(
-  () =>
-    initialColumns.map((column, index) => (
-      <th
-        key={index}
+              <CircularProgress size={30} />
+              <Typography variant="body2">Loading data...</Typography>
+            </Box>
+          </td>
+        </tr>
+      );
+    }
+
+    if (data.length === 0) {
+      return (
+        <tr>
+          <td
+            colSpan={initialColumns.length}
+            style={{
+              textAlign: "center",
+              padding: "40px 20px",
+              fontStyle: "inter",
+              color: "#666",
+            }}
+          >
+            <Typography variant="body1">No data available</Typography>
+          </td>
+        </tr>
+      );
+    }
+
+    return data.map((row, rowIndex) => (
+      <tr
+        key={rowIndex}
         style={{
-          padding: "16px 12px",
-          textAlign: "left",
-          fontWeight: 550,
-          fontSize: "14px",
-          width: column.width || "auto",
-          minWidth: column.width || "auto",
-          letterSpacing: "0.5px",
-          borderBottom: "2px solid #e2e8f0",
-          fontFamily: 'Inter',
-          position: "sticky",
-          top: 0,
-          zIndex: 1,
-          whiteSpace: "nowrap"
+          borderBottom: "1px solid #e0e0e0",
+          transition: "background-color 0.2s ease",
+          "&:hover": {
+            backgroundColor: "#f8f9fa",
+          },
         }}
+        className="table-row"
       >
-        {typeof column.name === "string" ? (
-          <Box sx={{ 
-            display: "flex", 
-            alignItems: "center",
-            justifyContent: "space-between"
-          }}>
-            <span>{column.name}</span>
-            {/* Optional: Add sorting indicators if needed */}
-            {/* <ArrowUpwardIcon sx={{ fontSize: 14, opacity: 0.5 }} /> */}
-          </Box>
-        ) : (
-          column.name?.props?.children || `Column ${index + 1}`
-        )}
-      </th>
-    )),
-  [initialColumns]
-);
+        {initialColumns.map((column, colIndex) => (
+          <td
+            key={colIndex}
+            style={{
+              padding: "14px 12px",
+              verticalAlign: "middle",
+              width: column.width || "auto",
+              textAlign: "left",
+              fontSize: "14px",
+              lineHeight: "1",
+              borderBottom: "1px solid #e2e8f0", // ✅ horizontal line
+              fontFamily: "inter",
+              fontWeight: 400,
+              color: "#000",
+            }}
+          >
+            {column.selector ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  textAlign: "left",
+                  justifyContent: "flex-start",
+                }}
+              >
+                {column.selector(row)}
+              </Box>
+            ) : (
+              <Typography
+                variant="body2"
+                sx={{
+                  textAlign: "left",
+                  fontWeight: column.name === "Amount" ? 600 : 400,
+                  color: column.name === "Status" ? "transparent" : "inherit", // Status will be handled by its selector
+                }}
+              >
+                {row[column.name] || "—"}
+              </Typography>
+            )}
+          </td>
+        ))}
+      </tr>
+    ));
+  }, [loading, data, initialColumns]);
+  // Memoized table headers
+  const tableHeaders = useMemo(
+    () =>
+      initialColumns.map((column, index) => (
+        <th
+          key={index}
+          style={{
+            padding: "16px 12px",
+            textAlign: "left",
+            fontWeight: 550,
+            fontSize: "14px",
+            width: column.width || "auto",
+            minWidth: column.width || "auto",
+            letterSpacing: "0.5px",
+            borderBottom: "2px solid #e2e8f0",
+            fontFamily: "Inter",
+            position: "sticky",
+            top: 0,
+            zIndex: 1,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {typeof column.name === "string" ? (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <span>{column.name}</span>
+              {/* Optional: Add sorting indicators if needed */}
+              {/* <ArrowUpwardIcon sx={{ fontSize: 14, opacity: 0.5 }} /> */}
+            </Box>
+          ) : (
+            column.name?.props?.children || `Column ${index + 1}`
+          )}
+        </th>
+      )),
+    [initialColumns]
+  );
   return (
-    <Box sx={{}}>
+    <Box>
       <Loader request={loading} />
       {/* Filter Section */}
       {availableFilters.length > 0 && (
         <>
           <Paper sx={{ p: 2, mb: 2, display: { xs: "none", md: "block" } }}>
             {/* <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}> */}
-              {/* <FilterListIcon sx={{ mr: 1 }} /> */}
-              {/* <Typography variant="h6">Filters</Typography> */}
+            {/* <FilterListIcon sx={{ mr: 1 }} /> */}
+            {/* <Typography variant="h6">Filters</Typography> */}
             {/* </Box> */}
 
-            <Box sx={{ 
-        display: "flex", 
-        alignItems: "center", 
-        flexWrap: "wrap", 
-        gap: 2, 
-        mb: 2 
-      }}>
-        {availableFilters.map((filter) => (
-          <Box key={filter.id} sx={{ minWidth: 120 }}>
-            {filter.type === "dropdown" ? (
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <TextField
-                  select
-                  label={filter.label}
-                  value={filterValues[filter.id] || "All"}
-                  onChange={(e) => handleFilterChange(filter.id, e.target.value)}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 2,
+                mb: 2,
+              }}
+            >
+              {availableFilters.map((filter) => (
+                <Box key={filter.id} sx={{ minWidth: 120 }}>
+                  {filter.type === "dropdown" ? (
+                    <FormControl size="small" sx={{ minWidth: 120 }}>
+                      <TextField
+                        select
+                        label={filter.label}
+                        value={filterValues[filter.id] || "All"}
+                        onChange={(e) =>
+                          handleFilterChange(filter.id, e.target.value)
+                        }
+                        size="small"
+                      >
+                        <MenuItem value="All">All</MenuItem>
+                        {filter.options &&
+                          filter.options.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                              {option.label}
+                            </MenuItem>
+                          ))}
+                      </TextField>
+                    </FormControl>
+                  ) : (
+                    <TextField
+                      size="small"
+                      label={filter.label}
+                      value={filterValues[filter.id] || ""}
+                      onChange={(e) =>
+                        handleFilterChange(filter.id, e.target.value)
+                      }
+                      sx={{ minWidth: 120 }}
+                    />
+                  )}
+                </Box>
+              ))}
+
+              {/* Apply and Reset buttons */}
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <Button variant="contained" onClick={applyFilters} size="small">
+                  Apply
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={resetFilters}
+                  startIcon={<ClearIcon />}
                   size="small"
                 >
-                  <MenuItem value="All">All</MenuItem>
-                  {filter.options &&
-                    filter.options.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                </TextField>
-              </FormControl>
-            ) : (
-              <TextField
-                size="small"
-                label={filter.label}
-                value={filterValues[filter.id] || ""}
-                onChange={(e) => handleFilterChange(filter.id, e.target.value)}
-                sx={{ minWidth: 120 }}
-              />
-            )}
-          </Box>
-        ))}
-        
-        {/* Apply and Reset buttons */}
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <Button variant="contained" onClick={applyFilters} size="small">
-            Apply
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={resetFilters}
-            startIcon={<ClearIcon />}
-            size="small"
-          >
-            Reset
-          </Button>
-        </Box>
-      </Box>
+                  Reset
+                </Button>
+              </Box>
+            </Box>
 
             {/* Applied filters chips */}
             {/* <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
@@ -704,26 +720,32 @@ const tableHeaders = useMemo(
       )}
 
       {/* Table Header with Refresh */}
-<Box
-  sx={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    mb: 2,
-  }}
->
-  <Typography variant="h5">{title}</Typography>
-  
-  <Box sx={{ display: "flex", alignItems: "center" }}>
-    {customHeader} {/* Add custom header content here */}
-    <Tooltip title="Refresh">
-      <IconButton onClick={handleManualRefresh} disabled={loading} sx={{ ml: 1 }}>
-        <CachedIcon />
-        {/* {loading ? <CircularProgress size={24} /> : <CachedIcon />} */}
-      </IconButton>
-    </Tooltip>
-  </Box>
-</Box>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
+      >
+        <Typography variant="h5">{title}</Typography>
+
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          {customHeader} {/* Add custom header content here */}
+          {refresh && (
+            <Tooltip title="Refresh">
+              <IconButton
+                onClick={handleManualRefresh}
+                disabled={loading}
+                sx={{ ml: 1 }}
+              >
+                <CachedIcon />
+                {/* {loading ? <CircularProgress size={24} /> : <CachedIcon />} */}
+              </IconButton>
+            </Tooltip>
+          )}
+        </Box>
+      </Box>
 
       {/* Data Table */}
       <Paper sx={{ width: "100%", overflow: "hidden" }}>

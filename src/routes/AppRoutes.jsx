@@ -48,6 +48,8 @@ import AccountStatement from "../pages/AccountStatement";
 import AllServices from "../pages/AllServices";
 import Dmt from "../pages/Dmt";
 import Bbps from "../pages/Bbps";
+import Wallet2WalletTransfer from "../pages/Wallet2WalletTransfer";
+import W2wTransfer from "../pages/w2wTransfer";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useContext(AuthContext);
@@ -118,6 +120,10 @@ export default function AppRoutes() {
                 path="admin/accountstatements/:id"
                 element={<AccountStatement />}
               />
+              <Route
+                path="admin/wallet-transfer"
+                element={<Wallet2WalletTransfer />}
+              />
               <Route path="admin/layout" element={<Layouts />} />
               <Route path="admin/commissionrule" element={<CommissionRule />} />
               <Route path="admin/sidenav" element={<Navs />} />
@@ -149,6 +155,11 @@ export default function AppRoutes() {
                 path="customer/fund-transfer"
                 element={<SuperTransfer />}
               />
+                 <Route
+                path="customer/wallet-transfer"
+                element={<Wallet2WalletTransfer />}
+              />
+              <Route path="customer/w2w-transfer" element={<W2wTransfer />} />
               <Route path="customer/upi-transfer" element={<UpiTransfer />} />
               <Route path="customer/transactions" element={<Transaction />} />
               <Route path="customer/recharge-bill" element={<Recharge />} />
