@@ -45,6 +45,7 @@ import Statements from "../pages/Statements";
 import UpiTransfer from "../pages/UpiTransfer";
 import BankStatements from "../pages/BankStatements";
 import AccountStatement from "../pages/AccountStatement";
+import Aeps from "../pages/Aeps";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useContext(AuthContext);
@@ -113,6 +114,7 @@ export default function AppRoutes() {
               <Route path="admin/commissionrule" element={<CommissionRule />} />
               <Route path="admin/sidenav" element={<Navs />} />
               <Route path="admin/selectlayout" element={<SelectLayout />} />
+                <Route path="admin/aeps" element={<Aeps />} />
 
               <Route path="admin/statements" element={<Statements />} />
               <Route
@@ -149,7 +151,7 @@ export default function AppRoutes() {
               <Route path="customer/purchase" element={<MyPurchase />} />
               <Route path="customer/fund-request" element={<FundRequest />} />
               <Route path="customer/sale" element={<MySale />} />
-
+             <Route path="customer/aeps" element={<Aeps />} />
               <Route path="customer/profile" element={<ProfilePage />} />
 
               <Route
