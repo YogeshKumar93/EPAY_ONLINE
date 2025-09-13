@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import {
   Card,
   CardContent,
@@ -46,10 +47,47 @@ import {
   union2,
   yes2,
 } from "../utils/iconsImports";
-const Beneficiaries = ({ beneficiaries, onSelect, onDelete, onVerify }) => {
+import CommonModal from "../components/common/CommonModal";
+import { useSchemaForm } from "../hooks/useSchemaForm";
+import ApiEndpoints from "../api/ApiEndpoints";
+import { apiCall } from "../api/apiClient";
+const Beneficiaries = ({ beneficiaries, onSelect, onDelete, onVerify,sender }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [open, setOpen] = useState(true);
+  const [openModal, setOpenModal] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+
+  const { schema, formData, handleChange, errors, setErrors, loading } =
+    useSchemaForm(ApiEndpoints.ADD_DMT1_SCHEMA, openModal, {
+      sender_id: sender?.id,
+    });
+
+  const handleAddBeneficiary = async () => {
+    setSubmitting(true);
+    setErrors({});
+    try {
+      const payload = { ...formData, sender_id: sender.id };
+      const res = await apiCall(
+        "post",
+        ApiEndpoints.REGISTER_DMT1_BENEFICIARY,
+        payload
+      );
+
+      if (res) {
+        okSuccessToast(res?.message || "Beneficiary added successfully");
+        setOpenModal(false);
+        onSuccess?.(sender.mobile_number);
+      } else {
+        apiErrorToast(res?.message || "Failed to add beneficiary");
+      }
+    } catch (err) {
+      apiErrorToast(err);
+      setErrors(err?.response?.data?.errors || {});
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   // normalize to always have at least one "N/A" entry
   const normalized =
@@ -119,6 +157,29 @@ const Beneficiaries = ({ beneficiaries, onSelect, onDelete, onVerify }) => {
         <Typography variant="subtitle1" fontWeight="bold">
           Beneficiary List ({beneficiaries?.length || 0})
         </Typography>
+          <Box ml={isMobile ? 2 : "auto"}>
+    <Button
+      variant="contained"
+      size="small"
+      onClick={() => setOpenModal(true)}
+      startIcon={<PersonAddIcon sx={{ fontSize: 16 }} />}
+      sx={{ 
+        minWidth: "auto", 
+        px: 1.5, 
+        backgroundColor:"#1AB1FF",
+        py: 0.5, 
+        fontSize: "0.75rem",
+        borderRadius: 1,
+        textTransform: "none",
+        fontWeight: "500",
+        boxShadow: "none",
+       
+      }}
+    >
+      Add Beneficiary
+    </Button>
+
+  </Box>
         {isMobile && (
         <IconButton size="small" sx={{ color: "white" }}>
           {open ? <ExpandLess /> : <ExpandMore />}
@@ -302,6 +363,38 @@ const Beneficiaries = ({ beneficiaries, onSelect, onDelete, onVerify }) => {
           </List>
         </CardContent>
       </Collapse>
+      {openModal && (
+        <CommonModal
+          open={openModal}
+          onClose={() => setOpenModal(false)}
+          title="Add New Beneficiary"
+          iconType="info"
+          size="small"
+          dividers
+          fieldConfig={schema}
+          formData={formData}
+          handleChange={handleChange}
+          errors={errors}
+          loading={loading || submitting}
+          footerButtons={[
+            {
+              text: "Cancel",
+              variant: "outlined",
+              onClick: () => setOpenModal(false),
+              disabled: submitting,
+              sx: { borderRadius: 1 }
+            },
+            {
+              text: submitting ? "Saving..." : "Save Beneficiary",
+              variant: "contained",
+              color: "primary",
+              onClick: handleAddBeneficiary,
+              disabled: submitting,
+              sx: { borderRadius: 1 }
+            },
+          ]}
+        />
+      )}
     </Card>
   );
 };

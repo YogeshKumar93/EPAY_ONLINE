@@ -738,7 +738,7 @@ const CommonTable = ({
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
           {customHeader} {/* Add custom header content here */}
-          {refresh && (
+          {/* {refresh && (
             <Tooltip title="Refresh">
               <IconButton
                 onClick={handleManualRefresh}
@@ -746,10 +746,10 @@ const CommonTable = ({
                 sx={{ ml: 1 }}
               >
                 <CachedIcon />
-                {/* {loading ? <CircularProgress size={24} /> : <CachedIcon />} */}
+                {loading ? <CircularProgress size={24} /> : <CachedIcon />}
               </IconButton>
             </Tooltip>
-          )}
+          )} */}
         </Box>
       </Box>
       <Box
@@ -763,8 +763,8 @@ const CommonTable = ({
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
           {/* ✅ Show Refresh only if no filters are used */}
-          {availableFilters.length === 0 ||
-            (refresh    && (
+          {availableFilters.length === 0 &&
+            (refresh && (
               <Tooltip title="Refresh">
                 <IconButton
                   onClick={handleManualRefresh}

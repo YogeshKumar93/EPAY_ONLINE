@@ -105,6 +105,7 @@ const {showToast} = useToast();
           {/* Right column: Beneficiaries list */}
           <Box flex="0 0 70%">
             <Beneficiaries
+            sender={sender}
               beneficiaries={beneficiaries}
               onSelect={setSelectedBeneficiary}
               onDelete={handleDeleteBeneficiary}
