@@ -289,6 +289,7 @@ import { apiCall } from "../../api/apiClient";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import AuthContext from "../../contexts/AuthContext";
 import { useToast } from "../../utils/ToastContext";
+import QRLogin from "../QrLogin";
 
 const VerifyMpinLogin = ({
   username,
@@ -357,7 +358,11 @@ const VerifyMpinLogin = ({
         payload = { username, otp: fullCode, otp_ref: otpRef, password };
       }
 
-      const { error: apiError, response } = await apiCall("POST", endpoint, payload);
+      const { error: apiError, response } = await apiCall(
+        "POST",
+        endpoint,
+        payload
+      );
 
       if (apiError) {
         setError(apiError.message || "Verification failed");
@@ -409,7 +414,11 @@ const VerifyMpinLogin = ({
         payload = { username, type: "OTP" };
       }
 
-      const { error: apiError, response } = await apiCall("POST", endpoint, payload);
+      const { error: apiError, response } = await apiCall(
+        "POST",
+        endpoint,
+        payload
+      );
 
       if (apiError) {
         setError(apiError.message || "Failed to resend code");
@@ -437,19 +446,18 @@ const VerifyMpinLogin = ({
   };
 
   return (
-  <Paper
-  elevation={6}
-  sx={{
-    p: { xs: 2, sm: 3, md: 4 }, // responsive padding
-    minwidth: { xs: "90%", sm: "90%", md: "500px" }, // responsive width
-    maxWidth: "100%",
-    borderRadius: 3,
-    background: "#1E3A8A",
-    color: "#fff",
-    mx: "auto", // center horizontally
-  }}
->
-
+    <Paper
+      elevation={6}
+      sx={{
+        p: { xs: 2, sm: 3, md: 4 }, // responsive padding
+        minwidth: { xs: "90%", sm: "90%", md: "500px" }, // responsive width
+        maxWidth: "100%",
+        borderRadius: 3,
+        background: "#1E3A8A",
+        color: "#fff",
+        mx: "auto", // center horizontally
+      }}
+    >
       {/* Header */}
       <Box
         sx={{
@@ -471,11 +479,8 @@ const VerifyMpinLogin = ({
         </IconButton>
       </Box>
 
-      <Typography
-        variant="body2"
-        sx={{ mb: 3, color: "#E5E7EB" }}
-      >
-        Enter the 6-digit {secureValidate === "MPIN" ? "MPIN" : "OTP"} 
+      <Typography variant="body2" sx={{ mb: 3, color: "#E5E7EB" }}>
+        Enter the 6-digit {secureValidate === "MPIN" ? "MPIN" : "OTP"}
         <Box component="span" fontWeight="bold" sx={{ color: "#FFD60A" }}>
           {" "}
           {/* *******{username.slice(-3)} */}
@@ -556,7 +561,11 @@ const VerifyMpinLogin = ({
           "&:hover": { backgroundColor: "#EAB308" },
         }}
       >
-        {loading ? <CircularProgress size={24} sx={{ color: "#1E3A8A" }} /> : btn}
+        {loading ? (
+          <CircularProgress size={24} sx={{ color: "#1E3A8A" }} />
+        ) : (
+          btn
+        )}
       </Button>
 
       <Button

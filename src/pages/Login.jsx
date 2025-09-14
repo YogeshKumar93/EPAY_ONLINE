@@ -1,5 +1,5 @@
 // Login.js (Updated Layout - Image Left, Login Right, Full Functionality, Scrollbar Hidden)
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { use, useContext, useEffect, useRef, useState } from "react";
 import {
   Paper,
   Typography,
@@ -14,9 +14,14 @@ import {
   Checkbox,
   Link,
 } from "@mui/material";
-import { Visibility, VisibilityOff, PhoneAndroid, Lock } from "@mui/icons-material";
+import {
+  Visibility,
+  VisibilityOff,
+  PhoneAndroid,
+  Lock,
+} from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import AuthContext from "../contexts/AuthContext";
@@ -48,11 +53,12 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [secureValidate, setSecureValidate] = useState("");
   const [loginError, setLoginError] = useState("");
+  const [qrToken, setQrToken] = useState("");
   const [otpRef, setOtpRef] = useState("");
   const [forgotModal, setForgotModalOpen] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [captchaChecked, setCaptchaChecked] = useState(false);
-    const captchaRef = useRef(null);
+  const captchaRef = useRef(null);
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext);
   const user = authCtx.user;
@@ -79,7 +85,7 @@ const Login = () => {
     }
     // else if (!captchaChecked) {
     //   return true;
-    // } 
+    // }
 
     setLoading(true);
     setLoginError("");
@@ -122,44 +128,62 @@ const Login = () => {
     }
   };
 
+  const generateQrLogin = async (data) => {
+    try {
+      const { error, response } = await apiCall(
+        "POST",
+        ApiEndpoints.QR_LOGIN,
+        {}
+      );
+
+      if (error) {
+        setLoginError(error.message || "Login failed");
+        return;
+      }
+
+      if (response) {
+        setQrToken(response?.data);
+      }
+    } catch (err) {
+      setLoginError(err.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
   const handleMpinVerificationSuccess = () => setIsMpinRequired(false);
   const handleMpinVerificationClose = () => setIsMpinRequired(false);
   const handleForgotPassword = () => setForgotModalOpen(true);
-
-  
+useEffect(() => {
+generateQrLogin()
+}, []);
   const captchaclickApi = () => {
     setCaptchaChecked(true);
     console.log("Clicked Captcha");
   };
 
-const mobileInputProps = {
-  style: { padding: 0, borderRadius: "10px" },
-  endAdornment: (
-    <img
-      src={mobilelogin}
-      alt="mobile"
-      style={{ width: "57px" }}
-    />
-  ),
-};
+  const mobileInputProps = {
+    style: { padding: 0, borderRadius: "10px" },
+    endAdornment: (
+      <img src={mobilelogin} alt="mobile" style={{ width: "57px" }} />
+    ),
+  };
 
-// InputProps for Password
-const passwordInputProps = (showPassword, setShowPassword) => ({
-  style: { padding: 0, borderRadius: "10px" },
-  endAdornment: (
-    <InputAdornment position="end">
-      <IconButton onClick={() => setShowPassword(!showPassword)}>
-        {showPassword ? <Visibility /> : <VisibilityOff />}
-      </IconButton>
-      <img
-        src={lockicon}
-        alt="lock"
-        style={{ width: "57px", alignItems: "flex-end" }}
-      />
-    </InputAdornment>
-  ),
-});
-
+  // InputProps for Password
+  const passwordInputProps = (showPassword, setShowPassword) => ({
+    style: { padding: 0, borderRadius: "10px" },
+    endAdornment: (
+      <InputAdornment position="end">
+        <IconButton onClick={() => setShowPassword(!showPassword)}>
+          {showPassword ? <Visibility /> : <VisibilityOff />}
+        </IconButton>
+        <img
+          src={lockicon}
+          alt="lock"
+          style={{ width: "57px", alignItems: "flex-end" }}
+        />
+      </InputAdornment>
+    ),
+  });
 
   return (
     <Grid
@@ -173,22 +197,20 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
       }}
     >
       {/* Left Side - Background Image */}
-<Grid
-  item
-  xs={false}
-  md={7}
-  sx={{
-    backgroundImage: `url(${backImg})`,
-    backgroundRepeat: "no-repeat",
-    backgroundSize: "auto 88%", // <-- height is 50% of container
-    backgroundPosition: "center",
-    display: { xs: "none", md: "block" },
-    backgroundColor: "#0052CC",
-    width: "55%",
-  }}
-/>
-
-
+      <Grid
+        item
+        xs={false}
+        md={7}
+        sx={{
+          backgroundImage: `url(${backImg})`,
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "auto 88%", // <-- height is 50% of container
+          backgroundPosition: "center",
+          display: { xs: "none", md: "block" },
+          backgroundColor: "#0052CC",
+          width: "55%",
+        }}
+      />
 
       {/* Right Side - Login Form */}
       <Grid
@@ -201,7 +223,7 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
           justifyContent: "center",
           alignItems: "center",
           px: { xs: 4, sm: 3, md: 3 },
-         
+
           height: "100vh",
           boxSizing: "border-box",
           width: { xs: "100%", md: "45%" },
@@ -209,91 +231,101 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
       >
         <Box sx={{ width: "100%", maxWidth: 500 }}>
           {/* <a href="https://impsguru.com"> */}
-            <Box
-              component="img"
-              src={biggpayLogo}
-              alt="Logo"
-              sx={{
-                width: "100%",
-                maxWidth: 330,
-                mb: 3,
-                objectFit: "contain",
-                cursor: "pointer",
-                display: "block",
-                mx: "auto",
-              }}
-              onClick={() => navigate("/login")} 
-            />
+          <Box
+            component="img"
+            src={biggpayLogo}
+            alt="Logo"
+            sx={{
+              width: "100%",
+              maxWidth: 330,
+              mb: 3,
+              objectFit: "contain",
+              cursor: "pointer",
+              display: "block",
+              mx: "auto",
+            }}
+            onClick={() => navigate("/login")}
+          />
           {/* </a> */}
 
-      
-        {loginError && (
-          <Typography color="error" align="center" sx={{ mb: 3 }}>
-            {loginError}
-          </Typography>
-        )}
+          {loginError && (
+            <Typography color="error" align="center" sx={{ mb: 3 }}>
+              {loginError}
+            </Typography>
+          )}
 
-        <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ width: "100%" }}>
-          {/* User ID */}
-          <ReTextField
-            fullWidth
-            size="medium"
-            sx={{ mt: 4 }}
-            label="User ID"
-            {...register("mobile", { onChange: (e) => setUsername(e.target.value) })}
-            margin="normal"
-            error={!!errors.mobile}
-            helperText={errors.mobile?.message}
-            // InputProps={{
-            //   startAdornment: (
-            //     <InputAdornment position="start">
-            //       <PhoneAndroid color="action" />
-            //     </InputAdornment>
-            //   ),
-            // }}
-            InputProps={mobileInputProps}  
-          />
+          <Box
+            component="form"
+            onSubmit={handleSubmit(onSubmit)}
+            sx={{ width: "100%" }}
+          >
+            {/* User ID */}
+            <ReTextField
+              fullWidth
+              size="medium"
+              sx={{ mt: 4 }}
+              label="User ID"
+              {...register("mobile", {
+                onChange: (e) => setUsername(e.target.value),
+              })}
+              margin="normal"
+              error={!!errors.mobile}
+              helperText={errors.mobile?.message}
+              // InputProps={{
+              //   startAdornment: (
+              //     <InputAdornment position="start">
+              //       <PhoneAndroid color="action" />
+              //     </InputAdornment>
+              //   ),
+              // }}
+              InputProps={mobileInputProps}
+            />
 
-          {/* Password */}
-          <ReTextField
-            fullWidth
-            size="medium"
-            sx={{ mt: 5 }}
-            label="Password"
-            type={showPassword ? "text" : "password"}
-            {...register("password")}
-            margin="normal"
-            error={!!errors.password}
-            helperText={errors.password?.message}
-            // InputProps={{
-            //   startAdornment: (
-            //     <InputAdornment position="start">
-            //       <Lock color="action" />
-            //     </InputAdornment>
-            //   ),
-            //   endAdornment: (
-            //     <InputAdornment position="end">
-            //       <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-            //         {showPassword ? <VisibilityOff /> : <Visibility />}
-            //       </IconButton>
-            //     </InputAdornment>
-            //   ),
-            // }}
-                  InputProps={passwordInputProps(showPassword, setShowPassword)} 
-          />
+            {/* Password */}
+            <ReTextField
+              fullWidth
+              size="medium"
+              sx={{ mt: 5 }}
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              {...register("password")}
+              margin="normal"
+              error={!!errors.password}
+              helperText={errors.password?.message}
+              // InputProps={{
+              //   startAdornment: (
+              //     <InputAdornment position="start">
+              //       <Lock color="action" />
+              //     </InputAdornment>
+              //   ),
+              //   endAdornment: (
+              //     <InputAdornment position="end">
+              //       <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+              //         {showPassword ? <VisibilityOff /> : <Visibility />}
+              //       </IconButton>
+              //     </InputAdornment>
+              //   ),
+              // }}
+              InputProps={passwordInputProps(showPassword, setShowPassword)}
+            />
 
-          {/* Forgot Password */}
-          <Box display="flex" justifyContent="flex-end" mt={1.3} >
-            <Button
-              variant="text"
-              size="small"
-              sx={{ textTransform: "none", fontWeight: 500, color: "#0052CC", "&:hover": { textDecoration: "underline" } }}
-              onClick={handleForgotPassword}
-            >
-              Forgot Password?
-            </Button>
-          </Box>
-             {/* <ReCAPTCHA
+            {/* Forgot Password */}
+            <Box display="flex" justifyContent="flex-end" mt={1.3}>
+              <Button
+                variant="text"
+                size="small"
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 500,
+                  color: "#0052CC",
+                  "&:hover": { textDecoration: "underline" },
+                }}
+                onClick={handleForgotPassword}
+              >
+                Forgot Password?
+              </Button>
+            </Box>
+            {/* <ReCAPTCHA
                     sitekey={import.meta.env.VITE_SITE_KEY}
 
                     ref={captchaRef}
@@ -308,37 +340,57 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
                     }}
                   /> */}
 
-          {/* Terms & Conditions */}
-          <FormControlLabel
-            control={<Checkbox checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)} />}
-            label={
-              <Typography variant="body2" color="textSecondary" fontSize={12}>
-                I agree to the{" "}
-                <Link href="/terms-conditions" underline="always" color="#4253F0" fontSize={12}>
-                  Terms and Conditions
-                </Link>
-              </Typography>
-            }
-            sx={{ width: "100%", textAlign: "center", marginBottom: 0 }}
-          />
+            {/* Terms & Conditions */}
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={agreedToTerms}
+                  onChange={(e) => setAgreedToTerms(e.target.checked)}
+                />
+              }
+              label={
+                <Typography variant="body2" color="textSecondary" fontSize={12}>
+                  I agree to the{" "}
+                  <Link
+                    href="/terms-conditions"
+                    underline="always"
+                    color="#4253F0"
+                    fontSize={12}
+                  >
+                    Terms and Conditions
+                  </Link>
+                </Typography>
+              }
+              sx={{ width: "100%", textAlign: "center", marginBottom: 0 }}
+            />
 
-          {/* Submit */}
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            size="large"
-            sx={{ mt: 2, py: 1.5, borderRadius: 2, fontWeight: 600, background: "linear-gradient(90deg,#0052CC,#007BFF)" }}
-            disabled={loading}
-          >
-            {loading ? <CircularProgress size={24} /> : "Login"}
-          </Button>
-        </Box>
+            {/* Submit */}
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              size="large"
+              sx={{
+                mt: 2,
+                py: 1.5,
+                borderRadius: 2,
+                fontWeight: 600,
+                background: "linear-gradient(90deg,#0052CC,#007BFF)",
+              }}
+              disabled={loading}
+            >
+              {loading ? <CircularProgress size={24} /> : "Login"}
+            </Button>
+          </Box>
         </Box>
       </Grid>
 
       {/* MPIN/OTP Modal */}
-      <Modal open={isMpinRequired} onClose={handleMpinVerificationClose} aria-labelledby="verification-modal">
+      <Modal
+        open={isMpinRequired}
+        onClose={handleMpinVerificationClose}
+        aria-labelledby="verification-modal"
+      >
         <Box
           sx={{
             position: "absolute",
@@ -364,7 +416,11 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
       </Modal>
 
       {/* Forgot Password Modal */}
-      <ForgotPassword open={forgotModal} onClose={() => setForgotModalOpen(false)} initialUsername={username} />
+      <ForgotPassword
+        open={forgotModal}
+        onClose={() => setForgotModalOpen(false)}
+        initialUsername={username}
+      />
     </Grid>
   );
 };

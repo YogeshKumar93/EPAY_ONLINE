@@ -2,6 +2,8 @@ import { useMemo, useCallback } from "react";
 import { Box, Button, Tooltip, Chip } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
+import QRLogin from "../QrLogin";
+import { getToken } from "../../contexts/AuthContext";
 
 const AdminTransactions = () => {
   const formatAmount = useCallback((amount) => {
@@ -145,12 +147,14 @@ const AdminTransactions = () => {
   );
 
   return (
-    <CommonTable
-      columns={columns}
-      endpoint={ApiEndpoints.GET_TRANSACTIONS}
-      filters={filters}
-      // refreshInterval={30000}
-    />
+    <>
+      <CommonTable
+        columns={columns}
+        endpoint={ApiEndpoints.GET_TRANSACTIONS}
+        filters={filters}
+        // refreshInterval={30000}
+      />
+    </>
   );
 };
 

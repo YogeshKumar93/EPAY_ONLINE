@@ -102,6 +102,10 @@ const ApiEndpoints = {
   UPDATE_FUND_REQUEST: "fundrequest/updateFundRequest",
   DELETE_FUND_REQUEST: "fundrequest/deleteFundRequest",
   GET_BANKS: "bank/getBanks",
+
+  QR_LOGIN: "auth/generateQr",
+  QR_STATUS: "auth/qrStatus",
+
   // ****************************** NEW API'S ABOVE ******************************
   GET_COMMISSION_RULE: "commission/getCommissions",
   GET_NOTIFICATION: "notification/getNotification",

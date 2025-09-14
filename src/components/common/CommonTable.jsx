@@ -459,43 +459,46 @@ const CommonTable = ({
               }}
             />
           ) : filter.type === "daterange" ? (
-            <Box>
-              <Typography variant="body2" sx={{ mb: 1 }}>
+            <Box
+              sx={{ display: "flex", flexDirection: "column", minWidth: 250 }}
+            >
+              <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
                 {filter.label}
               </Typography>
-              <TextField
-                fullWidth
-                size="small"
-                label="Start Date"
-                type="date"
-                value={filterValues[filter.id]?.start || ""}
-                onChange={(e) =>
-                  handleFilterChange(filter.id, {
-                    ...filterValues[filter.id],
-                    start: e.target.value,
-                  })
-                }
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                sx={{ mb: 1 }}
-              />
-              <TextField
-                fullWidth
-                size="small"
-                label="End Date"
-                type="date"
-                value={filterValues[filter.id]?.end || ""}
-                onChange={(e) =>
-                  handleFilterChange(filter.id, {
-                    ...filterValues[filter.id],
-                    end: e.target.value,
-                  })
-                }
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <TextField
+                  size="small"
+                  label="Start"
+                  type="date"
+                  value={filterValues[filter.id]?.start || ""}
+                  onChange={(e) =>
+                    handleFilterChange(filter.id, {
+                      ...filterValues[filter.id],
+                      start: e.target.value,
+                    })
+                  }
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  sx={{ flex: 1 }}
+                />
+                <TextField
+                  size="small"
+                  label="End"
+                  type="date"
+                  value={filterValues[filter.id]?.end || ""}
+                  onChange={(e) =>
+                    handleFilterChange(filter.id, {
+                      ...filterValues[filter.id],
+                      end: e.target.value,
+                    })
+                  }
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  sx={{ flex: 1 }}
+                />
+              </Box>
             </Box>
           ) : (
             <TextField
@@ -713,16 +716,20 @@ const CommonTable = ({
           <td
             key={colIndex}
             style={{
-              padding: "14px 12px",
+
+              padding: "16px 14px", // ✅ thoda spacious feel
               verticalAlign: "middle",
               width: column.width || "auto",
               textAlign: "left",
-              fontSize: "14px",
-              lineHeight: "1",
-              borderBottom: "1px solid #e2e8f0", // ✅ horizontal line
-              fontFamily: "inter",
+              fontSize: "14.5px",
+              lineHeight: "1.6",
+              borderBottom: "1px solid #e5e7eb", // ✅ subtle divider
+              fontFamily: "Source Sans Pro, Inter, sans-serif",
               fontWeight: 400,
-              color: "#000",
+              color: "#1e293b", // dark slate (eye-friendly fintech look)
+              backgroundColor: "rgba(255,255,255,0.7)", // ✅ glassy bg
+              backdropFilter: "blur(1px)", // ✅ premium glassmorphism
+              transition: "all 0.2s ease-in-out", // ✅ smooth hover
             }}
           >
             {column.selector ? (
@@ -760,6 +767,7 @@ const CommonTable = ({
         <th
           key={index}
           style={{
+            backgroundColor: "#FFF6E9",
             padding: "16px 12px",
             textAlign: "left",
             fontWeight: 550,
@@ -767,8 +775,8 @@ const CommonTable = ({
             width: column.width || "auto",
             minWidth: column.width || "auto",
             letterSpacing: "0.5px",
-            borderBottom: "2px solid #e2e8f0",
-            fontFamily: "Inter",
+            borderBottom: "1px solid #e2e8f0",
+            fontFamily: "Inter, Roboto, sans-serif",
             position: "sticky",
             top: 0,
             zIndex: 1,
@@ -805,7 +813,7 @@ const CommonTable = ({
             {/* <FilterListIcon sx={{ mr: 1 }} /> */}
             {/* <Typography variant="h6">Filters</Typography> */}
             {/* </Box> */}
-           
+
             <Box
               sx={{
                 display: "flex",
@@ -815,7 +823,7 @@ const CommonTable = ({
                 // mb: 2
               }}
             >
-            {renderDesktopFilters()}
+              {renderDesktopFilters()}
               {/* Apply and Reset buttons */}
               <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                 {/* Left side buttons */}

@@ -51,6 +51,7 @@ import Wallet2WalletTransfer from "../pages/Wallet2WalletTransfer";
 import W2wTransfer from "../pages/w2wTransfer";
 import { SelectLayout } from "../pages/SelectLayout";
 import Cms from "../pages/Cms";
+import QrLoginPage from "../pages/QrLoginPage";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useContext(AuthContext);
@@ -82,7 +83,7 @@ export default function AppRoutes() {
           <Route path="landingpageintro2" element={<LandingPageIntro2 />} />
           <Route path="landingpageintro3" element={<LandingPageIntro3 />} /> */}
 
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<QrLoginPage />} />
 
         {/* Protected layout */}
         <Route
@@ -113,7 +114,7 @@ export default function AppRoutes() {
               <Route path="admin/logs" element={<Logs />} />
               <Route path="admin/profile" element={<ProfilePage />} />
               <Route path="admin/banks" element={<Banks />} />
-                <Route path="admin/wallet-ledger" element={<AccountLadger />} />
+              <Route path="admin/wallet-ledger" element={<AccountLadger />} />
 
               <Route
                 path="admin/bankstatements/:id"
@@ -162,7 +163,10 @@ export default function AppRoutes() {
                 path="customer/wallet-transfer"
                 element={<Wallet2WalletTransfer />}
               />
-                <Route path="customer/wallet-ledger" element={<AccountLadger />} />
+              <Route
+                path="customer/wallet-ledger"
+                element={<AccountLadger />}
+              />
               <Route path="customer/w2w-transfer" element={<W2wTransfer />} />
               <Route path="customer/upi-transfer" element={<UpiTransfer />} />
               <Route path="customer/transactions" element={<Transaction />} />
@@ -188,7 +192,10 @@ export default function AppRoutes() {
               <Route path="di/users" element={<Users />} />
               <Route path="di/services" element={<Dashboard />} />
               <Route path="di/allServices" element={<AllServices />} />
-              <Route path="customer/wallet-ledger" element={<AccountLadger />} />
+              <Route
+                path="customer/wallet-ledger"
+                element={<AccountLadger />}
+              />
 
               <Route path="customer/logs" element={<RetailerLogs />} />
               <Route
