@@ -321,49 +321,49 @@ const CommonTable = ({
       [filterId]: value,
     }));
   }, []);
-const applyFilters = useCallback(() => {
-  // Copy current filter values
-  const formattedFilters = { ...filterValues };
+  const applyFilters = useCallback(() => {
+    // Copy current filter values
+    const formattedFilters = { ...filterValues };
 
-  Object.keys(formattedFilters).forEach((key) => {
-    const filterConfig = availableFilters.find((f) => f.id === key);
+    Object.keys(formattedFilters).forEach((key) => {
+      const filterConfig = availableFilters.find((f) => f.id === key);
 
-    if (filterConfig?.type === "date" && formattedFilters[key]) {
-      // Format single date to YYYY-MM-DD
-      formattedFilters[key] = new Date(formattedFilters[key])
-        .toISOString()
-        .split("T")[0];
-    } else if (filterConfig?.type === "daterange" && formattedFilters[key]) {
-      // Convert daterange to from_date / to_date
-      if (formattedFilters[key].start) {
-        formattedFilters["from_date"] = new Date(formattedFilters[key].start)
+      if (filterConfig?.type === "date" && formattedFilters[key]) {
+        // Format single date to YYYY-MM-DD
+        formattedFilters[key] = new Date(formattedFilters[key])
           .toISOString()
           .split("T")[0];
+      } else if (filterConfig?.type === "daterange" && formattedFilters[key]) {
+        // Convert daterange to from_date / to_date
+        if (formattedFilters[key].start) {
+          formattedFilters["from_date"] = new Date(formattedFilters[key].start)
+            .toISOString()
+            .split("T")[0];
+        }
+        if (formattedFilters[key].end) {
+          formattedFilters["to_date"] = new Date(formattedFilters[key].end)
+            .toISOString()
+            .split("T")[0];
+        }
+        // Remove original daterange object
+        delete formattedFilters[key];
       }
-      if (formattedFilters[key].end) {
-        formattedFilters["to_date"] = new Date(formattedFilters[key].end)
-          .toISOString()
-          .split("T")[0];
-      }
-      // Remove original daterange object
-      delete formattedFilters[key];
+    });
+
+    // Apply filters
+    setAppliedFilters(formattedFilters);
+    appliedFiltersRef.current = formattedFilters;
+    setPage(0);
+    pageRef.current = 0;
+
+    // Close mobile modal if small screen
+    if (isSmallScreen) {
+      setFilterModalOpen(false);
     }
-  });
 
-  // Apply filters
-  setAppliedFilters(formattedFilters);
-  appliedFiltersRef.current = formattedFilters;
-  setPage(0);
-  pageRef.current = 0;
-
-  // Close mobile modal if small screen
-  if (isSmallScreen) {
-    setFilterModalOpen(false);
-  }
-
-  // Fetch data with new filters
-  fetchData();
-}, [filterValues, isSmallScreen, fetchData, availableFilters]);
+    // Fetch data with new filters
+    fetchData();
+  }, [filterValues, isSmallScreen, fetchData, availableFilters]);
 
   const resetFilters = useCallback(() => {
     setFilterValues(initialFilterValues);
@@ -474,37 +474,35 @@ const applyFilters = useCallback(() => {
                 {filter.label}
               </Typography>
               <Box sx={{ display: "flex", gap: 1 }}>
-                <TextField
-                  size="small"
-                  label="Start"
-                  type="date"
-                  value={filterValues[filter.id]?.start || ""}
-                  onChange={(e) =>
-                    handleFilterChange(filter.id, {
-                      ...filterValues[filter.id],
-                      start: e.target.value,
-                    })
-                  }
-                  InputLabelProps={{
-                    shrink: true,
+                <DateRangePicker
+                  size="md"
+                  editable
+                  ranges={predefinedRanges}
+                  cleanable
+                  showOneCalendar
+                  appearance="subtle"
+                  placeholder="Select Date Range"
+                  placement="auto"
+                  value={filterValues[filter.id]?.value || null}
+                  onChange={(value) => {
+                    if (value) {
+                      handleFilterChange(filter.id, {
+                        value: value,
+                        start: yyyymmdd(value[0]),
+                        end: yyyymmdd(value[1]),
+                      });
+                    } else {
+                      handleFilterChange(filter.id, { start: "", end: "" });
+                    }
                   }}
-                  sx={{ flex: 1 }}
-                />
-                <TextField
-                  size="small"
-                  label="End"
-                  type="date"
-                  value={filterValues[filter.id]?.end || ""}
-                  onChange={(e) =>
-                    handleFilterChange(filter.id, {
-                      ...filterValues[filter.id],
-                      end: e.target.value,
-                    })
-                  }
-                  InputLabelProps={{
-                    shrink: true,
+                  disabledDate={afterToday()}
+                  container={() => document.body}
+                  style={{
+                    width: "100%",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                    zIndex: 9999,
                   }}
-                  sx={{ flex: 1 }}
                 />
               </Box>
             </Box>
@@ -607,7 +605,12 @@ const applyFilters = useCallback(() => {
             />
           ) : filter.type === "daterange" ? (
             <Box
-              sx={{ display: "flex", flexDirection: "column", minWidth: 280,mt:-1 }}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                minWidth: 280,
+                mt: -1,
+              }}
             >
               <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
                 {filter.label}
@@ -634,11 +637,12 @@ const applyFilters = useCallback(() => {
                   }
                 }}
                 disabledDate={afterToday()}
+                container={() => document.body}
                 style={{
                   width: "100%",
                   border: "1px solid #ccc",
                   borderRadius: "4px",
-                  
+                  zIndex: 9999,
                 }}
               />
             </Box>

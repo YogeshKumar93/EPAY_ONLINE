@@ -679,6 +679,9 @@ th:last-child::after {
   color: #ffd700;
 }
 
+.rs-picker-dropdown, .rs-picker-container {
+  z-index: 9999 !important;
+}
 
 
 /* ******************************************************* */
