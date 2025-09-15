@@ -190,6 +190,7 @@ import bank from "./assets/Images/Bank.png";
 import dashboardnew from "./assets/Images/dashboard.svg";
 import users from "./assets/Images/users.png";
 import transctionNew from "./assets/Images/Transctionns.png";
+import bgimage from "./assets/Images/bgimage.png";
 
 // side nav images
 
@@ -527,6 +528,7 @@ export const bankImage = bank;
 export const dashboardImage = dashboardnew;
 export const usersImage = users;
 export const transImage = transctionNew;
+export const bgImage = bgimage;
 // export const fundReqImage = fundReq;
 // export const walletTransferImage = walletTransfer;
 // export const walletLdgerImage = walletLdger;

@@ -13,7 +13,7 @@ import {
 import OTPInput from "react-otp-input";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
-import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
+import { okSuccessToast, apiErrorToast, okSuccessToastAlt } from "../utils/ToastUtil";
 import AuthContext from "../contexts/AuthContext";
 import { useToast } from "../utils/ToastContext";
 
@@ -113,7 +113,7 @@ console.log("referenceKey",referenceKey);
 
       const { error, response } = await apiCall("post", ApiEndpoints.DMT1_TXN, payload);
       if (response) {
-        okSuccessToast("Payout successful!");
+        okSuccessToastAlt(response?.message)
         setAmount("");
         setOtp("");
         setMpin("");

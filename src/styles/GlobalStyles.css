@@ -679,6 +679,23 @@ th:last-child::after {
   color: #ffd700;
 }
 
+.swal2-border-radius {
+  border-radius: 20px !important; /* adjust as needed */
+}
+.custom-close-btn {
+  background: red !important;
+  color: white !important;
+  border-radius: 50% !important;
+  width: 22px !important;
+  height: 22px !important;
+  font-size: 14px !important;
+  line-height: 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  top: 8px !important;
+  right: 8px !important;
+}
 
 
 /* ******************************************************* */
