@@ -52,12 +52,16 @@ import { useSchemaForm } from "../hooks/useSchemaForm";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { apiCall } from "../api/apiClient";
 import { apiErrorToast, okSuccessToast } from "../utils/ToastUtil";
+import DeleteBeneficiaryModal from "./DeleteBeneficiaryModal";
 const Beneficiaries = ({ beneficiaries, onSelect, onDelete, onVerify,sender ,onSuccess}) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [open, setOpen] = useState(true);
   const [openModal, setOpenModal] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+const [deleting, setDeleting] = useState(false);
+const [deleteOpen, setDeleteOpen] = useState(false);
+const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
 
   const { schema, formData, handleChange, errors, setErrors, loading } =
     useSchemaForm(ApiEndpoints.ADD_DMT1_SCHEMA, openModal, {
@@ -74,14 +78,14 @@ const payload = {
   sender_id: sender?.id,
   rem_mobile: sender?.mobileNumber   // <-- correct property name
 };
-      const {res,error} = await apiCall(
+    const {error,response} = await apiCall(
         "post",
         ApiEndpoints.REGISTER_DMT1_BENEFICIARY,
         payload
       );
 
-      if (res) {
-        okSuccessToast(res?.message || "Beneficiary added successfully");
+      if (response) {
+        okSuccessToast(response?.message || "Beneficiary added successfully");
         setOpenModal(false);
         onSuccess?.(sender.mobile_number);
       } else {
@@ -112,7 +116,7 @@ const payload = {
         ];
 
   const bankImageMapping = {
-     SBI: sbi2,
+     SBIN: sbi2,
         IBKL: idbi2,
         UTIB: axis2,
         HDFC: hdfc2,
@@ -135,6 +139,22 @@ const payload = {
         SCBL: stand2,
         JAKA: jk2,
   }; // add mappings if needed
+
+  const handleDeleteClick = (beneficiary) => {
+    setSelectedBeneficiary(beneficiary);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async (id) => {
+    try {
+      setDeleting(true);
+      await onDelete?.(id); // call parent delete
+      setDeleteModalOpen(false);
+      setSelectedBeneficiary(null);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
      <Card 
@@ -163,7 +183,10 @@ const payload = {
         <Typography variant="subtitle1" fontWeight="bold">
           Beneficiary List ({beneficiaries?.length || 0})
         </Typography>
+        
           <Box ml={isMobile ? 2 : "auto"}>
+                      {sender &&
+
     <Button
       variant="contained"
       size="small"
@@ -184,7 +207,7 @@ const payload = {
     >
       Add Beneficiary
     </Button>
-
+}
   </Box>
         {isMobile && (
         <IconButton size="small" sx={{ color: "white" }}>
@@ -264,24 +287,20 @@ const payload = {
                         Send Money
                       </Button>
 
-                      <IconButton
-                        edge="end"
-                        size="small"
-                        color="error"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDelete?.(b.id);
-                        }}
-                        sx={{
-                          backgroundColor: "error.light",
-                          "&:hover": { backgroundColor: "error.main" },
-                          color: "white",
-                        }}
-                      >
-                        <Tooltip title="Delete Beneficiary">
-                          <DeleteIcon fontSize="small" />
-                        </Tooltip>
-                      </IconButton>
+         <IconButton
+  edge="end"
+  size="small"
+  color="error"
+  onClick={(e) => {
+    e.stopPropagation();
+    setSelectedBeneficiary(b);
+    setDeleteOpen(true);
+  }}
+>
+  <Tooltip title="Delete Beneficiary">
+    <DeleteIcon fontSize="small" />
+  </Tooltip>
+</IconButton>
                     </Stack>
                   )
                 }
@@ -401,6 +420,17 @@ const payload = {
           ]}
         />
       )}
+   <DeleteBeneficiaryModal
+  open={deleteOpen}
+  onClose={() => setDeleteOpen(false)}
+  beneficiary={selectedBeneficiary}
+  sender={sender}
+  onSuccess={() => {
+    setDeleteOpen(false);
+    setSelectedBeneficiary(null);
+    onSuccess?.(sender.mobileNumber); // refresh list
+  }}
+/>
     </Card>
   );
 };

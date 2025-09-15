@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Tabs, Tab, Box, CircularProgress, Button } from "@mui/material";
 import { useSchemaForm } from "../../hooks/useSchemaForm";
-import CommonModal from "../common/CommonModal";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import { apiCall } from "../../api/apiClient";
 import { useToast } from "../../utils/ToastContext";
@@ -9,6 +8,7 @@ import CommonFormField from "../common/CommonFormField";
 
 export const BusinessInformation = ({ open, onClose }) => {
   const [activeTab, setActiveTab] = useState(0);
+  const [maxStep, setMaxStep] = useState(0); // ✅ highest unlocked tab
   const { showToast } = useToast();
   const [submitting, setSubmitting] = useState(false);
 
@@ -25,7 +25,6 @@ export const BusinessInformation = ({ open, onClose }) => {
     activeTab === 5
   );
   const kyc = useSchemaForm(ApiEndpoints.KYC_SCHEMA, activeTab === 6);
-  const status = useSchemaForm(ApiEndpoints.STATUS_SCHEMA, activeTab === 7);
 
   const tabs = [
     { label: "Basic", data: basic, submitApi: ApiEndpoints.CREATE_BASIC },
@@ -43,16 +42,13 @@ export const BusinessInformation = ({ open, onClose }) => {
       submitApi: ApiEndpoints.CREATE_DOCUMENTS,
     },
     { label: "KYC", data: kyc, submitApi: ApiEndpoints.CREATE_KYC },
-    { label: "Status", data: status, submitApi: ApiEndpoints.CREATE_STATUS },
   ];
 
   const currentTab = tabs[activeTab];
 
-  // ✅ Handle Submit (similar to CreateBankModal)
   const handleSubmit = async () => {
-    const { schema, formData, errors, setErrors } = currentTab.data;
+    const { schema, formData } = currentTab.data;
 
-    // simple validation check (if required you can extend like CreateBankModal)
     if (!schema || !schema.length) {
       showToast("Schema not loaded yet", "error");
       return;
@@ -66,11 +62,42 @@ export const BusinessInformation = ({ open, onClose }) => {
         formData
       );
 
+      console.log("📌 API Response:", response);
+      console.log("📌 response.data (step):", response?.data);
+
       if (response) {
         showToast(
           response?.message || `${currentTab.label} saved successfully`,
           "success"
         );
+
+        const nextStep = response?.data;
+        if (nextStep != null) {
+          if (nextStep === 2) {
+            showToast(
+              "🎉 All steps completed! Business information is done.",
+              "success"
+            );
+            return;
+          }
+
+          const valueToTabIndex = {
+            9: 0, // Basic
+            8: 1, // Contact
+            7: 2, // Address
+            6: 3, // Identification
+            5: 4, // Bank
+            4: 5, // Documents
+            3: 6, // KYC
+          };
+
+          const tabIndex = valueToTabIndex[nextStep] ?? 0;
+          console.log(`📌 Switching to tab index: ${tabIndex}`);
+
+          // ✅ unlock the tab
+          setMaxStep((prev) => Math.max(prev, tabIndex));
+          setActiveTab(tabIndex);
+        }
       } else {
         showToast(
           error?.message || `Failed to save ${currentTab.label}`,
@@ -78,24 +105,26 @@ export const BusinessInformation = ({ open, onClose }) => {
         );
       }
     } catch (err) {
-      console.error(`Error saving ${currentTab.label}:`, err);
+      console.error(`❌ Error saving ${currentTab.label}:`, err);
       showToast("Something went wrong while saving", "error");
     } finally {
       setSubmitting(false);
     }
   };
-  console.log("TThe current tab schema is", currentTab.data.schema);
+
   return (
     <Box>
       {/* Tabs Navigation */}
       <Tabs
         value={activeTab}
-        onChange={(e, val) => setActiveTab(val)}
+        onChange={(e, val) => {
+          if (val <= maxStep) setActiveTab(val); // ✅ only allow unlocked tabs
+        }}
         variant="scrollable"
         scrollButtons="auto"
       >
         {tabs.map((tab, idx) => (
-          <Tab key={idx} label={tab.label} />
+          <Tab key={idx} label={tab.label} disabled={idx > maxStep} />
         ))}
       </Tabs>
 

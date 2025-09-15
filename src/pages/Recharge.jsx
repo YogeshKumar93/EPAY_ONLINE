@@ -60,13 +60,14 @@ import SecurityIcon from "@mui/icons-material/Security";             // Insuranc
 import PhoneIcon from "@mui/icons-material/Phone";                   // Landline
 import Prepaid from "../components/UI/rechange and bill/Prepaid";
 import Postpaid from "../components/UI/rechange and bill/Postpaid";
+import Dth from "../components/UI/rechange and bill/Dth";
 
 export const Recharge = () => {
   const tabItems = [
     { label: "Prepaid", icon: <PhoneIphoneIcon />, component: <Prepaid /> },
     { label: "Postpaid", icon: <PhoneIphoneIcon />, component: <Postpaid /> },
     { label: "Electricity", icon: <ElectricBoltIcon />, component: <Postpaid /> },
-    { label: "DTH", icon: <SatelliteAltIcon />, component: <Postpaid /> },
+    { label: "DTH", icon: <SatelliteAltIcon />, component: <Dth /> },
     { label: "Broadband", icon: <RouterIcon />, component: <Postpaid /> },
     { label: "Gas", icon: <LocalGasStationIcon />, component: <Postpaid /> },
     { label: "Water", icon: <OpacityIcon />, component: <Postpaid /> },

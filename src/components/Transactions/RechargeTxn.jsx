@@ -10,12 +10,30 @@ import LaptopIcon from "@mui/icons-material/Laptop";
 import DrawerDetails from "../common/DrawerDetails";
 import VisibilityIcon from '@mui/icons-material/Visibility';
  
-const RechargeTxn = ({ filters = [], query }) => {
+const RechargeTxn = ({  query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [selectedRow, setSelectedRow] = useState(null);
-
+const filters = useMemo(
+    () => [
+      {
+        id: "status",
+        label: "Status",
+        type: "dropdown",
+        options: [
+          { value: "success", label: "Success" },
+          { value: "failed", label: "Failed" },
+          { value: "refund", label: "Refund" },
+          { value: "pending", label: "Pending" },
+        ],
+        defaultValue: "pending",
+      },
+      { id: "sender_mobile", label: "Sender Mobile", type: "textfield" },
+      { id: "txn_id", label: "Txn ID", type: "textfield" },
+    ],
+    []
+  );
   const [openCreate, setOpenCreate] = useState(false);
   const columns = useMemo(
     () => [

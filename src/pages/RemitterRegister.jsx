@@ -1,4 +1,3 @@
-// RemitterRegister.js
 import React, { useState, useEffect } from "react";
 import CommonModal from "../components/common/CommonModal";
 import { apiCall } from "../api/apiClient";
@@ -28,22 +27,24 @@ const RemitterRegister = ({ open, onClose, mobile, onSuccess }) => {
     }
   }, [mobile, setFormData]);
 
+  // ✅ disable mobile number by overriding fieldConfig
+  const disabledSchema = schema.map((field) =>
+    field.name === "mobile_number" ? { ...field, disabled: true } : field
+  );
+
   const handleRegister = async () => {
     setSubmitting(true);
     setErrors({});
     try {
       const { response, error } = await apiCall(
         "post",
-        ApiEndpoints.DMT1_REGISTER, // ✅ use DMT1_REGISTER here
+        ApiEndpoints.DMT1_REGISTER,
         formData
       );
 
       if (response) {
         okSuccessToast("Remitter registered successfully");
-
-        // ✅ pass back response to parent
         onSuccess?.(response.data);
-
         onClose();
       } else {
         apiErrorToast(error?.message || "Failed to register remitter");
@@ -64,7 +65,7 @@ const RemitterRegister = ({ open, onClose, mobile, onSuccess }) => {
       iconType="info"
       size="small"
       dividers
-      fieldConfig={schema}       // ✅ schema-driven fields
+      fieldConfig={disabledSchema} // ✅ use disabledSchema instead of schema
       formData={formData}
       handleChange={handleChange}
       errors={errors}

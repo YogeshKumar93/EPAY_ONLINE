@@ -4,11 +4,10 @@ import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
 import RemitterDetails from "./RemitterDetails";
-import RegistterRemitter from "./RegistterRemitter";
 import Beneficiaries from "./Beneficiaries";
 import SelectedBeneficiary from "./SelectedBeneficiary";
-import SenderRegisterModal from "./SenderRegisterModal";
 import { useToast } from "../utils/ToastContext";
+import RemitterRegister from "./RemitterRegister";
 
 const Dmt = () => {
   const [mobile, setMobile] = useState("");
@@ -29,20 +28,21 @@ const {showToast} = useToast();
       const data = response?.data || response?.response?.data;
       const message = response?.message || "";
 
-      if (message === "Remitter Found") {
-        setSender(data);
-        setBeneficiaries(data?.beneficiaries || []);
-        setShowRegister(false);
-        showToast(message,"success");
-      } else if (message === "Remitter Not Found") {
-        setSender(null);
-              setOpenRegisterModal(true);
-        setBeneficiaries([]);
-        setShowRegister(true);
-        // okSuccessToast(message);
-      } else {
-        apiErrorToast(message || "Unexpected response");
-      }
+     if (response?.message ==="Remitter Found") {
+  // success always gives sender
+  setSender(data);
+  setBeneficiaries(data?.beneficiaries || []);
+  setShowRegister(false);
+  showToast(message, "success");
+} else if (message === "Remitter Not Found") {
+  setSender(null);
+  setOpenRegisterModal(true);
+  setBeneficiaries([]);
+  setShowRegister(true);
+} else {
+  apiErrorToast(message || "Unexpected response");
+}
+
     } else if (error) {
       apiErrorToast(error?.message || "Something went wrong");
       setSender(null);
@@ -84,7 +84,7 @@ const {showToast} = useToast();
       />
 
           {openRegisterModal && (
- <RegistterRemitter   open={openRegisterModal}
+ <RemitterRegister   open={openRegisterModal}
           onClose={() => setOpenRegisterModal(false)} mobile={mobile} onSuccess={setSender} />
           )}
 
@@ -97,7 +97,9 @@ const {showToast} = useToast();
               <SelectedBeneficiary
                 beneficiary={selectedBeneficiary}
                 senderId={sender.id}
+                sender={sender}
                 senderMobile={sender.mobileNumber}
+                referenceKey={sender.referenceKey}
               />
             )}
           </Box>

@@ -86,7 +86,7 @@ const handleChange = (e) => {
   };
 
   return (
-    <Box p={3}>
+    <Box >
       {/* Always show mobile input */}
       <TextField
         label="Mobile Number"
@@ -96,7 +96,7 @@ const handleChange = (e) => {
           autoComplete="on"   // <-- enable autocomplete for phone numbers
         onChange={handleChange}
         inputProps={{ maxLength: 10 }}
-        sx={{ mb: 2 }}
+        sx={{ mb: 1 }}
       />
 
       {/* Main Content (Sender + Beneficiaries) */}
@@ -113,6 +113,7 @@ const handleChange = (e) => {
             <BeneficiaryDetails
               beneficiary={selectedBeneficiary}
               senderMobile={mobile}
+              sender={sender}
             />
           )}
         </Box>

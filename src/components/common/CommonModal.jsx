@@ -460,7 +460,7 @@ case "autocomplete":
           type={type || "text"}
           value={formData[name] || ""}
           onChange={handleChange}
-          disabled={loading}
+disabled={field.disabled || loading}
           {...getErrorProps()}
           {...props}
         />

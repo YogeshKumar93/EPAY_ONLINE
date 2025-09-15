@@ -27,42 +27,45 @@ const SenderRegisterModal = ({ open, onClose, mobile, onRegistered }) => {
     }
   }, [mobile, setFormData]);
 
-const handleRegister = async () => {
-  setSubmitting(true);
-  setErrors({});
-  try {
-    const res = await apiCall("post", ApiEndpoints.REGISTER_SENDER, formData);
+  // ✅ Disable mobile_number in schema
+  const disabledSchema = schema.map((field) =>
+    field.name === "mobile_number" ? { ...field, disabled: true } : field
+  );
 
-    if (res) {
+  const handleRegister = async () => {
+    setSubmitting(true);
+    setErrors({});
+    try {
+      const res = await apiCall("post", ApiEndpoints.REGISTER_SENDER, formData);
 
-      // ✅ log response
-      console.log("REGISTER_SENDER response:", res);
+      if (res) {
+        // ✅ log response
+        console.log("REGISTER_SENDER response:", res);
 
-      const otp_ref = res?.response?.data?.otp_ref;
-      const sender_id = res?.response?.data?.sender?.id;
+        const otp_ref = res?.response?.data?.otp_ref;
+        const sender_id = res?.response?.data?.sender?.id;
 
-      console.log("Extracted otp_ref:", otp_ref);
-      console.log("Extracted sender_id:", sender_id);
+        console.log("Extracted otp_ref:", otp_ref);
+        console.log("Extracted sender_id:", sender_id);
 
-      // ✅ pass both values back
-      onRegistered?.({
-        mobile_number: formData.mobile_number,
-        otp_ref,
-        sender_id,
-      });
+        // ✅ pass both values back
+        onRegistered?.({
+          mobile_number: formData.mobile_number,
+          otp_ref,
+          sender_id,
+        });
 
-      onClose();
-    } else {
-      apiErrorToast(res?.message || "Failed to register sender");
+        onClose();
+      } else {
+        apiErrorToast(res?.message || "Failed to register sender");
+      }
+    } catch (err) {
+      apiErrorToast(err);
+      setErrors(err?.response?.data?.errors || {});
+    } finally {
+      setSubmitting(false);
     }
-  } catch (err) {
-    apiErrorToast(err);
-    setErrors(err?.response?.data?.errors || {});
-  } finally {
-    setSubmitting(false);
-  }
-};
-
+  };
 
   return (
     <CommonModal
@@ -72,7 +75,7 @@ const handleRegister = async () => {
       iconType="info"
       size="small"
       dividers
-      fieldConfig={schema}
+      fieldConfig={disabledSchema} // ✅ use disabledSchema here
       formData={formData}
       handleChange={handleChange}
       errors={errors}

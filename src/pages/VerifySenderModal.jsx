@@ -48,7 +48,7 @@ const handleVerify = async () => {
 
     const res = await apiCall("post", ApiEndpoints.VERIFY_SENDER, payload);
 
-    if (res?.status) {
+    if (res) {
       okSuccessToast(res?.message || "Sender verified successfully");
       onClose();
     } else {
