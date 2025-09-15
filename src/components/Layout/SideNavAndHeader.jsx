@@ -215,16 +215,22 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             }}
             className={isItemActive ? "nav-link active" : "nav-link"}
           >
-          <ListItemIcon
-  sx={{ color: isItemActive ? "#fff" : "text.s" }}
-  className="nav-icon"
+     <ListItemIcon
+  sx={{
+    "& img": {
+      width: 26,
+      height: 26,
+      filter: isItemActive ? "brightness(0) invert(1)" : "none",
+      transition: "filter 0.2s ease-in-out",
+    },
+    "&:hover img": {
+      filter: "brightness(0) invert(1)", // makes icon white
+    },
+  }}
 >
-  <img
-    src={isItemActive ? item.icon: item.icon}
-    alt={item.title}
-    style={{ width: 26, height: 26, fill: isItemActive ? "#fff" : "#fff" }}
-  />
+  <img src={item.icon} alt={item.title} />
 </ListItemIcon>
+
 
 
             {(desktopOpen || isMobile) && (

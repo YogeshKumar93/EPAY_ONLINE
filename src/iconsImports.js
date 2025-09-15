@@ -187,7 +187,7 @@ import lock_icon from "./assets/lock.png";
 
 
 import bank from "./assets/Images/Bank.png";
-import dashboardnew from "./assets/Images/Dashboard.png";
+import dashboardnew from "./assets/Images/dashboard.svg";
 import users from "./assets/Images/users.png";
 import transctionNew from "./assets/Images/Transctionns.png";
 
