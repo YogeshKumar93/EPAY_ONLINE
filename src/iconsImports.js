@@ -180,6 +180,17 @@ import TrainImage from "./assets/irctcimage.png";
 import HotelImage from "./assets/hotelimage.jpg";
 import lock_icon from "./assets/lock.png";
 
+
+
+
+
+
+
+import bank from "./assets/Images/Bank.png";
+import dashboardnew from "./assets/Images/Dashboard.png";
+import users from "./assets/Images/users.png";
+import transctionNew from "./assets/Images/Transctionns.png";
+
 // side nav images
 
 import linkdinIcon from "../src/assets/linkdin.png";
@@ -511,3 +522,17 @@ export const macintosh2 = macintosh_1;
 export const windows2 = windows_1;
 export const linux2 = linux_1;
 export const festivalIMage = fest;
+
+export const bankImage = bank;
+export const dashboardImage = dashboardnew;
+export const usersImage = users;
+export const transImage = transctionNew;
+// export const fundReqImage = fundReq;
+// export const walletTransferImage = walletTransfer;
+// export const walletLdgerImage = walletLdger;
+// export const settingImage = setting;
+// export const serviceImage = service;
+// export const layoutImage = layout;
+// export const aepsImage = aeps;
+// export const complainImage = complain;
+// export const riskImage = risk;

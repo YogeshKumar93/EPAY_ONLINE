@@ -21,6 +21,7 @@ import {
   Grid,
   styled,
   Button,
+  Tooltip,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
@@ -47,7 +48,11 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import Notification from "../Notification/Notification";
 import NotificationModal from "../Notification/NotificationModal";
 import { setTitleFunc } from "../../utils/HeaderTitleUtil";
+import CameraAltIcon from "@mui/icons-material/CameraAlt";
+ 
 
+// ✅ Default male avatar image (replace with your own asset if available)
+import defaultMaleAvatar from "../../assets/Images/male_avtar.jpg";
 // Navigation configuration
 
 const roleNavigation = {
@@ -63,6 +68,20 @@ const roleNavigation = {
   api:api_nav,
   md:md_nav,
 };
+
+  const roleRoutes = {
+    adm: "/admin/profile",
+    sadm: "/admin/profile",
+    Asm: "/asm/profile",
+    dd: "/customer/profile",
+    ret: "/customer/profile",
+    Ret: "/customer/profile",
+    Dd: "/customer/profile",
+    Zsm: "/zsm/profile",
+    Ad: "/ad/profile",
+    Md: "/md/profile",
+    Api: "/api-user/profile",
+  };
 
 const themeSettings = {
   drawerWidth: 240,
@@ -94,6 +113,8 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
   const [desktopOpen, setDesktopOpen] = useState(true);
   const [userMenuAnchor, setUserMenuAnchor] = useState(null);
   const [expandedItems, setExpandedItems] = useState({});
+   const [preview, setPreview] = useState(user?.profile_image || "");
+   
   const navigate = useNavigate();
   const location = useLocation();
   const title = setTitleFunc(location.pathname, location.state);
@@ -108,6 +129,15 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
       duration: theme.transitions.duration.leavingScreen,
     }),
   }));
+
+   const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setPreview(URL.createObjectURL(file));
+      // 🔄 upload logic API call can be added here
+      console.log("Selected file:", file);
+    }
+  };
 
   const getNavigationItems = () => {
     if ((userRole === "ret" || userRole === "dd") && userLayout === 2) {
@@ -185,12 +215,17 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             }}
             className={isItemActive ? "nav-link active" : "nav-link"}
           >
-            <ListItemIcon
-              sx={{ color: isItemActive ? "#fff" : "text.primary" }}
-              className="nav-icon"
-            >
-              {isItemActive ? item.icon2 : item.icon}
-            </ListItemIcon>
+          <ListItemIcon
+  sx={{ color: isItemActive ? "#fff" : "text.s" }}
+  className="nav-icon"
+>
+  <img
+    src={isItemActive ? item.icon: item.icon}
+    alt={item.title}
+    style={{ width: 24, height: 24 }}
+  />
+</ListItemIcon>
+
 
             {(desktopOpen || isMobile) && (
               <>
@@ -352,86 +387,137 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
 
             <Divider />
 
-            <MenuItem
-              disableRipple
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                width: "100%",
-                marginTop: "-8px",
-                "&:hover": { cursor: "default", background: "#fff" },
-              }}
-            >
-              {user && user.profile_image !== "0" ? (
-                <Avatar
-                  id="user_img"
-                  alt="Remy Sharp"
-                  src={""}
-                  sx={{ width: 80, height: 80 }}
-                />
-              ) : (
-                <AccountCircle sx={{ fontSize: "80px" }} />
-              )}
+            
+ <MenuItem
+      disableRipple
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 3,
+        width: "100%",
+        px: 3,
+        py: 3,
+        borderRadius: "16px",
+        background: "linear-gradient(135deg, #fdfdfd 0%, #f5f7f9 100%)",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+      }}
+    >
+      {/* Avatar + Edit */}
+      <Box sx={{ position: "relative" }}>
+        <Tooltip title={user?.name || "Guest User"} arrow enterDelay={300}>
+          <Avatar
+            alt={user?.name || "User Avatar"}
+            src={preview || defaultMaleAvatar}
+            sx={{
+              width: 90,
+              height: 90,
+              border: "2px solid #1CA895",
+              boxShadow: "0 3px 8px rgba(28,168,149,0.25)",
+              transition: "all 0.25s ease-in-out",
+              "&:hover": { transform: "scale(1.04)" },
+            }}
+          />
+        </Tooltip>
 
-              <span
-                style={{
-                  fontWeight: "550",
-                  fontSize: "0.9rem",
-                  marginTop: "0.3rem",
-                }}
-              >
-                {user && user.name}
-              </span>
+        {/* Edit Button */}
+        <Tooltip title="Change Photo" arrow enterDelay={300}>
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              bgcolor: "#1CA895",
+              border: "2px solid #fff",
+              color: "#fff",
+              width: 36,
+              height: 36,
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+              "&:hover": { bgcolor: "#138f79" },
+            }}
+            onClick={() => document.getElementById("profileUpload")?.click()}
+          >
+            <CameraAltIcon fontSize="small" />
+            <input
+              id="profileUpload"
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={handleImageChange}
+            />
+          </Box>
+        </Tooltip>
+      </Box>
 
-              <span
-                onClick={() => {
-                  if (user && user.role === "adm") {
-                    navigate("/admin/profile");
-                  } else if (user && user.role === "sadm") {
-                    navigate("/admin/profile");
-                  } else if (user && user.role === "Asm") {
-                    navigate("/asm/profile");
-                  } else if (user && user.role === "dd") {
-                    navigate("/customer/profile");
-                  } else if (user && user.role === "ret") {
-                    navigate("/customer/profile");
-                  } else if (user && user.role === "Zsm") {
-                    navigate("/zsm/profile");
-                  } else if (user && user.role === "Ad") {
-                    navigate("/ad/profile");
-                  } else if (user && user.role === "Md") {
-                    navigate("/md/profile");
-                  } else if (
-                    user &&
-                    (user.role === "Ret" || user.role === "Dd")
-                  ) {
-                    navigate("/customer/profile");
-                  } else if (user && user.role === "Api") {
-                    navigate("/api-user/profile");
-                  } else {
-                    navigate("/other/profile");
-                  }
-                }}
-                style={{
-                  border: "1px solid #3f3f3f",
-                  borderRadius: "16px",
-                  padding: "0.2rem 1rem",
-                  fontSize: "0.9rem",
-                  margin: "1rem 0",
-                }}
-                className="simple-hover"
-              >
-                Manage your Profile
-              </span>
-            </MenuItem>
+      {/* User Details */}
+      <Box sx={{ flexGrow: 1 }}>
+        <Typography sx={{ fontWeight: 700, fontSize: "1.2rem", color: "#222" }}>
+          {user?.name || "Guest User"}
+        </Typography>
 
-            <MenuItem onClick={handleLogout}>
-              <ListItemIcon>
-                <LogoutIcon fontSize="small" />
-              </ListItemIcon>
-              <span className="text-base">Logout</span>
-            </MenuItem>
+        <Typography variant="body2" color="text.secondary">
+          {user?.role || "Standard User"}
+        </Typography>
+
+        <Divider sx={{ my: 1, width: "60px", borderColor: "#1CA895" }} />
+
+        <Button
+          variant="contained"
+          size="small"
+          sx={{
+            mt: 1.5,
+            textTransform: "none",
+            borderRadius: "20px",
+            fontWeight: 600,
+            background: "linear-gradient(45deg, #1CA895, #4CAF50)",
+            "&:hover": {
+              background: "linear-gradient(45deg, #138f79, #3b9445)",
+            },
+          }}
+          onClick={() => navigate(roleRoutes[user?.role] || "/other/profile")}
+        >
+          Manage Profile
+        </Button>
+      </Box>
+    </MenuItem>
+
+
+
+
+
+
+           <MenuItem
+  onClick={handleLogout}
+  sx={{
+    display: "flex",
+    alignItems: "center",
+    gap: 1.5,
+    px: 10,
+    py: 1.5,
+    borderRadius: "12px",
+    fontWeight: 500,
+    color: "#dc2626", // red-600
+    background: "#1405",
+    boxShadow: "0 2px 6px rgba(220, 38, 38, 0.15)",
+    transition: "all 0.3s ease",
+    "&:hover": {
+      background: "#4450A1",
+      color: "#fff",
+      transform: "scale(1.02)",
+      boxShadow: "0 4px 12px rgba(220, 38, 38, 0.3)",
+    },
+  }}
+>
+  <ListItemIcon sx={{ color: "inherit" }}>
+    <LogoutIcon fontSize="small" />
+  </ListItemIcon>
+  <span className="text-base">Logout</span>
+</MenuItem>
+
           </Menu>
         </Toolbar>
       </AppBar>
