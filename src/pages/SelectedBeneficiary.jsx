@@ -17,7 +17,7 @@ import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
 import AuthContext from "../contexts/AuthContext";
 import { useToast } from "../utils/ToastContext";
 
-const SelectedBeneficiary = ({ beneficiary, senderId, senderMobile }) => {
+const SelectedBeneficiary = ({ beneficiary, senderId, senderMobile ,referenceKey,sender}) => {
   const { location } = useContext(AuthContext);
   const [transferMode, setTransferMode] = useState("IMPS");
   const [amount, setAmount] = useState("");
@@ -26,6 +26,9 @@ const SelectedBeneficiary = ({ beneficiary, senderId, senderMobile }) => {
   const [mpin, setMpin] = useState("");
   const [loading, setLoading] = useState(false);
 const {showToast} = useToast()
+  const [resendLoading, setResendLoading] = useState(false);
+console.log("sender linit ",sender.limitAvailable);
+
   if (!beneficiary) return null;
 
   const handleGetOtp = async () => {
@@ -33,19 +36,21 @@ const {showToast} = useToast()
       apiErrorToast("Enter a valid amount");
       return;
     }
+console.log("referenceKey",referenceKey);
 
     setLoading(true);
     try {
       const payload = {
-        mobile_number: senderMobile,
+        referenceKey: referenceKey,
+        number: senderMobile,
         beneficiary_id: beneficiary.id,
         amount,
       };
-      const { error, response } = await apiCall("post", ApiEndpoints.PAYOUT_OTP, payload);
+      const { error, response } = await apiCall("post", ApiEndpoints.OTP_DMT1_BENEFICIARY, payload);
       if (error) apiErrorToast(error);
       else {
         showToast("OTP sent successfully!","success");
-        setOtpRef(response?.data?.otp_ref || null);
+        setOtpRef(response?.data?.referenceKey || null);
       }
     } catch (err) {
       apiErrorToast(err);
@@ -53,7 +58,28 @@ const {showToast} = useToast()
       setLoading(false);
     }
   };
-
+ const handleResendOtp = async () => {
+    setResendLoading(true);
+    try {
+      const payload = {
+        referenceKey: referenceKey, // still pass original referenceKey
+        number: senderMobile,
+        beneficiary_id: beneficiary.id,
+        amount,
+      };
+      const { error, response } = await apiCall("post", ApiEndpoints.OTP_DMT1_BENEFICIARY, payload);
+      if (error) apiErrorToast(error);
+      else {
+        showToast("OTP resent successfully!", "success");
+        setOtpRef(response?.data?.referenceKey || null); // 🔑 Save NEW referenceKey
+        setOtp(""); // clear old OTP
+      }
+    } catch (err) {
+      apiErrorToast(err);
+    } finally {
+      setResendLoading(false);
+    }
+  };
   const handleProceed = async () => {
     if (!otp || otp.length !== 6) {
       apiErrorToast("Enter the 6-digit OTP");
@@ -68,23 +94,24 @@ const {showToast} = useToast()
     try {
       const payload = {
         sender_id: senderId,
-        beneficiary_id: beneficiary.id,
-        beneficiary_name: beneficiary.beneficiary_name,
-        account_number: beneficiary.account_number,
-        ifsc_code: beneficiary.ifsc_code,
+        ben_id: beneficiary.bene_id,
+        ben_name: beneficiary.beneficiary_name,
+        ben_acc: beneficiary.account_number,
+        ifsc: beneficiary.ifsc_code,
         bank_name: beneficiary.bank_name,
         mobile_number: beneficiary.mobile_number,
-        operator: 11,
+        operator: 13,
         latitude: location?.lat || "",
         longitude: location?.long || "",
         amount,
         otp,
-        otp_ref: otpRef,
-        mop: transferMode,
+        referenceKey: otpRef,
+        type: transferMode,
         mpin,
+        pf:"web"
       };
 
-      const { error, response } = await apiCall("post", ApiEndpoints.PAYOUT, payload);
+      const { error, response } = await apiCall("post", ApiEndpoints.DMT1_TXN, payload);
       if (response) {
         okSuccessToast("Payout successful!");
         setAmount("");
@@ -202,6 +229,15 @@ const {showToast} = useToast()
                 textAlign: "center",
               }}
             />
+            <Button
+              variant="text"
+              size="small"
+              sx={{ mt: 1 }}
+              onClick={handleResendOtp}
+              disabled={resendLoading}
+            >
+              {resendLoading ? "Resending..." : "Resend OTP"}
+            </Button>
           </Box>
 
           {/* M-PIN */}

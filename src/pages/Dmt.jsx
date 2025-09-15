@@ -97,7 +97,9 @@ const {showToast} = useToast();
               <SelectedBeneficiary
                 beneficiary={selectedBeneficiary}
                 senderId={sender.id}
+                sender={sender}
                 senderMobile={sender.mobileNumber}
+                referenceKey={sender.referenceKey}
               />
             )}
           </Box>

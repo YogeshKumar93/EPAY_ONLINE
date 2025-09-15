@@ -113,6 +113,7 @@ const handleChange = (e) => {
             <BeneficiaryDetails
               beneficiary={selectedBeneficiary}
               senderMobile={mobile}
+              sender={sender}
             />
           )}
         </Box>

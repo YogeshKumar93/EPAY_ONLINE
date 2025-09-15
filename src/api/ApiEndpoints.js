@@ -178,6 +178,8 @@ const ApiEndpoints = {
   ADD_DMT1_SCHEMA: "dmt1/getBeneficiarySchema",
   REMOVE_DMT1_BENEFICIARY: "dmt1/removeBeneficiary",
   REMOVE_DMT1_BENEFICIARY_VERIFY: "dmt1/VerifyRemoveBeneficiary",
+  OTP_DMT1_BENEFICIARY: "dmt1/transactionOtpDmt1",
+  DMT1_TXN: "dmt1/dmtTxn",
 
   CREATE_USER: "signup/createUser",
   GET_SIGNUP_SCHEMA: "signup/getSignupSchema",
