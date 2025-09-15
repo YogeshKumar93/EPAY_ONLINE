@@ -51,6 +51,8 @@ import { setTitleFunc } from "../../utils/HeaderTitleUtil";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import defaultMaleAvatar from "../../assets/Images/male_avtar.jpg";
  import defaultMaleAvatar2 from "../../assets/Images/male_avtar2.jpg"
+ import logo from "../../assets/Images/logo(1).png"; // adjust path
+
 
 // ✅ Default male avatar image (replace with your own asset if available)
  
@@ -288,16 +290,16 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
         }}
       >
         {desktopOpen && (
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            className="nav-title"
-            sx={{ fontWeight: "bold" }}
-          >
-            App Name
-          </Typography>
-        )}
+  <Box
+    component="img"
+    src={logo}
+    alt="App Logo"
+    sx={{
+      height: 40,   // adjust as needed
+      width: "auto",
+    }}
+  />
+)}
 
         {!isMobile && (
           <IconButton

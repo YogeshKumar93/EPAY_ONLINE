@@ -44,7 +44,7 @@ export const Admin_nav = [
     to: "/admin/bankings",
   },
     { title: "Layouts", icon:layoutImage, icon2: "👥", to: "/admin/selectlayout" },
-     { title: "AEPS", icon: aepsImage, icon2: "👥", to: "/admin/aeps" },
+    
   
   { title: "Complaint", icon: complainImage, icon2: "👥", to: "/admin/complaint" },
   { title: "Risk", icon: riskImage, icon2: "👥", to: "/admin/risk" },
@@ -110,6 +110,7 @@ export const customer_nav = [
     icon2: "📒",
     to: "/customer/account-ledger",
   },
+   { title: "AEPS", icon: aepsImage, icon2: "👥", to: "/customer/aeps" },
   { title: "My Purchase", icon: "🛠️", icon2: "🛠️", to: "/customer/purchase" },
   { title: "My Sale", icon: "📒", icon2: "📒", to: "/customer/sale" },
   { title: "Bbps", icon: "📒", icon2: "📒", to: "/customer/bbps" },

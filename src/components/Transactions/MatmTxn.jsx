@@ -117,13 +117,49 @@ const filters = useMemo(
       },
 
       {
-        name: "Charges & Comm",
+        name: "GST",
         selector: (row) => (
           <div style={{ textAlign: "right", fontSize: "0.85rem" }}>
-            <div>Charges: ₹{parseFloat(row.charges).toFixed(2)}</div>
+           
             <div>GST: ₹{parseFloat(row.gst).toFixed(2)}</div>
+            
+          </div>
+        ),
+        wrap: true,
+        right: true,
+      },
+      {
+        name: " Comm",
+        selector: (row) => (
+          <div style={{ textAlign: "right", fontSize: "0.85rem" }}>
+           
+            
             <div>Comm: ₹{parseFloat(row.commission).toFixed(2)}</div>
+            
+          </div>
+        ),
+        wrap: true,
+        right: true,
+      },
+      {
+        name: "TDS",
+        selector: (row) => (
+          <div style={{ textAlign: "right", fontSize: "0.85rem" }}>
+           
+           
             <div>TDS: ₹{parseFloat(row.tds).toFixed(2)}</div>
+ 
+          </div>
+        ),
+        wrap: true,
+        right: true,
+      },
+      {
+        name: "NET",
+        selector: (row) => (
+          <div style={{ textAlign: "right", fontSize: "0.85rem" }}>
+           
+            
             <div style={{ fontWeight: 600, color: "#1976d2" }}>
               Net: ₹{parseFloat(row.net_commission).toFixed(2)}
             </div>

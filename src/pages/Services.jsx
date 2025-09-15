@@ -9,8 +9,10 @@ import CreateServiceModal from "../components/CreateServiceModal";
 import EditServiceModal from "../components/EditServiceModaL";
 import ReButton from "../components/common/ReButton";
 import CommonStatus from "../components/common/CommonStatus";
+import { Lock, LockOpen } from "@mui/icons-material";
 
-const Services = ({ filters = [], query }) => {
+
+const Services = ({  query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
 
@@ -32,11 +34,11 @@ const Services = ({ filters = [], query }) => {
   const columns = useMemo(
     () => [
       {
-        name: "Date/Time",
+        name: "User Id",
         selector: (row) => (
-          <div style={{ textAlign: "left" }}>
-            {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
-          </div>
+          <Tooltip title={row?.id}>
+            <div style={{ textAlign: "left" }}>{row?.id}</div>
+          </Tooltip>
         ),
         wrap: true,
       },
@@ -68,9 +70,45 @@ const Services = ({ filters = [], query }) => {
         width: "150px",
       },
       {
-        name: "Status",
-        selector: (row) => <CommonStatus value={row.is_active} />,
-      },
+  name: "Status",
+  selector: (row) =>
+    row.is_active ? (
+      <Tooltip title="Active">
+        <LockOpen sx={{ color: "green" }} />
+      </Tooltip>
+    ) : (
+      <Tooltip title="Inactive">
+        <Lock sx={{ color: "red" }} />
+      </Tooltip>
+    ),
+},
+{
+  name: "Api Status",
+  selector: (row) =>
+    row.is_active_api ? (
+      <Tooltip title="Active">
+        <LockOpen sx={{ color: "green" }} />
+      </Tooltip>
+    ) : (
+      <Tooltip title="Inactive">
+        <Lock sx={{ color: "red" }} />
+      </Tooltip>
+    ),
+},
+{
+  name: "User Status",
+  selector: (row) =>
+    row.is_active_users ? (
+      <Tooltip title="Active">
+        <LockOpen sx={{ color: "green" }} />
+      </Tooltip>
+    ) : (
+      <Tooltip title="Inactive">
+        <Lock sx={{ color: "red" }} />
+      </Tooltip>
+    ),
+},
+
       {
         name: "Actions",
         selector: (row) => (
@@ -89,6 +127,10 @@ const Services = ({ filters = [], query }) => {
     ],
     []
   );
+
+  const filters = useMemo(()=>[
+    {id:"name", label:"Service Name", type:"textfield"},
+  ],[]);
 
   return (
     <Box>
