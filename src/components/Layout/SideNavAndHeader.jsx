@@ -38,7 +38,17 @@ import {
   AccountCircle,
 } from "@mui/icons-material";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
-import { Admin_nav, api_nav, asm_nav, customer_nav, di_nav, md_nav, nav, service_nav, zsm_nav } from "./navConfig";
+import {
+  Admin_nav,
+  api_nav,
+  asm_nav,
+  customer_nav,
+  di_nav,
+  md_nav,
+  nav,
+  service_nav,
+  zsm_nav,
+} from "./navConfig";
 import AuthContext from "../../contexts/AuthContext";
 
 {
@@ -50,12 +60,11 @@ import NotificationModal from "../Notification/NotificationModal";
 import { setTitleFunc } from "../../utils/HeaderTitleUtil";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import defaultMaleAvatar from "../../assets/Images/male_avtar.jpg";
- import defaultMaleAvatar2 from "../../assets/Images/male_avtar2.jpg"
- import logo from "../../assets/Images/logo(1).png"; // adjust path
-
+import defaultMaleAvatar2 from "../../assets/Images/male_avtar2.jpg";
+import logo from "../../assets/Images/logo(1).png"; // adjust path
 
 // ✅ Default male avatar image (replace with your own asset if available)
- 
+
 // Navigation configuration
 
 const roleNavigation = {
@@ -65,26 +74,26 @@ const roleNavigation = {
   ret: customer_nav,
   dd: customer_nav,
   service_nav: service_nav,
-  di:di_nav,
-  asm:asm_nav,
-  zsm:zsm_nav,
-  api:api_nav,
-  md:md_nav,
+  di: di_nav,
+  asm: asm_nav,
+  zsm: zsm_nav,
+  api: api_nav,
+  md: md_nav,
 };
 
-  const roleRoutes = {
-    adm: "/admin/profile",
-    sadm: "/admin/profile",
-    Asm: "/asm/profile",
-    dd: "/customer/profile",
-    ret: "/customer/profile",
-    Ret: "/customer/profile",
-    Dd: "/customer/profile",
-    Zsm: "/zsm/profile",
-    Ad: "/ad/profile",
-    Md: "/md/profile",
-    Api: "/api-user/profile",
-  };
+const roleRoutes = {
+  adm: "/admin/profile",
+  sadm: "/admin/profile",
+  Asm: "/asm/profile",
+  dd: "/customer/profile",
+  ret: "/customer/profile",
+  Ret: "/customer/profile",
+  Dd: "/customer/profile",
+  Zsm: "/zsm/profile",
+  Ad: "/ad/profile",
+  Md: "/md/profile",
+  Api: "/api-user/profile",
+};
 
 const themeSettings = {
   drawerWidth: 240,
@@ -116,8 +125,8 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
   const [desktopOpen, setDesktopOpen] = useState(true);
   const [userMenuAnchor, setUserMenuAnchor] = useState(null);
   const [expandedItems, setExpandedItems] = useState({});
-   const [preview, setPreview] = useState(user?.profile_image || "");
-   
+  const [preview, setPreview] = useState(user?.profile_image || "");
+
   const navigate = useNavigate();
   const location = useLocation();
   const title = setTitleFunc(location.pathname, location.state);
@@ -133,7 +142,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
     }),
   }));
 
-   const handleImageChange = (e) => {
+  const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setPreview(URL.createObjectURL(file));
@@ -218,23 +227,21 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             }}
             className={isItemActive ? "nav-link active" : "nav-link"}
           >
-     <ListItemIcon
-  sx={{
-    "& img": {
-      width: 26,
-      height: 26,
-      filter: isItemActive ? "brightness(0) invert(1)" : "none",
-      transition: "filter 0.2s ease-in-out",
-    },
-    "&:hover img": {
-      filter: "brightness(0) invert(1)", // makes icon white
-    },
-  }}
->
-  <img src={item.icon} alt={item.title} />
-</ListItemIcon>
-
-
+            <ListItemIcon
+              sx={{
+                "& img": {
+                  width: 26,
+                  height: 26,
+                  filter: isItemActive ? "brightness(0) invert(1)" : "none",
+                  transition: "filter 0.2s ease-in-out",
+                },
+                "&:hover img": {
+                  filter: "brightness(0) invert(1)", // makes icon white
+                },
+              }}
+            >
+              <img src={item.icon} alt={item.title} />
+            </ListItemIcon>
 
             {(desktopOpen || isMobile) && (
               <>
@@ -290,16 +297,16 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
         }}
       >
         {desktopOpen && (
-  <Box
-    component="img"
-    src={logo}
-    alt="App Logo"
-    sx={{
-      height: 40,   // adjust as needed
-      width: "auto",
-    }}
-  />
-)}
+          <Box
+            component="img"
+            src={logo}
+            alt="App Logo"
+            sx={{
+              height: 40, // adjust as needed
+              width: "auto",
+            }}
+          />
+        )}
 
         {!isMobile && (
           <IconButton
@@ -357,57 +364,46 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             <MenuIcon />
           </IconButton> */}
 
+          <Typography variant="h5" noWrap component="div" sx={{ flexGrow: 1 }}>
+            {title}
+          </Typography>
 
-          <Typography
-  variant="h5"
-  noWrap
-  component="div"
-  sx={{ flexGrow: 1 }}
->
-  {title}
-</Typography>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 2, // Adjust the gap value as needed
+            }}
+          >
+            {/* ✅ Refresh icon buttons */}
+            <IconButton onClick={refreshUser}>
+              <RefreshIcon sx={{ color: "yellow" }} />
+            </IconButton>
 
+            <IconButton onClick={colour}>
+              <RefreshIcon sx={{ color: "#fff" }} />
+            </IconButton>
 
+            {/* Notification Modal */}
+            <NotificationModal />
 
-         <Box
-  sx={{
-    display: "flex",
-    alignItems: "center",
-    gap: 2, // Adjust the gap value as needed
-  }}
->
-  {/* ✅ Refresh icon buttons */}
-  <IconButton onClick={refreshUser}>
-    <RefreshIcon sx={{ color: "yellow" }} />
-  </IconButton>
+            {/* 👤 User Avatar */}
+            <IconButton color="inherit" onClick={handleUserMenuOpen}>
+              <Avatar src={defaultMaleAvatar2} sx={{ width: 50, height: 50 }} />
+            </IconButton>
 
-  <IconButton onClick={colour}>
-    <RefreshIcon sx={{ color: "#fff" }} />
-  </IconButton>
-
-  {/* Notification Modal */}
-  <NotificationModal />
-
-  {/* 👤 User Avatar */}
-  <IconButton color="inherit" onClick={handleUserMenuOpen}>
-    <Avatar
-      src={defaultMaleAvatar2}
-      sx={{ width: 50, height: 50 }}
-    />
-  </IconButton>
-
-  {/* 👤 User Name */}
-  <Typography
-    variant="subtitle1"
-    sx={{
-      fontWeight: 600,
-      color: "#FFE7C7",
-      fontSize: "26px",
-    }}
-  >
-    {user?.name || userName}!
-  </Typography>
-</Box>
+            {/* 👤 User Name */}
+            <Typography
+              variant="subtitle1"
+              sx={{
+                fontWeight: 600,
+                color: "#FFE7C7",
+                fontSize: "26px",
+              }}
+            >
+              {user?.name || userName}!
+            </Typography>
+          </Box>
 
           <Menu
             anchorEl={userMenuAnchor}
@@ -426,142 +422,147 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
 
             <Divider />
 
-            
- <MenuItem
-      disableRipple
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        width: "100%",
-        px: 5,
-        py: 3,
-        borderRadius: "16px",
-        background: "linear-gradient(135deg, #fdfdfd 0%, #f5f7f9 100%)",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-      }}
-    >
-      {/* Avatar + Edit */}
-      <Box sx={{ position: "relative" }}>
-        <Tooltip title={user?.name || "Guest User"} arrow enterDelay={300}>
-          <Avatar
-            alt={user?.name || "User Avatar"}
-            src={preview || defaultMaleAvatar}
-            sx={{
-              width: 100,
-              height: 100,
-              border: "2px solid #1CA895",
-              boxShadow: "0 3px 8px rgba(28,168,149,0.25)",
-              transition: "all 0.25s ease-in-out",
-              "&:hover": { transform: "scale(1.04)" },
-            }}
-          />
-        </Tooltip>
+            <MenuItem
+              disableRipple
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                width: "100%",
+                px: 5,
+                py: 3,
+                borderRadius: "16px",
+                background: "linear-gradient(135deg, #fdfdfd 0%, #f5f7f9 100%)",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+              }}
+            >
+              {/* Avatar + Edit */}
+              <Box sx={{ position: "relative" }}>
+                <Tooltip
+                  title={user?.name || "Guest User"}
+                  arrow
+                  enterDelay={300}
+                >
+                  <Avatar
+                    alt={user?.name || "User Avatar"}
+                    src={preview || defaultMaleAvatar}
+                    sx={{
+                      width: 100,
+                      height: 100,
+                      border: "2px solid #1CA895",
+                      boxShadow: "0 3px 8px rgba(28,168,149,0.25)",
+                      transition: "all 0.25s ease-in-out",
+                      "&:hover": { transform: "scale(1.04)" },
+                    }}
+                  />
+                </Tooltip>
 
-        {/* Edit Button */}
-        <Tooltip title="Change Photo" arrow enterDelay={300}>
-          <Box
-            sx={{
-              position: "absolute",
-              bottom: 0,
-              right: 0,
-              bgcolor: "#1CA895",
-              border: "2px solid #fff",
-              color: "#fff",
-              width: 36,
-              height: 36,
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
-              "&:hover": { bgcolor: "#138f79" },
-            }}
-            onClick={() => document.getElementById("profileUpload")?.click()}
-          >
-            <CameraAltIcon fontSize="small" />
-            <input
-              id="profileUpload"
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              onChange={handleImageChange}
-            />
-          </Box>
-        </Tooltip>
-      </Box>
+                {/* Edit Button */}
+                <Tooltip title="Change Photo" arrow enterDelay={300}>
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      bottom: 0,
+                      right: 0,
+                      bgcolor: "#1CA895",
+                      border: "2px solid #fff",
+                      color: "#fff",
+                      width: 36,
+                      height: 36,
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+                      "&:hover": { bgcolor: "#138f79" },
+                    }}
+                    onClick={() =>
+                      document.getElementById("profileUpload")?.click()
+                    }
+                  >
+                    <CameraAltIcon fontSize="small" />
+                    <input
+                      id="profileUpload"
+                      type="file"
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      onChange={handleImageChange}
+                    />
+                  </Box>
+                </Tooltip>
+              </Box>
 
-      {/* User Details */}
-      <Box sx={{ flexGrow: 1 }}>
-        <Typography sx={{ fontWeight: 700, fontSize: "2rem", color: "#145Ca1" }}>
-          {user?.name || "Guest User"}
-        </Typography>
+              {/* User Details */}
+              <Box sx={{ flexGrow: 1 }}>
+                <Typography
+                  sx={{ fontWeight: 700, fontSize: "2rem", color: "#145Ca1" }}
+                >
+                  {user?.name || "Guest User"}
+                </Typography>
 
-        <Typography variant="body2" color="text.secondary">
-          {user?.role || "Standard User"}
-        </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {user?.role || "Standard User"}
+                </Typography>
 
-        <Divider sx={{ my: 1, width: "80px", borderColor: "#1CA895" }} />
+                <Divider
+                  sx={{ my: 1, width: "80px", borderColor: "#1CA895" }}
+                />
 
-        <Button
-          variant="contained"
-          size="small"
-          sx={{
-            mt: 1.5,
-            textTransform: "none",
-            borderRadius: "20px",
-            fontWeight: 600,
-            background: "linear-gradient(45deg, #1CA895, #4CAF50)",
-            "&:hover": {
-              background: "linear-gradient(45deg, #138f79, #3b9445)",
-            },
-          }}
-          onClick={() => navigate(roleRoutes[user?.role] || "/other/profile")}
-        >
-          Manage Profile
-        </Button>
-      </Box>
-    </MenuItem>
+                <Button
+                  variant="contained"
+                  size="small"
+                  sx={{
+                    mt: 1.5,
+                    textTransform: "none",
+                    borderRadius: "20px",
+                    fontWeight: 600,
+                    background: "linear-gradient(45deg, #1CA895, #4CAF50)",
+                    "&:hover": {
+                      background: "linear-gradient(45deg, #138f79, #3b9445)",
+                    },
+                  }}
+                  onClick={() =>
+                    navigate(roleRoutes[user?.role] || "/other/profile")
+                  }
+                >
+                  Manage Profile
+                </Button>
+              </Box>
+            </MenuItem>
 
-
-
-
-
-
-           <MenuItem
-  onClick={handleLogout}
-  sx={{
-    display: "flex",
-    alignItems: "center",
-    justifyContent:"center",
-    mt:2,
-    mb:1.5,
-    gap: 2,
-    px: 4,
-    py: 1.5,
-    width:200,
-    borderRadius: "12px",
-    fontWeight: 500,
-    color: "#dc2626", // red-600
-    background: "#1405",
-    boxShadow: "0 2px 6px rgba(220, 38, 38, 0.15)",
-    transition: "all 0.3s ease",
-    "&:hover": {
-      background: "#4450A1",
-      color: "#fff",
-      transform: "scale(1.02)",
-      boxShadow: "0 4px 12px rgba(220, 38, 38, 0.3)",
-    },
-    mx:"auto",
-  }}
->
-  <ListItemIcon sx={{ color: "inherit" }}>
-    <LogoutIcon fontSize="small" />
-  </ListItemIcon>
-  <span className="text-base">Logout</span>
-</MenuItem>
-
+            <MenuItem
+              onClick={handleLogout}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mt: 2,
+                mb: 1.5,
+                gap: 2,
+                px: 4,
+                py: 1.5,
+                width: 200,
+                borderRadius: "12px",
+                fontWeight: 500,
+                color: "#dc2626", // red-600
+                background: "#1405",
+                boxShadow: "0 2px 6px rgba(220, 38, 38, 0.15)",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  background: "#4450A1",
+                  color: "#fff",
+                  transform: "scale(1.02)",
+                  boxShadow: "0 4px 12px rgba(220, 38, 38, 0.3)",
+                },
+                mx: "auto",
+              }}
+            >
+              <ListItemIcon sx={{ color: "inherit" }}>
+                <LogoutIcon fontSize="small" />
+              </ListItemIcon>
+              <span className="text-base">Logout</span>
+            </MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>
