@@ -60,7 +60,7 @@ const PrivateRoute = ({ children }) => {
   if (loading) return <div>Loading...</div>;
 
   // If user exists but status !== 1, show subscription gate
-  if (user && user.status !== 1) {
+  if (user && user.status == 1) {
     return <ProfilePage user={user} />;
   }
 

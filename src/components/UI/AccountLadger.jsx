@@ -29,13 +29,20 @@ const AccountLadger = ({ query }) => {
         label: "User Name",
         type: "textfield",
       },
-      { id: "from_date", label: "Start Date", type: "date" },
-      { id: "to_date", label: "End Date", type: "date" },
-
-      { id: "mobile", label: "Mobile", type: "textfield" },
+      {
+        id: "date_range",
+        // label: "Date Range",
+        type: "daterange",
+      },
+      {
+        id: "mobile",
+        label: "Mobile",
+        type: "textfield",
+      },
     ],
     []
   );
+
   const columns = useMemo(
     () => [
       {

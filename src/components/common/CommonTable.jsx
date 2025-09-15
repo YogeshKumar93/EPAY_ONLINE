@@ -38,6 +38,9 @@ import {
 import CachedIcon from "@mui/icons-material/Cached";
 import { apiCall } from "../../api/apiClient";
 import Loader from "./Loader";
+import { DateRangePicker } from "rsuite";
+import { predefinedRanges, yyyymmdd } from "../../utils/DateUtils";
+import "rsuite/dist/rsuite.min.css";
 
 // Memoized TablePaginationActions component
 const TablePaginationActions = memo(function TablePaginationActions(props) {
@@ -137,6 +140,7 @@ const CommonTable = ({
   refresh = true,
   customHeader = null, // Add this line
 }) => {
+  const { afterToday } = DateRangePicker;
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -146,6 +150,7 @@ const CommonTable = ({
   const [rowsPerPage, setRowsPerPage] = useState(defaultPageSize);
   const [totalCount, setTotalCount] = useState(0);
   const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const [dateRange, setDateRange] = useState([null, null]);
 
   // Use refs to track values without causing re-renders
   const appliedFiltersRef = useRef({});
@@ -176,7 +181,6 @@ const CommonTable = ({
 
   // Initialize filter values
   useEffect(() => {
-        console.log("hey i am here 2")
     setFilterValues(initialFilterValues);
     setAppliedFilters(initialFilterValues);
     appliedFiltersRef.current = initialFilterValues;
@@ -282,7 +286,6 @@ const CommonTable = ({
 
   // Update refs when state changes
   useEffect(() => {
-        console.log("hey i am here 3")
     appliedFiltersRef.current = appliedFilters;
     pageRef.current = page;
     rowsPerPageRef.current = rowsPerPage;
@@ -291,7 +294,6 @@ const CommonTable = ({
 
   // Initial data fetch
   useEffect(() => {
-        console.log("hey i am here 4")
     if (!hasFetchedInitialData.current) {
       fetchData();
       hasFetchedInitialData.current = true;
@@ -300,7 +302,6 @@ const CommonTable = ({
 
   // Setup refresh interval
   useEffect(() => {
-        console.log("hey i am here 5")
     let intervalId;
     if (refreshIntervalRef.current > 0) {
       intervalId = setInterval(() => {
@@ -320,46 +321,49 @@ const CommonTable = ({
       [filterId]: value,
     }));
   }, []);
+const applyFilters = useCallback(() => {
+  // Copy current filter values
+  const formattedFilters = { ...filterValues };
 
-  const applyFilters = useCallback(() => {
-    // Format dates before applying filters
-    const formattedFilters = { ...filterValues };
+  Object.keys(formattedFilters).forEach((key) => {
+    const filterConfig = availableFilters.find((f) => f.id === key);
 
-    Object.keys(formattedFilters).forEach((key) => {
-      const filterConfig = availableFilters.find((f) => f.id === key);
-
-      if (filterConfig?.type === "date" && formattedFilters[key]) {
-        // Format date to YYYY-MM-DD for API
-        formattedFilters[key] = new Date(formattedFilters[key])
+    if (filterConfig?.type === "date" && formattedFilters[key]) {
+      // Format single date to YYYY-MM-DD
+      formattedFilters[key] = new Date(formattedFilters[key])
+        .toISOString()
+        .split("T")[0];
+    } else if (filterConfig?.type === "daterange" && formattedFilters[key]) {
+      // Convert daterange to from_date / to_date
+      if (formattedFilters[key].start) {
+        formattedFilters["from_date"] = new Date(formattedFilters[key].start)
           .toISOString()
           .split("T")[0];
-      } else if (filterConfig?.type === "daterange" && formattedFilters[key]) {
-        // Format date range
-        if (formattedFilters[key].start) {
-          formattedFilters[`${key}_start`] = new Date(
-            formattedFilters[key].start
-          )
-            .toISOString()
-            .split("T")[0];
-        }
-        if (formattedFilters[key].end) {
-          formattedFilters[`${key}_end`] = new Date(formattedFilters[key].end)
-            .toISOString()
-            .split("T")[0];
-        }
-        delete formattedFilters[key]; // Remove the original daterange object
       }
-    });
-
-    setAppliedFilters(formattedFilters);
-    appliedFiltersRef.current = formattedFilters;
-    setPage(0);
-    pageRef.current = 0;
-    if (isSmallScreen) {
-      setFilterModalOpen(false);
+      if (formattedFilters[key].end) {
+        formattedFilters["to_date"] = new Date(formattedFilters[key].end)
+          .toISOString()
+          .split("T")[0];
+      }
+      // Remove original daterange object
+      delete formattedFilters[key];
     }
-    fetchData();
-  }, [filterValues, isSmallScreen, fetchData, availableFilters]);
+  });
+
+  // Apply filters
+  setAppliedFilters(formattedFilters);
+  appliedFiltersRef.current = formattedFilters;
+  setPage(0);
+  pageRef.current = 0;
+
+  // Close mobile modal if small screen
+  if (isSmallScreen) {
+    setFilterModalOpen(false);
+  }
+
+  // Fetch data with new filters
+  fetchData();
+}, [filterValues, isSmallScreen, fetchData, availableFilters]);
 
   const resetFilters = useCallback(() => {
     setFilterValues(initialFilterValues);
@@ -421,10 +425,13 @@ const CommonTable = ({
     fetchData(true);
   }, [fetchData]);
   useEffect(() => {
-    console.log("hey i am here 1")
     if (onFetchRef) onFetchRef(fetchData);
   }, [fetchData, onFetchRef]);
 
+  // Initial fetch
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
   // Memoized filter inputs renderer
   const renderFilterInputs = useCallback(
     () =>
@@ -600,43 +607,40 @@ const CommonTable = ({
             />
           ) : filter.type === "daterange" ? (
             <Box
-              sx={{ display: "flex", flexDirection: "column", minWidth: 280 }}
+              sx={{ display: "flex", flexDirection: "column", minWidth: 280,mt:-1 }}
             >
               <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
                 {filter.label}
               </Typography>
-              <Box sx={{ display: "flex", gap: 1 }}>
-                <TextField
-                  size="small"
-                  label="Start"
-                  type="date"
-                  value={filterValues[filter.id]?.start || ""}
-                  onChange={(e) =>
+              <DateRangePicker
+                size="md"
+                editable
+                ranges={predefinedRanges}
+                cleanable
+                showOneCalendar
+                appearance="subtle"
+                placeholder="Select Date Range"
+                placement="bottomEnd"
+                value={filterValues[filter.id]?.value || null}
+                onChange={(value) => {
+                  if (value) {
                     handleFilterChange(filter.id, {
-                      ...filterValues[filter.id],
-                      start: e.target.value,
-                    })
+                      value: value,
+                      start: yyyymmdd(value[0]),
+                      end: yyyymmdd(value[1]),
+                    });
+                  } else {
+                    handleFilterChange(filter.id, { start: "", end: "" });
                   }
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
-                <TextField
-                  size="small"
-                  label="End"
-                  type="date"
-                  value={filterValues[filter.id]?.end || ""}
-                  onChange={(e) =>
-                    handleFilterChange(filter.id, {
-                      ...filterValues[filter.id],
-                      end: e.target.value,
-                    })
-                  }
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
-              </Box>
+                }}
+                disabledDate={afterToday()}
+                style={{
+                  width: "100%",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  
+                }}
+              />
             </Box>
           ) : (
             <TextField
