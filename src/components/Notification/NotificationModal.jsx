@@ -83,6 +83,7 @@ const NotificationModal = () => {
         sx={{
           fontFamily: "Nioicon",
           color: "#526484",
+          mr:1
         }}
         onClick={handleClick}
       >

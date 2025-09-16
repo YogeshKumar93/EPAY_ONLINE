@@ -186,6 +186,14 @@ const ApiEndpoints = {
   DMT1_TXN: "dmt1/dmtTxn",
   DMT1_VERIFY_BENEFICIARY: "dmt1/accountVerification",
 
+  DMT2: "dmt2/remitterStatusDmt2",
+  OTP_DMT2: "dmt2/transactionOtpDmt2",
+  DMT2_ADD_BENE_SCHEMA: "dmt2/getBeneficiarySchemaDmt2",
+  DMT2_TXN: "dmt2/dmt2Txn",
+  DMT2_REMOVE_BENEFICIARY: "dmt2/removeBeneficiaryDmt2",
+  REGISTER_DMT2_BENEFICIARY: "dmt2/registerBeneficiaryDmt2",
+  DMT2_VERIFY_BENEFICIARY: "dmt1/accountVerification",
+
   CREATE_USER: "signup/createUser",
   GET_SIGNUP_SCHEMA: "signup/getSignupSchema",
   DMT1: "dmt1/remitterStatus",

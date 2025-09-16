@@ -428,7 +428,6 @@ const CommonTable = ({
   //   if (onFetchRef) onFetchRef(fetchData);
   // }, [fetchData, onFetchRef]);
 
-
   const renderFilterInputs = useCallback(
     () =>
       availableFilters.map((filter) => (
@@ -570,8 +569,13 @@ const CommonTable = ({
       availableFilters.map((filter) => (
         <Box key={filter.id} sx={{ minWidth: 120 }}>
           {filter.type === "dropdown" ? (
-            <FormControl size="small" sx={{ minWidth: 120 }}>
+            <FormControl
+              size="small"
+              sx={{ minWidth: 120 }}
+              className="textFieldCustom"
+            >
               <TextField
+                className="textFieldCustom"
                 select
                 label={filter.label}
                 value={filterValues[filter.id] || "All"}
@@ -597,7 +601,7 @@ const CommonTable = ({
               InputLabelProps={{
                 shrink: true,
               }}
-              sx={{ minWidth: 140 }}
+              sx={{ minWidth: 140, fontFamily: "DM Sans, sans-serif" }}
             />
           ) : filter.type === "daterange" ? (
             <Box
@@ -608,7 +612,15 @@ const CommonTable = ({
                 mt: -1,
               }}
             >
-              <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
+              <Typography
+              className="textFieldCustom"
+                variant="body2"
+                sx={{
+                  mb: 1,
+                  fontWeight: "bold",
+                
+                }}
+              >
                 {filter.label}
               </Typography>
               <DateRangePicker
@@ -637,7 +649,7 @@ const CommonTable = ({
                 style={{
                   width: "100%",
                   border: "1px solid #ccc",
-                  borderRadius: "4px",
+                  borderRadius: "6px",
                   zIndex: 9999,
                 }}
               />
@@ -648,7 +660,7 @@ const CommonTable = ({
               label={filter.label}
               value={filterValues[filter.id] || ""}
               onChange={(e) => handleFilterChange(filter.id, e.target.value)}
-              sx={{ minWidth: 120 }}
+              className="textFieldCustom"
             />
           )}
         </Box>
@@ -665,10 +677,8 @@ const CommonTable = ({
             colSpan={initialColumns.length}
             style={{
               textAlign: "center",
-              padding: "40px 20px",
-              fontStyle: "inter",
-              color: "#666",
-              backgroundColor: "#fff",
+              padding: 40,
+              fontFamily: "DM Sans, sans-serif",
             }}
           >
             <Box
@@ -677,6 +687,7 @@ const CommonTable = ({
                 flexDirection: "column",
                 alignItems: "center",
                 gap: 2,
+                fontFamily: "DM Sans, sans-serif",
               }}
             >
               <CircularProgress size={30} />
@@ -694,9 +705,8 @@ const CommonTable = ({
             colSpan={initialColumns.length}
             style={{
               textAlign: "center",
-              padding: "40px 20px",
-              fontStyle: "inter",
-              color: "#666",
+              padding: 40,
+              fontFamily: "DM Sans, sans-serif",
             }}
           >
             <Typography variant="body1">No data available</Typography>
@@ -706,64 +716,61 @@ const CommonTable = ({
     }
 
     return data.map((row, rowIndex) => (
-      <tr
-        key={rowIndex}
-        style={{
-          borderBottom: "1px solid #e0e0e0",
-          transition: "background-color 0.2s ease",
-          "&:hover": {
-            backgroundColor: "#f8f9fa",
-          },
-        }}
-        className="table-row"
-      >
-        {initialColumns.map((column, colIndex) => (
+      <React.Fragment key={rowIndex}>
+        {/* This is the main row with data */}
+        <tr
+          style={{
+            backgroundColor: "#fefefe",
+            boxShadow: "0px 2px 8px rgba(0,0,0,0.08)",
+            borderRadius: "8px",
+            marginBottom: "12px",
+            display: "table-row",
+          }}
+          className="table-row"
+        >
+          {initialColumns.map((column, colIndex) => (
+            <td
+              key={colIndex}
+              style={{
+                padding: "16px 20px",
+                verticalAlign: "middle",
+                textAlign: "left",
+                fontSize: "14.5px",
+                lineHeight: "1.6",
+                fontFamily: "DM Sans, sans-serif",
+                fontWeight: 500,
+
+                color: "#646e84",
+                border: "none", // Remove default borders
+              }}
+            >
+              {column.selector ? (
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  {column.selector(row)}
+                </Box>
+              ) : (
+                <Typography
+                  variant="body2"
+                  sx={{ fontFamily: "DM Sans, sans-serif", color: "#8094ae" }}
+                >
+                  {row[column.name] || "—"}
+                </Typography>
+              )}
+            </td>
+          ))}
+        </tr>
+
+        {/* This is the spacing row between cards */}
+        <tr style={{ height: "12px", backgroundColor: "transparent" }}>
           <td
-            key={colIndex}
-            style={{
-              padding: "16px 14px", // ✅ thoda spacious feel
-              verticalAlign: "middle",
-              width: column.width || "auto",
-              textAlign: "left",
-              fontSize: "14.5px",
-              lineHeight: "1.6",
-              borderBottom: "1px solid #e5e7eb", // ✅ subtle divider
-              fontFamily: "Source Sans Pro, Inter, sans-serif",
-              fontWeight: 400,
-              color: "#1e293b", // dark slate (eye-friendly fintech look)
-              backgroundColor: "rgba(255,255,255,0.7)", // ✅ glassy bg
-              backdropFilter: "blur(1px)", // ✅ premium glassmorphism
-              transition: "all 0.2s ease-in-out", // ✅ smooth hover
-            }}
-          >
-            {column.selector ? (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  textAlign: "left",
-                  justifyContent: "flex-start",
-                }}
-              >
-                {column.selector(row)}
-              </Box>
-            ) : (
-              <Typography
-                variant="body2"
-                sx={{
-                  textAlign: "left",
-                  fontWeight: column.name === "Amount" ? 600 : 400,
-                  color: column.name === "Status" ? "transparent" : "inherit", // Status will be handled by its selector
-                }}
-              >
-                {row[column.name] || "—"}
-              </Typography>
-            )}
-          </td>
-        ))}
-      </tr>
+            colSpan={initialColumns.length}
+            style={{ padding: 0, border: "none" }}
+          ></td>
+        </tr>
+      </React.Fragment>
     ));
   }, [loading, data, initialColumns]);
+
   // Memoized table headers
   const tableHeaders = useMemo(
     () =>
@@ -771,41 +778,27 @@ const CommonTable = ({
         <th
           key={index}
           style={{
-            backgroundColor: "#FFF6E9",
-            padding: "16px 12px",
+            backgroundColor: "#fefefe",
+            boxShadow: " rgba(0,0,0,0.08)", // ✅ same as row
+            borderRadius: "8px",
+            marginBottom: "12px",
+            padding: "16px 20px",
+            verticalAlign: "middle",
             textAlign: "left",
-            fontWeight: 550,
-            fontSize: "14px",
-            width: column.width || "auto",
-            minWidth: column.width || "auto",
-            letterSpacing: "0.5px",
-            borderBottom: "1px solid #e2e8f0",
-            fontFamily: "Inter, Roboto, sans-serif",
-            position: "sticky",
-            top: 0,
-            zIndex: 1,
-            whiteSpace: "nowrap",
+            fontSize: "14.5px",
+            lineHeight: "1.6",
+            fontFamily: "DM Sans, sans-serif",
+            fontWeight: 600,
+            color: "#526484", // header ka thoda dark color
+            border: "none",
           }}
         >
-          {typeof column.name === "string" ? (
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <span>{column.name}</span>
-              {/* Optional: Add sorting indicators if needed */}
-              {/* <ArrowUpwardIcon sx={{ fontSize: 14, opacity: 0.5 }} /> */}
-            </Box>
-          ) : (
-            column.name?.props?.children || `Column ${index + 1}`
-          )}
+          {column.name}
         </th>
       )),
     [initialColumns]
   );
+
   return (
     <Box>
       <Loader request={loading} />
@@ -813,11 +806,6 @@ const CommonTable = ({
       {availableFilters.length > 0 && (
         <>
           <Paper sx={{ p: 1, display: { xs: "none", md: "block" } }}>
-            {/* <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}> */}
-            {/* <FilterListIcon sx={{ mr: 1 }} /> */}
-            {/* <Typography variant="h6">Filters</Typography> */}
-            {/* </Box> */}
-
             <Box
               sx={{
                 display: "flex",
@@ -831,14 +819,23 @@ const CommonTable = ({
               {/* Apply and Reset buttons */}
               <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                 {/* Left side buttons */}
-                <Button variant="contained" onClick={applyFilters} size="small">
+                <Button
+                  className="btnCustom"
+                  variant="contained"
+                  onClick={applyFilters}
+                  size="small"
+                  sx={{ backgroundColor:"#00A300" }}
+                >
                   Apply
                 </Button>
+
                 <Button
-                  variant="outlined"
+                  // className="btnCustom"
+                  // variant="outlined"
                   onClick={resetFilters}
                   startIcon={<ClearIcon />}
                   size="small"
+                  sx={{ backgroundColor:"#FF542E",color:"#fff" }}
                 >
                   Reset
                 </Button>
@@ -966,7 +963,14 @@ const CommonTable = ({
       </Box>
 
       {/* Data Table */}
-      <Paper sx={{ width: "100%", overflow: "hidden" }}>
+      <Paper
+        sx={{
+          width: "100%",
+          overflow: "hidden",
+          backgroundColor: "transparent",
+          boxShadow: "none",
+        }}
+      >
         {error ? (
           <Box sx={{ p: 3, textAlign: "center" }}>
             <Typography color="error">Error: {error}</Typography>
@@ -981,10 +985,31 @@ const CommonTable = ({
         ) : (
           <>
             <Box sx={{ overflow: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <table
+                style={{
+                  width: "100%",
+                  // borderCollapse: "separate",
+                }}
+              >
                 <thead>
-                  <tr style={{ backgroundColor: "#f5f5f5" }}>{tableHeaders}</tr>
+                  <tr
+                    style={{
+                      display: "table-row",
+
+                      backgroundColor: "#fefefe",
+                      boxShadow: "0px 2px 8px rgba(0,0,0,0.08)",
+                    }}
+                  >
+                    {tableHeaders}
+                  </tr>
+                  <tr
+                    style={{
+                      height: "12px",
+                      boxShadow: "0px 2px 8px rgba(0,0,0,0.08)",
+                    }}
+                  />{" "}
                 </thead>
+
                 <tbody>{tableRows}</tbody>
               </table>
             </Box>

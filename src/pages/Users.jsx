@@ -168,7 +168,7 @@ const Users = ({ query }) => {
         ),
       },
       {
-        name: "Lien Amount",
+        name: "Lien",
         selector: (row) => (
           <Tooltip title={row?.lien}>
             <div style={{ textAlign: "left" }}>{row?.lien}</div>
@@ -234,7 +234,7 @@ const Users = ({ query }) => {
         queryParam={query}
         onFetchRef={handleFetchRef}
         customHeader={
-          <ReButton label="User" onClick={() => setOpenCreateUser(true)} />
+          <ReButton label="Add User" onClick={() => setOpenCreateUser(true)} />
         }
       />
       {openCreateUser && (

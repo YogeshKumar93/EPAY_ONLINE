@@ -43,18 +43,21 @@ const CommonTabs = ({ tabs = [], defaultTab = 0 }) => {
           TabIndicatorProps={{ style: { display: "none" } }}
           sx={{
             "& .MuiTab-root": {
-              minWidth: { xs: 100, sm: 140, md: 180 },
-              borderRadius: "12px",
-              textTransform: "none",
+              minWidth: { xs: 80, sm: 100, md: 130 },
+              borderRadius: "10px",
+              textTransform: "uppercase",
               fontSize: { xs: "0.7rem", sm: "0.8rem", md: "0.9rem" },
-              color: "#1976d2",
+              color: "#364a63",
               display: "flex",
               flexDirection: "column",
-              padding: { xs: "6px 8px", sm: "8px 12px" },
+              padding: { xs: "4px 4px", sm: "4px 6px" },
+            },
+            "& .MuiTab-root .MuiTab-wrapper": {
+              fontFamily: `"DM Sans", sans-serif !important`, // 👈 yaha lagao
             },
             "& .Mui-selected": {
-              bgcolor: "#e3f2fd",
-              color: "#1976d2",
+              bgcolor: "#ebeef2",
+              color: "#9d72ff",
               fontWeight: "bold",
             },
           }}
@@ -63,7 +66,7 @@ const CommonTabs = ({ tabs = [], defaultTab = 0 }) => {
             <Tab
               key={index}
               icon={tabItem.icon}
-              label={isMobile ? null : tabItem.label} // hide text on mobile if needed
+              label={isMobile ? null : tabItem.label}
             />
           ))}
         </Tabs>

@@ -44,19 +44,43 @@
   --border-radius-lg: 12px;
 }
 
-/* Reset and Base Styles */
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+   font-family: "DM Sans", sans-serif !important;
 }
 
 body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+ font-family: "DM Sans", sans-serif !important;
   background-color: var(--background-color);
   color: var(--text-primary);
   line-height: 1.6;
 
+}
+
+
+.textFieldCustom {
+  border: 1px solid #dbdfea;
+  border-radius: 4px;
+}
+
+/* Input text color */
+.textFieldCustom .MuiInputBase-input {
+  color: #3c4d62;
+  font-family: "DM Sans", sans-serif;
+}
+
+/* Label color */
+.textFieldCustom .MuiInputLabel-root {
+  color: #8094ae;
+  font-size: 15px;
+}
+
+.btnCustom {
+  font-family: "DM Sans", sans-serif !important;
+  text-transform: none; /* Optional: REMOVE automatic uppercase */
 }
 
 .container {

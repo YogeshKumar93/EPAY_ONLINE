@@ -11,7 +11,7 @@ import RemitterRegister from "./RemitterRegister";
 
 const Dmt = () => {
   const [mobile, setMobile] = useState("");
-  const [account, setAccount] = useState(""); 
+  const [account, setAccount] = useState("");
   const [sender, setSender] = useState(null);
   const [beneficiaries, setBeneficiaries] = useState([]);
   const [showRegister, setShowRegister] = useState(false);
@@ -81,7 +81,7 @@ const Dmt = () => {
         value={mobile}
         onChange={handleMobileChange}
         inputProps={{ maxLength: 10 }}
-        sx={{ mb: 0}}
+        sx={{ mb: 0 }}
       />
 
       {/* OR Divider */}

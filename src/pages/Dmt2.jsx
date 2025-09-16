@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Box, TextField } from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
@@ -8,6 +8,9 @@ import Beneficiaries from "./Beneficiaries";
 import SelectedBeneficiary from "./SelectedBeneficiary";
 import { useToast } from "../utils/ToastContext";
 import RemitterRegister from "./RemitterRegister";
+import AuthContext from "../contexts/AuthContext";
+import Dmt2SelectedBene from "./Dmt2SelectedBene";
+import Dmt2Beneficiaries from "./Dmt2Beneficiaries";
 
 const Dmt2 = () => {
   const [mobile, setMobile] = useState("");
@@ -16,33 +19,36 @@ const Dmt2 = () => {
   const [showRegister, setShowRegister] = useState(false);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
   const [openRegisterModal, setOpenRegisterModal] = useState(false);
-const {showToast} = useToast();
+  const { showToast } = useToast();
+  const { location } = useContext(AuthContext);
+
   const handleFetchSender = async (number = mobile) => {
     if (!number || number.length !== 10) return;
 
-    const { error, response } = await apiCall("post", ApiEndpoints.DMT1, {
+    const { error, response } = await apiCall("post", ApiEndpoints.DMT2, {
       mobile_number: number,
+      latitude: location?.lat || "",
+      longitude: location?.long || "",
     });
 
     if (response) {
       const data = response?.data || response?.response?.data;
       const message = response?.message || "";
 
-     if (response?.message ==="Remitter Found") {
-  // success always gives sender
-  setSender(data);
-  setBeneficiaries(data?.beneficiaries || []);
-  setShowRegister(false);
-  showToast(message, "success");
-} else if (message === "Remitter Not Found") {
-  setSender(null);
-  setOpenRegisterModal(true);
-  setBeneficiaries([]);
-  setShowRegister(true);
-} else {
-  apiErrorToast(message || "Unexpected response");
-}
-
+      if (response?.message === "Remitter Found") {
+        // success always gives sender
+        setSender(data);
+        setBeneficiaries(data?.beneficiaries || []);
+        setShowRegister(false);
+        showToast(message, "success");
+      } else if (message === "Remitter Not Found") {
+        setSender(null);
+        setOpenRegisterModal(true);
+        setBeneficiaries([]);
+        setShowRegister(true);
+      } else {
+        apiErrorToast(message || "Unexpected response");
+      }
     } else if (error) {
       apiErrorToast(error?.message || "Something went wrong");
       setSender(null);
@@ -71,7 +77,7 @@ const {showToast} = useToast();
   };
 
   return (
-    <Box >
+    <Box>
       <TextField
         label="Mobile Number"
         variant="outlined"
@@ -79,42 +85,45 @@ const {showToast} = useToast();
         value={mobile}
         onChange={handleChange}
         inputProps={{ maxLength: 10 }}
-                sx={{ mb: 1}}
-
+        sx={{ mb: 1 }}
       />
 
-          {openRegisterModal && (
- <RemitterRegister   open={openRegisterModal}
-          onClose={() => setOpenRegisterModal(false)} mobile={mobile} onSuccess={setSender} />
+      {openRegisterModal && (
+        <RemitterRegister
+          open={openRegisterModal}
+          onClose={() => setOpenRegisterModal(false)}
+          mobile={mobile}
+          onSuccess={setSender}
+        />
+      )}
+
+      <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={0.5}>
+        {/* Left column: Remitter + selected beneficiary */}
+        <Box flex="0 0 30%" display="flex" flexDirection="column">
+          <RemitterDetails sender={sender} />
+
+          {selectedBeneficiary && (
+            <Dmt2SelectedBene
+              beneficiary={selectedBeneficiary}
+              senderId={sender.id}
+              sender={sender}
+              senderMobile={sender.mobile}
+              referenceKey={sender.referenceKey}
+            />
           )}
+        </Box>
 
-        <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={0.5}>
-          {/* Left column: Remitter + selected beneficiary */}
-          <Box flex="0 0 30%" display="flex" flexDirection="column" >
-            <RemitterDetails sender={sender} />
-
-            {selectedBeneficiary && (
-              <SelectedBeneficiary
-                beneficiary={selectedBeneficiary}
-                senderId={sender.id}
-                sender={sender}
-                senderMobile={sender.mobileNumber}
-                referenceKey={sender.referenceKey}
-              />
-            )}
-          </Box>
-
-          {/* Right column: Beneficiaries list */}
-          <Box flex="0 0 70%">
-            <Beneficiaries
+        {/* Right column: Beneficiaries list */}
+        <Box flex="0 0 70%">
+          <Dmt2Beneficiaries
             sender={sender}
             onSuccess={handleFetchSender}
-              beneficiaries={beneficiaries}
-              onSelect={setSelectedBeneficiary}
-              onDelete={handleDeleteBeneficiary}
-            />
-          </Box>
+            beneficiaries={beneficiaries}
+            onSelect={setSelectedBeneficiary}
+            onDelete={handleDeleteBeneficiary}
+          />
         </Box>
+      </Box>
     </Box>
   );
 };

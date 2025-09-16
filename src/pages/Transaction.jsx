@@ -27,7 +27,7 @@ export const Transaction = () => {
     { label: "BBPS", icon: <ReceiptIcon />, component: <BbpxTxn /> },
     { label: "Aeps", icon: <FingerprintIcon />, component: <AepsTxn /> },
     { label: "Matm", icon: <CreditCardIcon />, component: <MatmTxn /> },
-    { label: "Payout", icon: <PaymentIcon />, component: <PayoutTxn /> },
+    { label: "Fund Transfer", icon: <PaymentIcon />, component: <PayoutTxn /> },
     { label: "Recharge", icon: <PhoneIphoneIcon />, component: <RechargeTxn /> },
     { label: "Irctc", icon: <TrainIcon />, component: <IrctcTxn /> },
     { label: "W2W", icon: <Wallet />, component: <Wallet2WalletTransfer /> },

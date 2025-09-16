@@ -30,7 +30,11 @@ export const useSchemaForm = (endpoint, open) => {
           const res = await apiCall("post", endpoint);
 
           const payload =
-            res?.data?.data || res?.data || res?.response?.data || res || res?.response?.data?.data;
+            res?.data?.data ||
+            res?.data ||
+            res?.response?.data ||
+            res ||
+            res?.response?.data?.data;
 
           console.log("📥 Schema structure:", payload);
 
@@ -95,6 +99,7 @@ export const useSchemaForm = (endpoint, open) => {
 
     let errorMsg = "";
 
+    // ✅ Regex validation
     if (field?.validation?.regex) {
       try {
         const regexString = field.validation.regex;
@@ -104,25 +109,33 @@ export const useSchemaForm = (endpoint, open) => {
             field.validation.message || `${field.label || name} is invalid`;
         }
       } catch (err) {
-        console.error("Invalid regex from schema:", field.validation.regex, err);
+        console.error(
+          "Invalid regex from schema:",
+          field.validation.regex,
+          err
+        );
       }
     }
 
     setFormData((prev) => {
-    let newData = { ...prev, [name]: value };
+      let newData = { ...prev, [name]: value };
 
-    // 👉 Special case: if Bank is selected, auto-fill IFSC
-    if (name === "bank_id") {
-      const selectedBank = field?.options?.find(
-        (opt) => opt.bank_id === value || opt.value === value
-      );
-      if (selectedBank?.ifsc) {
-        newData.ifsc = selectedBank.ifsc; // <-- make sure schema field is named "ifsc_code"
+      // ✅ Special case: if Bank is selected, auto-fill IFSC
+      if (name === "bank_id") {
+        const selectedBank = field?.options?.find(
+          (opt) =>
+            opt.value === value || opt.id === value || opt.bank_id === value
+        );
+
+        if (selectedBank?.ifsc) {
+          newData.ifsc = selectedBank.ifsc; // match IFSC field in schema
+        } else {
+          newData.ifsc = ""; // reset IFSC if no bank selected
+        }
       }
-    }
 
-    return newData;
-  });
+      return newData;
+    });
 
     setErrors((prev) => ({
       ...prev,

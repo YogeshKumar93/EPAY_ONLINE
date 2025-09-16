@@ -1,5 +1,5 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "DM Sans", sans-serif !important;
   line-height: 1.5;
   font-weight: 400;
 
@@ -12,7 +12,12 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
+html, body {
+  font-family: "DM Sans", sans-serif !important;
+}
+* {
+  font-family: inherit !important;
+}
 a {
   font-weight: 500;
   color: #646cff;
@@ -36,6 +41,7 @@ h1 {
 }
 
 button {
+   font-family: var(--font-family) !important;
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;

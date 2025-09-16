@@ -23,7 +23,7 @@ const ReButton = ({ label, onClick, startIcon = <AddIcon /> }) => {
       onClick={onClick}
       sx={{
         backgroundColor: bgColor,
-        color: textColor,
+        color: "#FFFF",
         textTransform: "none",
         fontWeight: 500,
         "&:hover": {

@@ -64,61 +64,121 @@ const RemitterDetails = ({ sender }) => {
       <Collapse in={open || !isMobile} timeout="auto" unmountOnExit>
         {sender ? (
           <Box sx={{ p: 2 }}>
-  <Grid container>
-  {/* Top Row */}
-  <Grid item xs={12} sm={6} sx={{ display: "flex", alignItems: "center" }}>
-    <Avatar sx={{ bgcolor: "#e6f3fb", color: "#0078B6", width: 32, height: 32 }}>
-      <Person fontSize="small" />
-    </Avatar>
-    <Box ml={1.5}>
-      <Typography variant="body2" color="text.secondary">
-        Name
-      </Typography>
-      <Typography>{sender.firstName} {sender.lastName}</Typography>
-    </Box>
-  </Grid>
+            <Grid container>
+              {/* Top Row */}
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                sx={{ display: "flex", alignItems: "center" }}
+              >
+                <Avatar
+                  sx={{
+                    bgcolor: "#e6f3fb",
+                    color: "#0078B6",
+                    width: 32,
+                    height: 32,
+                  }}
+                >
+                  <Person fontSize="small" />
+                </Avatar>
+                <Box ml={1.5}>
+                  <Typography variant="body2" color="text.secondary">
+                    Name
+                  </Typography>
+                  <Typography>
+                    {sender.firstName || sender?.fname}{" "}
+                    {sender.lastName || sender?.lname}
+                  </Typography>
+                </Box>
+              </Grid>
 
-  <Grid item xs={12} sm={6} sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
-    <Avatar sx={{ bgcolor: "#e6f3fb", color: "#0078B6", width: 32, height: 32 }}>
-      <Phone fontSize="small" />
-    </Avatar>
-    <Box ml={1.5} textAlign="left">
-      <Typography variant="body2" color="text.secondary">
-        Number
-      </Typography>
-      <Typography>{sender.mobileNumber}</Typography>
-    </Box>
-  </Grid>
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                }}
+              >
+                <Avatar
+                  sx={{
+                    bgcolor: "#e6f3fb",
+                    color: "#0078B6",
+                    width: 32,
+                    height: 32,
+                  }}
+                >
+                  <Phone fontSize="small" />
+                </Avatar>
+                <Box ml={1.5} textAlign="left">
+                  <Typography variant="body2" color="text.secondary">
+                    Number
+                  </Typography>
+                  <Typography>
+                    {sender.mobileNumber || sender.mobile}
+                  </Typography>
+                </Box>
+              </Grid>
 
-  {/* Bottom Row */}
-  <Grid item xs={12} sm={6} sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-    <Avatar sx={{ bgcolor: "#e6f3fb", color: "#0078B6", width: 32, height: 32 }}>
-      <Verified fontSize="small" />
-    </Avatar>
-    <Box ml={1.5}>
-      <Typography variant="body2" color="text.secondary">
-        Limit per txn
-      </Typography>
-      <Typography>{sender.limitPerTransaction}</Typography>
-    </Box>
-  </Grid>
+              {/* Bottom Row */}
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                sx={{ display: "flex", alignItems: "center", mt: 2 }}
+              >
+                <Avatar
+                  sx={{
+                    bgcolor: "#e6f3fb",
+                    color: "#0078B6",
+                    width: 32,
+                    height: 32,
+                  }}
+                >
+                  <Verified fontSize="small" />
+                </Avatar>
+                <Box ml={1.5}>
+                  <Typography variant="body2" color="text.secondary">
+                    Limit per txn
+                  </Typography>
+                  <Typography>{sender.limitPerTransaction || 25000}</Typography>
+                </Box>
+              </Grid>
 
-  <Grid item xs={12} sm={6} sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end", mt: 2 }}>
-    <Avatar sx={{ bgcolor: "#e6f3fb", color: "#0078B6", width: 32, height: 32 }}>
-      <AccountBalance fontSize="small" />
-    </Avatar>
-    <Box ml={1.5} textAlign="left">
-      <Typography variant="body2" color="text.secondary">
-        Limit Available
-      </Typography>
-      <Typography fontWeight="bold" color="#0078B6">
-        ₹{sender.limitAvailable}
-      </Typography>
-    </Box>
-  </Grid>
-</Grid>
-
-
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                  mt: 2,
+                }}
+              >
+                <Avatar
+                  sx={{
+                    bgcolor: "#e6f3fb",
+                    color: "#0078B6",
+                    width: 32,
+                    height: 32,
+                  }}
+                >
+                  <AccountBalance fontSize="small" />
+                </Avatar>
+                <Box ml={1.5} textAlign="left">
+                  <Typography variant="body2" color="text.secondary">
+                    Limit Available
+                  </Typography>
+                  <Typography fontWeight="bold" color="#0078B6">
+                    ₹{sender.limitAvailable || sender.limit}
+                  </Typography>
+                </Box>
+              </Grid>
+            </Grid>
           </Box>
         ) : (
           <Box
