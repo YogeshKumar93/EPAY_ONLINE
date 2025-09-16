@@ -177,7 +177,12 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
       >
         <Box display="flex" alignItems="center" gap={1} flexGrow={1}>
           <Typography variant="subtitle2" fontWeight="600" color="#fff">
-            Beneficiary List ({beneficiaries?.length || 0})
+            Beneficiary List 
+              {sender && (
+                <>
+             ({beneficiaries?.length || 0})
+              </>
+             )}
           </Typography>
 
 <Box ml={isMobile ? 1 : "auto"}>

@@ -321,7 +321,29 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
 
       <List className="nav-list" sx={{ overflowY: "auto" }}>
         {renderNavItems(navigationItems)}
+        <MenuItem
+                  disableRipple
+                  onClick={() => {
+                    handleLogout();
+                    navigate("/login");
+                  }}
+                  sx={{
+                    width: "100%",
+                    marginBottom: "-8px",
+                    textAlign: "center",
+                    py: 2,
+                    display: "flex",
+                    justifyContent: "center",
+                    // "&:hover": {
+                    //   backgroundColor: getHoverInActive(),
+                    //   color: "#fff",
+                    // },
+                  }}
+                >
+                <LogoutIcon className="ms-2" fontSize="small" />  Logout 
+                </MenuItem>
       </List>
+      
     </Box>
   );
 

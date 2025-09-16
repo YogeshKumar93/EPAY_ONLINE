@@ -108,10 +108,21 @@ export const useSchemaForm = (endpoint, open) => {
       }
     }
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => {
+    let newData = { ...prev, [name]: value };
+
+    // 👉 Special case: if Bank is selected, auto-fill IFSC
+    if (name === "bank_id") {
+      const selectedBank = field?.options?.find(
+        (opt) => opt.bank_id === value || opt.value === value
+      );
+      if (selectedBank?.ifsc) {
+        newData.ifsc = selectedBank.ifsc; // <-- make sure schema field is named "ifsc_code"
+      }
+    }
+
+    return newData;
+  });
 
     setErrors((prev) => ({
       ...prev,

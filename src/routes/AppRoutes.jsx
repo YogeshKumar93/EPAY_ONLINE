@@ -59,6 +59,7 @@ import Risk from "../pages/Risk";
 import Virtual_Accounts from "../pages/Virtual_Accounts";
 import Login_History from "../pages/Login_History";
 import KycPending from "../pages/KycPending";
+import { MoneyTransfer } from "../components/UI/MoneyTransfer/MoneyTransfer";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading, user } = useContext(AuthContext);
@@ -187,7 +188,7 @@ export default function AppRoutes() {
                 element={<AccountLadger />}
               />
               <Route path="customer/logs" element={<RetailerLogs />} />
-              <Route path="customer/money-transfer" element={<Dmt />} />
+              <Route path="customer/money-transfer" element={<MoneyTransfer />} />
               <Route
                 path="customer/fund-transfer"
                 element={<SuperTransfer />}
