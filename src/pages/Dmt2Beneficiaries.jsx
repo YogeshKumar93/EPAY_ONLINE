@@ -124,7 +124,7 @@ const Dmt2Beneficiaries = ({
       setSubmitting(true);
 
       const payload = {
-        mobile_number: sender?.mobileNumber,
+        mobile_number: sender?.mobile,
         sender_id: sender?.id,
         ben_id: selectedBeneficiary.id,
         ben_name: selectedBeneficiary.beneficiary_name,
@@ -135,6 +135,7 @@ const Dmt2Beneficiaries = ({
         longitude: location?.long || "",
         pf: "WEB",
         mpin,
+        route: "DMT2",
       };
 
       const { error, response } = await apiCall(
@@ -144,9 +145,7 @@ const Dmt2Beneficiaries = ({
       );
 
       if (response) {
-        okSuccessToast(
-          response?.message || "Beneficiary verified successfully"
-        );
+        okSuccessToast(response?.data || "Beneficiary verified successfully");
         setVerifyOpen(false);
         setMpinDigits(Array(6).fill(""));
         onSuccess?.(sender.mobileNumber);
@@ -296,16 +295,18 @@ const Dmt2Beneficiaries = ({
                 secondaryAction={
                   b.id !== "na" && (
                     <Stack direction="row" spacing={1} alignItems="center">
-                      {b.is_verified === 1 ? (
-                        <Box display="flex" alignItems="center" gap={0.3}>
+                      {b.is_verified === "1" ? (
+                        <Box display="flex" alignItems="center" gap={0.5}>
                           <CheckCircleIcon
                             sx={{ fontSize: 16, color: "success.main" }}
                           />
                           <Typography
                             variant="caption"
-                            color="success.main"
-                            fontWeight="500"
-                            sx={{ fontSize: "0.75rem" }}
+                            sx={{
+                              fontSize: "0.75rem",
+                              color: "success.main",
+                              fontWeight: 500,
+                            }}
                           >
                             Verified
                           </Typography>
@@ -325,6 +326,7 @@ const Dmt2Beneficiaries = ({
                             fontSize: "0.75rem",
                             px: 1,
                             py: 0.2,
+                            minWidth: "unset", // prevents too wide button
                           }}
                         >
                           Verify

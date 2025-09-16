@@ -113,7 +113,7 @@ const Dmt2SelectedBene = ({
     }
   };
   const handleProceed = async () => {
-    if (!otp || otp.length !== 6) {
+    if (!otp || otp.length !== 4) {
       apiErrorToast("Enter the 4-digit OTP");
       return;
     }
@@ -126,18 +126,18 @@ const Dmt2SelectedBene = ({
     try {
       const payload = {
         sender_id: senderId,
-        ben_id: beneficiary.bene_id,
-        ben_name: beneficiary.beneficiary_name,
-        ben_acc: beneficiary.account_number,
-        ifsc: beneficiary.ifsc_code,
-        bank_name: beneficiary.bank_name,
-        mobile_number: beneficiary.mobile_number,
-        operator: 13,
+        ben_id: beneficiary?.bene_id,
+        ben_name: beneficiary?.beneficiary_name,
+        ben_acc: beneficiary?.account_number,
+        ifsc: beneficiary?.ifsc_code,
+        bank_name: beneficiary?.bank_name,
+        number: sender.mobile,
+        operator: 14,
         latitude: location?.lat || "",
         longitude: location?.long || "",
         amount,
         otp,
-        referenceKey: otpRef,
+        stateresp: otpRef,
         type: transferMode,
         mpin,
         pf: "web",
@@ -149,41 +149,16 @@ const Dmt2SelectedBene = ({
         payload
       );
       if (response) {
-        // const txnDetails = {
-        //   txnID: response?.message,
-        //   amount,
-        //   transferMode,
-        //   beneficiary: {
-        //     name: beneficiary.beneficiary_name,
-        //     account: beneficiary.account_number,
-        //     bank: beneficiary.bank_name,
-        //     ifsc: beneficiary.ifsc_code,
-        //   },
-        //   date: new Date().toLocaleString(),
-        // };
-
-        okSuccessToastAlt(response?.message); // pass full details
+        okSuccessToast(response?.message); // pass full details
         setAmount("");
         setOtp("");
         setMpin("");
         setOtpRef(null);
       } else {
-        // const txnDetails = {
-        //   txnID: response?.message,
-        //   amount,
-        //   transferMode,
-        //   beneficiary: {
-        //     name: beneficiary.beneficiary_name,
-        //     account: beneficiary.account_number,
-        //     bank: beneficiary.bank_name,
-        //     ifsc: beneficiary.ifsc_code,
-        //   },
-        //   date: new Date().toLocaleString(),
-        // };
         okSuccessToastAlt(error?.message);
       }
-    } catch (err) {
-      apiErrorToast(err);
+    } catch (error) {
+      apiErrorToast(err?.message);
     } finally {
       setLoading(false);
     }
