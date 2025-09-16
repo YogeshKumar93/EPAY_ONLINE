@@ -44,15 +44,16 @@
   --border-radius-lg: 12px;
 }
 
-/* Reset and Base Styles */
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+   font-family: "DM Sans", sans-serif !important;
 }
 
 body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+ font-family: "DM Sans", sans-serif !important;
   background-color: var(--background-color);
   color: var(--text-primary);
   line-height: 1.6;

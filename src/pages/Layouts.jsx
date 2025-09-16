@@ -113,7 +113,7 @@ const Layouts = ({ filters = [], query }) => {
      onFetchRef={handleFetchRef} 
         columns={columns}
         // endpoint={ApiEndpoints.GET_COLOURS}
-        endpoint={ApiEndpoints.GET_COMPLAINS}
+        endpoint={ApiEndpoints.GET_COLOURS}
         filters={filters}
         queryParam={query}
         Button={Button}

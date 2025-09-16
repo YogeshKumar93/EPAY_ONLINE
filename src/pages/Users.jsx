@@ -234,7 +234,7 @@ const Users = ({ query }) => {
         queryParam={query}
         onFetchRef={handleFetchRef}
         customHeader={
-          <ReButton label="User" onClick={() => setOpenCreateUser(true)} />
+          <ReButton label="Add User" onClick={() => setOpenCreateUser(true)} />
         }
       />
       {openCreateUser && (
