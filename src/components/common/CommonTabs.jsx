@@ -56,7 +56,7 @@ const CommonTabs = ({ tabs = [], defaultTab = 0 }) => {
               fontFamily: `"DM Sans", sans-serif !important`, // 👈 yaha lagao
             },
             "& .Mui-selected": {
-              bgcolor: "#ebeef2",
+              backgroundColor: "#ebeef2",
               color: "#9d72ff",
               fontWeight: "bold",
             },

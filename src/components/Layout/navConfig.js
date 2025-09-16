@@ -21,7 +21,12 @@ import {
 export const nav = [
   { title: "Dashboard", icon: dashboardImage, icon2: "📊", to: "/dashboard" },
   { title: "Recharge", icon: "🔋", icon2: "🔋", to: "/recharge" },
-  { title: "Money Transfer", icon: transImage, icon2: "💸", to: "/money-transfer" },
+  {
+    title: "Money Transfer",
+    icon: transImage,
+    icon2: "💸",
+    to: "/money-transfer",
+  },
 ];
 
 // Admin Navigation
@@ -149,23 +154,31 @@ export const customer_nav = [
     to: "/customer/recharge-bill",
   },
   {
-    title: "Account Ledger",
+    title: "Wallet Ledger",
     icon: bankImage,
     icon2: "📒",
     to: "/customer/account-ledger",
   },
   { title: "AEPS", icon: aepsImage, icon2: "👥", to: "/customer/aeps" },
-  // { title: "My Purchase", icon: "🛠️", icon2: "🛠️", to: "/customer/purchase" },
-  // { title: "My Sale", icon: "📒", icon2: "📒", to: "/customer/sale" },
+
   { title: "Bbps", icon: "📒", icon2: "📒", to: "/customer/bbps" },
-  { title: "Logs", icon: "📒", icon2: "📒", to: "/customer/logs" },
-  { title: "Cms", icon: "📒", icon2: "📒", to: "/customer/cms" },
-   { title: "AEPS", icon: aepsImage, icon2: "👥", to: "/customer/aeps" },
-  { title: "My Purchase", icon: transImage, icon2: "🛠️", to: "/customer/purchase" },
-  { title: "My Sale", icon: fundReqImage, icon2: "📒", to: "/customer/sale" },
-  { title: "Bbps", icon: layoutImage, icon2: "📒", to: "/customer/bbps" },
-  { title: "Activity Logs", icon: riskImage, icon2: "📒", to: "/customer/logs" },
+
   { title: "Cms", icon: transImage, icon2: "📒", to: "/customer/cms" },
+
+  {
+    title: "My Purchase",
+    icon: transImage,
+    icon2: "🛠️",
+    to: "/customer/purchase",
+  },
+  { title: "My Sale", icon: fundReqImage, icon2: "📒", to: "/customer/sale" },
+
+  {
+    title: "Activity Logs",
+    icon: riskImage,
+    icon2: "📒",
+    to: "/customer/logs",
+  },
 ];
 export const di_nav = [
   {

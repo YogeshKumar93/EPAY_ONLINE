@@ -357,7 +357,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             src={logo}
             alt="App Logo"
             sx={{
-              height: 40, // adjust as needed
+              height: 30, // adjust as needed
               width: "auto",
             }}
           />
