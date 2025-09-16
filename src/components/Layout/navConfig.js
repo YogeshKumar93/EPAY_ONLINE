@@ -19,9 +19,9 @@ import {
 
 // Normal User Navigation
 export const nav = [
-  { title: "Dashboard", icon: "📊", icon2: "📊", to: "/dashboard" },
+  { title: "Dashboard", icon: dashboardImage, icon2: "📊", to: "/dashboard" },
   { title: "Recharge", icon: "🔋", icon2: "🔋", to: "/recharge" },
-  { title: "Money Transfer", icon: "💸", icon2: "💸", to: "/money-transfer" },
+  { title: "Money Transfer", icon: transImage, icon2: "💸", to: "/money-transfer" },
 ];
 
 // Admin Navigation
@@ -120,7 +120,7 @@ export const customer_nav = [
   },
   {
     title: "Fund Transfer",
-    icon: "🛠️",
+    icon: fundReqImage,
     icon2: "🛠️",
     to: "/customer/fund-transfer",
   },
@@ -138,19 +138,19 @@ export const customer_nav = [
   },
   {
     title: "Upi Transfer",
-    icon: "🛠️",
+    icon: walletTransferImage,
     icon2: "🛠️",
     to: "/customer/upi-transfer",
   },
   {
     title: "Recharge and bill",
-    icon: "🛠️",
+    icon: serviceImage,
     icon2: "🛠️",
     to: "/customer/recharge-bill",
   },
   {
     title: "Account Ledger",
-    icon: "📒",
+    icon: bankImage,
     icon2: "📒",
     to: "/customer/account-ledger",
   },
@@ -160,6 +160,12 @@ export const customer_nav = [
   { title: "Bbps", icon: "📒", icon2: "📒", to: "/customer/bbps" },
   { title: "Logs", icon: "📒", icon2: "📒", to: "/customer/logs" },
   { title: "Cms", icon: "📒", icon2: "📒", to: "/customer/cms" },
+   { title: "AEPS", icon: aepsImage, icon2: "👥", to: "/customer/aeps" },
+  { title: "My Purchase", icon: transImage, icon2: "🛠️", to: "/customer/purchase" },
+  { title: "My Sale", icon: fundReqImage, icon2: "📒", to: "/customer/sale" },
+  { title: "Bbps", icon: layoutImage, icon2: "📒", to: "/customer/bbps" },
+  { title: "Activity Logs", icon: riskImage, icon2: "📒", to: "/customer/logs" },
+  { title: "Cms", icon: transImage, icon2: "📒", to: "/customer/cms" },
 ];
 export const di_nav = [
   {
@@ -171,7 +177,7 @@ export const di_nav = [
   { title: "Users", icon: usersImage, icon2: "👥", to: "/di/users" },
   {
     title: "All Services",
-    icon: "🛠️",
+    icon: serviceImage,
     icon2: "🛠️",
     to: "/di/allServices",
   },
@@ -186,7 +192,7 @@ export const service_nav = [
   },
   {
     title: "All Services",
-    icon: "🛠️",
+    icon: serviceImage,
     icon2: "🛠️",
     to: "/customer/allServices",
   },
@@ -198,7 +204,7 @@ export const service_nav = [
   },
   {
     title: "Wallet Ledger",
-    icon: "🛠️",
+    icon: walletLdgerImage,
     icon2: "🛠️",
     to: "/customer/wallet-ledger",
   },
