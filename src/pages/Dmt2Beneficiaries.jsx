@@ -228,7 +228,7 @@ const Dmt2Beneficiaries = ({
       {/* Header */}
       <Box
         sx={{
-          bgcolor: "#0078B6",
+          bgcolor: "#9d72ff",
           color: "#fff",
           py: 1,
           px: 2,

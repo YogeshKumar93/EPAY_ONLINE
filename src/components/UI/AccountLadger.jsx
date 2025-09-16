@@ -82,17 +82,30 @@ const AccountLadger = ({ query }) => {
         wrap: true,
       },
       {
-        name: "Amount txn",
-        selector: (row) => (
-          <Tooltip title={row?.amount}>
-            <div style={{ textAlign: "left" }}>
-              {parseFloat(row?.amount).toFixed(2)}
-            </div>
-          </Tooltip>
-        ),
+        name: "Amount",
+        selector: (row) => {
+          const isCredit = row.txn_type === "cr";
+          const sign = isCredit ? "+" : "-";
+          const color = isCredit ? "green" : "red";
+
+          return (
+            <Tooltip title={row?.amount}>
+              <div
+                style={{
+                  textAlign: "left",
+                  color: color,
+                  fontWeight: 500,
+                }}
+              >
+                {sign} {parseFloat(row?.amount).toFixed(2)}
+              </div>
+            </Tooltip>
+          );
+        },
       },
+
       {
-        name: "Opening Balance",
+        name: "Opening",
         selector: (row) => (
           <Tooltip title={row?.opening_balance}>
             <div style={{ textAlign: "left" }}>
@@ -102,7 +115,7 @@ const AccountLadger = ({ query }) => {
         ),
       },
       {
-        name: "Closing Balance",
+        name: "Closing",
         selector: (row) => (
           <Tooltip title={row?.closing_balance}>
             <div style={{ textAlign: "left" }}>
@@ -111,54 +124,7 @@ const AccountLadger = ({ query }) => {
           </Tooltip>
         ),
       },
-      {
-        name: "Debit",
-        selector: (row) => {
-          return (
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                fontSize: "16px",
-                textAlign: "justify",
-                fontWeight: "500",
-              }}
-            >
-              {row.txn_type === "DR" && (
-                <div style={{ color: "red", textAlign: "left" }}>
-                  {row.txn_type === "W2W TRANSFER" ? "Debit" : "NA"}
-                </div>
-              )}
-            </Box>
-          );
-        },
-        wrap: true,
-        center: false,
-      },
-      {
-        name: "Credit",
-        selector: (row) => {
-          return (
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                fontSize: "16px",
-                textAlign: "justify",
-                fontWeight: "500",
-              }}
-            >
-              {row.txn_type === "CR" && (
-                <div style={{ color: "green", textAlign: "left" }}>
-                  {row.txn_type === "CR" ? "Credit" : "Na"}
-                </div>
-              )}
-            </Box>
-          );
-        },
-        wrap: true,
-        center: false,
-      },
+
       {
         name: "Status",
         selector: (row) => <CommonStatus value={row.status} />,

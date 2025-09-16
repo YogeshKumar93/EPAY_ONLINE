@@ -85,14 +85,24 @@ const Wallet2WalletTransfer = ({ filters = [] }) => {
       },
       {
         name: "Amount",
-        selector: (row) => (
-          <div style={{ color: "green", fontWeight: "600" }}>
-            ₹ {parseFloat(row.amount).toFixed(2)}
-          </div>
-        ),
+        selector: (row) => {
+          const loggedInUserId = user.id || user.id; // tumhare auth context se
+          let isDebit = row.user_id === loggedInUserId; // logged-in user se nikal raha paisa → red
+          let isCredit = row.receiver_id === loggedInUserId; // logged-in user ko paisa mila → green
+
+          let color = isCredit ? "green" : isDebit ? "red" : "black";
+          let sign = isCredit ? "+" : isDebit ? "-" : "";
+
+          return (
+            <div style={{ color: color, fontWeight: 600 }}>
+              {sign} ₹ {parseFloat(row.amount).toFixed(2)}
+            </div>
+          );
+        },
         wrap: true,
         width: "80px",
       },
+
       {
         name: "Remarks",
         selector: (row) => <div>{row.remark || "N/A"}</div>,
@@ -111,32 +121,7 @@ const Wallet2WalletTransfer = ({ filters = [] }) => {
         center: true,
         width: "80px",
       },
-      // {
-      //   name: "Route",
-      //   selector: (row) => <div style={{ textAlign: "left" }}>{row.route}</div>,
-      //   wrap: true,
-      // },
-      // {
-      //   name: "Client Ref",
-      //   selector: (row) => (
-      //     <Tooltip title={row.client_ref}>
-      //       <div style={{ textAlign: "left" }}>{row.client_ref}</div>
-      //     </Tooltip>
-      //   ),
-      //   wrap: true,
-      // },
-      // {
-      //   name: "IP",
-      //   selector: (row) => {
-      //     let loc = {};
-      //     try {
-      //       loc = JSON.parse(row.location);
-      //     } catch (e) {}
-      //     return <div>{loc?.ip || "-"}</div>;
-      //   },
-      //   center: true,
-      //   width: "120px",
-      // },
+
       {
         name: "Status",
         selector: (row) => <CommonStatus value={row.status} />,

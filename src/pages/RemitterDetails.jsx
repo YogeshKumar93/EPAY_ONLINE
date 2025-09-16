@@ -39,7 +39,7 @@ const RemitterDetails = ({ sender }) => {
       {/* Header */}
       <Box
         sx={{
-          bgcolor: "#0078B6",
+          bgcolor: "#9d72ff",
           color: "#fff",
           display: "flex",
           alignItems: "center",
@@ -75,7 +75,7 @@ const RemitterDetails = ({ sender }) => {
                 <Avatar
                   sx={{
                     bgcolor: "#e6f3fb",
-                    color: "#0078B6",
+                    color: "#5c3ac8",
                     width: 32,
                     height: 32,
                   }}
@@ -106,7 +106,7 @@ const RemitterDetails = ({ sender }) => {
                 <Avatar
                   sx={{
                     bgcolor: "#e6f3fb",
-                    color: "#0078B6",
+                    color: "#5c3ac8",
                     width: 32,
                     height: 32,
                   }}
@@ -133,7 +133,7 @@ const RemitterDetails = ({ sender }) => {
                 <Avatar
                   sx={{
                     bgcolor: "#e6f3fb",
-                    color: "#0078B6",
+                    color: "#5c3ac8",
                     width: 32,
                     height: 32,
                   }}
@@ -162,7 +162,7 @@ const RemitterDetails = ({ sender }) => {
                 <Avatar
                   sx={{
                     bgcolor: "#e6f3fb",
-                    color: "#0078B6",
+                    color: "#5c3ac8",
                     width: 32,
                     height: 32,
                   }}
@@ -173,7 +173,7 @@ const RemitterDetails = ({ sender }) => {
                   <Typography variant="body2" color="text.secondary">
                     Limit Available
                   </Typography>
-                  <Typography fontWeight="bold" color="#0078B6">
+                  <Typography fontWeight="bold" color="#5c3ac8">
                     ₹{sender.limitAvailable || sender.limit}
                   </Typography>
                 </Box>

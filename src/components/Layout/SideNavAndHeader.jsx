@@ -357,7 +357,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             src={logo}
             alt="App Logo"
             sx={{
-              height: 40, // adjust as needed
+              height: 30, // adjust as needed
               width: "auto",
             }}
           />
@@ -397,20 +397,30 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             width: "100%",
             marginBottom: "-8px",
             textAlign: "center",
-            py: 2,
+            // py: 2,
             display: "flex",
             justifyContent: "center",
-            // "&:hover": {
-            //   backgroundColor: getHoverInActive(),
-            //   color: "#fff",
-            // },
+            alignItems: "center",
+            gap: 1, // icon aur text ke beech gap
+            color: "#364a63", // normal text color
+            fontFamily: "DM Sans, sans-serif",
+            "&:hover": {
+              backgroundColor: "#9d72ff", // hover purple
+              color: "#ffffff", // hover me text white
+              "& svg": {
+                color: "#ffffff", // icon bhi white ho jaye hover pe
+              },
+            },
+            "& svg": {
+              color: "#364a63", // normal icon color
+            },
           }}
         >
-          <LogoutIcon className="ms-2" fontSize="small" /> Logout
+          <LogoutIcon fontSize="small" /> Logout
         </MenuItem>
       </List>
 
-      <MenuItem
+      {/* <MenuItem
         onClick={handleLogout}
         sx={{
           display: "flex",
@@ -440,8 +450,8 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
         <ListItemIcon sx={{ color: "inherit" }}>
           <LogoutIcon fontSize="small" />
         </ListItemIcon>
-        <span className="text-base">Logout</span>
-      </MenuItem>
+        {/* <span className="text-base">Logout</span> */}
+      {/* </MenuItem> */}
     </Box>
   );
 

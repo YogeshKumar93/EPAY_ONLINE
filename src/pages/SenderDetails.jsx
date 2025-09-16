@@ -40,7 +40,7 @@ const SenderDetails = ({ sender }) => {
     mr: 1.2,
   };
 
-  const iconStyle = { fontSize: 18, color: "#0078B6" };
+  const iconStyle = { fontSize: 18, color: "#5c3ac8" };
 
   return (
     <Card
@@ -61,7 +61,7 @@ const SenderDetails = ({ sender }) => {
         sx={{
           p: 1,
           cursor: isMobile ? "pointer" : "default",
-          background: "#0078B6",
+          background: "#5c3ac8",
           color: "#fff",
         }}
         onClick={isMobile ? handleToggle : undefined}
@@ -168,7 +168,7 @@ const SenderDetails = ({ sender }) => {
                     <Typography
                       variant="body2"
                       fontWeight={700}
-                      color="primary.main"
+                      color="#7a4dff"
                     >
                       ₹{sender?.rem_limit?.toLocaleString() || "N/A"}
                     </Typography>

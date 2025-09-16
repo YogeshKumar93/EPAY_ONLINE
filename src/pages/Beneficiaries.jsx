@@ -57,7 +57,13 @@ import { apiErrorToast, okSuccessToast } from "../utils/ToastUtil";
 import DeleteBeneficiaryModal from "./DeleteBeneficiaryModal";
 import AuthContext from "../contexts/AuthContext";
 
-const Beneficiaries = ({ beneficiaries, onSelect, onDelete, sender, onSuccess }) => {
+const Beneficiaries = ({
+  beneficiaries,
+  onSelect,
+  onDelete,
+  sender,
+  onSuccess,
+}) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [open, setOpen] = useState(true);
@@ -137,13 +143,15 @@ const Beneficiaries = ({ beneficiaries, onSelect, onDelete, sender, onSuccess })
       );
 
       if (response) {
-        okSuccessToast(response?.message || "Beneficiary verified successfully");
+        okSuccessToast(
+          response?.message || "Beneficiary verified successfully"
+        );
         setVerifyOpen(false);
         setMpinDigits(Array(6).fill(""));
         onSuccess?.(sender.mobileNumber);
       } else {
-                setVerifyOpen(false);
-                        setMpinDigits(Array(6).fill(""));
+        setVerifyOpen(false);
+        setMpinDigits(Array(6).fill(""));
         apiErrorToast(error?.errors || "Failed to verify beneficiary");
       }
     } catch (err) {
@@ -219,7 +227,7 @@ const Beneficiaries = ({ beneficiaries, onSelect, onDelete, sender, onSuccess })
       {/* Header */}
       <Box
         sx={{
-          bgcolor: "#0078B6",
+          bgcolor: "#9d72ff",
           color: "#fff",
           py: 1,
           px: 2,
@@ -244,7 +252,7 @@ const Beneficiaries = ({ beneficiaries, onSelect, onDelete, sender, onSuccess })
               sx={{
                 minWidth: "auto",
                 px: 1.5,
-                backgroundColor: "#1AB1FF",
+                backgroundColor: "#5c3ac8",
                 py: 0.5,
                 fontSize: "0.75rem",
                 borderRadius: 1,
@@ -305,13 +313,16 @@ const Beneficiaries = ({ beneficiaries, onSelect, onDelete, sender, onSuccess })
                         <Button
                           size="small"
                           variant="outlined"
-                          color="warning"
+                        
                           onClick={() => {
                             setSelectedBeneficiary(b);
                             setVerifyOpen(true);
                           }}
                           sx={{
+                            backgroundColor: "#ff9d4d",
+                             color:"#fff",
                             borderRadius: 1,
+                            border:"none",
                             textTransform: "none",
                             fontSize: "0.75rem",
                             px: 1,
@@ -328,6 +339,7 @@ const Beneficiaries = ({ beneficiaries, onSelect, onDelete, sender, onSuccess })
                         color="primary"
                         onClick={() => onSelect?.(b)}
                         sx={{
+                          backgroundColor: "#5c3ac8",
                           borderRadius: 1,
                           textTransform: "none",
                           fontSize: isMobile ? "0.6rem" : "0.75rem",
