@@ -127,7 +127,7 @@ export default function AppRoutes() {
           {/* ADMIN */}
           {isAdmin && (
             <>
-              <Route path="admin/dashboard" element={<AdminTransactions />} />
+              <Route path="admin/dashboard" element={<Dashboard />} />
               <Route path="admin/users" element={<Users />} />
               <Route path="admin/transactions" element={<Transaction />} />
               <Route path="admin/notification" element={<Notification />} />
@@ -167,11 +167,11 @@ export default function AppRoutes() {
                    <Route path="admin/virtual_accounts" element={<Virtual_Accounts />} />
                      <Route path="admin/login_history" element={<Login_History />} />
 
-
+{/* 
               <Route
                 path="admin/*"
                 element={<Navigate to="/admin/dashboard" replace />}
-              />
+              /> */}
             </>
           )}
 
