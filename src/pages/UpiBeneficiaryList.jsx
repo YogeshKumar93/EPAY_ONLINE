@@ -263,8 +263,8 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
                         // color="primary"
                         onClick={() => onSelect?.(b)}
                         sx={{
-                          color:"#fff",
-                          backgroundColor:"#5c3ac8",
+                          color: "#fff",
+                          backgroundColor: "#5c3ac8",
                           borderRadius: 1,
                           textTransform: "none",
                           fontSize: "0.75rem",

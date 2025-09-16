@@ -1,7 +1,8 @@
 import { Box } from "@mui/material";
 import React from "react";
 import styled, { keyframes } from "styled-components";
-import { smLogo } from "../../utils/iconsImports";
+import { smLogo } from "../../iconsImports";
+
 
 // Orbit animation
 const orbit = keyframes`

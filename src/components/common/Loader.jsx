@@ -5,7 +5,7 @@
 // // import { useRouter } from "next/router"
 // import { AuthContextProvider } from "../../store/AuthContext"
 // import { alpha, styled } from "@mui/material/styles"
-// import { smLogo } from "../../iconsImports"
+// import { biggpayLogo_sm } from "../../iconsImports"
 
 // const StyledRoot = styled("div")(() => ({
 //   right: 0,
@@ -40,7 +40,7 @@
 //             }}
 //           >
 //             <img
-//               src={smLogo}
+//               src={biggpayLogo_sm}
 //               style={{ cursor: "pointer", width: 80 }}
 //               alt="favicon"
 //             />
@@ -97,7 +97,8 @@
 // export default Loader
 
 import { Box } from "@mui/material";
-import { smLogo } from "../../utils/iconsImports";
+import { smLogo } from "../../iconsImports";
+
 // import { smLogo } from "../../iconsImports";
 
 const Loader = ({ loading, children }) => {
