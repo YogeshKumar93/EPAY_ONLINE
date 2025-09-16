@@ -1,8 +1,8 @@
 import React from "react";
 
 // Icons
-import DescriptionIcon from "@mui/icons-material/Description";     // Template
-import RuleIcon from "@mui/icons-material/Rule";                   // Comm Rules
+import DescriptionIcon from "@mui/icons-material/Description"; // Template
+import RuleIcon from "@mui/icons-material/Rule"; // Comm Rules
 import Dmt2 from "../../../pages/Dmt2";
 import Dmt from "../../../pages/Dmt";
 import CommonTabs from "../../common/CommonTabs";
