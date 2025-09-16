@@ -604,8 +604,6 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
               View Profile
             </MenuItem>
 
-<<<<<<< HEAD
-=======
             <MenuItem onClick={() => navigate("/settings")}>
               <ListItemIcon>
                 <SettingsIcon fontSize="small" />
@@ -642,7 +640,6 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
               Sign Out
             </MenuItem>
           </Menu>
->>>>>>> 4766cd684c5b085572a11b37dc2d0db22de3de98
         </Toolbar>
       </AppBar>
 
