@@ -22,7 +22,7 @@ import AuthContext from "../contexts/AuthContext";
 import { useToast } from "../utils/ToastContext";
 import ResetMpin from "../components/common/ResetMpin";
 
-const SelectedBeneficiary = ({
+const Dmt2SelectedBene = ({
   beneficiary,
   senderId,
   senderMobile,
@@ -58,19 +58,23 @@ const SelectedBeneficiary = ({
     try {
       const payload = {
         referenceKey: referenceKey,
-        number: senderMobile,
         beneficiary_id: beneficiary.id,
         amount,
+        latitude: location?.lat || "",
+        longitude: location?.long || "",
+        type: transferMode,
+        number: senderMobile,
+        ben_id: beneficiary?.bene_id,
       };
       const { error, response } = await apiCall(
         "post",
-        ApiEndpoints.OTP_DMT1_BENEFICIARY,
+        ApiEndpoints.OTP_DMT2,
         payload
       );
       if (error) apiErrorToast(error);
       else {
         showToast("OTP sent successfully!", "success");
-        setOtpRef(response?.data?.referenceKey || null);
+        setOtpRef(response?.data || null);
       }
     } catch (err) {
       apiErrorToast(err);
@@ -82,20 +86,24 @@ const SelectedBeneficiary = ({
     setResendLoading(true);
     try {
       const payload = {
-        referenceKey: referenceKey, // still pass original referenceKey
-        number: senderMobile,
+        referenceKey: referenceKey,
         beneficiary_id: beneficiary.id,
         amount,
+        latitude: location?.lat || "",
+        longitude: location?.long || "",
+        type: transferMode,
+        number: senderMobile,
+        ben_id: beneficiary?.bene_id,
       };
       const { error, response } = await apiCall(
         "post",
-        ApiEndpoints.OTP_DMT1_BENEFICIARY,
+        ApiEndpoints.OTP_DMT2,
         payload
       );
       if (error) apiErrorToast(error);
       else {
         showToast("OTP resent successfully!", "success");
-        setOtpRef(response?.data?.referenceKey || null); // 🔑 Save NEW referenceKey
+        setOtpRef(response?.data || null); // 🔑 Save NEW referenceKey
         setOtp(""); // clear old OTP
       }
     } catch (err) {
@@ -106,7 +114,7 @@ const SelectedBeneficiary = ({
   };
   const handleProceed = async () => {
     if (!otp || otp.length !== 6) {
-      apiErrorToast("Enter the 6-digit OTP");
+      apiErrorToast("Enter the 4-digit OTP");
       return;
     }
     if (!mpin || mpin.length !== 6) {
@@ -137,42 +145,42 @@ const SelectedBeneficiary = ({
 
       const { error, response } = await apiCall(
         "post",
-        ApiEndpoints.DMT1_TXN,
+        ApiEndpoints.DMT2_TXN,
         payload
       );
       if (response) {
-        const txnDetails = {
-          txnID: response?.message,
-          amount,
-          transferMode,
-          beneficiary: {
-            name: beneficiary.beneficiary_name,
-            account: beneficiary.account_number,
-            bank: beneficiary.bank_name,
-            ifsc: beneficiary.ifsc_code,
-          },
-          date: new Date().toLocaleString(),
-        };
+        // const txnDetails = {
+        //   txnID: response?.message,
+        //   amount,
+        //   transferMode,
+        //   beneficiary: {
+        //     name: beneficiary.beneficiary_name,
+        //     account: beneficiary.account_number,
+        //     bank: beneficiary.bank_name,
+        //     ifsc: beneficiary.ifsc_code,
+        //   },
+        //   date: new Date().toLocaleString(),
+        // };
 
-        okSuccessToastAlt(txnDetails); // pass full details
+        okSuccessToastAlt(response?.message); // pass full details
         setAmount("");
         setOtp("");
         setMpin("");
         setOtpRef(null);
       } else {
-        const txnDetails = {
-          txnID: response?.message,
-          amount,
-          transferMode,
-          beneficiary: {
-            name: beneficiary.beneficiary_name,
-            account: beneficiary.account_number,
-            bank: beneficiary.bank_name,
-            ifsc: beneficiary.ifsc_code,
-          },
-          date: new Date().toLocaleString(),
-        };
-        okSuccessToastAlt(txnDetails);
+        // const txnDetails = {
+        //   txnID: response?.message,
+        //   amount,
+        //   transferMode,
+        //   beneficiary: {
+        //     name: beneficiary.beneficiary_name,
+        //     account: beneficiary.account_number,
+        //     bank: beneficiary.bank_name,
+        //     ifsc: beneficiary.ifsc_code,
+        //   },
+        //   date: new Date().toLocaleString(),
+        // };
+        okSuccessToastAlt(error?.message);
       }
     } catch (err) {
       apiErrorToast(err);
@@ -250,7 +258,7 @@ const SelectedBeneficiary = ({
           value={amount}
           onChange={(e) => {
             const value = e.target.value;
-            const limit = parseFloat(sender?.limitAvailable || 0);
+            const limit = parseFloat(sender?.limit || 0);
 
             // ✅ Block invalid or over-limit values
             if (parseFloat(value) > limit) {
@@ -292,7 +300,7 @@ const SelectedBeneficiary = ({
             <OTPInput
               value={otp}
               onChange={setOtp}
-              numInputs={6}
+              numInputs={4}
               inputType="tel"
               renderInput={(props) => <input {...props} />}
               inputStyle={{
@@ -367,4 +375,4 @@ const SelectedBeneficiary = ({
   );
 };
 
-export default SelectedBeneficiary;
+export default Dmt2SelectedBene;

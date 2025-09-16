@@ -71,8 +71,8 @@ const ToastAlt = Swal.mixin({
   },
   width: "max-content",
   background: "#e6f7ff", // slightly different from #fefefe
-  color: "#0a6ebd",      // slightly different from green
-  iconColor: "#0288d1",  // slightly different from green
+  color: "#0a6ebd", // slightly different from green
+  iconColor: "#0288d1", // slightly different from green
   showCloseButton: true,
   allowEscapeKey: true,
   allowEnterKey: true,
@@ -136,35 +136,34 @@ export const ErrorSwal = withReactContent(ErrorToast);
 export const errorNotiToast = Swal.mixin({
   toast: true,
   position: "top-end",
-  width: "26em", 
-  iconHtml: "⚠️",  
+  width: "26em",
+  iconHtml: "⚠️",
   iconColor: "#FFEB3B",
   background: "#F0F8FF",
-  // color: "#72A0C1", 
-  confirmButtonText: "View", 
-  showConfirmButton: true, 
-  showCancelButton: true,  
-  cancelButtonText: "Dismiss", 
-  allowOutsideClick: false,  
-  allowEscapeKey: false, 
-  allowEnterKey: false, 
-  
+  // color: "#72A0C1",
+  confirmButtonText: "View",
+  showConfirmButton: true,
+  showCancelButton: true,
+  cancelButtonText: "Dismiss",
+  allowOutsideClick: false,
+  allowEscapeKey: false,
+  allowEnterKey: false,
+
   // Custom classes for styling
   customClass: {
     icon: "custom-toast-icon",
     title: "custom-toast-title",
-    content: "custom-toast-content", 
+    content: "custom-toast-content",
     confirmButton: "custom-toast-button",
-    cancelButton: "custom-toast-cancel-button", 
+    cancelButton: "custom-toast-cancel-button",
   },
 
   // didOpen: (toast) => {
-  //   toast.addEventListener("mouseenter", Swal.stopTimer); 
-  //   toast.addEventListener("mouseleave", Swal.resumeTimer); 
+  //   toast.addEventListener("mouseenter", Swal.stopTimer);
+  //   toast.addEventListener("mouseleave", Swal.resumeTimer);
   //   toast.classList.add('fade-in');
   // },
 });
-
 
 // type = 'success' | 'error' | 'warning' | 'info' | 'question'
 export const okToast = (title, msg, type) => {
@@ -375,9 +374,9 @@ export const toastInvoicePopup = (msg, timer) => {
 export const okSuccessToastsm = (title, msg) => {
   ToastSm.fire(title, msg, "success");
 };
-export const okSuccessToastAlt = (txnID) => {
+export const okSuccessToastAlt = (txnDetails) => {
   MySwalAlt.fire({
-    title: '',
+    title: "",
     html: `
       <div style="text-align: center; padding: 0px; position: relative;">
         
@@ -449,15 +448,30 @@ export const okSuccessToastAlt = (txnID) => {
             />
           </div>
         </div>
-  <!-- Transaction ID -->
+
+        <!-- Transaction ID -->
         <div style="font-size: 15px; font-weight: 600; color: #333;">
-          <span style="color: #169816">${txnID}</span>
+          <span style="color: #169816">${txnDetails.txnID}</span>
         </div>
         <div style="font-size: 15px; margin-bottom: 10px; color: #555;">
           Congratulations! Your transaction was completed successfully.
         </div>
 
-      
+        <!-- Hidden Receipt Content for Printing -->
+        <div id="receipt-content" style="display:none;">
+          <div style="text-align:left;padding:10px;border:1px dashed #ddd;border-radius:8px;background:#fafafa;max-width:280px;margin:0 auto;">
+            <h3 style="text-align:center;margin-bottom:10px;color:#169816;">Transaction Receipt</h3>
+            <p><b>Txn ID:</b> ${txnDetails.txnID}</p>
+            <p><b>Name:</b> ${txnDetails.beneficiary.name}</p>
+            <p><b>Account:</b> ${txnDetails.beneficiary.account}</p>
+            <p><b>Bank:</b> ${txnDetails.beneficiary.bank}</p>
+            <p><b>IFSC:</b> ${txnDetails.beneficiary.ifsc}</p>
+            <p><b>Amount:</b> ₹${txnDetails.amount}</p>
+            <p><b>Mode:</b> ${txnDetails.transferMode}</p>
+            <p><b>Date:</b> ${txnDetails.date}</p>
+          </div>
+        </div>
+
         <!-- Print Button -->
         <button id="print-receipt" style="
           background-color: #ff7f27;
@@ -476,23 +490,36 @@ export const okSuccessToastAlt = (txnID) => {
       </div>
     `,
     showConfirmButton: false,
-    showCloseButton: true,  // ✅ enable cross button
+    showCloseButton: true,
     background: "#fff",
     customClass: {
-      popup: 'swal2-border-radius',
-      closeButton: 'custom-close-btn'  // ✅ custom class for close button
+      popup: "swal2-border-radius",
+      closeButton: "custom-close-btn",
     },
     didOpen: () => {
-      document.getElementById('print-receipt').addEventListener('click', () => {
-        window.print();
+      document.getElementById("print-receipt").addEventListener("click", () => {
+        const printContents =
+          document.getElementById("receipt-content").innerHTML;
+        const newWindow = window.open("", "", "width=600,height=400");
+        newWindow.document.write(`
+          <html>
+            <head>
+              <title>Transaction Receipt</title>
+              <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                p { margin: 4px 0; font-size: 14px; }
+                h3 { text-align: center; color: #169816; margin-bottom: 10px; }
+                div { border: 1px dashed #ddd; padding: 10px; border-radius: 8px; background: #fafafa; }
+              </style>
+            </head>
+            <body>${printContents}</body>
+          </html>
+        `);
+        newWindow.document.close();
+        newWindow.print();
       });
 
       triggerConfetti();
-    }
+    },
   });
 };
-
-
-
-
-
