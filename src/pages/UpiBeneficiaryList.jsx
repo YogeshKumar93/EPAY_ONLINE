@@ -152,8 +152,8 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
         ];
 
   return (
-    <Card 
-      sx={{ 
+    <Card
+      sx={{
         borderRadius: 2,
         boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
         border: "1px solid",
@@ -164,13 +164,13 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
       {/* Header */}
       <Box
         display="flex"
-  justifyContent={isMobile ? "flex-start" : "space-between"}
+        justifyContent={isMobile ? "flex-start" : "space-between"}
         alignItems="center"
-        sx={{ 
+        sx={{
           p: 1.5,
-          background: "#0078B6",
+          background: "#5c3ac8",
           borderBottom: openList ? "1px solid" : "none",
-          borderColor: "divider"
+          borderColor: "divider",
         }}
       >
         <Box display="flex" alignItems="center" gap={1} flexGrow={1}>
@@ -178,207 +178,213 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
             Beneficiary List ({beneficiaries?.length || 0})
           </Typography>
 
-       <Box ml={isMobile ? 2 : "auto"}>
-    <Button
-      variant="contained"
-      size="small"
-      onClick={() => setOpenModal(true)}
-      startIcon={<PersonAddIcon sx={{ fontSize: 16 }} />}
-      sx={{ 
-        minWidth: "auto", 
-        px: 1.5, 
-        backgroundColor:"#1AB1FF",
-        py: 0.5, 
-        fontSize: "0.75rem",
-        borderRadius: 1,
-        textTransform: "none",
-        fontWeight: "500",
-        boxShadow: "none",
-       
-      }}
-    >
-      Add Beneficiary
-    </Button>
-  </Box>
-
+          <Box ml={isMobile ? 2 : "auto"}>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => setOpenModal(true)}
+              startIcon={<PersonAddIcon sx={{ fontSize: 16 }} />}
+              sx={{
+                minWidth: "auto",
+                px: 1.5,
+                backgroundColor: "#7a4dff",
+                py: 0.5,
+                fontSize: "0.75rem",
+                borderRadius: 1,
+                textTransform: "none",
+                fontWeight: "500",
+                boxShadow: "none",
+              }}
+            >
+              Add Beneficiary
+            </Button>
+          </Box>
         </Box>
 
         {isMobile && (
-    <IconButton
-      onClick={() => setOpenList((prev) => !prev)}
-      size="small"
-      sx={{
-        transform: openList ? "rotate(180deg)" : "rotate(0deg)",
-        transition: "transform 0.3s",
-        color: "text.secondary",
-        ml: 1
-      }}
-    >
-      <ExpandMoreIcon />
-    </IconButton>
-  )}
+          <IconButton
+            onClick={() => setOpenList((prev) => !prev)}
+            size="small"
+            sx={{
+              transform: openList ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "transform 0.3s",
+              color: "text.secondary",
+              ml: 1,
+            }}
+          >
+            <ExpandMoreIcon />
+          </IconButton>
+        )}
       </Box>
 
       <Collapse in={openList}>
         <CardContent sx={{ p: 2 }}>
-    <List dense sx={{ py: 0, maxHeight: 300, overflowY: "auto" }}>
-  {beneficiaries.map((b) => (
-    <ListItem
-      key={b.id}
-      sx={{
-        py: 1.5,
-        px: 1.5,
-        mb: 1,
-        borderRadius: 2,
-        border: "1px solid",
-        borderColor: b.id === "na" ? "transparent" : "divider",
-        backgroundColor: b.id === "na" ? "transparent" : "background.paper",
-        boxShadow: b.id !== "na" ? "0 2px 6px rgba(0,0,0,0.04)" : "none",
-        opacity: b.id === "na" ? 0.7 : 1,
-      }}
-      secondaryAction={
-        
-        b.id !== "na" && (
-       <Stack direction="row" spacing={4} alignItems="center">
-  {/* Verified text with tick */}
-  {b.is_verified === 1 && (
-    <Box display="flex" alignItems="center" gap={0.3}>
-      <CheckCircleIcon sx={{ fontSize: 16, color: "success.main" }} />
-      <Typography
-        variant="caption"
-        color="success.main"
-        fontWeight="500"
-        sx={{ fontSize: "0.75rem" }}
-      >
-        Verified
-      </Typography>
-    </Box>
-  )}
+          <List dense sx={{ py: 0, maxHeight: 300, overflowY: "auto" }}>
+            {beneficiaries.map((b) => (
+              <ListItem
+                key={b.id}
+                sx={{
+                  py: 1.5,
+                  px: 1.5,
+                  mb: 1,
+                  borderRadius: 2,
+                  border: "1px solid",
+                  borderColor: b.id === "na" ? "transparent" : "divider",
+                  backgroundColor:
+                    b.id === "na" ? "transparent" : "background.paper",
+                  boxShadow:
+                    b.id !== "na" ? "0 2px 6px rgba(0,0,0,0.04)" : "none",
+                  opacity: b.id === "na" ? 0.7 : 1,
+                }}
+                secondaryAction={
+                  b.id !== "na" && (
+                    <Stack direction="row" spacing={4} alignItems="center">
+                      {/* Verified text with tick */}
+                      {b.is_verified === 1 && (
+                        <Box display="flex" alignItems="center" gap={0.3}>
+                          <CheckCircleIcon
+                            sx={{ fontSize: 16, color: "success.main" }}
+                          />
+                          <Typography
+                            variant="caption"
+                            color="success.main"
+                            fontWeight="500"
+                            sx={{ fontSize: "0.75rem" }}
+                          >
+                            Verified
+                          </Typography>
+                        </Box>
+                      )}
 
-  {/* Pay button */}
-  <Button
-    size="small"
-    variant="contained"
-    color="primary"
-    onClick={() => onSelect?.(b)}
-    sx={{
-      borderRadius: 1,
-      textTransform: "none",
-      fontSize: "0.75rem",
-      px: 1,
-      py: 0.2,
-    }}
-  >
-    Pay
-  </Button>
+                      {/* Pay button */}
+                      <Button
+                        size="small"
+                        variant="contained"
+                        // color="primary"
+                        onClick={() => onSelect?.(b)}
+                        sx={{
+                          color:"#fff",
+                          backgroundColor:"#5c3ac8",
+                          borderRadius: 1,
+                          textTransform: "none",
+                          fontSize: "0.75rem",
+                          px: 1,
+                          py: 0.2,
+                        }}
+                      >
+                        Pay
+                      </Button>
 
-  {/* Delete button */}
-  <IconButton
-    edge="end"
-    size="small"
-    color="error"
-    onClick={(e) => {
-      e.stopPropagation();
-      handleDeleteBeneficiary(b.id);
-    }}
-    sx={{
-      backgroundColor: "error.light",
-      "&:hover": { backgroundColor: "error.main" },
-      color: "white",
-    }}
-  >
-    <Tooltip title="Delete Beneficiary">
-    <DeleteIcon fontSize="small" />
-    </Tooltip>
-  </IconButton>
-</Stack>
-        )
-      }
-    >
-      <Box display="flex" alignItems="flex-start" gap={1.5} width="100%">
-        {/* Bank logo */}
-        {bankImageMapping[b.bank_name] ? (
-          <Box
-            component="img"
-            src={bankImageMapping[b.bank_name]}
-            alt={b.bank_name}
-            sx={{
-              width: 36,
-              height: 36,
-              objectFit: "contain",
-              borderRadius: 1,
-              border: "1px solid",
-              borderColor: "divider",
-              p: 0.5,
-              backgroundColor: "white",
-            }}
-          />
-        ) : (
-          <Avatar
-            sx={{
-              width: 36,
-              height: 36,
-              bgcolor: "primary.light",
-              fontSize: 16,
-            }}
-          >
-            <AccountBalanceIcon sx={{ fontSize: 20 }} />
-          </Avatar>
-        )}
+                      {/* Delete button */}
+                      <IconButton
+                        edge="end"
+                        size="small"
+                        color="error"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteBeneficiary(b.id);
+                        }}
+                        sx={{
+                          backgroundColor: "error.light",
+                          "&:hover": { backgroundColor: "error.main" },
+                          color: "white",
+                        }}
+                      >
+                        <Tooltip title="Delete Beneficiary">
+                          <DeleteIcon fontSize="small" />
+                        </Tooltip>
+                      </IconButton>
+                    </Stack>
+                  )
+                }
+              >
+                <Box
+                  display="flex"
+                  alignItems="flex-start"
+                  gap={1.5}
+                  width="100%"
+                >
+                  {/* Bank logo */}
+                  {bankImageMapping[b.bank_name] ? (
+                    <Box
+                      component="img"
+                      src={bankImageMapping[b.bank_name]}
+                      alt={b.bank_name}
+                      sx={{
+                        width: 36,
+                        height: 36,
+                        objectFit: "contain",
+                        borderRadius: 1,
+                        border: "1px solid",
+                        borderColor: "divider",
+                        p: 0.5,
+                        backgroundColor: "white",
+                      }}
+                    />
+                  ) : (
+                    <Avatar
+                      sx={{
+                        width: 36,
+                        height: 36,
+                        bgcolor: "primary.light",
+                        fontSize: 16,
+                      }}
+                    >
+                      <AccountBalanceIcon sx={{ fontSize: 20 }} />
+                    </Avatar>
+                  )}
 
-        {/* Details */}
-        <Box flexGrow={1} minWidth={0}>
-          <Box display="flex" alignItems="center" gap={1} mb={0.5}>
-            <Typography
-              variant="body1"
-              fontWeight="500"
-              noWrap
-              sx={{
-                fontSize: isMobile ? "0.9rem" : "1rem",
-                color: b.id === "na" ? "text.secondary" : "text.primary",
-              }}
-            >
-              {b.beneficiary_name}
-            </Typography>
+                  {/* Details */}
+                  <Box flexGrow={1} minWidth={0}>
+                    <Box display="flex" alignItems="center" gap={1} mb={0.5}>
+                      <Typography
+                        variant="body1"
+                        fontWeight="500"
+                        noWrap
+                        sx={{
+                          fontSize: isMobile ? "0.9rem" : "1rem",
+                          color:
+                            b.id === "na" ? "text.secondary" : "text.primary",
+                        }}
+                      >
+                        {b.beneficiary_name}
+                      </Typography>
+                    </Box>
 
-        
-          </Box>
-
-          <Stack
-            direction={isMobile ? "column" : "row"}
-            spacing={isMobile ? 0.5 : 2}
-          >
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              display="flex"
-              alignItems="center"
-              sx={{ fontSize: "0.75rem" }}
-            >
-              <Box component="span" fontWeight="500" mr={0.5}>
-                IFSC:
-              </Box>
-              {b.ifsc_code}
-            </Typography>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              display="flex"
-              alignItems="center"
-              sx={{ fontSize: "0.75rem" }}
-            >
-              <Box component="span" fontWeight="500" mr={0.5}>
-                A/C:
-              </Box>
-              {b.account_number}
-            </Typography>
-          </Stack>
-        </Box>
-      </Box>
-    </ListItem>
-  ))}
-</List>
-
+                    <Stack
+                      direction={isMobile ? "column" : "row"}
+                      spacing={isMobile ? 0.5 : 2}
+                    >
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        display="flex"
+                        alignItems="center"
+                        sx={{ fontSize: "0.75rem" }}
+                      >
+                        <Box component="span" fontWeight="500" mr={0.5}>
+                          IFSC:
+                        </Box>
+                        {b.ifsc_code}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        display="flex"
+                        alignItems="center"
+                        sx={{ fontSize: "0.75rem" }}
+                      >
+                        <Box component="span" fontWeight="500" mr={0.5}>
+                          A/C:
+                        </Box>
+                        {b.account_number}
+                      </Typography>
+                    </Stack>
+                  </Box>
+                </Box>
+              </ListItem>
+            ))}
+          </List>
         </CardContent>
       </Collapse>
 
@@ -401,7 +407,7 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
               variant: "outlined",
               onClick: () => setOpenModal(false),
               disabled: submitting,
-              sx: { borderRadius: 1 }
+              sx: { borderRadius: 1 },
             },
             {
               text: submitting ? "Saving..." : "Save Beneficiary",
@@ -409,7 +415,7 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
               color: "primary",
               onClick: handleAddBeneficiary,
               disabled: submitting,
-              sx: { borderRadius: 1 }
+              sx: { borderRadius: 1 },
             },
           ]}
         />
