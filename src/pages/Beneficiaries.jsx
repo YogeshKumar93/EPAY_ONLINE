@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import {
   Card,
@@ -15,6 +15,8 @@ import {
   useTheme,
   useMediaQuery,
   Collapse,
+  TextField,
+  Grid,
 } from "@mui/material";
 import {
   AccountBalance as AccountBalanceIcon,
@@ -53,32 +55,36 @@ import ApiEndpoints from "../api/ApiEndpoints";
 import { apiCall } from "../api/apiClient";
 import { apiErrorToast, okSuccessToast } from "../utils/ToastUtil";
 import DeleteBeneficiaryModal from "./DeleteBeneficiaryModal";
-const Beneficiaries = ({ beneficiaries, onSelect, onDelete, onVerify,sender ,onSuccess}) => {
+import AuthContext from "../contexts/AuthContext";
+
+const Beneficiaries = ({ beneficiaries, onSelect, onDelete, sender, onSuccess }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [open, setOpen] = useState(true);
   const [openModal, setOpenModal] = useState(false);
-    const [submitting, setSubmitting] = useState(false);
-const [deleting, setDeleting] = useState(false);
-const [deleteOpen, setDeleteOpen] = useState(false);
-const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
+  const [verifyOpen, setVerifyOpen] = useState(false); // 🔑 verify modal state
+  const [mpinDigits, setMpinDigits] = useState(Array(6).fill(""));
 
+  const { location } = useContext(AuthContext);
   const { schema, formData, handleChange, errors, setErrors, loading } =
     useSchemaForm(ApiEndpoints.ADD_DMT1_SCHEMA, openModal, {
       sender_id: sender?.id,
     });
-console.log("sender",sender);
 
+  // 👉 Add Beneficiary
   const handleAddBeneficiary = async () => {
     setSubmitting(true);
     setErrors({});
     try {
-const payload = { 
-  ...formData, 
-  sender_id: sender?.id,
-  rem_mobile: sender?.mobileNumber   // <-- correct property name
-};
-    const {error,response} = await apiCall(
+      const payload = {
+        ...formData,
+        sender_id: sender?.id,
+        rem_mobile: sender?.mobileNumber,
+      };
+      const { error, response } = await apiCall(
         "post",
         ApiEndpoints.REGISTER_DMT1_BENEFICIARY,
         payload
@@ -99,6 +105,66 @@ const payload = {
     }
   };
 
+  // 👉 Verify Beneficiary
+  const handleVerify = async () => {
+    if (mpinDigits.some((d) => !d)) {
+      apiErrorToast("Please enter all 6 digits of MPIN");
+      return;
+    }
+    const mpin = mpinDigits.join("");
+
+    try {
+      setSubmitting(true);
+
+      const payload = {
+        mobile_number: sender?.mobileNumber,
+        sender_id: sender?.id,
+        ben_id: selectedBeneficiary.id,
+        ben_name: selectedBeneficiary.beneficiary_name,
+        ben_acc: selectedBeneficiary.account_number,
+        ifsc: selectedBeneficiary.ifsc_code,
+        operator: 18,
+        latitude: location?.lat || "",
+        longitude: location?.long || "",
+        pf: "WEB",
+        mpin,
+      };
+
+      const { error, response } = await apiCall(
+        "post",
+        ApiEndpoints.DMT1_VERIFY_BENEFICIARY,
+        payload
+      );
+
+      if (response) {
+        okSuccessToast(response?.message || "Beneficiary verified successfully");
+        setVerifyOpen(false);
+        setMpinDigits(Array(6).fill(""));
+        onSuccess?.(sender.mobileNumber);
+      } else {
+                setVerifyOpen(false);
+                        setMpinDigits(Array(6).fill(""));
+        apiErrorToast(error?.errors || "Failed to verify beneficiary");
+      }
+    } catch (err) {
+      apiErrorToast(err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // 👉 Handle MPIN change
+  const handleMpinChange = (index, value) => {
+    if (/^[0-9]?$/.test(value)) {
+      const newDigits = [...mpinDigits];
+      newDigits[index] = value;
+      setMpinDigits(newDigits);
+      if (value && index < 5) {
+        document.getElementById(`mpin-${index + 1}`).focus();
+      }
+    }
+  };
+
   // normalize to always have at least one "N/A" entry
   const normalized =
     beneficiaries && beneficiaries.length > 0
@@ -116,49 +182,33 @@ const payload = {
         ];
 
   const bankImageMapping = {
-     SBIN: sbi2,
-        IBKL: idbi2,
-        UTIB: axis2,
-        HDFC: hdfc2,
-        ICIC: icici2,
-        KKBK: kotak2,
-        BARB: bob2,
-        PUNB: pnb2,
-        MAHB: bom2,
-        UBIN: union2,
-        DBSS: dbs2,
-        RATN: rbl2,
-        YESB: yes2,
-        INDB: indus2,
-        AIRP: airtel2,
-        ABHY: abhy2,
-        CNRB: canara2,
-        BDBL: bandhan2,
-        CBIN: cbi2,
-        IDIB: idib2,
-        SCBL: stand2,
-        JAKA: jk2,
-  }; // add mappings if needed
-
-  const handleDeleteClick = (beneficiary) => {
-    setSelectedBeneficiary(beneficiary);
-    setDeleteModalOpen(true);
-  };
-
-  const handleConfirmDelete = async (id) => {
-    try {
-      setDeleting(true);
-      await onDelete?.(id); // call parent delete
-      setDeleteModalOpen(false);
-      setSelectedBeneficiary(null);
-    } finally {
-      setDeleting(false);
-    }
+    SBIN: sbi2,
+    IBKL: idbi2,
+    UTIB: axis2,
+    HDFC: hdfc2,
+    ICIC: icici2,
+    KKBK: kotak2,
+    BARB: bob2,
+    PUNB: pnb2,
+    MAHB: bom2,
+    UBIN: union2,
+    DBSS: dbs2,
+    RATN: rbl2,
+    YESB: yes2,
+    INDB: indus2,
+    AIRP: airtel2,
+    ABHY: abhy2,
+    CNRB: canara2,
+    BDBL: bandhan2,
+    CBIN: cbi2,
+    IDIB: idib2,
+    SCBL: stand2,
+    JAKA: jk2,
   };
 
   return (
-     <Card 
-      sx={{ 
+    <Card
+      sx={{
         borderRadius: 2,
         boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
         border: "1px solid",
@@ -166,7 +216,7 @@ const payload = {
         overflow: "hidden",
       }}
     >
-         {/* Header */}
+      {/* Header */}
       <Box
         sx={{
           bgcolor: "#0078B6",
@@ -183,36 +233,34 @@ const payload = {
         <Typography variant="subtitle1" fontWeight="bold">
           Beneficiary List ({beneficiaries?.length || 0})
         </Typography>
-        
-          <Box ml={isMobile ? 1 : "auto"}>
-                      {sender &&
 
-    <Button
-      variant="contained"
-      size="small"
-      onClick={() => setOpenModal(true)}
-      startIcon={<PersonAddIcon sx={{ fontSize: 16 }} />}
-      sx={{ 
-        minWidth: "auto", 
-        px: 1.5, 
-        backgroundColor:"#1AB1FF",
-        py: 0.5, 
-        fontSize: "0.75rem",
-        borderRadius: 1,
-        textTransform: "none",
-        fontWeight: "500",
-        boxShadow: "none",
-       
-      }}
-    >
-      Add Beneficiary
-    </Button>
-}
-  </Box>
+        <Box ml={isMobile ? 1 : "auto"}>
+          {sender && (
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => setOpenModal(true)}
+              startIcon={<PersonAddIcon sx={{ fontSize: 16 }} />}
+              sx={{
+                minWidth: "auto",
+                px: 1.5,
+                backgroundColor: "#1AB1FF",
+                py: 0.5,
+                fontSize: "0.75rem",
+                borderRadius: 1,
+                textTransform: "none",
+                fontWeight: "500",
+                boxShadow: "none",
+              }}
+            >
+              Add Beneficiary
+            </Button>
+          )}
+        </Box>
         {isMobile && (
-        <IconButton size="small" sx={{ color: "white" }}>
-          {open ? <ExpandLess /> : <ExpandMore />}
-        </IconButton>
+          <IconButton size="small" sx={{ color: "white" }}>
+            {open ? <ExpandLess /> : <ExpandMore />}
+          </IconButton>
         )}
       </Box>
 
@@ -258,7 +306,10 @@ const payload = {
                           size="small"
                           variant="outlined"
                           color="warning"
-                          onClick={() => onVerify?.(b)}
+                          onClick={() => {
+                            setSelectedBeneficiary(b);
+                            setVerifyOpen(true);
+                          }}
                           sx={{
                             borderRadius: 1,
                             textTransform: "none",
@@ -287,42 +338,42 @@ const payload = {
                         Send Money
                       </Button>
 
-         <IconButton
-  edge="end"
-  size="small"
-  color="error"
-  onClick={(e) => {
-    e.stopPropagation();
-    setSelectedBeneficiary(b);
-    setDeleteOpen(true);
-  }}
->
-  <Tooltip title="Delete Beneficiary">
-    <DeleteIcon fontSize="small" />
-  </Tooltip>
-</IconButton>
+                      <IconButton
+                        edge="end"
+                        size="small"
+                        color="error"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedBeneficiary(b);
+                          setDeleteOpen(true);
+                        }}
+                      >
+                        <Tooltip title="Delete Beneficiary">
+                          <DeleteIcon fontSize="small" />
+                        </Tooltip>
+                      </IconButton>
                     </Stack>
                   )
                 }
               >
                 <Box display="flex" alignItems="center" gap={1.5} width="100%">
                   {/* Bank logo */}
-                 {bankImageMapping[b.ifsc_code?.slice(0, 4)] ? (
-  <Box
-    component="img"
-    src={bankImageMapping[b.ifsc_code.slice(0, 4)]}
-    alt={b.bank_name}
-    sx={{
-      width: 36,
-      height: 36,
-      objectFit: "contain",
-      borderRadius: 1,
-      border: "1px solid",
-      borderColor: "divider",
-      p: 0.5,
-      backgroundColor: "white",
-    }}
-  />
+                  {bankImageMapping[b.ifsc_code?.slice(0, 4)] ? (
+                    <Box
+                      component="img"
+                      src={bankImageMapping[b.ifsc_code.slice(0, 4)]}
+                      alt={b.bank_name}
+                      sx={{
+                        width: 36,
+                        height: 36,
+                        objectFit: "contain",
+                        borderRadius: 1,
+                        border: "1px solid",
+                        borderColor: "divider",
+                        p: 0.5,
+                        backgroundColor: "white",
+                      }}
+                    />
                   ) : (
                     <Avatar
                       sx={{
@@ -388,6 +439,8 @@ const payload = {
           </List>
         </CardContent>
       </Collapse>
+
+      {/* Add Beneficiary Modal */}
       {openModal && (
         <CommonModal
           open={openModal}
@@ -407,7 +460,7 @@ const payload = {
               variant: "outlined",
               onClick: () => setOpenModal(false),
               disabled: submitting,
-              sx: { borderRadius: 1 }
+              sx: { borderRadius: 1 },
             },
             {
               text: submitting ? "Saving..." : "Save Beneficiary",
@@ -415,22 +468,71 @@ const payload = {
               color: "primary",
               onClick: handleAddBeneficiary,
               disabled: submitting,
-              sx: { borderRadius: 1 }
+              sx: { borderRadius: 1 },
             },
           ]}
         />
       )}
-   <DeleteBeneficiaryModal
-  open={deleteOpen}
-  onClose={() => setDeleteOpen(false)}
-  beneficiary={selectedBeneficiary}
-  sender={sender}
-  onSuccess={() => {
-    setDeleteOpen(false);
-    setSelectedBeneficiary(null);
-    onSuccess?.(sender.mobileNumber); // refresh list
-  }}
-/>
+
+      {/* Verify Beneficiary - MPIN Modal */}
+      {verifyOpen && (
+        <CommonModal
+          open={verifyOpen}
+          onClose={() => setVerifyOpen(false)}
+          title="Enter 6-digit MPIN"
+          iconType="info"
+          size="small"
+          dividers
+          loading={submitting}
+          footerButtons={[
+            {
+              text: "Cancel",
+              variant: "outlined",
+              onClick: () => setVerifyOpen(false),
+              disabled: submitting,
+              sx: { borderRadius: 1 },
+            },
+            {
+              text: submitting ? "Verifying..." : "Verify",
+              variant: "contained",
+              color: "primary",
+              onClick: handleVerify,
+              disabled: submitting,
+              sx: { borderRadius: 1 },
+            },
+          ]}
+        >
+          <Grid container spacing={1} justifyContent="center" sx={{ mt: 1 }}>
+            {mpinDigits.map((digit, idx) => (
+              <Grid item key={idx}>
+                <TextField
+                  id={`mpin-${idx}`}
+                  value={digit}
+                  onChange={(e) => handleMpinChange(idx, e.target.value)}
+                  inputProps={{
+                    maxLength: 1,
+                    style: { textAlign: "center", fontSize: "1.2rem" },
+                  }}
+                  sx={{ width: 45 }}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        </CommonModal>
+      )}
+
+      {/* Delete Beneficiary Modal */}
+      <DeleteBeneficiaryModal
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        beneficiary={selectedBeneficiary}
+        sender={sender}
+        onSuccess={() => {
+          setDeleteOpen(false);
+          setSelectedBeneficiary(null);
+          onSuccess?.(sender.mobileNumber);
+        }}
+      />
     </Card>
   );
 };

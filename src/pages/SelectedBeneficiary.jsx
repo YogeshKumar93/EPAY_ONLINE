@@ -13,12 +13,15 @@ import {
 import OTPInput from "react-otp-input";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
-import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
+import { okSuccessToast, apiErrorToast, okSuccessToastAlt } from "../utils/ToastUtil";
 import AuthContext from "../contexts/AuthContext";
 import { useToast } from "../utils/ToastContext";
+import ResetMpin from "../components/common/ResetMpin";
 
 const SelectedBeneficiary = ({ beneficiary, senderId, senderMobile ,referenceKey,sender}) => {
   const { location } = useContext(AuthContext);
+    const authCtx = useContext(AuthContext);
+    const user = authCtx?.user;
   const [transferMode, setTransferMode] = useState("IMPS");
   const [amount, setAmount] = useState("");
   const [otpRef, setOtpRef] = useState(null);
@@ -28,6 +31,9 @@ const SelectedBeneficiary = ({ beneficiary, senderId, senderMobile ,referenceKey
 const {showToast} = useToast()
   const [resendLoading, setResendLoading] = useState(false);
 console.log("sender linit ",sender.limitAvailable);
+  const [openResetModal, setOpenResetModal] = useState(false);
+
+  const username = `GURU1${user?.id}`;
 
   if (!beneficiary) return null;
 
@@ -113,7 +119,7 @@ console.log("referenceKey",referenceKey);
 
       const { error, response } = await apiCall("post", ApiEndpoints.DMT1_TXN, payload);
       if (response) {
-        okSuccessToast("Payout successful!");
+        okSuccessToastAlt(response?.message)
         setAmount("");
         setOtp("");
         setMpin("");
@@ -270,6 +276,14 @@ console.log("referenceKey",referenceKey);
                 textAlign: "center",
               }}
             />
+             <Button
+              variant="text"
+              size="small"
+              sx={{ mt: 1 }}
+              onClick={() => setOpenResetModal(true)} // ✅ open modal
+            >
+              Reset Mpin
+            </Button>
           </Box>
 
           <Button
@@ -282,6 +296,12 @@ console.log("referenceKey",referenceKey);
           </Button>
         </Box>
       )}
+        {/* ✅ Reset MPIN Modal */}
+      <ResetMpin
+        open={openResetModal}
+        onClose={() => setOpenResetModal(false)}
+        username={username}
+      />
     </Paper>
   );
 };

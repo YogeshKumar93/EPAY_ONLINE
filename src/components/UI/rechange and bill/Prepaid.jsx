@@ -10,8 +10,21 @@ import {
   MenuItem,
   Button,
   Avatar,
-  Paper
+  Paper,
+  Container,
+  InputAdornment,
+  Divider,
+  Chip,
+  Fade,
+  Slide
 } from "@mui/material";
+import {
+  LocalAtm,
+  PhoneIphone,
+  Payments,
+  SimCard,
+  CheckCircle
+} from "@mui/icons-material";
 import { apiCall } from "../../../api/apiClient";
 import ApiEndpoints from "../../../api/ApiEndpoints";
 import { apiErrorToast, okSuccessToast } from "../../../utils/ToastUtil";
@@ -26,6 +39,7 @@ const Prepaid = () => {
   const [plans, setPlans] = useState([]);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [mobileNumber, setMobileNumber] = useState("");
+  const [step, setStep] = useState(1); // 1: select operator, 2: select plan, 3: confirm
   const { location } = useContext(AuthContext);
 
   const fetchServices = async () => {
@@ -51,6 +65,7 @@ const Prepaid = () => {
     setPlansLoading(true);
     setSelectedService(service);
     setPlans([]);
+    setStep(2);
     try {
       const { error, response } = await apiCall(
         "post",
@@ -96,11 +111,16 @@ const Prepaid = () => {
       }
 
       okSuccessToast(`Recharge successful for ${mobileNumber}`);
-
-      setSelectedService(null);
-      setPlans([]);
-      setSelectedPlan("");
-      setMobileNumber("");
+      setStep(4); // Success step
+      
+      // Reset after 3 seconds
+      setTimeout(() => {
+        setSelectedService(null);
+        setPlans([]);
+        setSelectedPlan(null);
+        setMobileNumber("");
+        setStep(1);
+      }, 3000);
     } catch (err) {
       apiErrorToast(err);
     }
@@ -112,127 +132,320 @@ const Prepaid = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" p={3}>
-        <CircularProgress />
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+        <Box textAlign="center">
+          <CircularProgress size={60} thickness={4} />
+          <Typography variant="h6" sx={{ mt: 2 }}>Loading Operators...</Typography>
+        </Box>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
     
-
-      <Grid container spacing={3}>
-        {services.map((service) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={service.id}>
-            <Card
-              sx={{
-                borderRadius: 3,
-                boxShadow: 4,
-                p: 2,
-                transition: "0.3s",
-                cursor: "pointer",
-                "&:hover": {
-                  boxShadow: 8,
-                  transform: "translateY(-6px)",
-                },
-                textAlign: "center",
-              }}
-              onClick={() => fetchPlans(service)}
-            >
+      {/* Step indicator */}
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', maxWidth: 500, width: '100%' }}>
+          {[1, 2, 3].map((stepNumber, index) => (
+            <Box key={stepNumber} sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
               <Box
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  mb: 2,
+                  width: 40,
+                  height: 40,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: step >= stepNumber ? 'primary.main' : 'grey.300',
+                  color: step >= stepNumber ? 'white' : 'grey.500',
+                  fontWeight: 'bold',
+                  zIndex: 2,
+                  position: 'relative'
                 }}
               >
-                <Avatar
-                  src={operatorImages[service.code]}
-                  alt={service.name}
+                {stepNumber}
+              </Box>
+              {index < 2 && (
+                <Box
                   sx={{
-                    width: 70,
-                    height: 70,
-                    border: "3px solid #1976d2",
-                    background: "linear-gradient(135deg, #42a5f5, #1e88e5)",
+                    flex: 1,
+                    height: 3,
+                    backgroundColor: step > stepNumber ? 'primary.main' : 'grey.300',
+                    ml: -1,
+                    mr: -1,
+                    zIndex: 1
                   }}
                 />
-              </Box>
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: 600, color: "#333" }}
-              >
-                {service.name}
-              </Typography>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-
-      {plansLoading && (
-        <Box display="flex" justifyContent="center" width="100%" mt={4}>
-          <CircularProgress size={28} />
+              )}
+            </Box>
+          ))}
         </Box>
+      </Box>
+
+      {/* Step 1: Operator Selection */}
+      {step === 1 && (
+        <Slide direction="right" in={step === 1} mountOnEnter unmountOnExit>
+          <Box>
+            {/* <Typography variant="h5" gutterBottom sx={{ mb: 3, textAlign: 'center' }}>
+              Select Your Operator
+            </Typography> */}
+            <Grid container spacing={3}>
+              {services.map((service) => (
+                <Grid item xs={6} sm={4} md={3} key={service.id}>
+                  <Card
+                    sx={{
+                      borderRadius: 3,
+                      boxShadow: 3,
+                      p: 2,
+                      transition: "0.3s",
+                      cursor: "pointer",
+                      "&:hover": {
+                        boxShadow: 6,
+                        transform: "translateY(-8px)",
+                      },
+                      textAlign: "center",
+                      background: "linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)",
+                      border: selectedService?.id === service.id ? '2px solid #1976d2' : '2px solid transparent'
+                    }}
+                    onClick={() => fetchPlans(service)}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        mb: 2,
+                      }}
+                    >
+                      <Avatar
+                        src={operatorImages[service.code]}
+                        alt={service.name}
+                        sx={{
+                          width: 70,
+                          height: 70,
+                          border: "3px solid #fff",
+                          boxShadow: 2,
+                        }}
+                      />
+                    </Box>
+                    <Typography
+                      variant="h6"
+                      sx={{ fontWeight: 600, color: "#2c3e50" }}
+                    >
+                      {service.name}
+                    </Typography>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        </Slide>
       )}
 
-      {selectedService && !plansLoading && plans.length > 0 && (
-        <Paper
-          elevation={6}
-          sx={{
-            mt: 5,
-            p: { xs: 2, sm: 3 },
-            maxWidth: 500,
-            mx: "auto",
-            borderRadius: 3,
-            background: "#f5f5f5",
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: 700, mb: 2, textAlign: "center" }}
-          >
-            Selected Service: {selectedService.name}
-          </Typography>
+      {/* Step 2: Plan Selection */}
+      {step === 2 && (
+        <Slide direction="left" in={step === 2} mountOnEnter unmountOnExit>
+          <Box sx={{ maxWidth: 800, mx: 'auto' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, justifyContent: 'center' }}>
+              <Avatar 
+                src={operatorImages[selectedService?.code]} 
+                sx={{ width: 50, height: 50, mr: 2 }} 
+              />
+              <Typography variant="h5">
+                Select a plan for {selectedService?.name}
+              </Typography>
+              <Button 
+                sx={{ ml: 'auto' }} 
+                onClick={() => setStep(1)}
+                color="primary"
+              >
+                Change Operator
+              </Button>
+            </Box>
 
-          <TextField
-            select
-            fullWidth
-            label="Select Plan"
-            value={selectedPlan ? selectedPlan.id : ""}
-            onChange={(e) => {
-              const plan = plans.find((p) => p.id === e.target.value);
-              setSelectedPlan(plan);
-            }}
-            sx={{ mb: 2 }}
-          >
-            {plans.map((plan) => (
-              <MenuItem key={plan.id} value={plan.id}>
-                {plan.name} - ₹{plan.price}
-              </MenuItem>
-            ))}
-          </TextField>
-
-          <TextField
-            fullWidth
-            label="Mobile Number"
-            value={mobileNumber}
-            onChange={(e) => setMobileNumber(e.target.value)}
-            type="tel"
-            sx={{ mb: 3 }}
-          />
-
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ py: 1.5, fontWeight: 600 }}
-            onClick={handleRecharge}
-          >
-            Recharge
-          </Button>
-        </Paper>
+            {plansLoading ? (
+              <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+                <Box textAlign="center">
+                  <CircularProgress size={40} />
+                  <Typography variant="h6" sx={{ mt: 2 }}>Loading Plans...</Typography>
+                </Box>
+              </Box>
+            ) : (
+              <>
+                <Grid container spacing={2} sx={{ mb: 4 }}>
+                  {plans.map((plan) => (
+                    <Grid item xs={12} sm={6} md={4} key={plan.id}>
+                      <Card
+                        sx={{
+                          p: 2,
+                          borderRadius: 3,
+                          cursor: "pointer",
+                          transition: "0.3s",
+                          border: selectedPlan?.id === plan.id ? '2px solid #1976d2' : '1px solid #e0e0e0',
+                          background: selectedPlan?.id === plan.id ? '#f0f7ff' : 'white',
+                          "&:hover": {
+                            boxShadow: 4,
+                            transform: "translateY(-4px)",
+                          },
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column'
+                        }}
+                        onClick={() => {
+                          setSelectedPlan(plan);
+                          setStep(3);
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                          <Typography variant="h6" component="div" color="primary.main" fontWeight="700">
+                            ₹{plan.price}
+                          </Typography>
+                          {selectedPlan?.id === plan.id && (
+                            <CheckCircle color="primary" />
+                          )}
+                        </Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1, mb: 2 }}>
+                          {plan.name}
+                        </Typography>
+                        <Chip 
+                          label={`Validity: ${plan.validity || 'N/A'}`} 
+                          size="small" 
+                          variant="outlined" 
+                          sx={{ alignSelf: 'flex-start' }}
+                        />
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+                
+                {plans.length === 0 && (
+                  <Paper sx={{ p: 4, textAlign: 'center' }}>
+                    <Payments sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
+                    <Typography variant="h6" color="text.secondary">
+                      No plans available for this operator
+                    </Typography>
+                    <Button sx={{ mt: 2 }} onClick={() => setStep(1)}>
+                      Back to Operators
+                    </Button>
+                  </Paper>
+                )}
+              </>
+            )}
+          </Box>
+        </Slide>
       )}
-    </Box>
+
+      {/* Step 3: Confirmation */}
+      {step === 3 && selectedPlan && (
+        <Fade in={step === 3}>
+          <Box sx={{ maxWidth: 500, mx: 'auto' }}>
+            <Typography variant="h5" gutterBottom sx={{ mb: 3, textAlign: 'center' }}>
+              Confirm Recharge
+            </Typography>
+            
+            <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                <Avatar 
+                  src={operatorImages[selectedService?.code]} 
+                  sx={{ width: 50, height: 50, mr: 2 }} 
+                />
+                <Box>
+                  <Typography variant="h6">{selectedService?.name}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Prepaid Mobile
+                  </Typography>
+                </Box>
+              </Box>
+              
+              <Divider sx={{ my: 2 }} />
+              
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  Plan Details
+                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="h6">{selectedPlan.name}</Typography>
+                  <Typography variant="h6" color="primary.main">₹{selectedPlan.price}</Typography>
+                </Box>
+                {selectedPlan.validity && (
+                  <Typography variant="body2" color="text.secondary">
+                    Validity: {selectedPlan.validity}
+                  </Typography>
+                )}
+              </Box>
+              
+              <TextField
+                fullWidth
+                label="Mobile Number"
+                value={mobileNumber}
+                onChange={(e) => setMobileNumber(e.target.value)}
+                type="tel"
+                sx={{ mb: 3 }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <PhoneIphone />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={() => setStep(2)}
+                  sx={{ py: 1.5, borderRadius: 2 }}
+                >
+                  Back
+                </Button>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  onClick={handleRecharge}
+                  sx={{ py: 1.5, borderRadius: 2 }}
+                  startIcon={<LocalAtm />}
+                >
+                  Pay ₹{selectedPlan.price}
+                </Button>
+              </Box>
+            </Paper>
+          </Box>
+        </Fade>
+      )}
+
+      {/* Step 4: Success */}
+      {step === 4 && (
+        <Fade in={step === 4}>
+          <Box sx={{ textAlign: 'center', maxWidth: 500, mx: 'auto', py: 4 }}>
+            <CheckCircle sx={{ fontSize: 80, color: 'success.main', mb: 2 }} />
+            <Typography variant="h4" gutterBottom color="success.main">
+              Recharge Successful!
+            </Typography>
+            <Typography variant="h6" gutterBottom>
+              ₹{selectedPlan?.price} recharge for {mobileNumber}
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Your mobile number has been recharged successfully. The amount will be credited shortly.
+            </Typography>
+            <Button 
+              variant="contained" 
+              sx={{ mt: 4 }} 
+              onClick={() => {
+                setSelectedService(null);
+                setPlans([]);
+                setSelectedPlan(null);
+                setMobileNumber("");
+                setStep(1);
+              }}
+              startIcon={<SimCard />}
+            >
+              New Recharge
+            </Button>
+          </Box>
+        </Fade>
+      )}
+    </Container>
   );
 };
 

@@ -1,5 +1,7 @@
+import { Brightness2Rounded } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { bgImage, Logo } from "../iconsImports";
 
 export const Toast = Swal.mixin({
   // toast: true,
@@ -275,7 +277,6 @@ export const apiErrorToast = (error, history) => {
   return msg;
 };
 
-
 export const okSuccessToast = (title, msg) => {
   Toast.fire(title, msg, "success");
 };
@@ -374,6 +375,124 @@ export const toastInvoicePopup = (msg, timer) => {
 export const okSuccessToastsm = (title, msg) => {
   ToastSm.fire(title, msg, "success");
 };
-export const okSuccessToastAlt = (title, msg) => {
-  MySwalAlt.fire(title, msg, "success");
+export const okSuccessToastAlt = (txnID) => {
+  MySwalAlt.fire({
+    title: '',
+    html: `
+      <div style="text-align: center; padding: 0px; position: relative;">
+        
+        <!-- Logo at top-left corner -->
+        <img 
+          src="${Logo}" 
+          alt="logo"
+          style="
+            position: absolute;
+            top: -10px;
+            left: -20px;
+            height: 30px;
+            width: auto;
+          "
+        />
+
+        <!-- Success Icon with Full Left/Right Confetti -->
+        <div style="
+          position: relative;
+          width: 100%;
+          height: 140px;
+          margin: 0 auto 15px auto;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">
+          <!-- Left Confetti -->
+          <img 
+            src="${bgImage}" 
+            alt="confetti left"
+            style="
+              position: absolute;
+              left: 0;
+              top: 0;
+              height: 100%;
+              width: 45%;
+              object-fit: cover;
+            "
+          />
+          <!-- Right Confetti -->
+          <img 
+            src="${bgImage}" 
+            alt="confetti right"
+            style="
+              position: absolute;
+              right: 0;
+              top: 0;
+              height: 100%;
+              width: 45%;
+              object-fit: cover;
+            "
+          />
+          <!-- Tick Icon in Circle -->
+          <div style="
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background-color: #eaf9f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+          ">
+            <img 
+              src="https://cdn-icons-png.flaticon.com/512/845/845646.png" 
+              width="50" 
+              height="50" 
+              alt="success"
+            />
+          </div>
+        </div>
+  <!-- Transaction ID -->
+        <div style="font-size: 15px; font-weight: 600; color: #333;">
+          <span style="color: #169816">${txnID}</span>
+        </div>
+        <div style="font-size: 15px; margin-bottom: 10px; color: #555;">
+          Congratulations! Your transaction was completed successfully.
+        </div>
+
+      
+        <!-- Print Button -->
+        <button id="print-receipt" style="
+          background-color: #ff7f27;
+          color: white;
+          border: none;
+          padding: 10px 24px;
+          border-radius: 24px;
+          font-weight: bold;
+          margin-top: 25px;
+          cursor: pointer;
+          font-size: 15px;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        ">
+          Print Receipt
+        </button>
+      </div>
+    `,
+    showConfirmButton: false,
+    showCloseButton: true,  // ✅ enable cross button
+    background: "#fff",
+    customClass: {
+      popup: 'swal2-border-radius',
+      closeButton: 'custom-close-btn'  // ✅ custom class for close button
+    },
+    didOpen: () => {
+      document.getElementById('print-receipt').addEventListener('click', () => {
+        window.print();
+      });
+
+      triggerConfetti();
+    }
+  });
 };
+
+
+
+
+

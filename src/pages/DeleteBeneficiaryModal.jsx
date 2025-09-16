@@ -5,6 +5,7 @@ import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { apiErrorToast, okSuccessToast } from "../utils/ToastUtil";
 import OtpInput from "./OtpInput";
+import { useToast } from "../utils/ToastContext";
 
 const DeleteBeneficiaryModal = ({ open, onClose, beneficiary, sender, onSuccess }) => {
   const [step, setStep] = useState("confirm"); // confirm | otp
@@ -12,7 +13,7 @@ const DeleteBeneficiaryModal = ({ open, onClose, beneficiary, sender, onSuccess 
   const [otp, setOtp] = useState("");
   const [otpRefId, setOtpRefId] = useState(null);
   const [beneficiaryId, setBeneficiaryId] = useState(null);
-
+  const {showToast} = useToast();
   if (!beneficiary) return null;
 
 // Step 1 → Call delete init API
@@ -40,13 +41,13 @@ const handleDeleteInit = async () => {
       // Open OTP modal
       setStep("otp");
     } else {
-      apiErrorToast(
-        error?.message || res?.response?.message || "Failed to initiate deletion"
+      showToast(
+        error?.message || "Failed to initiate deletion" ||error?.errors||error?.errors?.status,"error"
       );
     }
   } catch (err) {
     console.error("❌ Delete Init Error:", err);
-    apiErrorToast(err.message || "Unexpected error");
+    showToast(err.message || "Unexpected error","error");
   } finally {
     setLoading(false);
   }
@@ -55,7 +56,7 @@ const handleDeleteInit = async () => {
 
   // Step 2 → Verify OTP
   const handleVerifyOtp = async () => {
-    if (!otp) return apiErrorToast("Please enter OTP");
+    if (!otp) return showToast("Please enter OTP","error");
     setLoading(true);
     try {
       const payload = {
@@ -79,10 +80,10 @@ const handleDeleteInit = async () => {
         onSuccess?.(); // refresh list
         handleCloseAll();
       } else {
-        apiErrorToast(error?.message || res?.message || "OTP verification failed");
+        showToast(error?.message || res?.message || "OTP verification failed","error");
       }
     } catch (err) {
-      apiErrorToast(err.message || "Unexpected error");
+      showToast(err.message || "Unexpected error","error");
     } finally {
       setLoading(false);
     }
