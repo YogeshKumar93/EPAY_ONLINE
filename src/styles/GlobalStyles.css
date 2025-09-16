@@ -137,8 +137,8 @@ body {
 }
 
 .nav-link.active {
-  background: var(--primary-color);
-  color: white;
+  background:#ebeef2;
+  color:#9769ff;
 }
 
 .nav-icon {

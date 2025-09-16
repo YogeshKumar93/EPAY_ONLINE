@@ -48,7 +48,7 @@ const ComplaintForm = ({ txnId, onSuccess, open, onClose, type }) => {
       const { error, response } = await apiCall(
         "POST",
         ApiEndpoints.CREATE_COMPLAINTS, // 🔄 endpoint
-        { txn_id: txnId.id, message, type: type }
+        { id: txnId.id, message, type: type,txn_id:txnId.txn_id }
       );
 
       if (response) {
