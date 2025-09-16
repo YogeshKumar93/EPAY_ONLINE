@@ -114,7 +114,7 @@ export const customer_nav = [
   { title: "My Purchase", icon: transImage, icon2: "🛠️", to: "/customer/purchase" },
   { title: "My Sale", icon: fundReqImage, icon2: "📒", to: "/customer/sale" },
   { title: "Bbps", icon: layoutImage, icon2: "📒", to: "/customer/bbps" },
-  { title: "Logs", icon: riskImage, icon2: "📒", to: "/customer/logs" },
+  { title: "Activity Logs", icon: riskImage, icon2: "📒", to: "/customer/logs" },
   { title: "Cms", icon: transImage, icon2: "📒", to: "/customer/cms" },
 ];
 export const di_nav = [

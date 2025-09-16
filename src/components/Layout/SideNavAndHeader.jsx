@@ -315,6 +315,39 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
       <List className="nav-list" sx={{ overflowY: "auto" }}>
         {renderNavItems(navigationItems)}
       </List>
+
+         <MenuItem
+  onClick={handleLogout}
+  sx={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent:"center",
+    mt:2,
+    mb:1.5,
+    gap: 2,
+    px: 4,
+    py: 1.5,
+    width:200,
+    borderRadius: "12px",
+    fontWeight: 500,
+    color: "#dc2626", // red-600
+    background: "#1405",
+    boxShadow: "0 2px 6px rgba(220, 38, 38, 0.15)",
+    transition: "all 0.3s ease",
+    "&:hover": {
+      background: "#4450A1",
+      color: "#fff",
+      transform: "scale(1.02)",
+      boxShadow: "0 4px 12px rgba(220, 38, 38, 0.3)",
+    },
+    mx:"auto",
+  }}
+>
+  <ListItemIcon sx={{ color: "inherit" }}>
+    <LogoutIcon fontSize="small" />
+  </ListItemIcon>
+  <span className="text-base">Logout</span>
+</MenuItem>
     </Box>
   );
 
