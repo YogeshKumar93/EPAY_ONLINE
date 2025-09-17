@@ -143,7 +143,7 @@ const BbpsBillers = ({ category, onBack }) => {
                 sm={2}
                 md={2.4}
                 xl={2.4}
-                lg={3}
+                lg={2.4}
               >
                 {/* xs=6 (2 per row mobile), sm=4 (3 per row tablet), md=2.4 (5 per row desktop) */}
 
@@ -152,7 +152,7 @@ const BbpsBillers = ({ category, onBack }) => {
                     borderRadius: is_layout === 2 ? 2 : 3,
                     boxShadow: 3,
                     width: is_layout === 2 ? 180 : 305, // ✅ Compact width in layout 2
-                    height: is_layout === 2 ? 110 : 150, // ✅ Compact height ensure uniform height
+                    height: is_layout === 2 ? 110 : 160, // ✅ Compact height ensure uniform height
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
@@ -178,7 +178,7 @@ const BbpsBillers = ({ category, onBack }) => {
                   <CardContent
                     sx={{
                       textAlign: "center",
-                      p: 1,
+                
                       width: "100%",
                       height: "100%",
                       display: "flex",
@@ -193,8 +193,8 @@ const BbpsBillers = ({ category, onBack }) => {
                         src={biller.iconUrl}
                         alt={biller.billerName}
                         sx={{
-                          width: is_layout === 2 ? 40 : 55,
-                          height: is_layout === 2 ? 40 : 55,
+                          width: is_layout === 2 ? 40 : 52,
+                          height: is_layout === 2 ? 40 : 52,
                           objectFit: "contain",
                           mb: 1,
                         }}
@@ -206,11 +206,12 @@ const BbpsBillers = ({ category, onBack }) => {
                       <Typography
                         variant={is_layout === 2 ? "body2" : "subtitle2"}
                         fontWeight="600"
-                        noWrap
+                        Wrap
                         sx={{
                           maxWidth: "100%",
                           textOverflow: "ellipsis",
-                          overflow: "hidden",
+                          
+                          
                         }}
                       >
                         {biller.billerName}
@@ -218,11 +219,13 @@ const BbpsBillers = ({ category, onBack }) => {
                     </Tooltip>
 
                     <Typography
-                      variant="caption"
+                      variant="caption" 
                       sx={{
+                        
                         color:
                           biller.billerStatus === "ACTIVE" ? "green" : "red",
                         fontWeight: "bold",
+                        
                       }}
                     >
                       {biller.billerStatus}
