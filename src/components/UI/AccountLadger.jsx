@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useContext } from "react";
+import { useMemo, useCallback, useContext, useEffect, useState } from "react";
 import { Box, Tooltip, Typography } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
@@ -6,166 +6,157 @@ import { currencySetter } from "../../utils/Currencyutil";
 import { dateToTime, ddmmyy } from "../../utils/DateUtils";
 import { capitalize1 } from "../../utils/TextUtil";
 import AuthContext from "../../contexts/AuthContext";
+import CommonStatus from "../common/CommonStatus";
+import CommonLoader from "../common/CommonLoader";
 
+const AccountLadger = ({ query }) => {
+  const authCtx = useContext(AuthContext);
+  const user = authCtx?.user;
+  const [loading, setLoading] = useState(true); // initially true
 
-const AccountLadger = ({ filters=[], query }) => {
- 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false); // stop loader after data is ready
+    }, 1000); // 1 second delay just as an example
 
- const authCtx=useContext(AuthContext)
- const user=authCtx?.user
-  const getStatusColor = useCallback((status) => {
-    switch (status?.toUpperCase()) {
-      case "SUCCESS":
-        return "success";
-      case "FAILED":
-        return "error";
-      case "REFUND":
-        return "warning";
-      case "PENDING":
-        return "info";
-      default:
-        return "default";
-    }
+    return () => clearTimeout(timer);
   }, []);
 
-  // memoized columns
-  const columns = useMemo(() => [
-    {
-      name: "Date/Time",
-      selector: (row) => (
-        <div className="mb-1" style={{ textAlign: "left" }}>
-          {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
-        </div>
-      ),
-      wrap: true,
-    },
-    {
-      name: "Particular",
-      selector: (row) => (
-        <Tooltip title={row?.operator}>
-          <div style={{ textAlign: "left" }}>{capitalize1(row?.operator)}</div>
-        </Tooltip>
-      ),
-      width: "185px",
-      wrap: true,
-    },
-    {
-      name: "Amount txn",
-      selector: (row) => (
-        <Tooltip title={row?.amount}>
-          <div style={{ textAlign: "left" }}>
-            {parseFloat(row?.amount).toFixed(2)}
+  const filters = useMemo(
+    () => [
+      {
+        id: "user_id",
+        label: "User Name",
+        type: "textfield",
+      },
+      {
+        id: "date_range",
+        // label: "Date Range",
+        type: "daterange",
+      },
+      {
+        id: "mobile",
+        label: "Mobile",
+        type: "textfield",
+      },
+    ],
+    []
+  );
+
+  const columns = useMemo(
+    () => [
+      {
+        name: "Date/Time",
+        selector: (row) => (
+          <div className="mb-1" style={{ textAlign: "left" }}>
+            {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
           </div>
-        </Tooltip>
-      ),
-    },
-    {
-      name: "Debit",
-      selector: (row) => {
-        return (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              fontSize: "16px",
-              textAlign: "justify",
-              fontWeight: "500",
-            }}
-          >
-            {(user.role === "Ad" || user.role === "Md") && row.txn_type === "DR" && (
-              <div style={{ color: "red", textAlign: "left" }}>
-                {row.type === "W2W TRANSFER"
-                  ? currencySetter(parseFloat(row.net_amount).toFixed(2))
-                  : "0"}
-              </div>
-            )}
-            
-            {(user.role === "Ret" || user.role === "Dd") && row.txn_type === "DR" && (
-              <div style={{ color: "red", textAlign: "left" }}>
-                -{currencySetter(parseFloat(row.net_amount).toFixed(2))}
-              </div>
-            )}
-          </Box>
-        );
+        ),
+        wrap: true,
       },
-      wrap: true,
-      center: false,
-    },
-    {
-      name: "Credit",
-      selector: (row) => {
-        return (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              fontSize: "16px",
-              textAlign: "justify",
-              fontWeight: "500",
-            }}
-          >
-            {(user.role === "Ad" || user.role === "Md") && row.txn_type === "CR" && (
-              <div style={{ color: "green", textAlign: "left" }}>
-                {row.type === "W2W TRANSFER"
-                  ? currencySetter(parseFloat(row.net_amount).toFixed(2))
-                  : currencySetter(parseFloat(row.ad_comm).toFixed(2))}
-              </div>
-            )}
-    
-            {(user.role === "Ret" || user.role === "Dd") && row.txn_type === "CR" && (
-              <div style={{ color: "green", textAlign: "left" }}>
-                + {currencySetter(parseFloat(row.net_amount).toFixed(2))}
-              </div>
-            )}
-          </Box>
-        );
+      {
+        name: "Service",
+        selector: (row) => (
+          <div  style={{ fontWeight:500 ,color:"#000"}}>
+            {" "}
+            {row.service}
+          </div>
+        ),
+        center: true,
       },
-      wrap: true,
-      center: false,
-    },
-    {
-      name: "Closing Balance",
-      selector: (row) => {
-        return (
-          <Tooltip title={row.ip}>
-            {(user.role === "Ad" || user.role === "Md") && (
-              <Typography>
-                {row.user_id === user.id
-                  ? currencySetter(parseFloat(row.w1).toFixed(2))
-                  : currencySetter(parseFloat(row.ad_closing).toFixed(2))}
-              </Typography>
-            )}
-            
-            {(user.role === "Dd" || user.role === "Ret") && (
-              <>
-                <Typography align="left">{currencySetter(parseFloat(row.w1).toFixed(2))}</Typography>
-                <Typography align="left">{currencySetter(parseFloat(row.w2).toFixed(2))}</Typography>
-              </>
-            )}
+      {
+        name: "Narration",
+        selector: (row) => (
+          <Tooltip title={row?.narration}>
+            <div style={{ textAlign: "left" }}>
+              {capitalize1(row?.narration)}
+            </div>
           </Tooltip>
-        );
+        ),
+        width: "185px",
+        wrap: true,
       },
-      width: "190px",
-    },
-    {
-      name: "Status",
-      selector: (row) => (
-      getStatusColor(row.status)
-      ),
-      center: true,
-    },
-  ], [user]);
+      {
+        name: "Transaction Id",
+        selector: (row) => (
+          <Tooltip title={row?.txn_id}>
+            <div style={{ textAlign: "left" }}>{capitalize1(row?.txn_id)}</div>
+          </Tooltip>
+        ),
+        width: "185px",
+        wrap: true,
+      },
+      {
+        name: "Amount",
+        selector: (row) => {
+          const isCredit = row.txn_type === "CR";
+          const sign = isCredit ? "+" : "-";
+          const color = isCredit ? "green" : "red";
+
+          return (
+            <Tooltip title={row?.amount}>
+              <div
+                style={{
+                  textAlign: "left",
+                  color: color,
+                  fontWeight: 500,
+                }}
+              >
+                {sign} {parseFloat(row?.amount).toFixed(2)}
+              </div>
+            </Tooltip>
+          );
+        },
+      },
+
+      {
+        name: "Opening",
+        selector: (row) => (
+          <Tooltip title={row?.opening_balance}>
+            <div style={{ textAlign: "left" }}>
+              {parseFloat(row?.opening_balance).toFixed(2)}
+            </div>
+          </Tooltip>
+        ),
+      },
+      {
+        name: "Closing",
+        selector: (row) => (
+          <Tooltip title={row?.closing_balance}>
+            <div style={{ textAlign: "left" }}>
+              {parseFloat(row?.closing_balance).toFixed(2)}
+            </div>
+          </Tooltip>
+        ),
+      },
+
+      {
+        name: "Status",
+        selector: (row) => <CommonStatus value={row.status} />,
+        center: true,
+      },
+    ],
+    [user]
+  );
 
   const queryParam = "type_txn=LEDGER";
 
   return (
-    <CommonTable
-      columns={columns}
-      endpoint={ApiEndpoints.GET_TRANSACTIONS}
-      filters={filters}
-      queryParam={queryParam}
-      // refreshInterval={30000}
-    />
+    <>
+      {/* Loader */}
+      <CommonLoader loading={loading} text="Loading Fund Requests" />
+
+      {/* Table */}
+      {!loading && (
+        <CommonTable
+          columns={columns}
+          endpoint={ApiEndpoints.GET_WALLETLEDGER}
+          filters={filters}
+          queryParam={queryParam}
+          refresh={true}
+        />
+      )}
+    </>
   );
 };
 

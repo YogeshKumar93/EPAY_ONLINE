@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Box, Button, IconButton, Tooltip } from "@mui/material";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -7,11 +7,16 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import CreateAccount from "./CreateAccount";
 import UpdateAccount from "./UpdateAccount";
 import DeleteAccount from "./DeleteAccount";
-
+import DescriptionIcon from "@mui/icons-material/Description";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CommonTable from "../components/common/CommonTable";
+import ReButton from "../components/common/ReButton";
+import CommonStatus from "../components/common/CommonStatus";
+import CommonLoader from "../components/common/CommonLoader";
+import AuthContext from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
-const Accounts = ( ) => {
+const Accounts = ({ filters = [] }) => {
   const [openCreate, setOpenCreate] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -19,133 +24,191 @@ const Accounts = ( ) => {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Manual refresh trigger
-  const handleManualRefresh = () => {
-    // CommonTable will handle fetch since endpoint is passed
+  const fetchUsersRef = useRef(null);
+  const authCtx = useContext(AuthContext);
+  const user = authCtx?.user;
+  const navigate = useNavigate();
+
+  const handleFetchRef = (fetchFn) => {
+    fetchUsersRef.current = fetchFn;
   };
+
+  const refreshUsers = () => {
+    if (fetchUsersRef.current) {
+      fetchUsersRef.current();
+    }
+  };
+
+  const handleAccountStatement = (row) => {
+    navigate(`/admin/accountstatements/${row.id}`, {
+      state: { account_id: row.id },
+    });
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // ✅ Add new account
   const handleSaveCreate = (newAccount) => {
     setAccounts((prev) => [newAccount, ...prev]);
-    handleManualRefresh();
     setOpenCreate(false);
   };
 
-  // ✅ Update existing account
-  const handleSaveUpdate = (updatedAccount) => {
-    setAccounts((prev) =>
-      prev.map((acc) => (acc.id === updatedAccount.id ? updatedAccount : acc))
-    );
-    
-    // handleManualRefresh();
-    // setOpenUpdate(false);
-    // setSelectedAccount(null);
-  };
-
-  // ✅ Handle edit
- const handleEdit = (row) => {
-  setSelectedAccount(row);
-  setOpenUpdate(true);
-};
-
-
-  // ✅ Handle delete
-  const handleDelete = (row) => {
-    setSelectedAccount(row);
-    setOpenDelete(true);
-  };
-
   // ✅ Columns definition
-  const columns = [
-    { name: "Name", selector: (row) => row.name },
-    { name: "User ID", selector: (row) => row.user_id },
-    { name: "Establishment", selector: (row) => row.establishment },
-    { name: "Mobile", selector: (row) => row.mobile },
-    { name: "Type", selector: (row) => row.type },
-    { name: "ASM", selector: (row) => row.asm || "-" },
-    { name: "Credit Limit", selector: (row) => row.credit_limit },
-    { name: "Balance", selector: (row) => row.balance },
-    {
-      name: "Status",
-      selector: (row) => (row.status === 1 ? "Active" : "Inactive"),
-    },
-    {
-      name: "Actions",
-      selector: (row) => (
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <Tooltip title="Edit">
-            <IconButton color="primary" onClick={() => handleEdit(row)}>
-              <EditIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Delete">
-            <IconButton color="error" onClick={() => handleDelete(row)}>
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+ const columns = [
+  { name: "Name", selector: (row) => row.name },
+  { name: "User ID", selector: (row) => row.user_id },
+  { name: "Establishment", selector: (row) => row.establishment },
+  { name: "Mobile", selector: (row) => row.mobile },
+  { name: "Type", selector: (row) => row.type },
+  { name: "ASM", selector: (row) => row.asm || "-" },
+  { name: "Credit Limit", selector: (row) => row.credit_limit },
+  { name: "Balance", selector: (row) => row.balance },
+  {
+    name: "Status",
+    selector: (row) => <CommonStatus value={row.status} />,
+  },
+  {
+    name: "Actions",
+    selector: (row, { hoveredRow, enableActionsHover }) => {
+      const isHovered = hoveredRow === row.id || !enableActionsHover;
+
+      return (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minWidth: "120px", // stable width
+          }}
+        >
+          {isHovered ? (
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                transition: "opacity 0.2s ease-in-out",
+              }}
+            >
+              <Tooltip title="Account Statement">
+                <IconButton
+                  color="info"
+                  size="small"
+                  onClick={() => handleAccountStatement(row)}
+                >
+                  <DescriptionIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="Edit">
+                <IconButton
+                  color="primary"
+                  size="small"
+                  onClick={() => {
+                    setSelectedAccount(row);
+                    setOpenUpdate(true);
+                  }}
+                >
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="Delete">
+                <IconButton
+                  color="error"
+                  size="small"
+                  onClick={() => {
+                    setSelectedAccount(row);
+                    setOpenDelete(true);
+                  }}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          ) : (
+            <Typography
+              variant="body2"
+              sx={{ color: "#999", textAlign: "center", minWidth: "120px" }}
+            >
+              -
+            </Typography>
+          )}
         </Box>
-      ),
+      );
     },
-  ];
+    width: "120px",
+    center: true,
+  },
+];
+
+
+  const queryParam = "";
 
   return (
-    <Box sx={{ p: 3 }}>
-      {/* ✅ Header */}
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          sx={{ bgcolor: "#1CA895" }}
-          onClick={() => setOpenCreate(true)}
-        >
-          Create Account
-        </Button>
-      </Box>
+    <>
+      <CommonLoader loading={loading} text="Loading Fund Requests" />
 
-      {/* ✅ Table */}
-      <CommonTable
-        title="Accounts"
-        columns={columns}
-        loading={loading}
-        endpoint={ApiEndpoints.GET_ACCOUNTS}
-        handleManualRefresh={handleManualRefresh}
-          
-      />
+      {!loading && (
+        <Box>
+          {/* ✅ Table */}
+          <CommonTable
+            columns={columns}
+            loading={loading}
+            endpoint={ApiEndpoints.GET_ACCOUNTS}
+            onFetchRef={handleFetchRef}
+            filters={filters}
+            queryParam={queryParam}
+            customHeader={
+              <ReButton
+                variant="contained"
+                label="Account"
+                startIcon={<AddIcon />}
+                onClick={() => setOpenCreate(true)}
+              />
+            }
+          />
 
-      {/* ✅ Create Account Modal */}
-      <CreateAccount
-        open={openCreate}
-        handleClose={() => setOpenCreate(false)}
-        handleSave={handleSaveCreate}
-      />
+          {/* ✅ Create Account Modal */}
+          <CreateAccount
+            open={openCreate}
+            handleClose={() => setOpenCreate(false)}
+            handleSave={handleSaveCreate}
+            onFetchRef={refreshUsers} // ✅ trigger fetch after create
+          />
 
-      {/* ✅ Update Account Modal */}
-    {openUpdate && selectedAccount && (
-  <UpdateAccount
-    open={openUpdate}
-    handleClose={() => {
-      setOpenUpdate(false);
-      setSelectedAccount(null);
-    }}
-    handleSave={handleSaveUpdate}
-    selectedAccount={selectedAccount}
-  />
-)}
+          {/* ✅ Update Account Modal */}
+          {openUpdate && selectedAccount && (
+            <UpdateAccount
+              open={openUpdate}
+              handleClose={() => {
+                setOpenUpdate(false);
+                setSelectedAccount(null);
+              }}
+              selectedAccount={selectedAccount}
+              onFetchRef={refreshUsers} // ✅ trigger fetch after update
+            />
+          )}
 
-
-      {/* ✅ Delete Account Modal */}
-      {selectedAccount && (
-        <DeleteAccount
-          open={openDelete}
-          handleClose={() => {
-            setOpenDelete(false);
-            setSelectedAccount(null);
-          }}
-          selectedAccount={selectedAccount}
-         
-        />
+          {/* ✅ Delete Account Modal */}
+          {openDelete && selectedAccount && (
+            <DeleteAccount
+              open={openDelete}
+              handleClose={() => {
+                setOpenDelete(false);
+                setSelectedAccount(null);
+              }}
+              selectedAccount={selectedAccount}
+              onFetchRef={refreshUsers} // ✅ trigger fetch after delete
+            />
+          )}
+        </Box>
       )}
-    </Box>
+    </>
   );
 };
 

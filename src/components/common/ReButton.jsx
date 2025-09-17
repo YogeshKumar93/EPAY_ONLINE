@@ -1,42 +1,40 @@
-import React from "react";
-import {
-  Box,
-  Stack,
-  TextField,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormHelperText
-} from "@mui/material";
-export const ReButton = ({
-  lable,
-  onClick,
-  type = "button",
-  variant = "contained",
-  size = "medium",
-  fullWidth = false,
-  disabled = false,
-  startIcon,
-  endIcon,
-  color = "primary",
-  ...props
-}) => {
+// ReButton.js
+import React, { useContext } from "react";
+import { Button } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import AuthContext from "../../contexts/AuthContext";
+
+// Fallback defaults
+const DEFAULT_BG = "orange";
+const DEFAULT_TEXT = "#000";
+
+const ReButton = ({ label, onClick, startIcon = <AddIcon /> }) => {
+  const { colours } = useContext(AuthContext);
+
+  // pick from API or fallback
+  const bgColor = colours?.button_color || DEFAULT_BG;
+  const textColor = colours?.text_color || DEFAULT_TEXT;
+
   return (
     <Button
-      onClick={onClick}
-      type={type}
-      variant={variant}
-      size={size}
-      fullWidth={fullWidth}
-      disabled={disabled}
+      variant="contained"
+      size="medium"
       startIcon={startIcon}
-      endIcon={endIcon}
-      color={color}
-      {...props}
+      onClick={onClick}
+      sx={{
+        backgroundColor: bgColor,
+        color: "#FFFF",
+        textTransform: "none",
+        fontWeight: 500,
+        "&:hover": {
+          backgroundColor: bgColor,
+          opacity: 0.9,
+        },
+      }}
     >
-      {lable}
+      {label}
     </Button>
   );
 };
+
+export default ReButton;

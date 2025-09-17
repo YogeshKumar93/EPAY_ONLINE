@@ -59,7 +59,7 @@
 //       error: { icon: <ErrorIcon />, color: theme.palette.error.main },
 //       help: { icon: <HelpIcon />, color: theme.palette.primary.main },
 //     };
-    
+
 //     const { icon, color } = iconConfig[iconType] || iconConfig.info;
 //     return React.cloneElement(icon, { sx: { color, fontSize: 24 } });
 //   };
@@ -67,13 +67,13 @@
 //   // Determine maxWidth value
 //   const getMaxWidth = () => {
 //     if (maxWidth) return maxWidth;
-    
+
 //     const sizeMap = {
 //       small: 'sm',
 //       medium: 'md',
 //       large: 'lg'
 //     };
-    
+
 //     return sizeMap[size] || 'md';
 //   };
 
@@ -93,10 +93,10 @@
 //       }}
 //     >
 //       {/* Header */}
-//       <DialogTitle sx={{ 
-//         m: 0, 
-//         p: 3, 
-//         display: 'flex', 
+//       <DialogTitle sx={{
+//         m: 0,
+//         p: 3,
+//         display: 'flex',
 //         alignItems: 'center',
 //         borderBottom: dividers ? 1 : 0,
 //         borderColor: 'divider',
@@ -111,7 +111,7 @@
 //             {title}
 //           </Typography>
 //         </Box>
-        
+
 //         {showCloseButton && (
 //           <IconButton
 //             aria-label="close"
@@ -132,8 +132,8 @@
 
 //       {/* Footer */}
 //       {footerButtons && footerButtons.length > 0 && (
-//         <DialogActions sx={{ 
-//           p: 2, 
+//         <DialogActions sx={{
+//           p: 2,
 //           gap: 1,
 //           borderTop: dividers ? 1 : 0,
 //           borderColor: 'divider',
@@ -164,13 +164,7 @@
 
 // CommonModal.js
 
-
-
-
-
-
-
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -188,6 +182,8 @@ import {
   Radio,
   RadioGroup,
   FormLabel,
+  TextField,
+  Autocomplete,
 } from "@mui/material";
 import {
   Close as CloseIcon,
@@ -197,13 +193,58 @@ import {
   Info as InfoIcon,
   Help as HelpIcon,
 } from "@mui/icons-material";
-import { ReTextField } from "./ReTextField"; // ✅ custom wrapper (TextField base)
+import { ReTextField } from "./ReTextField";
 import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
+import { apiCall } from "../../api/apiClient";
 
-// ✅ Extended Common Form Field
-const CommonFormField = ({ field, formData, handleChange, errors, loading }) => {
-  const { name, label, type, options = [], props = {} } = field;
+// ✅ Fixed Common Form Field with API integration
+const CommonFormField = ({
+  field,
+  formData,
+  handleChange,
+  errors,
+  loading,
+}) => {
+  const { name, label, type, options = [], apiOptions, props = {} } = field;
+  const [dynamicOptions, setDynamicOptions] = useState([]);
+  const [optionsLoading, setOptionsLoading] = useState(false);
+  console.log("The field in common form field is", field);
+  useEffect(() => {
+    if (!apiOptions) return;
+
+    const fetchOptions = async () => {
+      try {
+        setOptionsLoading(true);
+        console.log(`Fetching options for ${name} from ${apiOptions.endpoint}`);
+
+        const res = await apiCall(
+          apiOptions.method || "post",
+          apiOptions.endpoint
+        );
+        console.log(`API response for ${name}:`, res);
+
+        const rawData = res?.response?.data || res?.data || []; // Changed from res?.data?.data
+        console.log(`Raw data for ${name}:`, rawData);
+
+        const mapped = apiOptions.mapOptions
+          ? apiOptions.mapOptions(rawData)
+          : rawData;
+        console.log(`Mapped options for ${name}:`, mapped);
+
+        setDynamicOptions(mapped);
+      } catch (err) {
+        console.error(`Error fetching options for ${name}:`, err);
+        setDynamicOptions([]);
+      } finally {
+        setOptionsLoading(false);
+      }
+    };
+
+    fetchOptions();
+  }, [apiOptions, name]);
+
+  const finalOptions = dynamicOptions.length > 0 ? dynamicOptions : options;
 
   // Helper to show error state
   const getErrorProps = () => ({
@@ -213,7 +254,78 @@ const CommonFormField = ({ field, formData, handleChange, errors, loading }) => 
 
   // Switch between field types
   switch (type) {
+    case "datepicker":
+      return (
+        <DatePicker
+          label={label}
+          value={formData[name] ? dayjs(formData[name]) : null}
+          onChange={(newValue) =>
+            handleChange({
+              target: {
+                name,
+                // ✅ send formatted date instead of timestamp
+                value: newValue ? dayjs(newValue).format("YYYY-MM-DD") : "",
+              },
+            })
+          }
+          slotProps={{
+            textField: {
+              fullWidth: true,
+              ...getErrorProps(),
+            },
+          }}
+          disabled={loading}
+          {...props}
+        />
+      );
+    case "autocomplete":
+      return (
+        <Autocomplete
+          options={finalOptions}
+          getOptionLabel={(opt) => {
+            if (!opt) return "";
+            if (typeof opt === "string") return opt;
+            return (
+              opt.label ?? opt.name ?? opt.bank_name ?? String(opt.value ?? "")
+            );
+          }}
+          value={
+            finalOptions.find(
+              (opt) =>
+                opt?.value === formData[name] ||
+                opt?.id === formData[name] ||
+                opt?.bank_id === formData[name]
+            ) || null
+          }
+          onChange={(e, newValue) => {
+            handleChange({
+              target: {
+                name,
+                value:
+                  newValue?.value ??
+                  newValue?.id ??
+                  newValue?.bank_id ??
+                  newValue ??
+                  "",
+              },
+            });
+          }}
+          loading={optionsLoading}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={label}
+              fullWidth
+              {...getErrorProps()}
+            />
+          )}
+          disabled={loading || optionsLoading}
+          {...props}
+        />
+      );
+
     case "select":
+    case "dropdown":
       return (
         <ReTextField
           select
@@ -222,148 +334,125 @@ const CommonFormField = ({ field, formData, handleChange, errors, loading }) => 
           name={name}
           value={formData[name] || ""}
           onChange={handleChange}
-          disabled={loading}
-          {...getErrorProps()}
-          {...props}
+          disabled={loading || optionsLoading}
+          error={!!errors[name]}
+          helperText={errors[name]}
         >
-          {options.map((option, i) => (
-            <MenuItem key={i} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
+          {optionsLoading ? (
+            <MenuItem disabled>Loading options...</MenuItem>
+          ) : finalOptions && finalOptions.length > 0 ? (
+            finalOptions.map((opt, i) => {
+              // ✅ Normalize both object & string options
+              if (typeof opt === "string") {
+                return (
+                  <MenuItem key={i} value={opt}>
+                    {opt}
+                  </MenuItem>
+                );
+              }
+              // if object with id/bank_name
+              const value = opt.value ?? opt.id ?? opt.bank_id ?? i;
+              const label =
+                opt.label ?? opt.bank_name ?? opt.name ?? String(value);
+              return (
+                <MenuItem key={value} value={value}>
+                  {label}
+                </MenuItem>
+              );
+            })
+          ) : (
+            <MenuItem disabled>No options available</MenuItem>
+          )}
         </ReTextField>
       );
 
-   case "datepicker":
-  return (
-    <DatePicker
-      label={label}
-      value={formData[name] ? dayjs(formData[name]) : null}
-      onChange={(newValue) =>
-        handleChange({ target: { name, value: newValue?.toISOString() } })
-      }
-      slotProps={{
-        textField: {
-          fullWidth: true,
-          ...getErrorProps(),
-        },
-      }}
-      disabled={loading}
-      {...props}
-    />
-  );
-
- case "timepicker":
-  return (
-    <TimePicker
-      label={label}
-      value={formData[name] ? dayjs(formData[name]) : null}
-      onChange={(newValue) =>
-        handleChange({ target: { name, value: newValue?.toISOString() } })
-      }
-      slotProps={{
-        textField: {
-          fullWidth: true,
-          ...getErrorProps(),
-        },
-      }}
-      disabled={loading}
-      {...props}
-    />
-  );
-
-    case "email":
+    case "timepicker":
       return (
-        <ReTextField
-          fullWidth
-          type="email"
+        <TimePicker
           label={label}
-          name={name}
-          value={formData[name] || ""}
-          onChange={handleChange}
-          disabled={loading}
-          {...getErrorProps()}
-          {...props}
-        />
-      );
-
-    case "phone":
-      return (
-        <ReTextField
-          fullWidth
-          type="tel"
-          label={label}
-          name={name}
-          value={formData[name] || ""}
-          onChange={handleChange}
-          disabled={loading}
-          inputProps={{ pattern: "[0-9]{10}", maxLength: 10 }}
-          {...getErrorProps()}
-          {...props}
-        />
-      );
-
-    case "password":
-      return (
-        <ReTextField
-          fullWidth
-          type="password"
-          label={label}
-          name={name}
-          value={formData[name] || ""}
-          onChange={handleChange}
-          disabled={loading}
-          {...getErrorProps()}
-          {...props}
-        />
-      );
-
-    case "checkbox":
-      return (
-        <FormControlLabel
-          control={
-            <Checkbox
-              name={name}
-              checked={!!formData[name]}
-              onChange={(e) =>
-                handleChange({
-                  target: { name, value: e.target.checked },
-                })
-              }
-              disabled={loading}
-              {...props}
-            />
+          value={formData[name] ? dayjs(formData[name]) : null}
+          onChange={(newValue) =>
+            handleChange({ target: { name, value: newValue?.toISOString() } })
           }
-          label={label}
+          slotProps={{
+            textField: {
+              fullWidth: true,
+              ...getErrorProps(),
+            },
+          }}
+          disabled={loading}
+          {...props}
         />
       );
 
-    case "radio":
+    case "colorpicker":
+    case "color":
+    case "color_code":
       return (
-        <Box>
-          <FormLabel>{label}</FormLabel>
-          <RadioGroup
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          {/* Color Picker */}
+          <input
+            type="color"
             name={name}
-            value={formData[name] || ""}
+            value={formData[name] || "#000000"}
+            onChange={(e) => handleChange(e)}
+            disabled={loading}
+            style={{
+              width: "50px",
+              height: "40px",
+              border: "1px solid #ccc",
+              borderRadius: "6px",
+              cursor: "pointer",
+              padding: 0,
+            }}
+            {...props}
+          />
+
+          {/* Manual Hex Input */}
+          <ReTextField
+            label={label || "Color Code"}
+            name={name}
+            value={formData[name] || "#000000"}
             onChange={handleChange}
-          >
-            {options.map((option, i) => (
-              <FormControlLabel
-                key={i}
-                value={option.value}
-                control={<Radio />}
-                label={option.label}
-              />
-            ))}
-          </RadioGroup>
-          {errors[name] && (
-            <Typography color="error" variant="caption">
-              {errors[name]}
-            </Typography>
-          )}
+            disabled={loading}
+            placeholder="#000000"
+            sx={{ flex: 1 }}
+            {...getErrorProps()}
+          />
         </Box>
       );
 
+    case "color":
+    case "color_code": // if schema only sends name= color_code but type=text
+      return (
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+            {label || "Color"}
+          </Typography>
+          <input
+            type="color"
+            name={name}
+            value={formData[name] || "#000000"} // default to black
+            onChange={(e) => handleChange(e)}
+            disabled={loading}
+            style={{
+              width: "100%",
+              height: "40px",
+              border: "1px solid #ccc",
+              borderRadius: "6px",
+              cursor: "pointer",
+              background: formData[name] || "#fff",
+            }}
+            {...props}
+          />
+          {/* optional hex code */}
+          <Typography variant="caption" color="text.secondary">
+            {formData[name] || "#000000"}
+          </Typography>
+        </Box>
+      );
+
+    // Other field types remain the same
     default:
       return (
         <ReTextField
@@ -373,7 +462,7 @@ const CommonFormField = ({ field, formData, handleChange, errors, loading }) => 
           type={type || "text"}
           value={formData[name] || ""}
           onChange={handleChange}
-          disabled={loading}
+          disabled={field.disabled || loading}
           {...getErrorProps()}
           {...props}
         />
@@ -381,7 +470,7 @@ const CommonFormField = ({ field, formData, handleChange, errors, loading }) => 
   }
 };
 
-// ✅ CommonModal (same as before, only fieldConfig extended)
+// ✅ CommonModal Component
 const CommonModal = ({
   open = false,
   onClose,
@@ -396,7 +485,7 @@ const CommonModal = ({
   showCloseButton = true,
   closeOnBackdropClick = true,
   maxWidth,
-  dividers = false,
+  dividers = true,
   fieldConfig = [],
   formData = {},
   handleChange = () => {},
@@ -433,19 +522,26 @@ const CommonModal = ({
     const sizeMap = { small: "sm", medium: "md", large: "lg" };
     return sizeMap[size] || "md";
   };
-
+  console.log("The field config in common modal is", fieldConfig);
   return (
     <Dialog
       open={open}
-      onClose={closeOnBackdropClick ? onClose : null}
+      onClose={onClose}
       fullScreen={fullScreen}
       maxWidth={getMaxWidth()}
       fullWidth
       aria-labelledby="modal-title"
       PaperProps={{
         sx: {
-          borderRadius: 2,
-          boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+          borderRadius: { xs: 0, sm: 2 },
+          boxShadow: { xs: "none", sm: "0 10px 40px rgba(0,0,0,0.1)" },
+          bgcolor: "#FFFFFF",
+          fontFamily: '"DM Sans", sans-serif !important',
+          maxHeight: "90vh",
+          overflow: "hidden",
+          "& *": {
+            fontFamily: '"DM Sans", sans-serif !important',
+          },
         },
       }}
     >
@@ -458,20 +554,27 @@ const CommonModal = ({
           alignItems: "center",
           borderBottom: dividers ? 1 : 0,
           borderColor: "divider",
-          bgcolor: "#014C50",
-          color: "white",
+          color: "#344357",
+          fontFamily: '"DM Sans", sans-serif',
+          backgroundColor: "#f8fafc",
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexGrow: 1,
-          }}
-        >
-          <Box sx={{ mr: 1.5, display: "flex" }}>{getIcon()}</Box>
-          <Typography variant="h5" component="h2" id="modal-title">
+        <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
+          <Box sx={{ mr: 1.5, display: "flex", color: "#4f46e5" }}>
+            {getIcon()}
+          </Box>
+          <Typography
+            variant="h5"
+            component="h2"
+            id="modal-title"
+            sx={{
+              color: "#1e293b",
+              fontFamily: '"DM Sans", sans-serif',
+              fontWeight: 550,
+              fontSize: { xs: "1.25rem", sm: "1.5rem" },
+              color:"#364a63",
+            }}
+          >
             {title}
           </Typography>
         </Box>
@@ -481,6 +584,9 @@ const CommonModal = ({
             onClick={onClose}
             sx={{
               color: (theme) => theme.palette.grey[500],
+              "&:hover": {
+                backgroundColor: "rgba(0,0,0,0.04)",
+              },
             }}
           >
             <CloseIcon />
@@ -489,37 +595,65 @@ const CommonModal = ({
       </DialogTitle>
 
       {/* Content */}
-     <DialogContent dividers={dividers} sx={{ p: 3 }}>
-  {fieldConfig.length > 0 ? (
-    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-      {fieldConfig.map((field, i) => (
-        <Box key={i} sx={{ flex: "1 1 calc(50% - 16px)" }}>
-          <CommonFormField
-            field={field}
-            formData={formData}
-            handleChange={handleChange}
-            errors={errors}
-            loading={loading}
-          />
-        </Box>
-      ))}
-    </Box>
-  ) : (
-    children
-  )}
-</DialogContent>
-
+      {/* Content */}
+      <DialogContent
+        dividers={dividers}
+        sx={{
+          p: 4,
+          backgroundColor: "#ffffff",
+          overflowY: "auto",
+          maxHeight: "calc(90vh - 140px)",
+        }}
+      >
+        {fieldConfig.length > 0 ? (
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)" }, // ✅ 2 fields per row on sm+, 1 per row on xs
+              gap: 3, // spacing between fields
+              alignItems: "start",
+              mt: 1.4,
+            }}
+          >
+            {fieldConfig.map((field, i) => (
+              <Box
+                key={i}
+                sx={{
+                  gridColumn: field.fullWidth ? "1 / -1" : "auto", // fullWidth fields span both columns
+                  minWidth: 0,
+                }}
+              >
+                <CommonFormField
+                  field={field}
+                  formData={formData}
+                  handleChange={handleChange}
+                  errors={errors}
+                  loading={loading}
+                />
+              </Box>
+            ))}
+          </Box>
+        ) : (
+          children
+        )}
+      </DialogContent>
 
       {/* Footer */}
       {footerButtons && footerButtons.length > 0 && (
         <DialogActions
           sx={{
-            p: 2,
+            p: { xs: 2, sm: 3 },
             gap: 1,
             borderTop: dividers ? 1 : 0,
             borderColor: "divider",
-            bgcolor: "#014C50",
-            color: "white",
+            bgcolor: "#f8fafc",
+            color: "#344357",
+            fontFamily: '"DM Sans", sans-serif',
+            flexDirection: { xs: "column", sm: "row" },
+            "& > *": {
+              width: { xs: "100%", sm: "auto" },
+              mx: { xs: 0, sm: 0.5 },
+            },
           }}
         >
           {footerButtons.map((button, index) => (
@@ -531,7 +665,15 @@ const CommonModal = ({
               startIcon={button.startIcon}
               endIcon={button.endIcon}
               disabled={button.disabled}
-              sx={{ borderRadius: 2 }}
+              sx={{
+                fontFamily: '"DM Sans", sans-serif !important',
+                backgroundColor:
+                  button.text.toLowerCase() === "cancel"
+                    ? "#8094ae !important"
+                    : "#854fff",
+                color: "#fff",
+                textTransform: "none",
+              }}
             >
               {button.text}
             </Button>
@@ -543,4 +685,3 @@ const CommonModal = ({
 };
 
 export default CommonModal;
-

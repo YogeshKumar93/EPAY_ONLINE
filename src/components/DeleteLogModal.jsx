@@ -3,7 +3,7 @@ import CommonModal from "../components/common/CommonModal";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 
-const DeleteLogModal = ({ open, onClose, logId, onSuccess }) => {
+const DeleteLogModal = ({ open, onClose, logId, onFetchRef }) => {
   const handleDelete = async () => {
     const { error, response } = await apiCall(
       "POST",
@@ -12,7 +12,7 @@ const DeleteLogModal = ({ open, onClose, logId, onSuccess }) => {
     );
 
     if (!error && response?.status) {
-      onSuccess?.();
+      onFetchRef();
       onClose();
     } else {
       alert("Delete failed: " + (error?.message || response?.message));

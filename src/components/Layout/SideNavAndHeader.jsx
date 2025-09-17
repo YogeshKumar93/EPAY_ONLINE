@@ -21,6 +21,7 @@ import {
   Grid,
   styled,
   Button,
+  Tooltip,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
@@ -37,14 +38,39 @@ import {
   AccountCircle,
 } from "@mui/icons-material";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
-import { Admin_nav, customer_nav, nav } from "./navConfig";
+import {
+  Admin_nav,
+  api_nav,
+  asm_nav,
+  customer_nav,
+  di_nav,
+  md_nav,
+  nav,
+  service_nav,
+  zsm_nav,
+} from "./navConfig";
 import AuthContext from "../../contexts/AuthContext";
+import { Switch } from "@mui/material";
+
 {
   /* App Bar with reduced height */
 }
 import RefreshIcon from "@mui/icons-material/Refresh";
 import Notification from "../Notification/Notification";
 import NotificationModal from "../Notification/NotificationModal";
+import { setTitleFunc } from "../../utils/HeaderTitleUtil";
+import TimelineIcon from "@mui/icons-material/Timeline";
+import defaultMaleAvatar from "../../assets/Images/male_avtar.jpg";
+import defaultMaleAvatar2 from "../../assets/Images/male_avtar2.jpg";
+import logo from "../../assets/Images/logo(1).png"; // adjust path
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+// import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
+import EmailIcon from "@mui/icons-material/Email";
+import CameraAltIcon from "@mui/icons-material/CameraAlt";
+
+// ✅ Default male avatar image (replace with your own asset if available)
 
 // Navigation configuration
 
@@ -54,7 +80,29 @@ const roleNavigation = {
   sadm: Admin_nav,
   ret: customer_nav,
   dd: customer_nav,
+  service_nav: service_nav,
+  di: di_nav,
+  asm: asm_nav,
+  zsm: zsm_nav,
+  api: api_nav,
+  md: md_nav,
 };
+
+const roleRoutes = {
+  adm: "/admin/profile",
+  sadm: "/admin/profile",
+  Asm: "/asm/profile",
+  dd: "/customer/profile",
+  ret: "/customer/profile",
+  Ret: "/customer/profile",
+  Dd: "/customer/profile",
+  Zsm: "/zsm/profile",
+  Ad: "/ad/profile",
+  Md: "/md/profile",
+  Api: "/api-user/profile",
+};
+
+ 
 
 const themeSettings = {
   drawerWidth: 240,
@@ -74,18 +122,32 @@ const themeSettings = {
 
 const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
   // console.log("inroute",userRole);
+  const roleLabels = {
+    adm: "Admin",
+    sadm: "Super Admin",
+    ret: "Retailer",
+    dd: "DD",
+    user: "User",
+  };
+
+  const { colours } = useContext(AuthContext);
 
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
+  const userLayout = user?.is_layout;
   const refreshUser = authCtx.loadUserProfile;
+  const colour = authCtx.loadColours;
   const isMobile = useMediaQuery("(max-width: 900px)");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [desktopOpen, setDesktopOpen] = useState(true);
   const [userMenuAnchor, setUserMenuAnchor] = useState(null);
   const [expandedItems, setExpandedItems] = useState({});
+  const [preview, setPreview] = useState(user?.profile_image || "");
+  const [darkMode, setDarkMode] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
-
+  const title = setTitleFunc(location.pathname, location.state);
   const MainContent = styled(Box)(({ theme }) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
@@ -96,22 +158,33 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    [theme.breakpoints.down("sm")]: {
-      minWidth: "90%",
-      padding: theme.spacing(1.5),
-    },
-    [theme.breakpoints.between("sm", "md")]: {
-      minWidth: "768px",
-    },
-    [theme.breakpoints.up("md")]: {
-      minWidth: "1024px",
-    },
-    [theme.breakpoints.up("lg")]: {
-      minWidth: desktopOpen ? "1310px" : "1550px",
-    },
   }));
 
-  const navigationItems = roleNavigation[userRole] || nav;
+  const toggleDarkMode = () => {
+    setDarkMode((prev) => !prev);
+    // optional: save to localStorage
+    localStorage.setItem("darkMode", !darkMode);
+  };
+
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setPreview(URL.createObjectURL(file));
+      // 🔄 upload logic API call can be added here
+      console.log("Selected file:", file);
+    }
+  };
+
+  const getNavigationItems = () => {
+    if ((userRole === "ret" || userRole === "dd") && userLayout === 2) {
+      return service_nav; // Show service nav for layout 2
+    }
+
+    // Default navigation based on role
+    return roleNavigation[userRole] || nav;
+  };
+
+  const navigationItems = getNavigationItems();
 
   const handleDrawerToggle = () => {
     if (isMobile) {
@@ -160,35 +233,83 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
       const isExpanded = expandedItems[item.to] || false;
 
       return (
-        <Box key={index} className="nav-item">
+        <Box
+          key={index}
+          className=""
+          sx={{
+            padding: "4px 12px",
+          }}
+        >
           <ListItem
             button
             onClick={() => handleNavigation(item.to, hasSubmenus)}
             sx={{
-              pl: 2 + level * 2,
-              backgroundColor: isItemActive
-                ? themeSettings.palette.primary.main
-                : "transparent",
-              color: isItemActive ? "#fff" : "text.primary",
+              position: "relative",
+              backgroundColor: isItemActive ? "#ebeef2" : "transparent",
+              color: isItemActive ? "#9769ff" : "#6e82a5",
+              borderRadius: "4px",
+              mb: 0,
               "&:hover": {
-                backgroundColor: isItemActive
-                  ? themeSettings.palette.primary.main
-                  : "action.hover",
+                backgroundColor: "#ebeef2", // hover pe bhi active jaisa bg
+                color: "#9769ff", // hover pe bhi active jaisa text color
+                "& .MuiListItemIcon-root img": {
+                  filter:
+                    "invert(41%) sepia(83%) saturate(7421%) hue-rotate(261deg) brightness(97%) contrast(101%)",
+                },
               },
-              mb: 0.5,
+
+              "&::before": isItemActive
+                ? {
+                    content: '""',
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    height: "100%",
+                    width: "4px",
+                    backgroundColor: "#9769ff", // left border only for active
+                    borderRadius: "2px",
+                    color: "#9769ff",
+                  }
+                : {},
             }}
-            className={isItemActive ? "nav-link active" : "nav-link"}
           >
             <ListItemIcon
-              sx={{ color: isItemActive ? "#fff" : "text.primary" }}
-              className="nav-icon"
+              sx={{
+                "& img": {
+                  width: 26,
+                  height: 26,
+                  filter: isItemActive
+                    ? "invert(41%) sepia(83%) saturate(7421%) hue-rotate(261deg) brightness(97%) contrast(101%)"
+                    : "none",
+                  transition: "filter 0.2s ease-in-out",
+                },
+                "&:hover img": {
+                  filter: isItemActive
+                    ? "invert(41%) sepia(83%) saturate(7421%) hue-rotate(261deg) brightness(97%) contrast(101%)"
+                    : "brightness(0) invert(0.6)",
+                },
+              }}
             >
-              {isItemActive ? item.icon2 : item.icon}
+              <img src={item.icon} alt={item.title} />
             </ListItemIcon>
 
             {(desktopOpen || isMobile) && (
               <>
-                <ListItemText primary={item.title} />
+                <ListItemText
+                  primary={item.title}
+                  sx={{
+                    "& .MuiTypography-root": {
+                      fontFamily: "DM Sans, sans-serif",
+                      fontWeight: 550,
+                      fontSize: "15px",
+                      color: isItemActive ? "#9769ff" : "#6e82a5", // ✅ active text color
+                    },
+                    ".MuiListItem-root:hover & .MuiTypography-root": {
+                      color: "#9769ff",
+                    },
+                  }}
+                />
+
                 {hasSubmenus &&
                   (isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />)}
               </>
@@ -211,7 +332,12 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
   const drawerContent = (
     <Box
       className="side-nav"
-      sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: colours?.sidenav,
+      }}
     >
       {/* Logo area with white background */}
       <Box
@@ -219,24 +345,24 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
         sx={{
           display: "flex",
           alignItems: "center",
-          justifyContent: desktopOpen ? "space-between" : "center",
+          justifyContent: desktopOpen ? "center" : "center",
           p: 1.5, // Reduced padding to decrease height
-          backgroundColor: "#ffffff",
+          backgroundColor: "#fff",
           height: "64px",
           borderBottom: `1px solid rgba(0, 0, 0, 0.12)`,
           minHeight: "64px", // Matching the header height
         }}
       >
         {desktopOpen && (
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            className="nav-title"
-            sx={{ fontWeight: "bold" }}
-          >
-            App Name
-          </Typography>
+          <Box
+            component="img"
+            src={logo}
+            alt="App Logo"
+            sx={{
+              height: 30, // adjust as needed
+              width: "auto",
+            }}
+          />
         )}
 
         {!isMobile && (
@@ -245,14 +371,54 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             className="text-primary"
             size="small"
           >
-            <ChevronLeftIcon />
+            {/* <ChevronLeftIcon /> */}
           </IconButton>
         )}
       </Box>
-
-      <List className="nav-list" sx={{ flexGrow: 1, overflowY: "auto" }}>
+      <List
+        className="nav-list"
+        sx={{
+          overflowY: "auto",
+          flexGrow: 1,
+          "&::-webkit-scrollbar": {
+            width: 0,
+            background: "transparent",
+          },
+          "-ms-overflow-style": "none", // IE/Edge
+          "scrollbar-width": "none", // Firefox
+        }}
+      >
         {renderNavItems(navigationItems)}
+        <MenuItem
+  disableRipple
+  onClick={() => {
+    handleLogout();
+    navigate("/login");
+  }}
+  sx={{
+    width: "100%",
+     
+    
+    px:8,
+    display: "flex",
+    
+    alignItems: "center",
+    color: "#9769ff",
+    borderRadius: "4px",
+    mb: 0,
+    "&:hover": {
+      backgroundColor: "#ebeef2", // hover bg
+      color: "#9769ff",           // hover text
+    },
+    gap: 1, // space between icon and text
+  }}
+>
+  <LogoutIcon fontSize="small" /> Logout
+</MenuItem>
+
       </List>
+
+      
     </Box>
   );
 
@@ -264,7 +430,9 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
       <AppBar
         position="fixed"
         sx={{
-          backgroundColor:"#0037D7",
+          backgroundColor: "#FFFF",
+          boxShadow: " rgba(0,0,0,0.08)",
+          // boxShadow: "none",
           width: {
             md: desktopOpen
               ? `calc(100% - ${themeSettings.drawerWidth}px)`
@@ -278,134 +446,192 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
               duration: theme.transitions.duration.leavingScreen,
             }),
           height: "64px", // Reduced header height
+
           justifyContent: "center",
         }}
         className="header"
       >
         <Toolbar sx={{ minHeight: "64px !important" }}>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
           <Typography
-            variant="h6"
+            variant="h5"
             noWrap
             component="div"
-            sx={{ flexGrow: 1 }}
-            className="text-xl font-semibold"
+            sx={{ flexGrow: 1, color: "#9769FF", fontWeight: 700 }}
           >
-            Dashboard
+            {title}
           </Typography>
-          {/* ✅ Refresh icon button with black color */}
           <IconButton onClick={refreshUser}>
-            <RefreshIcon sx={{ color: "black" }} />
+            <RefreshIcon sx={{ color: "yellow" }} />
           </IconButton>
-          <IconButton color="inherit" onClick={handleUserMenuOpen}>
-            <Avatar src={userAvatar} sx={{ width: 32, height: 32 }}>
-              {!userAvatar && <PersonIcon />}
-            </Avatar>
+
+          <IconButton onClick={colour}>
+            <RefreshIcon sx={{ color: "#fff" }} />
           </IconButton>
-          <NotificationModal />
+
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
+            <NotificationModal />
+            <IconButton
+              color="inherit"
+              onClick={handleUserMenuOpen}
+              sx={{ p: 0, mr: 0.5 }} // padding remove
+            >
+              <Avatar
+                sx={{
+                  width: 30,
+                  height: 30,
+                  bgcolor: "#9769FF",
+                }}
+              >
+                <PersonOutlineIcon sx={{ color: "#FFF", fontSize: 20 }} />
+              </Avatar>
+            </IconButton>
+
+            {/* Role + Name as separate text (not clickable) */}
+            <Box onClick={handleUserMenuOpen} sx={{ display: "flex", flexDirection: "column",   cursor: "pointer"  }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 500,
+                  color: "#9769FF",
+                  fontSize: "11px",
+                  lineHeight: 1,
+                }}
+              >
+                {roleLabels[user?.role] || "User"}
+              </Typography>
+
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: 600,
+                    color: "#526484",
+                    fontSize: "12px",
+                    lineHeight: "16px",
+                  }}
+                >
+                  {user?.name || userName}
+                </Typography>
+
+                <IconButton
+                  onClick={handleUserMenuOpen}
+                  sx={{ p: 0, ml: 1, width: 20, height: 20 }}
+                >
+                  <ExpandMoreIcon sx={{ fontSize: 20, color: "#9769FF" }} />
+                </IconButton>
+              </Box>
+            </Box>
+          </Box>
 
           <Menu
             anchorEl={userMenuAnchor}
             open={Boolean(userMenuAnchor)}
             onClose={handleUserMenuClose}
-            onClick={handleUserMenuClose}
-            transformOrigin={{ horizontal: "right", vertical: "top" }}
+            transformOrigin={{ horizontal: "right", vertical: "right" }}
             anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+            PaperProps={{
+              elevation: 1,
+              sx: {
+                mt: 2,
+                borderRadius: "6px",
+                overflow: "hidden",
+                minWidth: 320,
+               
+              },
+            }}
           >
-            <MenuItem disabled>
-              <ListItemIcon>
-                <PersonIcon fontSize="small" />
-              </ListItemIcon>
-              <span className="text-base font-medium">{userName}</span>
-            </MenuItem>
+            {/* Profile Header */}
+            <Box
+              sx={{
+                px: 3.5,
+                py: 2,
+                 fontStyle:"revert",
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+                 color:"#220ad7ff",
+                bgcolor:"#e6eef4ff",
+                borderTop:"6px solid #9769FF ",
+              }}
+            >
+              <Avatar
+                alt={user?.name || "User Avatar"}
+                src={user?.avatar || ""}
+                sx={{ width: 48, height: 48, bgcolor: "primary.main" }}
+              >
+                {user?.name?.[0]}
+              </Avatar>
+              <Box>
+                <Typography sx={{ fontWeight: 600, fontSize: "0.95rem" }}>
+                  {user?.name || "Guest User"}
+                </Typography>
+                <Typography
+                  sx={{ fontSize: "0.8rem", color: "text.secondary" }}
+                >
+                  {user?.email || "guest@example.com"}
+                </Typography>
+              </Box>
+            </Box>
 
             <Divider />
 
-            <MenuItem
-              disableRipple
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                width: "100%",
-                marginTop: "-8px",
-                "&:hover": { cursor: "default", background: "#fff" },
-              }}
-            >
-              {user && user.profile_image !== "0" ? (
-                <Avatar
-                  id="user_img"
-                  alt="Remy Sharp"
-                  src={""}
-                  sx={{ width: 80, height: 80 }}
-                />
-              ) : (
-                <AccountCircle sx={{ fontSize: "80px" }} />
-              )}
+            {/* Menu Items */}
+         <Box sx={{ width: "350px", p: 2.5 }}>
+  <MenuItem onClick={() => navigate(roleRoutes[user?.role])}>
+    <ListItemIcon>
+      <PersonIcon fontSize="small" />
+    </ListItemIcon>
+    Manage Profile
+  </MenuItem> 
 
-              <span
-                style={{
-                  fontWeight: "550",
-                  fontSize: "0.9rem",
-                  marginTop: "0.3rem",
-                }}
-              >
-                {user && user.name}
-              </span>
+<MenuItem
+  onClick={() => {
+    if (user?.role === "adm") {
+      navigate("/logs");
+    } else if (user?.role === "ret") {
+      navigate("/customer/retailerlogs");
+    } else {
+      navigate(`/${user?.role}/logs`); // fallback for other roles
+    }
+  }}
+>
+  <ListItemIcon>
+    <TimelineIcon fontSize="small" />
+  </ListItemIcon>
+  Logs Activity
+</MenuItem>
 
-              <span
-                onClick={() => {
-                  if (user && user.role === "adm") {
-                    navigate("/admin/profile");
-                  } else if (user && user.role === "sadm") {
-                    navigate("/admin/profile");
-                  } else if (user && user.role === "Zsm") {
-                  } else if (user && user.role === "Asm") {
-                    navigate("/asm/profile");
-                  } else if (user && user.role === "Zsm") {
-                    navigate("/zsm/profile");
-                  } else if (user && user.role === "Ad") {
-                    navigate("/ad/profile");
-                  } else if (user && user.role === "Md") {
-                    navigate("/md/profile");
-                  } else if (
-                    user &&
-                    (user.role === "Ret" || user.role === "Dd")
-                  ) {
-                    navigate("/customer/profile");
-                  } else if (user && user.role === "Api") {
-                    navigate("/api-user/profile");
-                  } else {
-                    navigate("/other/profile");
-                  }
-                }}
-                style={{
-                  border: "1px solid #3f3f3f",
-                  borderRadius: "16px",
-                  padding: "0.2rem 1rem",
-                  fontSize: "0.9rem",
-                  margin: "1rem 0",
-                }}
-                className="simple-hover"
-              >
-                Manage your Profile
-              </span>
-            </MenuItem>
 
-            <MenuItem onClick={handleLogout}>
-              <ListItemIcon>
-                <LogoutIcon fontSize="small" />
-              </ListItemIcon>
-              <span className="text-base">Logout</span>
-            </MenuItem>
+  {/* <MenuItem>
+    <ListItemIcon>
+      <DarkModeIcon fontSize="small" />
+    </ListItemIcon>
+    Dark Mode
+    <Switch
+      edge="end"
+      checked={darkMode}
+      onChange={toggleDarkMode}
+      sx={{ ml: "auto" }}
+    />
+  </MenuItem> */}
+
+  <Divider />
+
+  <MenuItem onClick={handleLogout}>
+    <ListItemIcon>
+      <LogoutIcon fontSize="small" />
+    </ListItemIcon>
+    Sign Out
+  </MenuItem>
+</Box>
+
+
           </Menu>
         </Toolbar>
       </AppBar>
@@ -446,19 +672,23 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: themeSettings.drawerWidth,
+
               transition: (theme) =>
                 theme.transitions.create("width", {
                   easing: theme.transitions.easing.sharp,
                   duration: theme.transitions.duration.enteringScreen,
                 }),
+              overflow: "auto",
+              scrollbarWidth: "none",
               ...(!desktopOpen && {
                 overflowX: "hidden",
+
                 transition: (theme) =>
                   theme.transitions.create("width", {
                     easing: theme.transitions.easing.sharp,
                     duration: theme.transitions.duration.leavingScreen,
                   }),
-                width: (theme) => theme.spacing(7),
+                width: (theme) => theme.spacing(),
               }),
             },
           }}
@@ -472,15 +702,20 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
       <MainContent
         sx={{
           width: {
+            xs: "100%",
             md: desktopOpen
               ? `calc(100% - ${themeSettings.drawerWidth}px)`
               : "100%",
           },
+          position: "fixed",
+          top: 0,
+          right: 0,
+          height: "100vh",
+          overflowY: "auto",
         }}
         className="content"
       >
-        <Toolbar sx={{ minHeight: "64px !important" }} />{" "}
-        {/* Reduced toolbar spacing */}
+        <Toolbar sx={{ minHeight: "64px !important" }} />
         <Outlet />
       </MainContent>
     </Box>

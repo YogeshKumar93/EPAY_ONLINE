@@ -1,5 +1,7 @@
+import { Brightness2Rounded } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { bgImage, Logo } from "../iconsImports";
 
 export const Toast = Swal.mixin({
   // toast: true,
@@ -60,6 +62,22 @@ export const ErrorToast = Swal.mixin({
   keydownListenerCapture: true,
   returnFocus: false,
 });
+const ToastAlt = Swal.mixin({
+  showConfirmButton: true,
+  timerProgressBar: false,
+  didOpen: (toast) => {
+    toast.addEventListener("mouseenter", Swal.stopTimer);
+    toast.addEventListener("mouseleave", Swal.resumeTimer);
+  },
+  width: "max-content",
+  background: "#e6f7ff", // slightly different from #fefefe
+  color: "#0a6ebd", // slightly different from green
+  iconColor: "#0288d1", // slightly different from green
+  showCloseButton: true,
+  allowEscapeKey: true,
+  allowEnterKey: true,
+});
+export const MySwalAlt = withReactContent(ToastAlt);
 
 //
 const ConfirmSwal = (apiCallFunc, res) => {
@@ -118,35 +136,34 @@ export const ErrorSwal = withReactContent(ErrorToast);
 export const errorNotiToast = Swal.mixin({
   toast: true,
   position: "top-end",
-  width: "26em", 
-  iconHtml: "⚠️",  
+  width: "26em",
+  iconHtml: "⚠️",
   iconColor: "#FFEB3B",
   background: "#F0F8FF",
-  // color: "#72A0C1", 
-  confirmButtonText: "View", 
-  showConfirmButton: true, 
-  showCancelButton: true,  
-  cancelButtonText: "Dismiss", 
-  allowOutsideClick: false,  
-  allowEscapeKey: false, 
-  allowEnterKey: false, 
-  
+  // color: "#72A0C1",
+  confirmButtonText: "View",
+  showConfirmButton: true,
+  showCancelButton: true,
+  cancelButtonText: "Dismiss",
+  allowOutsideClick: false,
+  allowEscapeKey: false,
+  allowEnterKey: false,
+
   // Custom classes for styling
   customClass: {
     icon: "custom-toast-icon",
     title: "custom-toast-title",
-    content: "custom-toast-content", 
+    content: "custom-toast-content",
     confirmButton: "custom-toast-button",
-    cancelButton: "custom-toast-cancel-button", 
+    cancelButton: "custom-toast-cancel-button",
   },
 
   // didOpen: (toast) => {
-  //   toast.addEventListener("mouseenter", Swal.stopTimer); 
-  //   toast.addEventListener("mouseleave", Swal.resumeTimer); 
+  //   toast.addEventListener("mouseenter", Swal.stopTimer);
+  //   toast.addEventListener("mouseleave", Swal.resumeTimer);
   //   toast.classList.add('fade-in');
   // },
 });
-
 
 // type = 'success' | 'error' | 'warning' | 'info' | 'question'
 export const okToast = (title, msg, type) => {
@@ -177,88 +194,85 @@ export const okErrorToast = (title, msg) => {
 };
 
 export const apiErrorToast = (error, history) => {
-  var msg;
-  var status =
+  let msg = "Something went wrong";
+  let status =
     error && error.response && error.response.status && error.response.status;
+
   if (error) {
     if (error.data) {
-      error.response = error;
+      error.response = error; // normalize
     }
+
     if (error.response) {
       status = error.response.status;
+
       if (error.response.data) {
-        if (error.response.data.message) {
-          if (typeof error.response.data.message === "string") {
-            msg = error.response.data.message;
-          } else {
-            const msgObj = error.response.data.message;
-            msg = "";
-            for (let i in msgObj) {
-              msg += msgObj[i] + "\n";
-            }
+        const data = error.response.data;
+
+        // ✅ Handle "message" field
+        if (data.message) {
+          if (typeof data.message === "string") {
+            msg = data.message;
+          } else if (typeof data.message === "object") {
+            msg = Object.values(data.message).flat().join("\n");
           }
-        } else if (error.response.data.detail) {
-          if (typeof error.response.data.detail === "string") {
-            msg = error.response.data.detail;
-          } else {
-            const msgObj = error.response.data.detail;
-            msg = "";
-            for (let i in msgObj) {
-              msg += msgObj[i] + "\n";
-            }
+        }
+        // ✅ Handle "detail" field
+        else if (data.detail) {
+          if (typeof data.detail === "string") {
+            msg = data.detail;
+          } else if (typeof data.detail === "object") {
+            msg = Object.values(data.detail).flat().join("\n");
           }
-        } else if (typeof error.response.data === "object") {
-          msg = JSON.stringify(error.response.data);
+        }
+        // ✅ Handle raw object response
+        else if (typeof data === "object") {
+          msg = Object.values(data).flat().join("\n");
         } else {
-          msg = error.response.data;
+          msg = data;
         }
       } else {
-        msg = JSON.stringify(error.response);
-        // msg = "Something went wrong, Please try after sometime";
+        msg = "Something went wrong, Please try after sometime";
       }
     } else {
       if (error.message) {
         msg = error.message;
+      } else if (typeof error === "object") {
+        msg = Object.values(error).flat().join("\n");
       } else {
-        // msg = JSON.stringify(error);
         msg = error;
-        // msg = "Something went wrong, Please try after sometime";
       }
     }
   }
+
+  // 🔑 Handle different statuses
   if (status === 401) {
     ErrorSwal.fire({
       title: history ? "Login Required!!" : "Error!",
       text: msg,
-      icon: "error", // 'success' | 'error' | 'warning' | 'info' | 'question'
-      showCancelButton: false,
+      icon: "error",
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Login",
+      showCancelButton: false,
       showConfirmButton: history,
       showLoaderOnConfirm: history,
       keydownListenerCapture: true,
-      preConfirm: () => {},
       allowOutsideClick: () => !Swal.isLoading(),
-      // backdrop: true,
-    }).then((result) => {
+    }).then(() => {
       localStorage.clear();
       const location = window.location;
       let baseUrl = location.protocol + "//" + location.host;
       window.open(baseUrl, "_self");
     });
-  }
-  if (status === 500) {
-    // ErrorSwal.fire("", "Something Went wrong", "error");
+  } else if (status === 500) {
     okErrorToast("", "Something Went wrong");
-  }
-  if (status === 404 || status === 406) {
-    // ErrorSwal.fire("", msg ? msg : "Something Went wrong", "error");
+  } else if (status === 404 || status === 406) {
     okErrorToast("", msg ? msg : "Something Went wrong");
   } else {
     okErrorToast("", msg);
-    // ErrorSwal.fire("", msg ? msg : "Error can't be identified", "error");
   }
+
   return msg;
 };
 
@@ -359,4 +373,119 @@ export const toastInvoicePopup = (msg, timer) => {
 // small toast
 export const okSuccessToastsm = (title, msg) => {
   ToastSm.fire(title, msg, "success");
+};
+export const okSuccessToastAlt = (txnID) => {
+  MySwalAlt.fire({
+    title: "",
+    html: `
+      <div style="text-align: center; padding: 0px; position: relative;">
+        
+        <!-- Logo at top-left corner -->
+        <img 
+          src="${Logo}" 
+          alt="logo"
+          style="
+            position: absolute;
+            top: -10px;
+            left: -20px;
+            height: 30px;
+            width: auto;
+          "
+        />
+
+        <!-- Success Icon with Full Left/Right Confetti -->
+        <div style="
+          position: relative;
+          width: 100%;
+          height: 140px;
+          margin: 0 auto 15px auto;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">
+          <!-- Left Confetti -->
+          <img 
+            src="${bgImage}" 
+            alt="confetti left"
+            style="
+              position: absolute;
+              left: 0;
+              top: 0;
+              height: 100%;
+              width: 45%;
+              object-fit: cover;
+            "
+          />
+          <!-- Right Confetti -->
+          <img 
+            src="${bgImage}" 
+            alt="confetti right"
+            style="
+              position: absolute;
+              right: 0;
+              top: 0;
+              height: 100%;
+              width: 45%;
+              object-fit: cover;
+            "
+          />
+          <!-- Tick Icon in Circle -->
+          <div style="
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background-color: #eaf9f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+          ">
+            <img 
+              src="https://cdn-icons-png.flaticon.com/512/845/845646.png" 
+              width="50" 
+              height="50" 
+              alt="success"
+            />
+          </div>
+        </div>
+
+        <!-- Transaction ID -->
+        <div style="font-size: 15px; font-weight: 600; color: #333;">
+          <span style="color: #169816">${txnID}</span>
+        </div>
+        <div style="font-size: 15px; margin-bottom: 10px; color: #555;">
+          Congratulations! Your transaction was completed successfully.
+        </div>  
+
+        <!-- Print Button -->
+        <button id="print-receipt" style="
+          background-color: #ff7f27;
+          color: white;
+          border: none;
+          padding: 10px 24px;
+          border-radius: 24px;
+          font-weight: bold;
+          margin-top: 25px;
+          cursor: pointer;
+          font-size: 15px;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        ">
+          Print Receipt
+        </button>
+      </div>
+    `,
+    showConfirmButton: false,
+    showCloseButton: true,
+    background: "#fff",
+    customClass: {
+      popup: "swal2-border-radius",
+      closeButton: "custom-close-btn",
+    },
+    didOpen: () => {
+      document.getElementById("print-receipt").addEventListener("click", () => {
+        window.print();
+      });
+      triggerConfetti();
+    },
+  });
 };

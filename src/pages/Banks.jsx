@@ -1,21 +1,90 @@
-import { useMemo, useCallback, useContext, useState } from "react";
-import { Box, Tooltip, Typography,Button } from "@mui/material";
+import { useMemo, useContext, useState, useEffect, useRef } from "react";
+import { Tooltip, IconButton, Box, Typography } from "@mui/material";
+import { Edit } from "@mui/icons-material";
 import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
-import { currencySetter } from "../utils/Currencyutil";
 import AuthContext from "../contexts/AuthContext";
-import { dateToTime, dateToTime1, ddmmyy } from "../utils/DateUtils";
-import { capitalize1 } from "../utils/TextUtil";
+import { dateToTime1, ddmmyy, ddmmyyWithTime } from "../utils/DateUtils";
 import CreateBankModal from "../components/Bank/CreateBanks";
+import ReButton from "../components/common/ReButton";
+import CommonStatus from "../components/common/CommonStatus";
+import CommonLoader from "../components/common/CommonLoader";
+import DeleteIcon from "@mui/icons-material/Delete";
+import UpdateBanks from "../components/Bank/UpdateBanks";
+import DeleteBank from "./DeleteBank";
+import DescriptionIcon from "@mui/icons-material/Description";
+import { useNavigate } from "react-router-dom";
 
-const Banks = ({ filters = [], query }) => {
+const Banks = ({ filters = [] }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
+  const navigate = useNavigate();
+
   const [openCreate, setOpenCreate] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedBank, setSelectedBank] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // ✅ keep a ref to CommonTable for refreshing
+  const fetchBanksRef = useRef(null);
+
+  const handleFetchRef = (fetchFn) => {
+    fetchBanksRef.current = fetchFn;
+  };
+
+  const refreshBanks = () => {
+    if (fetchBanksRef.current) {
+      fetchBanksRef.current();
+    }
+  };
+
+  const handleDelete = (row) => {
+    setSelectedBank(row);
+    setOpenDelete(true);
+  };
+
+  const handleStatement = (row) => {
+    navigate(`/admin/bankstatements/${row.id}`, {
+      state: {
+        bank_id: row.id,
+        bank_name: row.bank_name,
+        balance: row.balance,
+      },
+    });
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // memoized columns
   const columns = useMemo(
     () => [
+      {
+        name: "Date",
+        selector: (row) => (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Tooltip title={`Created: ${ddmmyyWithTime(row.created_at)}`} arrow>
+              <span>
+                {ddmmyy(row.created_at)} {dateToTime1(row.created_at)}
+              </span>
+            </Tooltip>
+
+            <Tooltip title={`Updated: ${ddmmyyWithTime(row.updated_at)}`} arrow>
+              <span>
+                {ddmmyy(row.updated_at)} {dateToTime1(row.updated_at)}
+              </span>
+            </Tooltip>
+          </div>
+        ),
+        wrap: true,
+        width: "140px",
+      },
       {
         name: "Bank Name",
         selector: (row) => (
@@ -51,36 +120,83 @@ const Banks = ({ filters = [], query }) => {
         wrap: true,
       },
       {
-        name: "Created At",
-        selector: (row) => (
-          <div style={{ textAlign: "left" }}>
-            {ddmmyy(row.created_at)} {dateToTime1(row.created_at)}
-          </div>
-        ),
-        wrap: true,
-      },
-      {
-        name: "Updated At",
-        selector: (row) => (
-          <div style={{ textAlign: "left" }}>
-            {ddmmyy(row.updated_at)} {dateToTime1(row.updated_at)}
-          </div>
-        ),
-        wrap: true,
-      },
-      {
         name: "Status",
-        selector: (row) => (
-          <div
-            style={{
-              color: row.status === 1 ? "green" : "red",
-              fontWeight: 600,
-              textAlign: "center",
-            }}
-          >
-            {row.status === 1 ? "Active" : "Inactive"}
-          </div>
-        ),
+        selector: (row) => <CommonStatus value={row.status} />,
+        center: true,
+      },
+      {
+        name: "Actions",
+        selector: (row, { hoveredRow, enableActionsHover }) => {
+          const isHovered = hoveredRow === row.id || !enableActionsHover;
+
+          return (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth: "120px", // fixed width
+              }}
+            >
+              {isHovered ? (
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 1,
+                    transition: "opacity 0.2s ease-in-out",
+                  }}
+                >
+                  <Tooltip title="Statement">
+                    <IconButton
+                      color="info"
+                      size="small"
+                      onClick={() => handleStatement(row)}
+                    >
+                      <DescriptionIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+
+                  <Tooltip title="Edit">
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={() => {
+                        setSelectedRow(row);
+                        setOpenEdit(true);
+                      }}
+                    >
+                      <Edit fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+
+                  {user?.role === "adm" && (
+                    <Tooltip title="Delete">
+                      <IconButton
+                        color="error"
+                        size="small"
+                        onClick={() => handleDelete(row)}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </Box>
+              ) : (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "#999",
+                    textAlign: "center",
+                    minWidth: "120px", // same as icon container
+                  }}
+                >
+                  -
+                </Typography>
+              )}
+            </Box>
+          );
+        },
+        width: "120px",
         center: true,
       },
     ],
@@ -91,30 +207,56 @@ const Banks = ({ filters = [], query }) => {
 
   return (
     <>
-      {/* Top Bar with Create Button */}
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setOpenCreate(true)}
-        >
-          + Create Bank
-        </Button>
-      </Box>
+      <CommonLoader loading={loading} text="Loading Banks" />
 
-      <CommonTable
-        columns={columns}
-        endpoint={ApiEndpoints.GET_BANKS}
-        filters={filters}
-        queryParam={queryParam}
-      />
+      {!loading && (
+        <>
+          <CommonTable
+            onFetchRef={handleFetchRef}
+            columns={columns}
+            endpoint={ApiEndpoints.GET_BANKS}
+            filters={filters}
+            queryParam={queryParam}
+            customHeader={
+              <ReButton label="Bank" onClick={() => setOpenCreate(true)} />
+            }
+          />
 
-      {/* Create Bank Modal */}
-      {openCreate && (
-        <CreateBankModal
-          open={openCreate}
-          onClose={() => setOpenCreate(false)}
-        />
+          {/* Create Bank Modal */}
+          {openCreate && (
+            <CreateBankModal
+              open={openCreate}
+              onClose={() => setOpenCreate(false)}
+              onFetchRef={refreshBanks}
+            />
+          )}
+
+          {/* Edit Bank Modal */}
+          {openEdit && selectedRow && (
+            <UpdateBanks
+              open={openEdit}
+              onClose={() => {
+                setOpenEdit(false);
+                setSelectedRow(null);
+              }}
+              bankData={selectedRow}
+              onFetchRef={refreshBanks}
+            />
+          )}
+
+          {/* Delete Bank Modal */}
+          {selectedBank && user?.role === "adm" && (
+            <DeleteBank
+              open={openDelete}
+              handleClose={() => {
+                setOpenDelete(false);
+                setSelectedBank(null);
+              }}
+              selectedBank={selectedBank}
+              onFetchRef={refreshBanks}
+            />
+          )}
+        </>
       )}
     </>
   );

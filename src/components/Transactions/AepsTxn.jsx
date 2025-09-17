@@ -3,15 +3,55 @@ import { Box, Tooltip, Typography, Button } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import AuthContext from "../../contexts/AuthContext";
-import { dateToTime1, ddmmyy } from "../../utils/DateUtils";
+import { dateToTime1, ddmmyy, ddmmyyWithTime } from "../../utils/DateUtils";
+import CommonStatus from "../common/CommonStatus";
 
-const AepsTxn = ({ filters = [], query }) => {
+const AepsTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const [openCreate, setOpenCreate] = useState(false);
-
+const filters = useMemo(
+    () => [
+      {
+        id: "status",
+        label: "Status",
+        type: "dropdown",
+        options: [
+          { value: "success", label: "Success" },
+          { value: "failed", label: "Failed" },
+          { value: "refund", label: "Refund" },
+          { value: "pending", label: "Pending" },
+        ],
+        defaultValue: "pending",
+      },
+      { id: "sender_mobile", label: "Sender Mobile", type: "textfield" },
+      { id: "txn_id", label: "Txn ID", type: "textfield" },
+    ],
+    []
+  );
 const columns = useMemo(
   () => [
+          
+    {
+      name: "Date",
+      selector: (row) => (
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <Tooltip title={`Created: ${ddmmyyWithTime(row.created_at)}`} arrow>
+            <span>
+              {ddmmyy(row.created_at)} {dateToTime1(row.created_at)}
+            </span>
+          </Tooltip>
+    
+          <Tooltip title={`Updated: ${ddmmyyWithTime(row.updated_at)}`} arrow>
+            <span>
+             {ddmmyy(row.updated_at)} {dateToTime1(row.updated_at)}
+            </span>
+          </Tooltip>
+        </div>
+      ),
+      wrap: true,
+      width: "140px", 
+    },
     {
       name: "Txn ID",
       selector: (row) => <div style={{ textAlign: "left" }}>{row.txn_id}</div>,
@@ -79,42 +119,11 @@ const columns = useMemo(
     },
     {
       name: "Status",
-      selector: (row) => (
-        <div
-          style={{
-            color:
-              row.status === "SUCCESS"
-                ? "green"
-                : row.status === "PENDING"
-                ? "orange"
-                : "red",
-            fontWeight: 600,
-            textAlign: "center",
-          }}
-        >
-          {row.status}
-        </div>
-      ),
+      selector: (row) => <CommonStatus value={row.status} />,
+     
       center: true,
     },
-    {
-      name: "Created At",
-      selector: (row) => (
-        <div style={{ textAlign: "left" }}>
-          {ddmmyy(row.created_at)} {dateToTime1(row.created_at)}
-        </div>
-      ),
-      wrap: true,
-    },
-    {
-      name: "Updated At",
-      selector: (row) => (
-        <div style={{ textAlign: "left" }}>
-          {ddmmyy(row.updated_at)} {dateToTime1(row.updated_at)}
-        </div>
-      ),
-      wrap: true,
-    },
+   
   ],
   []
 );

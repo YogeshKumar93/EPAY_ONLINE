@@ -1,5 +1,5 @@
-import { Button, FormControl, Grid, Modal } from "@mui/material";
-import { Box } from "@mui/system";
+import { Button, FormControl, Grid, Modal,Typography  } from "@mui/material";
+import { Box, useMediaQuery, useTheme } from "@mui/system";
 import React, { useState } from "react";
 import PinInput from "react-pin-input";
 
@@ -22,7 +22,6 @@ const style = {
   height: "max-content",
   overflowY: "scroll",
 };
-
 const CommonMpinModal = ({
   open,
   setOpen,
@@ -31,6 +30,9 @@ const CommonMpinModal = ({
   mPinCallBack,
   title = "Enter MPIN",
 }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  
   const [err, setErr] = useState("");
   const [otp, setOtp] = useState("");
   const authCtx = useContext(AuthContext);
@@ -68,87 +70,163 @@ const CommonMpinModal = ({
   };
 
   return (
-    <CommonModal open={open} onClose={handleClose} title={title}>
+    <CommonModal
+      open={open}
+      onClose={handleClose}
+      title={title}
+      footerButtons={[]}
+      size="small"
+    >
       <Box
         component="form"
         noValidate
         autoComplete="off"
-        sx={{ "& .MuiTextField-root": { m: 2 } }}
+        sx={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center',
+          width: '100%',
+          px: { xs: 1, sm: 2 }
+        }}
       >
-        <Grid container sx={{ pt: 1 }}>
-          <Grid
-            item
-            md={12}
-            xs={12}
+        <Typography 
+          variant="body2" 
+          color="textSecondary" 
+          sx={{ 
+            textAlign: 'center', 
+            mb: 3,
+            px: 1
+          }}
+        >
+          Please enter your 6-digit MPIN to continue
+        </Typography>
+
+        {/* OTP Input */}
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          width: '100%',
+          mb: 2
+        }}>
+          <OtpInput
+            value={otp}
+            onChange={handleChange}
+            numInputs={6}
+            isInputSecure={true}
+            renderInput={(props) => <input {...props} />}
+            inputStyle={{
+              width: isMobile ? "35px" : "45px",
+              height: isMobile ? "35px" : "45px",
+              margin: "0 4px",
+              fontSize: isMobile ? "16px" : "18px",
+              borderRadius: "8px",
+              border: "2px solid #e0e0e0",
+              background: "#f8f9fa",
+              fontWeight: "600",
+              transition: "all 0.2s ease",
+              outline: "none",
+              textAlign: "center",
+            }}
+            focusStyle={{
+              border: "2px solid #4045A1",
+              boxShadow: "0 0 5px rgba(64, 69, 161, 0.3)",
+            }}
+          />
+        </Box>
+
+        {/* Error Message */}
+        {err && (
+          <Box
             sx={{
               display: "flex",
               justifyContent: "center",
-              flexDirection: "column",
               alignItems: "center",
+              width: "100%",
+              py: 1,
+              px: 2,
+              mb: 2,
+              backgroundColor: "#ffebee",
+              borderRadius: "6px",
+              border: "1px solid #ffcdd2",
             }}
           >
-            <OtpInput
-              value={otp}
-              onChange={handleChange}
-              numInputs={6}
-              isInputSecure={true}
-              renderInput={(props) => <input {...props} />}
-              inputStyle={{
-                width: "40px",
-                height: "40px",
-                margin: "0 5px",
-                fontSize: "18px",
-                borderBottom: "2px solid #000",
-                outline: "none",
-                textAlign: "center",
-              }}
-            />
-          </Grid>
-
-          {err && (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                mt: 2,
-                ml: 5,
-                fontSize: "12px",
-                px: 2,
-                color: "#DC5F5F",
-                width: "100%",
+            <ErrorOutline sx={{ 
+              color: "#d32f2f", 
+              fontSize: "18px", 
+              mr: 1 
+            }} />
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: "#d32f2f", 
+                fontSize: "0.85rem",
+                fontWeight: "500"
               }}
             >
-              <div>{err}</div>
-            </Box>
-          )}
-        </Grid>
+              {err}
+            </Typography>
+          </Box>
+        )}
 
-        <Grid
-          container
-          sx={{ display: "flex", justifyContent: "end", pr: 4, mt: 2 }}
-        >
-          <Grid item>
-            <ResetMpin variant="text" py mt username={username} />
-          </Grid>
-        </Grid>
+        {/* Reset MPIN Link */}
+        <Box sx={{ 
+          display: "flex", 
+          justifyContent: "center", 
+          width: "100%",
+          mb: 3
+        }}>
+          <ResetMpin 
+            variant="text" 
+            py 
+            mt 
+            username={username} 
+            sx={{ 
+              fontSize: isMobile ? "0.8rem" : "0.9rem",
+              color: "#4045A1",
+              fontWeight: "500",
+              "&:hover": {
+                color: "#30347a",
+                backgroundColor: "transparent"
+              }
+            }}
+          />
+        </Box>
 
+        {/* Submit Button */}
         <Button
           variant="contained"
           onClick={handleSubmit}
           fullWidth
           sx={{
-            bgcolor: "#8cc751",
+            background: "linear-gradient(135deg, #4045A1, #6065C9)",
             py: 1.5,
-            fontSize: "15px",
+            fontSize: isMobile ? "14px" : "15px",
             fontWeight: "bold",
-            borderRadius: "8px",
+            borderRadius: "10px",
             textTransform: "none",
-            mt: 2,
-            "&:hover": { bgcolor: "rgb(72, 176, 77)" },
+            boxShadow: "0 4px 12px rgba(64, 69, 161, 0.25)",
+            "&:hover": {
+              background: "linear-gradient(135deg, #30347a, #5055b5)",
+              boxShadow: "0 6px 15px rgba(64, 69, 161, 0.35)",
+            },
           }}
         >
-          Set New Password
+          Verify MPIN
         </Button>
+
+        {/* Helper Text */}
+        <Typography 
+          variant="caption" 
+          color="textSecondary" 
+          sx={{ 
+            textAlign: 'center', 
+            mt: 2,
+            display: 'block',
+            fontSize: '0.75rem'
+          }}
+        >
+          For security reasons, your MPIN is required to complete this action
+        </Typography>
       </Box>
     </CommonModal>
   );

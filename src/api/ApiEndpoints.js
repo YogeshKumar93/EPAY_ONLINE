@@ -2,7 +2,7 @@
 // export const BASE_URL = "https://uat.impsguru.com/";
 // export const BASE_URL = "https://api.dillipay.com/";
 // export const BASE_URL = "http://192.168.1.14/impsguru-php/";
-export const BASE_URL = "https://api.biggpay.in/";
+export const BASE_URL = "https://newapi.impsguru.com/";
 
 const ApiEndpoints = {
   COOKIE: "sanctum/csrf-cookie",
@@ -41,8 +41,7 @@ const ApiEndpoints = {
   PAYOUT_BENE_KYC_DOCS: "admin/beneKycDoc",
   GET_USER_BY_USERNAME: "auth/getUserByUsername",
   GET_USER_BY_ID: "admin/getUserById",
-  UPDATE_USER: "admin/updateUser",
-  RESEND_OTP: "wallet/resendOtp",
+  // RESEND_OTP: "wallet/resendOtp",
   USER_PROFIT: "admin/userProfitability",
   DELETE_USER: "admin/deleteUser",
   API_USERS_CHARGES: "admin/charges",
@@ -63,13 +62,10 @@ const ApiEndpoints = {
   CHANGE_OPERATOR_PIPE: "admin/changePipe",
   GET_ROUTE: "admin/getRoutes",
   GET_CATEGORIES: "admin/getCategories",
-
-
-
-
-
-
-
+  BBPS_GET_CATEGORIES: "bbps/getCategories",
+  BBPS_GET_BILLERS: "bbps/getBillers",
+  BBPS_GET_BILLERS_DETAILS: "bbps/getBillerDetails",
+  BBPS_FETCH_BILL: "bbps/fetchBill",
 
   // ****************************** NEW API'S ******************************
   SIGN_IN: "auth/signIn",
@@ -77,6 +73,7 @@ const ApiEndpoints = {
   LOGOUT: "auth/Logout",
   FORGOT_PASS: "auth/forgetPassword",
   RESET_MPIN: "auth/resetMpin",
+  RESEND_OTP: "auth/resendOtp",
   CHANGE_PASS: "auth/changePassword",
   CHANGE_MPIN: "auth/changeMpin",
   INITIATE_NUMBER: "auth/initiateChangeNumber",
@@ -96,41 +93,140 @@ const ApiEndpoints = {
   GET_LOGS: "auditlog/getAuditLogs",
   DELETE_LOG: "auditlog/deleteAuditLog",
   GET_LOG: "auditlog/getAuditLog",
+  GET_WALLETLEDGER: "walletledger/getWalletLedgers",
+
+  // ****************************** NEW API'S ABOVE ******************************
+
   GET_FUND_REQUESTS: "fundrequest/getFundRequests",
   CREATE_FUND_REQUEST: "fundrequest/createFundRequest",
   UPDATE_FUND_REQUEST: "fundrequest/updateFundRequest",
   DELETE_FUND_REQUEST: "fundrequest/deleteFundRequest",
+  GET_BANKS: "bank/getBanks",
+
+  QR_LOGIN: "auth/generateQr",
+  QR_STATUS: "auth/qrStatus",
+
+  GET_COMPLAINS: "complains/getComplains",
+  CREATE_COMPLAINTS: "complains/createComplains",
+  UPDATE_COMPLAINTS: "complains/updateComplains",
 
   // ****************************** NEW API'S ABOVE ******************************
-
+  GET_COMMISSION_RULE: "commission/getCommissions",
   GET_NOTIFICATION: "notification/getNotification",
   MARK_READ_NOTI: "notification/updateNotification",
   ADMIN_NOTIFICATION: "notification/createNotification",
+  UPDATE_NOTIFICATION: "notification/updateNotification",
+  DELETE_NOTIFICATION: "notification/deleteNotification",
 
-  GET_BANKS: "bank/getBanks",
+  GET_BANK_STATEMENTS: "bankStatement/getBankStatement",
+  CREATE_BANK_STATEMENT: "bankStatement/createBankStatement",
+  UPDATE_BANK_STATEMENT: "bankStatement/updateBankStatement",
+  DELETE_BANK_STATEMENT: "bankStatement/deleteBankStatement",
+  GET_BANK_STATEMENT_SCHEMA: "bankStatement/getBankStatementSchema",
+
+  GET_ACCOUNT_STATEMENTS: "accountStatement/getAccountStatement",
+  CREATE_ACCOUNT_STATEMENT: "accountStatement/createAccountStatement",
+  UPDATE_ACCOUNT_STATEMENT: "accountStatement/updateAccountStatement",
+  DELETE_ACCOUNT_STATEMENT: "accountStatement/deleteAccountStatement",
+  GET_ACCOUNT_STATEMENT_SCHEMA: "accountStatement/getAccountStatementSchema",
+
   CREATE_BANK: "bank/createBank",
   UPDATE_BANK: "bank/updateBank",
   DELETE_BANK: "bank/deleteBank",
 
-  GET_DMT_TXN: "dmttxn/getDmtTxns",
-  GET_BBPS_TXN: "bbpstxn/getBbpsTxns",
-  GET_AEPS_TXN: "aepstxn/getAepsTxns",
-  GET_MATM_TXN: "matmtxn/getMatmTxns",
-  GET_PAYOUT_TXN: "payouttxn/getPayoutTxns",
-  GET_RECHARGE_TXN: "rechargetxn/getRechargeTxns",
-  GET_IRCTC_TXN: "irctctxn/getIrctcTxns",
+  GET_DMT_TXN: "dmt1/getDmtTxns",
+  GET_BBPS_TXN: "bbps/getBbpsTxns",
+  GET_AEPS_TXN: "aeps/getAepsTxns",
+  GET_MATM_TXN: "matm/getMatmTxns",
+  GET_PAYOUT_TXN: "payout/getPayoutTxns",
+  GET_RECHARGE_TXN: "recharge/getRechargeTxns",
+  GET_IRCTC_TXN: "irctc/getIrctcTxns",
+  GET_FUNDREQUEST_SCHEMA: "fundrequest/getFundRequestsSchema",
+  GET_ACCOUNT_SCHEMA: "account/getAccountSchema",
+  GET_BANK_SCHEMA: "bank/getBankSchema",
+  GET_NOTIFICATION_SCHEMA: "notification/getNotificationSchema",
+  GET_COLOR_SCHEMA: "layout/colorSchema",
+  GET_COLOURS: "layout/getColours",
+  CREATE_COLOUR: "layout/createColour",
+  UPDATE_COLOUR: "layout/updateColour",
+  CREATE_COMMISSION_RULE: "commission/createCommissionRule",
+  GET_COMMISSION_SCHEMA: "commission/getCommissionSchema",
+  UPDATE_COMMISSION_RULE: "commission/updateCommissionRule",
+  GET_SENDER: "payout/getSender",
+  REGISTER_SENDER: "payout/registerSender",
+  REGISTER_SENDER_SCHEMA: "payout/registerSenderSchema",
+  VERIFY_SENDER_SCHEMA: "payout/verifySenderSchema",
+  VERIFY_SENDER: "payout/verifySender",
+  PAYOUT_OTP: "payout/otpExp",
+  ADD_BENEFICIARY_SCHEMA: "payout/getBeneficiarySchema",
+  CREATE_BENEFICIARY: "payout/createBeneficiary",
+  DELETE_BENEFICIARY: "payout/deleteBeneficiary",
+  PAYOUT: "payments/v2/userPayOut",
+  PAYOUT_SCHEMA: "payments/v2/getPayoutSchema",
+  UPDATE_USER_PERMISSIONS: "user/updateUserPermissions",
+  GET_PLANS_BY_OPERATOR: "recharge/getPlansByOperator",
+  RECHARGE: "recharge/recharge",
+  GET_SIDENAV: "layout/getSideNav",
+  GET_ACCOUNT_STATEMENT: "accountStatement/getStatements",
+  GET_PLANS: "plan/getPlans",
+  CREATE_PLAN: "plan/createPlan",
+  UPDATE_PLAN: "plan/updatePlan",
+  GET_PLAN_SCHEMA: "plan/getPlanSchema",
+  GET_UPI_SCHEMA: "payout/getBeneficiarySchemaUpi",
+  UPDATE_USER_STATUS: "user/blockAndUnblock",
+
+  CHANGE_USER_LAYOUT: "user/changeLayout",
+
+  DMT1: "dmt1/remitterStatus",
+  REGISTER_DMT1_BENEFICIARY: "dmt1/registerBeneficiary",
+  ADD_DMT1_SCHEMA: "dmt1/getBeneficiarySchema",
+  REMOVE_DMT1_BENEFICIARY: "dmt1/removeBeneficiary",
+  REMOVE_DMT1_BENEFICIARY_VERIFY: "dmt1/VerifyRemoveBeneficiary",
+  OTP_DMT1_BENEFICIARY: "dmt1/transactionOtpDmt1",
+  DMT1_TXN: "dmt1/dmtTxn",
+  DMT1_VERIFY_BENEFICIARY: "dmt1/accountVerification",
+
+  DMT2: "dmt2/remitterStatusDmt2",
+  OTP_DMT2: "dmt2/transactionOtpDmt2",
+  DMT2_ADD_BENE_SCHEMA: "dmt2/getBeneficiarySchemaDmt2",
+  DMT2_TXN: "dmt2/dmt2Txn",
+  DMT2_REMOVE_BENEFICIARY: "dmt2/removeBeneficiaryDmt2",
+  REGISTER_DMT2_BENEFICIARY: "dmt2/registerBeneficiaryDmt2",
+  DMT2_VERIFY_BENEFICIARY: "dmt1/accountVerification",
+  BLOCK_UNBLOCK_SERVICE: "service/blockUnblock",
+  CREATE_USER: "signup/createUser",
+  GET_SIGNUP_SCHEMA: "signup/getSignupSchema",
+  DMT1: "dmt1/remitterStatus",
+  DMT1_REGISTER: "dmt1/registerRemitter",
+
+  CREATE_BASIC: "business/createBasic",
+  CREATE_CONTACT: "business/createContact",
+  CREATE_ADDRESS: "business/createAddress",
+  CREATE_IDENTIFICATION: "business/createIdentification",
+  CREATE_BANK: "business/createBank",
+  CREATE_DOCUMENTS: "business/createDocuments",
+  CREATE_KYC: "business/createKyc",
+  CREATE_STATUS: "business/createStatus",
+
+  BASIC_SCHEMA: "business/basicSchema",
+  CONTACT_SCHEMA: "business/contactSchema",
+  ADDRESS_SCHEMA: "business/addressSchema",
+  IDENTIFICATION_SCHEMA: "business/identificationSchema",
+  BANK_SCHEMA: "business/bankSchema",
+  DOCUMENTS_SCHEMA: "business/documentsSchema",
+  KYC_SCHEMA: "business/kycSchema",
+  STATUS_SCHEMA: "business/statusSchema",
+
+  WALLET_LIST: "wallet/getW2WTransactions",
+  WALLET_GET_RECEIVER: "wallet/getReceiver",
+  WALLET_GET_W2W_TRANSACTION: "wallet/getW2WTransaction",
+  WALLET_CREATE: "wallet/createW2W",
+  CREATE_ORDER_CMS_NEW: "cms/createOrderCms",
+  VERIFY_UPI_BENEFICIARY: "payout/upiVerifiaction",
+  // WALLET_UPDATE: "wallet/update",
+  // WALLET_DELETE: "wallet/delete",
+
   // ****************************** NEW API'S ABOVE ******************************
-
-
-
-
-
-
-
-
-
-  GET_ACC_ACCOUNTS: "",
-  // GET_ACC_ACCOUNTS: "",
 
   GET_ACC_BANKS: "",
   UPDATE_BANKS: "admin/changeBankStatus",
@@ -140,15 +236,14 @@ const ApiEndpoints = {
   GET_MASSEGE: "admin/getMessages",
   GET_OUT_MASSEGE: "admin/getOutMessages",
   GET_WEBHOOK: "admin/getWebHooks",
-  GET_ACCOUNT_STATEMENT: "admin/getAccStatement",
+  // GET_ACCOUNT_STATEMENT: "admin/getAccStatement",
   GET_BANK_STATEMENT: "admin/getBankStatement",
   ADD_BANK_TXN: "admin/addBankTxn",
   DELETE_BANK_TXN: "admin/deleteBankTxn",
   GET_PENDING_ACCOUNT_TRANSACTION: "admin/getPendingBankTxn",
   GET_STATUS: "admin/checkTxnStatus",
   CHANGE_STATUS: "admin/changeTxnStatus",
-  
-  GET_PLANS: "admin/getPlans",
+
   BLOCK_UNBLOCK_PLANS: "",
   ADD_PLAN: "admin/createPlan",
   DELETE_PLAN: "admin/deletePlan",
@@ -205,7 +300,7 @@ const ApiEndpoints = {
   ADD_REM: "dmr/registerRemitter",
   NEW_ADD_REM: "dmr/registerExpRemitter",
   GET_BLOCKED_AC: "admin/blockedAccounts",
-  GET_BLOCKED_AC: "admin/blockedAccounts",
+
   DMT2_ADD_REM: "dmr/registerRemitterDmt2",
   ADD_BENE_EXPRESS: "dmr/addBenExpress",
   ADD_BENE_SUPER: "dmr/addBenExpress",
@@ -224,10 +319,10 @@ const ApiEndpoints = {
   DMT2_MT: "dmr/transactionDmt2",
 
   BBPS_CATEGORIES: "prepaid/getCategories",
-  BBPS_GET_BILLERS: "prepaid/getBillers",
-  BBPS_GET_BILLERS_DETAILS: "prepaid/getBillerDetails",
-  BBPS_FETCH_BILL: "prepaid/fetchBillInst",
-  BBPS_PAY_BILL: "prepaid/payBillInst",
+  // BBPS_GET_BILLERS: "prepaid/getBillers",
+  // BBPS_GET_BILLERS_DETAILS: "prepaid/getBillerDetails",
+  // BBPS_FETCH_BILL: "prepaid/fetchBillInst",
+  // BBPS_PAY_BILL: "prepaid/payBillInst",
 
   //recharges and bill payment
   RECH_FETCH_BILL: "prepaid/fetchBill",
@@ -383,7 +478,6 @@ const ApiEndpoints = {
   UPDATE_CARD_SCHEME: "schemes/updateCardScheme",
   CREATE_UPI_SCHEME: "schemes/createUpiScheme",
   UPDATE_UPI_SCHEME: "schemes/updateUpiScheme",
-  GET_UPI_SCHEMA: "schemes/upiSchemes",
   ADMIN_RESEND_TRANSACTION: "admin/resendTransaction",
   GET_AEPS_SCHEMA: "schemes/aepsSchemes",
   GET_CARD_SCHEMA: "schemes/cardSchemes",

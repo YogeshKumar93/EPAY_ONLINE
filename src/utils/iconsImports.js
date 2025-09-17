@@ -1,9 +1,75 @@
-import biggpayLogo from "../assets/logo.png";
+import biggpayLogo from "../assets/logo(1).png";
 
 // import biggpayLogo from "./assets/festivalVideo.mp4";
 // import biggpayLogo_sm from "./assets/impsguru.ico";
 // import airIndia from "./assets_travel/images/icons/AI.png";
 // import closeicon from "./assets_travel/images/icons/close1.png";
 // import successVdo from "./assets/video/checkmark.mp4";
+import sbi1 from "../assets/bankicons/sbi.png";
+import axis1 from "../assets/bankicons/Axis.jpg";
+import pnb1 from "../assets/bankicons/pnb.png";
+import bom1 from "../assets/bankicons/BOM.png";
+import bob1 from "../assets/bankicons/BOB.png";
+import hdfc1 from "../assets/bankicons/hdfc.png";
+import icici1 from "../assets/bankicons/Icici.jpg";
+import kotak1 from "../assets/bankicons/Kotak.png";
+import union1 from "../assets/bankicons/union.png";
+import dbs1 from "../assets/bankicons/Dbs.jpg";
+import idbi1 from "../assets/bankicons/Idbi.png";
+import rbl1 from "../assets/bankicons/rbl.png";
+import defbank1 from "../assets/bankicons/bank.jpg";
+import upi12 from "../assets/bankicons/upi.jpg";
+import yes1 from "../assets/bankicons/yes.png";
+import indus1 from "../assets/bankicons/indus.jpg";
+import airtel1 from "../assets/bankicons/airtel.jpg";
+import abhy1 from "../assets/bankicons/ABHY.png";
+import canara1 from "../assets/bankicons/canara.jpg";
+import bandhan1 from "../assets/bankicons/bandhan.png";
+import cbi1 from "../assets/bankicons/cbi.png";
+import idib1 from "../assets/bankicons/idib.avif";
+import stand1 from "../assets/bankicons/chartered.png";
+import jk1 from "../assets/bankicons/jandk.jpg";
 
+import lock_icon from "../assets/lock.png";
+import phone_login from "../assets/mobile.png";
+
+import android_1 from "../assets/android1.png";
+import macintosh_1 from "../assets/macintosh.png";
+import windows_1 from "../assets/windows1.png";
+import linux_1 from "../assets/linux.png";
+import okhttp_1 from "../assets/okhttp.png";
+
+
+export const sbi2 = sbi1;
+export const pnb2 = pnb1;
+export const rbl2 = rbl1;
+export const axis2 = axis1;
+export const hdfc2 = hdfc1;
+export const icici2 = icici1;
+export const kotak2 = kotak1;
+export const bob2 = bob1;
+export const bom2 = bom1;
+export const union2 = union1;
+export const dbs2 = dbs1;
+export const idbi2 = idbi1;
+export const defbank2 = defbank1;
+export const upi2 = upi12;
+export const yes2 = yes1;
+export const indus2 = indus1;
+export const airtel2 = airtel1;
+export const abhy2 = abhy1;
+export const canara2 = canara1;
+export const bandhan2 = bandhan1;
+export const cbi2 = cbi1;
+export const idib2 = idib1;
+export const stand2 = stand1;
+export const jk2 = jk1;
 export const smLogo = biggpayLogo;
+
+export const mobilelogin = phone_login;
+export const lockicon = lock_icon;
+export const android2 = android_1;
+export const macintosh2 = macintosh_1;
+export const windows2 = windows_1;
+export const linux2 = linux_1;
+export const okhttp = okhttp_1;

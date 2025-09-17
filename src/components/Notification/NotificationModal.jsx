@@ -16,7 +16,7 @@ import ApiEndpoints from "../../api/ApiEndpoints";
 import { apiCall } from "../../api/apiClient";
 import { capitalize1 } from "../../utils/TextUtil";
 import { dateToTime, ddmmyy } from "../../utils/DateUtils";
-
+import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 const NotificationModal = () => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
@@ -79,12 +79,24 @@ const NotificationModal = () => {
   return (
     <>
       {/* Notification Icon */}
-      <IconButton color="inherit" onClick={handleClick}>
+      <IconButton
+        sx={{
+          fontFamily: "Nioicon",
+          color: "#526484",
+          mr:1
+        }}
+        onClick={handleClick}
+      >
         <Badge
           badgeContent={notifications?.filter((n) => n.is_read === 0).length}
-          color="error"
+          sx={{
+            "& .MuiBadge-badge": {
+              backgroundColor: "#09c2de",
+              color: "#fff", // badge text color
+            },
+          }}
         >
-          <NotificationsIcon />
+          <NotificationsNoneIcon />
         </Badge>
       </IconButton>
 

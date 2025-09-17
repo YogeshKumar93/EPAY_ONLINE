@@ -1,38 +1,45 @@
-import React, { useState } from 'react'
-import CommonModal from '../components/common/CommonModal'
-import { apiCall } from '../api/apiClient';
-import ApiEndpoints from '../api/ApiEndpoints';
+import React, { useState } from "react";
+import { apiCall } from "../api/apiClient";
+import ApiEndpoints from "../api/ApiEndpoints";
+import CommonModal from "../components/common/CommonModal";
+import { useSchemaForm } from "../hooks/useSchemaForm";
+import { PATTERNS, isValid } from "../utils/validators";
+import { useToast } from "../utils/ToastContext";
 
-const CreateFundRequest = ({open, handleClose, handleSave}) => {
+const CreateFundRequest = ({ open, handleClose, handleSave,onFetchRef }) => {
+  const { schema, formData, handleChange, errors, setErrors, loading } =
+    useSchemaForm(ApiEndpoints.GET_FUNDREQUEST_SCHEMA, open);
 
-const [formData, setFormData] = useState({
-    bank_name: "",
-    status: "",
-    asm_id: "",
-    user_id: "",
-    name: "",
-    mode: "",
-    bank_ref_id: "",
-    date: "",
-    amount: "",
-    remark: "",
-    txn_id:"",
-});
+  const [submitting, setSubmitting] = useState(false);
+  const { showToast } = useToast();
 
-const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
+  // ✅ Validation
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.bank_name) newErrors.bank_name = "Bank is required";
+    if (!formData.mode) newErrors.mode = "Mode is required";
+        if (!formData.bank_ref_id) newErrors.bank_ref_id = "bank_ref_id is required";
 
-   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    if (!formData.date) newErrors.date = "Date is required";
+    if (
+      !formData.amount ||
+      isNaN(formData.amount) ||
+      Number(formData.amount) <= 0
+    ) {
+      newErrors.amount = "Enter a valid amount";
+    }
+    if (formData.remark && formData.remark.length > 200) {
+      newErrors.remark = "Remarks cannot exceed 200 characters";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-    const onSubmit = async () => {
-    // if (!validate()) return;
-    setLoading(true);
+  // ✅ Submit
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    setSubmitting(true);
     try {
       const { error, response } = await apiCall(
         "POST",
@@ -42,157 +49,85 @@ const [errors, setErrors] = useState({});
 
       if (response) {
         handleSave(response.data);
+
+        showToast(
+          response?.message || "Fund request created successfully",
+          "success"
+        );
+        onFetchRef();
         handleClose();
-        setFormData({
-           bank_name: "",
-    status: "",
-    asm_id: "",
-    user_id: "",
-    name: "",
-    mode: "",
-    bank_ref_id: "",
-    date: "",
-    amount: "",
-    remark: "",
-    txn_id:"",
-        });
       } else {
-        console.error("Failed to create account:", error || response);
+        showToast(error?.message || "Failed to create fund request", "error");
       }
     } catch (err) {
-      console.error("Error creating account:", err);
-      alert("Something went wrong while creating account.");
+      console.error("Error creating fund request:", err);
+      showToast("Something went wrong while creating fund request", "error");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
-  const footerButtons = [
-      {
-        text: "Cancel",
-        variant: "outlined",
-        onClick: handleClose,
-        disabled: loading,
-      },
-      {
-        text: "Save",
-        variant: "contained",
-        onClick: onSubmit,
-        disabled: loading,
-        startIcon: loading ? <CircularProgress size={20} color="inherit" /> : null,
-      },
-    ];
+  // ✅ Required fields
+  const requiredFields = [
+    "txn_id",
+    "bank_name",
+    "mode",
+    "bank_ref_id",
+    "date",
+    "amount",
+    "remark",
+  ];
 
-const fieldConfig = [
-  {
-    name: "bank_name",
-    label: "Bank Name",
-    type: "text",
-    validation: { required: true, minLength: 3 },
-  },
-  {
-    name: "status",
-    label: "Status",
-    type: "select",
-    options: [
-      { value: "Pending", label: "Pending" },
-      { value: "Failed", label: "Failed" },
-      { value: "Success", label: "Success" },
-    ],
-    validation: { required: true },
-  },
-  {
-    name: "asm_id",
-    label: "Asm Id",
-    type: "text",
-    validation: { required: false },
-  },
-  {
-    name: "user_id",
-    label: "User Id",
-    type: "text",
-    validation: { required: true, pattern: /^[0-9]+$/ },
-  },
-  {
-    name: "name",
-    label: "Merchant Name",
-    type: "text",
-    validation: { required: true, minLength: 2 },
-  },
-  {
-    name: "mode",
-    label: "Account / Mode",
-    type: "number",
-    validation: { required: true, min: 1 },
-  },
-  {
-    name: "bank_ref_id",
-    label: "Bank Ref Id",
-    type: "text",
-    validation: {
-      required: true,
-      minLength: 11,
-      maxLength: 11,
-      pattern: /^[A-Z0-9]+$/, // uppercase alphanumeric only
-    },
-  },
-  {
+  // ✅ Pick only required fields from schema
+  let visibleFields = schema.filter((field) =>
+    requiredFields.includes(field.name)
+  );
+
+  // ✅ Override date field to use DatePicker
+  const dateField = {
     name: "date",
     label: "Date",
-    type: "number", // important: matches backend "must be a number"
-    validation: { required: true },
-  },
-  {
-    name: "amount",
-    label: "Amount",
-    type: "number",
-    validation: { required: true, min: 1 },
-  },
-  {
-    name: "remark",
-    label: "Remarks",
-    type: "text",
-    validation: { required: false, maxLength: 200 },
-  },
-  {
-    name: "txn_id",
-    label: "TXN ID",
-    type: "text",
-    validation: {
-      required: true,
-      minLength: 6,
-      maxLength: 20,
-      pattern: /^[A-Za-z0-9_-]+$/,
+    type: "datepicker",
+    props: {
+      disableFuture: true,
+      format: "DD/MM/YYYY",
     },
-  },
-];
+  };
+  visibleFields = visibleFields.map((f) =>
+    f.name === "date" ? dateField : f
+  );
 
-
-    return (
-    
-<CommonModal
- open={open}
+  return (
+    <CommonModal
+      open={open}
       onClose={handleClose}
       title="Create Fund Request"
-      footerButtons={footerButtons}
-      size="medium"
       iconType="info"
-       layout="two-column"
-      showCloseButton={true}
-      closeOnBackdropClick={!loading}
-      dividers={true}
-      fieldConfig={fieldConfig} // ✅ pass config
+      size="medium"
+      layout="two-column"
+      dividers
+      fieldConfig={visibleFields}
       formData={formData}
       handleChange={handleChange}
       errors={errors}
-      loading={loading}
-      
->
+      loading={loading || submitting}
+      footerButtons={[
+        {
+          text: "Cancel",
+          variant: "outlined",
+          onClick: handleClose,
+          disabled: submitting,
+        },
+        {
+          text: submitting ? "Saving..." : "Save",
+          variant: "contained",
+          color: "primary",
+          onClick: handleSubmit,
+          disabled: submitting,
+        },
+      ]}
+    />
+  );
+};
 
-
-</CommonModal>
-
-  )
-}
-
-export default CreateFundRequest
+export default CreateFundRequest;

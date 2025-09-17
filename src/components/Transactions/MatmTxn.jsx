@@ -3,15 +3,55 @@ import { Box, Tooltip, Typography, Button } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import AuthContext from "../../contexts/AuthContext";
-import { dateToTime1, ddmmyy } from "../../utils/DateUtils";
+import { dateToTime1, ddmmyy, ddmmyyWithTime } from "../../utils/DateUtils";
+import CommonStatus from "../common/CommonStatus";
 
-const MatmTxn = ({ filters = [], query }) => {
+const MatmTxn = ({  query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const [openCreate, setOpenCreate] = useState(false);
-
+const filters = useMemo(
+    () => [
+      {
+        id: "status",
+        label: "Status",
+        type: "dropdown",
+        options: [
+          { value: "success", label: "Success" },
+          { value: "failed", label: "Failed" },
+          { value: "refund", label: "Refund" },
+          { value: "pending", label: "Pending" },
+        ],
+        defaultValue: "pending",
+      },
+      { id: "sender_mobile", label: "Sender Mobile", type: "textfield" },
+      { id: "txn_id", label: "Txn ID", type: "textfield" },
+    ],
+    []
+  );
   const columns = useMemo(
     () => [
+            
+      {
+        name: "Date",
+        selector: (row) => (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Tooltip title={`Created: ${ddmmyyWithTime(row.created_at)}`} arrow>
+              <span>
+                {ddmmyy(row.created_at)} {dateToTime1(row.created_at)}
+              </span>
+            </Tooltip>
+      
+            <Tooltip title={`Updated: ${ddmmyyWithTime(row.updated_at)}`} arrow>
+              <span>
+               {ddmmyy(row.updated_at)} {dateToTime1(row.updated_at)}
+              </span>
+            </Tooltip>
+          </div>
+        ),
+        wrap: true,
+        width: "140px", 
+      },
       {
         name: "Txn ID",
         selector: (row) => (
@@ -75,14 +115,51 @@ const MatmTxn = ({ filters = [], query }) => {
         wrap: true,
         right: true,
       },
+
       {
-        name: "Charges & Comm",
+        name: "GST",
         selector: (row) => (
           <div style={{ textAlign: "right", fontSize: "0.85rem" }}>
-            <div>Charges: ₹{parseFloat(row.charges).toFixed(2)}</div>
+           
             <div>GST: ₹{parseFloat(row.gst).toFixed(2)}</div>
+            
+          </div>
+        ),
+        wrap: true,
+        right: true,
+      },
+      {
+        name: " Comm",
+        selector: (row) => (
+          <div style={{ textAlign: "right", fontSize: "0.85rem" }}>
+           
+            
             <div>Comm: ₹{parseFloat(row.commission).toFixed(2)}</div>
+            
+          </div>
+        ),
+        wrap: true,
+        right: true,
+      },
+      {
+        name: "TDS",
+        selector: (row) => (
+          <div style={{ textAlign: "right", fontSize: "0.85rem" }}>
+           
+           
             <div>TDS: ₹{parseFloat(row.tds).toFixed(2)}</div>
+ 
+          </div>
+        ),
+        wrap: true,
+        right: true,
+      },
+      {
+        name: "NET",
+        selector: (row) => (
+          <div style={{ textAlign: "right", fontSize: "0.85rem" }}>
+           
+            
             <div style={{ fontWeight: 600, color: "#1976d2" }}>
               Net: ₹{parseFloat(row.net_commission).toFixed(2)}
             </div>
@@ -91,27 +168,7 @@ const MatmTxn = ({ filters = [], query }) => {
         wrap: true,
         right: true,
       },
-      {
-        name: "Status",
-        selector: (row) => (
-          <div
-            style={{
-              color:
-                row.status === "SUCCESS"
-                  ? "green"
-                  : row.status === "PENDING"
-                  ? "orange"
-                  : "red",
-              fontWeight: 700,
-              textAlign: "center",
-            }}
-          >
-            {row.status}
-          </div>
-        ),
-        center: true,
-      },
-      {
+       {
         name: "RRN",
         selector: (row) => (
           <div style={{ textAlign: "left", fontSize: "0.85rem" }}>
@@ -121,27 +178,13 @@ const MatmTxn = ({ filters = [], query }) => {
         wrap: true,
       },
       {
-        name: "Created At",
-        selector: (row) => (
-          <div
-            style={{ textAlign: "left", fontSize: "0.85rem", color: "#444" }}
-          >
-            {ddmmyy(row.created_at)} {dateToTime1(row.created_at)}
-          </div>
-        ),
-        wrap: true,
+        name: "Status",
+      selector: (row) => <CommonStatus value={row.status} />,
+      
+        center: true,
       },
-      {
-        name: "Updated At",
-        selector: (row) => (
-          <div
-            style={{ textAlign: "left", fontSize: "0.85rem", color: "#444" }}
-          >
-            {ddmmyy(row.updated_at)} {dateToTime1(row.updated_at)}
-          </div>
-        ),
-        wrap: true,
-      },
+     
+     
     ],
     []
   );

@@ -1,187 +1,153 @@
-import React, { useState, useContext, useEffect } from "react";
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Stack,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
-  Autocomplete,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import AuthContext from "../../contexts/AuthContext";
-import ApiEndpoints from "../../api/ApiEndpoints";
-import { apiErrorToast, okSuccessToast } from "../../utils/ToastUtil";
+import React, { useState, useEffect } from "react";
 import { apiCall } from "../../api/apiClient";
-const CreateNotification = ({ open, onClose }) => {
-  const authCtx = useContext(AuthContext);
-  const user = authCtx?.user;
-  const navigate = useNavigate();
+import ApiEndpoints from "../../api/ApiEndpoints";
+import CommonModal from "../common/CommonModal";
+import { useSchemaForm } from "../../hooks/useSchemaForm";
+import { useToast } from "../../utils/ToastContext";
 
-  const [title, setTitle] = useState("");
-  const [info, setInfo] = useState("");
-  const [message, setMessage] = useState("");
-  const [selectedUser, setSelectedUser] = useState(""); // selected user ID
-  const [users, setUsers] = useState([]); // users from API
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
+const CreateNotification = ({ open, onClose, onFetchRef}) => {
+  const {
+    schema,
+    formData,
+    handleChange,
+    errors,
+    setErrors,
+    loading,
+  } = useSchemaForm(ApiEndpoints.GET_NOTIFICATION_SCHEMA, open);
 
-  const titleOptions = ["System Update", "Maintenance", "Reminder"];
-  const fetchUsers = async () => {
-    try {
-      const { response, error } = await apiCall("get", ApiEndpoints.GET_USERS);
+  const { showToast } = useToast();
+  const [submitting, setSubmitting] = useState(false);
+  const [users, setUsers] = useState([]);
 
-      if (response) {
-        const userData = response.data
-          ? Array.isArray(response.data)
-            ? response.data
-            : [response.data] // wrap single object in array
-          : [];
-        setUsers(userData);
-      } else {
-        console.error("API Error:", error);
-      }
-    } catch (err) {
-      console.error("Unexpected error:", err);
-    }
-  };
-  // Fetch users from API
+  // ✅ Fetch users when modal opens
   useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const handleSubmit = async () => {
-    setLoading(true);
-    setErrors({});
-
-    if (!title || !info || !message || !selectedUser) {
-      setErrors({ general: "All fields are required" });
-      setLoading(false);
-      return;
-    }
- 
-
-    const formData = {
-      title,
-      info,
-      message,
-      user_id: selectedUser, // selected user from dropdown
+    if (!open) return;
+    const fetchUsers = async () => {
+      const { response, error } = await apiCall("POST", ApiEndpoints.GET_USERS);
+      if (response?.data) {
+        const userList = Array.isArray(response.data)
+          ? response.data
+          : [response.data];
+        setUsers(userList);
+      } else {
+        console.error("Failed to fetch users:", error);
+      }
     };
-   if (selectedUser !== "all") {
-      formData.user_id = selectedUser;
-    }
+    fetchUsers();
+  }, [open]);
+
+  // ✅ Validation
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.title) newErrors.title = "Title is required";
+    if (!formData.type) newErrors.type = "Type is required";
+    if (!formData.message) newErrors.message = "Message is required";
+    if (!formData.user_id) newErrors.user_id = "Please select a user";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // ✅ Submit handler
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    setSubmitting(true);
+
+    const payload = {
+      title: formData.title,
+      type: formData.type,
+      message: formData.message,
+      user_id: formData.user_id === "all" ? "all" : formData.user_id,
+    };
+
     try {
       const { response, error } = await apiCall(
         "post",
         ApiEndpoints.ADMIN_NOTIFICATION,
-        formData
+        payload
       );
 
       if (response) {
-        okSuccessToast(response.message || "Notification created successfully");
+        showToast(response.message || "Notification created successfully", "success");
+        onFetchRef();
         onClose();
       } else {
-        if (error?.errors) {
-          setErrors(error.errors);
-        } else {
-          apiErrorToast(error || "Failed to create notification");
-        }
+        showToast(error?.message || "Failed to create notification", "error");
       }
     } catch (err) {
-      apiErrorToast(err.message || "Something went wrong");
+      console.error("Unexpected API error:", err);
+      showToast("Something went wrong", "error");
     }
 
-    setLoading(false);
+    setSubmitting(false);
   };
 
+  // ✅ Restrict schema to required fields
+  const visibleFields = schema.filter((field) =>
+    ["title", "type", "message", "user_id"].includes(field.name)
+  );
+
+  // ✅ Inject dropdowns and autocomplete
+  const enrichedFields = visibleFields.map((field) => {
+    if (field.name === "user_id") {
+      return {
+        ...field,
+        type: "select",
+        options: [
+          { label: "All Users", value: "all" },
+          ...users.map((u) => ({ label: u.name, value: u.id })),
+        ],
+      };
+    }
+    if (field.name === "title") {
+      return {
+        ...field,
+        type: "autocomplete",
+        options: ["System Update", "Maintenance", "Reminder"],
+      };
+    }
+    if (field.name === "info") {
+      return {
+        ...field,
+        type: "select",
+        options: [
+          { label: "Important", value: "Important" },
+          { label: "Alert System", value: "Alert System" },
+        ],
+      };
+    }
+    return field;
+  });
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Create Notification</DialogTitle>
-      <DialogContent>
-        <Stack spacing={2} mt={1}>
-          {/* Title Autocomplete */}
-          <Autocomplete
-            freeSolo
-            options={titleOptions}
-            value={title}
-            onInputChange={(event, newValue) => setTitle(newValue)}
-            renderInput={(params) => <TextField {...params} label="Title" />}
-          />
-
-          <FormControl fullWidth>
-            <InputLabel id="user-label">Send To</InputLabel>
-            <Select
-              labelId="user-label"
-              value={selectedUser}
-              onChange={(e) => setSelectedUser(e.target.value)}
-              label="Send To"
-            >
-              {/* Option for all users */}
-              <MenuItem value="all">All Users</MenuItem>
-
-              {/* Options from API */}
-              {users?.map((u) => (
-                <MenuItem key={u.id} value={u.id}>
-                  {u.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* Info Dropdown */}
-          <FormControl fullWidth>
-            <InputLabel id="info-label">Info Type</InputLabel>
-            <Select
-              labelId="info-label"
-              value={info}
-              onChange={(e) => setInfo(e.target.value)}
-              label="Info Type"
-            >
-              <MenuItem value="Important">Important</MenuItem>
-              <MenuItem value="Alert System">Alert System</MenuItem>
-            </Select>
-          </FormControl>
-
-          {/* Message Field */}
-          <TextField
-            label="Message"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            multiline
-            rows={4}
-            fullWidth
-            error={!!errors.message}
-            helperText={errors.message}
-          />
-
-          {errors.general && (
-            <Typography color="error">{errors.general}</Typography>
-          )}
-        </Stack>
-      </DialogContent>
-
-      <DialogActions>
-        <Button
-          variant="outlined"
-          onClick={() => {
-            onClose();
-            navigate("/notifications");
-          }}
-        >
-          Cancel
-        </Button>
-        <Button variant="contained" onClick={handleSubmit} disabled={loading}>
-          {loading ? "Submitting..." : "Submit"}
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <CommonModal
+      open={open}
+      onClose={onClose}
+      title="Create Notification"
+      iconType="info"
+      size="small"
+      dividers
+      fieldConfig={enrichedFields}
+      formData={formData}
+      handleChange={handleChange}
+      errors={errors}
+      loading={loading || submitting}
+      footerButtons={[
+        {
+          text: "Cancel",
+          variant: "outlined",
+          onClick: onClose,
+          disabled: submitting,
+        },
+        {
+          text: submitting ? "Submitting..." : "Submit",
+          variant: "contained",
+          color: "primary",
+          onClick: handleSubmit,
+          disabled: submitting,
+        },
+      ]}
+    />
   );
 };
 
