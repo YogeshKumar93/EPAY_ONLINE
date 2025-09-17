@@ -17,7 +17,7 @@ export const MoneyTransfer = () => {
       style={{
         display: "flex",
         alignItems: "center",
-        gap: "6px",
+        gap: "12px",
         minWidth: "80px", // gives proper width
         justifyContent: "flex-start", // align consistently
       }}
@@ -34,7 +34,7 @@ export const MoneyTransfer = () => {
       style={{
         display: "flex",
         alignItems: "center",
-        gap: "6px",
+        gap: "12px",
         minWidth: "80px", // same width for consistency
         justifyContent: "flex-start",
       }}

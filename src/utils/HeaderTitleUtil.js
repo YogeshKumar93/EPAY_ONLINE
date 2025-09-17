@@ -41,6 +41,8 @@ export const setTitleFunc = (path, states) => {
     ? "Logs"
        : path === "/customer/logs"
     ? "Logs"
+     : path === "/customer/retailerlogs"
+    ? "Activity Logs"
       : path === "/admin/selectlayout"
     ? "Layout"
     : path === "/admin/my-profile"

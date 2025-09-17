@@ -7,6 +7,8 @@ import { dateToTime1, ddmmyy, ddmmyyWithTime } from "../../utils/DateUtils";
 import CommonStatus from "../common/CommonStatus";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import ComplaintForm from "../ComplaintForm";
+import DrawerDetails from "../common/DrawerDetails";
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 const DmtTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
@@ -14,7 +16,8 @@ const DmtTxn = ({ query }) => {
 
   const [openCreate, setOpenCreate] = useState(false);
   const [selectedTxn, setSelectedTxn] = useState(null);
-
+ const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
   const filters = useMemo(
     () => [
       {
@@ -228,6 +231,18 @@ const DmtTxn = ({ query }) => {
         filters={filters}
         queryParam={queryParam}
         enableActionsHover={true}
+      />
+
+     <DrawerDetails
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        rowData={selectedRow}
+        
+        // fields={[
+        //   { label: "Gst", key: "gst" },
+        //   { label: "Api Response", key: "api_response" },
+         
+        // ]}
       />
 
       {/* ✅ Complaint Modal */}

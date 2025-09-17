@@ -9,7 +9,7 @@ import RechargeTxn from "../components/Transactions/RechargeTxn";
 import PayoutTxn from "../components/Transactions/PayoutTxn";
 import MatmTxn from "../components/Transactions/MatmTxn";
 import IrctcTxn from "../components/Transactions/IrctcTxn";
-
+import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 // Icons
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import ReceiptIcon from "@mui/icons-material/Receipt";
@@ -23,14 +23,143 @@ import Wallet2WalletTransfer from "./Wallet2WalletTransfer";
 
 export const Transaction = () => {
   const tabItems = [
-    { label: "DMT", icon: <SwapHorizIcon />, component: <DmtTxn /> },
-    { label: "BBPS", icon: <ReceiptIcon />, component: <BbpxTxn /> },
-    { label: "Aeps", icon: <FingerprintIcon />, component: <AepsTxn /> },
-    { label: "Matm", icon: <CreditCardIcon />, component: <MatmTxn /> },
-    { label: "Fund Transfer", icon: <PaymentIcon />, component: <PayoutTxn /> },
-    { label: "Recharge", icon: <PhoneIphoneIcon />, component: <RechargeTxn /> },
-    { label: "Irctc", icon: <TrainIcon />, component: <IrctcTxn /> },
-    { label: "W2W", icon: <Wallet />, component: <Wallet2WalletTransfer /> },
+     
+     {
+    label: (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          minWidth: "80px",
+          justifyContent: "flex-start",
+        }}
+      >
+        <CurrencyRupeeIcon fontSize="small" />
+        <span>DMT</span>
+      </div>
+    ),
+    component: <DmtTxn />,
+  },
+  {
+    label: (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          minWidth: "80px",
+          justifyContent: "flex-start",
+        }}
+      >
+        <ReceiptIcon fontSize="small" />
+        <span>BBPS</span>
+      </div>
+    ),
+    component: <BbpxTxn />,
+  },
+  {
+    label: (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          minWidth: "80px",
+          justifyContent: "flex-start",
+        }}
+      >
+        <FingerprintIcon fontSize="small" />
+        <span>Aeps</span>
+      </div>
+    ),
+    component: <AepsTxn />,
+  },
+  {
+    label: (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          minWidth: "80px",
+          justifyContent: "flex-start",
+        }}
+      >
+        <CreditCardIcon fontSize="small" />
+        <span>Matm</span>
+      </div>
+    ),
+    component: <MatmTxn />,
+  },
+  {
+    label: (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          minWidth: "80px",
+          justifyContent: "flex-start",
+        }}
+      >
+        <SwapHorizIcon fontSize="small" />
+        <span>Fund Transfer</span>
+      </div>
+    ),
+    component: <PayoutTxn />,
+  },
+  {
+    label: (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          minWidth: "80px",
+          justifyContent: "flex-start",
+        }}
+      >
+        <PhoneIphoneIcon fontSize="small" />
+        <span>Recharge</span>
+      </div>
+    ),
+    component: <RechargeTxn />,
+  },
+  {
+    label: (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          minWidth: "80px",
+          justifyContent: "flex-start",
+        }}
+      >
+        <TrainIcon fontSize="small" />
+        <span>Irctc</span>
+      </div>
+    ),
+    component: <IrctcTxn />,
+  },
+  {
+    label: (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          minWidth: "80px",
+          justifyContent: "flex-start",
+        }}
+      >
+        <Wallet fontSize="small" />
+        <span>W2W</span>
+      </div>
+    ),
+    component: <Wallet2WalletTransfer />,
+  },
   ];
 
   return <CommonTabs tabs={tabItems} defaultTab={0} />;

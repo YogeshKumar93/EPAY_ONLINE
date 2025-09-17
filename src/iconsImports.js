@@ -203,6 +203,7 @@ import complain from "./assets/Images/Settings.svg";
 import risk from "./assets/Images/Risk.svg";
 import virtualAccount from "./assets/sidenav/virtualaccount1.svg";
 import loginHistory from "./assets/Images/history.svg";
+ 
 
 // side nav images
 

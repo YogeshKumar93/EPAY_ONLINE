@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Box, TextField } from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
@@ -11,6 +11,7 @@ import RemitterRegister from "./RemitterRegister";
 import AuthContext from "../contexts/AuthContext";
 import Dmt2SelectedBene from "./Dmt2SelectedBene";
 import Dmt2Beneficiaries from "./Dmt2Beneficiaries";
+import CommonLoader from "../components/common/CommonLoader";
 
 const Dmt2 = () => {
   const [mobile, setMobile] = useState("");
@@ -21,15 +22,18 @@ const Dmt2 = () => {
   const [openRegisterModal, setOpenRegisterModal] = useState(false);
   const { showToast } = useToast();
   const { location } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
 
   const handleFetchSender = async (number = mobile) => {
     if (!number || number.length !== 10) return;
 
+     setLoading(true); // start loader
     const { error, response } = await apiCall("post", ApiEndpoints.DMT2, {
       mobile_number: number,
       latitude: location?.lat || "",
       longitude: location?.long || "",
     });
+     setLoading(false); // stop loader
 
     if (response) {
       const data = response?.data || response?.response?.data;
@@ -57,6 +61,13 @@ const Dmt2 = () => {
     }
   };
 
+   useEffect(() => {
+        const timer = setTimeout(() => {
+          setLoading(false);
+        }, 1000);
+        return () => clearTimeout(timer);
+      }, []);
+
   const handleChange = (e) => {
     const value = e.target.value.replace(/\D/g, "");
     if (value.length <= 10) {
@@ -78,6 +89,7 @@ const Dmt2 = () => {
 
   return (
     <Box>
+      <Box>
       <TextField
         label="Mobile Number"
         variant="outlined"
@@ -87,6 +99,18 @@ const Dmt2 = () => {
         inputProps={{ maxLength: 10 }}
         sx={{ mb: 1 }}
       />
+{loading && (
+            <CommonLoader loading={loading}  
+              size={24}
+              sx={{
+                position: "absolute",
+                top: "50%",
+                right: 16,
+                transform: "translateY(-50%)",
+              }}
+            />
+          )}
+      </Box>
 
       {openRegisterModal && (
         <RemitterRegister

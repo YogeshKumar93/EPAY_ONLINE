@@ -123,6 +123,14 @@ const Users = ({ query }) => {
           </Tooltip>
         ),
       },
+       {
+        name: "Role",
+        selector: (row) => (
+          <Tooltip title={row?.role}>
+            <div style={{ textAlign: "left" }}>{row?.role}</div>
+          </Tooltip>
+        ),
+      },
       {
         name: "Mobile",
         selector: (row) => (

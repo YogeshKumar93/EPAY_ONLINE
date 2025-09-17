@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { 
   Box, 
   Paper, 
-  Typography, 
   useTheme,
   useMediaQuery 
 } from "@mui/material";
@@ -16,6 +15,7 @@ import LocalGasStationIcon from "@mui/icons-material/LocalGasStation";
 import OpacityIcon from "@mui/icons-material/Opacity";
 import SecurityIcon from "@mui/icons-material/Security";
 import CallIcon from "@mui/icons-material/Call";
+
 import ElectricityForm from "./ElectricityForm";
 import CustomTabs from "../../common/CustomTabs";
 
@@ -25,15 +25,132 @@ const RechargeAndBill = () => {
   const [currentTab, setCurrentTab] = useState(0);
 
   const tabs = [
-    { label: "Postpaid", icon: <Diversity2Icon /> },
-    { label: "Prepaid", icon: <SettingsCellIcon /> },
-    { label: "DTH", icon: <SatelliteIcon /> },
-    { label: "Electricity", icon: <BoltIcon /> },
-    { label: "Broadband", icon: <RouterIcon /> },
-    { label: "Gas", icon: <LocalGasStationIcon /> },
-    { label: "Water", icon: <OpacityIcon /> },
-    { label: "Insurance", icon: <SecurityIcon /> },
-    { label: "Landline", icon: <CallIcon /> },
+    {
+      label: (
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "4px",
+          minWidth: "80px",
+          justifyContent: "flex-start",
+        }}>
+          <Diversity2Icon fontSize="small" />
+          <span>Postpaid</span>
+        </div>
+      ),
+    },
+    {
+      label: (
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "4px",
+          minWidth: "80px",
+          justifyContent: "flex-start",
+        }}>
+          <SettingsCellIcon fontSize="small" />
+          <span>Prepaid</span>
+        </div>
+      ),
+    },
+    {
+      label: (
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "4px",
+          minWidth: "80px",
+          justifyContent: "flex-start",
+        }}>
+          <SatelliteIcon fontSize="small" />
+          <span>DTH</span>
+        </div>
+      ),
+    },
+    {
+      label: (
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "4px",
+          minWidth: "80px",
+          justifyContent: "flex-start",
+        }}>
+          <BoltIcon fontSize="small" />
+          <span>Electricity</span>
+        </div>
+      ),
+    },
+    {
+      label: (
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "4px",
+          minWidth: "80px",
+          justifyContent: "flex-start",
+        }}>
+          <RouterIcon fontSize="small" />
+          <span>Broadband</span>
+        </div>
+      ),
+    },
+    {
+      label: (
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "4px",
+          minWidth: "80px",
+          justifyContent: "flex-start",
+        }}>
+          <LocalGasStationIcon fontSize="small" />
+          <span>Gas</span>
+        </div>
+      ),
+    },
+    {
+      label: (
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "4px",
+          minWidth: "80px",
+          justifyContent: "flex-start",
+        }}>
+          <OpacityIcon fontSize="small" />
+          <span>Water</span>
+        </div>
+      ),
+    },
+    {
+      label: (
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "4px",
+          minWidth: "80px",
+          justifyContent: "flex-start",
+        }}>
+          <SecurityIcon fontSize="small" />
+          <span>Insurance</span>
+        </div>
+      ),
+    },
+    {
+      label: (
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "4px",
+          minWidth: "80px",
+          justifyContent: "flex-start",
+        }}>
+          <CallIcon fontSize="small" />
+          <span>Landline</span>
+        </div>
+      ),
+    },
   ];
 
   const tabComponents = [
@@ -61,11 +178,13 @@ const RechargeAndBill = () => {
         background: theme.palette.background.paper,
       }}
     >
-      <Box sx={{ 
-        borderBottom: 1, 
-        borderColor: 'divider',
-        mb: 3,
-      }}>
+      <Box 
+        sx={{ 
+          borderBottom: 1, 
+          borderColor: "divider",
+          mb: 3,
+        }}
+      >
         <CustomTabs 
           tabs={tabs} 
           value={currentTab} 

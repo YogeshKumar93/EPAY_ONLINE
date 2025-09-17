@@ -16,6 +16,7 @@ import VerifySenderModal from "./VerifySenderModal";
 import BeneficiaryDetails from "./BeneficiaryDetails";
 import UpiBeneficiaryList from "./UpiBeneficiaryList";
 import UpiBeneficiaryDetails from "./UpiBeneficiaryDetails";
+import CommonLoader from "../components/common/CommonLoader";
 
 const UpiTransfer = () => {
   const theme = useTheme();
@@ -27,16 +28,18 @@ const UpiTransfer = () => {
   const [openVerifyModal, setOpenVerifyModal] = useState(false);
   const [otpData, setOtpData] = useState(null);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
+const [loading, setLoading] = useState(false);
 
   // Fetch sender by mobile number
   const handleFetchSender = async (number = mobile) => {
     if (!number || number.length !== 10) return;
 
+     setLoading(true); // start loader
     try {
       const response = await apiCall("post", ApiEndpoints.GET_SENDER, {
         mobile_number: number,
       });
-
+ setLoading(false); // stop loader
       const data = response?.data || response?.response?.data;
 
       if (response?.status)
@@ -54,6 +57,13 @@ const UpiTransfer = () => {
       console.error("Error fetching sender:", error);
     }
   };
+
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }, []);
 
   const handleChange = (e) => {
     const value = e.target.value.replace(/\D/g, ""); // only digits allowed
@@ -79,6 +89,7 @@ const UpiTransfer = () => {
   return (
     <Box p={3}>
       {/* Always show mobile input */}
+      <Box>
       <TextField
         label="Mobile Number"
         variant="outlined"
@@ -89,7 +100,18 @@ const UpiTransfer = () => {
         inputProps={{ maxLength: 10 }}
         sx={{ mb: 2 }}
       />
-
+        {loading && (
+            <CommonLoader loading={loading}  
+              size={24}
+              sx={{
+                position: "absolute",
+                top: "50%",
+                right: 16,
+                transform: "translateY(-50%)",
+              }}
+            />
+          )}
+</Box>
       {/* Main Content (Sender + Beneficiaries) */}
       <Box display="flex" flexDirection={isMobile ? "column" : "row"} gap={1}>
         {/* Left: Sender Details + Selected Beneficiary */}

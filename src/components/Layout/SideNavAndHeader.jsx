@@ -493,7 +493,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             </IconButton>
 
             {/* Role + Name as separate text (not clickable) */}
-            <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <Box onClick={handleUserMenuOpen} sx={{ display: "flex", flexDirection: "column",   cursor: "pointer"  }}>
               <Typography
                 variant="caption"
                 sx={{

@@ -12,8 +12,42 @@ import SyncAltIcon from "@mui/icons-material/SyncAlt";
 
 export const Transfer = () => {
   const tabItems = [
-  { label: "Fund Transfer", icon: <SyncAltIcon />, component: <SuperTransfer /> },
-  { label: "UPI", icon: <QrCodeIcon />, component: <UpiTransfer /> },
+   
+
+  {
+    label: (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          minWidth: "80px", 
+          justifyContent: "flex-start", 
+        }}
+      >
+        <SyncAltIcon fontSize="small" />
+        <span>Fund Transfer</span>
+      </div>
+    ),
+    component: <SuperTransfer />,
+  },
+  {
+    label: (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          minWidth: "80px", // same width for consistency
+          justifyContent: "flex-start",
+        }}
+      >
+        <QrCodeIcon fontSize="small" />
+        <span>UPI</span>
+      </div>
+    ),
+    component: <UpiTransfer />,
+  },
 
   
   ];

@@ -9,12 +9,33 @@ import { android2, linux2, macintosh2, okhttp, windows2 } from "../utils/iconsIm
 import LaptopIcon from "@mui/icons-material/Laptop";
 import CommonStatus from "../components/common/CommonStatus";
 
-const RetailerLogs = ({ filters = [] }) => {
+const RetailerLogs = ({  }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const [refreshKey, setRefreshKey] = useState(0);
   const [query, setQuery] = useState("");
 console.log("queryyy",query);
+
+ const filters = useMemo(
+    () => [
+      {
+        id: "service_name",
+        label: "Service Name",
+        type: "textfield",
+      },
+      // {
+      //   id: "date_range",
+      //   // label: "Date Range",
+      //   type: "daterange",
+      // },
+      // {
+      //   id: "mobile",
+      //   label: "Mobile",
+      //   type: "textfield",
+      // },
+    ],
+    []
+  );
 
   const columns = useMemo(
     () => [
@@ -116,6 +137,7 @@ console.log("queryyy",query);
     <Box>
      <CommonTable
   columns={columns}
+    filters={filters}
   endpoint={ApiEndpoints.GET_LOG}
   queryParam={{ id: user?.id }}   // ✅ merged into params
 />
