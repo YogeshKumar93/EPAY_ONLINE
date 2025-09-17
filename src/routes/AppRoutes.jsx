@@ -220,12 +220,12 @@ export default function AppRoutes() {
               />
               <Route path="customer/accounts" element={<Accounts />} />
               <Route path="customer/allServices" element={<AllServices />} />
-               
+               <Route path="di/dashboard" element={<AdminTransactions />} />
             </>
           )}
           {isDi && (
             <>
-              <Route path="di/dashboard" element={<AdminTransactions />} />
+              
               <Route path="di/users" element={<Users />} />
               <Route path="di/services" element={<Dashboard />} />
               <Route path="di/allServices" element={<AllServices />} />
