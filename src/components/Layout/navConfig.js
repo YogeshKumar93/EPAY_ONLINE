@@ -111,24 +111,31 @@ export const customer_nav = [
     icon2: "🛠️",
     to: "/customer/money-transfer",
   },
-   {
-    title: "Fund Transfer",
-    icon: fundReqImage,
+    {
+    title: "Transfer",
+     icon: fundReqImage,
     icon2: "🛠️",
-    to: "/customer/fund-transfer",
-  },
+     to: "/customer/transfer",
+    },
+
+  //  {
+  //   title: "Fund Transfer",
+  //   icon: fundReqImage,
+  //   icon2: "🛠️",
+  //   to: "/customer/fund-transfer",
+  // },
    {
     title: "Wallet Transfer",
     icon: walletTransferImage,
     icon2: "🛠️",
     to: "/customer/wallet-transfer",
   },
-   {
-    title: "Upi Transfer",
-    icon: walletTransferImage,
-    icon2: "🛠️",
-    to: "/customer/upi-transfer",
-  },
+  //  {
+  //   title: "Upi Transfer",
+  //   icon: walletTransferImage,
+  //   icon2: "🛠️",
+  //   to: "/customer/upi-transfer",
+  // },
   {
     title: "Recharge and bill",
     icon: serviceImage,
