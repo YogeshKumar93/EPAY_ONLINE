@@ -169,7 +169,7 @@ const RemitterDetails = ({ sender }) => {
                 >
                   <AccountBalance fontSize="small" />
                 </Avatar>
-                <Box ml={1.5} textAlign="left">
+                <Box ml={1.5}  textAlign="left">
                   <Typography variant="body2" color="text.secondary">
                     Limit Available
                   </Typography>
