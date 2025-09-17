@@ -203,6 +203,7 @@ import complain from "./assets/Images/Settings.svg";
 import risk from "./assets/Images/Risk.svg";
 import virtualAccount from "./assets/sidenav/virtualaccount1.svg";
 import loginHistory from "./assets/Images/history.svg";
+import BbpsIcon from "../assets/icons/bbps.svg";
 
 // side nav images
 
@@ -562,7 +563,7 @@ export const walletLdgerImage = walletLdger;
 export const settingImage = setting; 
 export const serviceImage = service; 
 export const layoutImage = layout;
- 
+export const bbpsImage = BbpsIcon;
 
 export const aepsImage = aeps;
 export const complainImage = complain;
