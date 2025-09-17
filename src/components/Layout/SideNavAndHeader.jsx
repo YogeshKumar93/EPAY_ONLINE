@@ -590,12 +590,23 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
     Manage Profile
   </MenuItem> 
 
-  <MenuItem onClick={() => navigate(`/${user?.role}/logs`)}>
-    <ListItemIcon>
-      <TimelineIcon fontSize="small" />
-    </ListItemIcon>
-    Logs Activity
-  </MenuItem>
+<MenuItem
+  onClick={() => {
+    if (user?.role === "adm") {
+      navigate("/logs");
+    } else if (user?.role === "ret") {
+      navigate("/customer/retailerlogs");
+    } else {
+      navigate(`/${user?.role}/logs`); // fallback for other roles
+    }
+  }}
+>
+  <ListItemIcon>
+    <TimelineIcon fontSize="small" />
+  </ListItemIcon>
+  Logs Activity
+</MenuItem>
+
 
   {/* <MenuItem>
     <ListItemIcon>

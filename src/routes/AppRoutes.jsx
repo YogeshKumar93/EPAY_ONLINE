@@ -190,7 +190,7 @@ export default function AppRoutes() {
                 path="customer/account-ledger"
                 element={<AccountLadger />}
               />
-              <Route path="customer/logs" element={<RetailerLogs />} />
+              <Route path="customer/retailerlogs" element={<RetailerLogs />} />
               <Route path="customer/money-transfer" element={<MoneyTransfer />} />
               {/* <Route
                 path="customer/fund-transfer"
@@ -222,6 +222,7 @@ export default function AppRoutes() {
               />
               <Route path="customer/accounts" element={<Accounts />} />
               <Route path="customer/allServices" element={<AllServices />} />
+               
             </>
           )}
           {isDi && (

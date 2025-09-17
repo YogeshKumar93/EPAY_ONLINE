@@ -190,7 +190,7 @@ export const customer_nav = [
     title: "Activity Logs",
     icon: riskImage,
     icon2: "📒",
-    to: "/customer/logs",
+    to: "/customer/retailerlogs",
   },
 ];
 export const di_nav = [
