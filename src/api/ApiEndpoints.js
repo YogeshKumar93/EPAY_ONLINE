@@ -193,7 +193,7 @@ const ApiEndpoints = {
   DMT2_REMOVE_BENEFICIARY: "dmt2/removeBeneficiaryDmt2",
   REGISTER_DMT2_BENEFICIARY: "dmt2/registerBeneficiaryDmt2",
   DMT2_VERIFY_BENEFICIARY: "dmt1/accountVerification",
-
+  BLOCK_UNBLOCK_SERVICE: "service/blockUnblock",
   CREATE_USER: "signup/createUser",
   GET_SIGNUP_SCHEMA: "signup/getSignupSchema",
   DMT1: "dmt1/remitterStatus",
