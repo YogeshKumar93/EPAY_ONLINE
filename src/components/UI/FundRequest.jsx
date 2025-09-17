@@ -1,5 +1,5 @@
 import { useMemo, useState, useContext, useEffect, useRef } from "react";
-import { Box, Button, IconButton, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Tooltip, Typography } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import { currencySetter } from "../../utils/Currencyutil";
@@ -158,45 +158,43 @@ const FundRequest = () => {
       ? [
           {
             name: "Actions",
-            width: "100px", // ✅ fix width to avoid jump
             selector: (row, { hoveredRow, enableActionsHover }) => (
               <Box
                 sx={{
                   display: "flex",
-                  justifyContent: "center",
                   alignItems: "center",
+                  justifyContent: "center",
                   gap: 1,
+                  width: "120px", // ✅ fixed width
                 }}
               >
-                {enableActionsHover && hoveredRow !== row.id ? (
-                  // ✅ hover na ho tab dash dikhe (but same width occupy kare)
-                  <span
-                    style={{
-                      color: "#999",
-                      display: "inline-block",
-                      width: 60,
-                      textAlign: "center",
-                    }}
-                  >
-                    -
-                  </span>
-                ) : (
-                  // ✅ hover ya always case -> buttons
-                  <>
-                    <Tooltip title="Approve">
-                      <IconButton size="small" color="success">
-                        <CheckCircleIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Reject">
-                      <IconButton size="small" color="error">
-                        <CancelIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </>
-                )}
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 1,
+                    opacity:
+                      enableActionsHover && hoveredRow === row.id ? 1 : 0, // ✅ only fade
+                    pointerEvents:
+                      enableActionsHover && hoveredRow === row.id
+                        ? "auto"
+                        : "none", // ✅ no click
+                    transition: "opacity 0.2s ease-in-out", // ✅ smooth fade
+                  }}
+                >
+                  <Tooltip title="Approve">
+                    <Button size="small" color="success">
+                      <CheckCircleIcon fontSize="small" />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip title="Reject">
+                    <Button size="small" color="error">
+                      <CancelIcon fontSize="small" />
+                    </Button>
+                  </Tooltip>
+                </Box>
               </Box>
             ),
+            width: "120px", // ✅ fix column width too
           },
         ]
       : []),

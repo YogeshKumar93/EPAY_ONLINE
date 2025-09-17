@@ -1,5 +1,5 @@
 import { useMemo, useContext, useState, useEffect, useRef } from "react";
-import { Box, Tooltip, Chip, IconButton } from "@mui/material";
+import { Box, Tooltip, Chip, IconButton, Typography } from "@mui/material";
 import { Delete, Info as InfoIcon } from "@mui/icons-material";
 import AuthContext from "../contexts/AuthContext";
 import { dateToTime, ddmmyy } from "../utils/DateUtils";
@@ -64,27 +64,44 @@ const Plans = ({ filters = [], query }) => {
       { name: "Name", selector: (row) => row?.name, wrap: true },
       { name: "Description", selector: (row) => row?.description, wrap: true },
 
-      {
-        name: "Actions",
-        selector: (row) => (
-          <>
-          <IconButton color="primary" onClick={() => handleEditClick(row)}>
-                     <Edit />
-                   </IconButton>
-            <IconButton
-              color="error"
-              onClick={() => {
-                setSelectedLogId(row.id);
-                setOpenDelete(true);
-              }}
-              size="small"
-            >
-              <Delete />
-            </IconButton>
-          </>
-        ),
-        width: "120px",
+   {
+      name: "Actions",
+      selector: (row, { hoveredRow, enableActionsHover }) => {
+        const isHovered = hoveredRow === row.id || !enableActionsHover;
+
+        return (
+          <Box sx={{ display: "flex", justifyContent: "center", minWidth: "120px" }}>
+            {isHovered ? (
+              <Box sx={{ display: "flex", gap: 1, transition: "opacity 0.2s" }}>
+                <Tooltip title="Edit">
+                  <IconButton color="primary" size="small" onClick={() => handleEditClick(row)}>
+                    <Edit fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete">
+                  <IconButton
+                    color="error"
+                    size="small"
+                    onClick={() => {
+                      setSelectedLogId(row.id);
+                      setOpenDelete(true);
+                    }}
+                  >
+                    <Delete fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            ) : (
+              <Typography variant="body2" sx={{ color: "#999", textAlign: "center", minWidth: "120px" }}>
+                -
+              </Typography>
+            )}
+          </Box>
+        );
       },
+      width: "120px",
+      center: true,
+    },
     ],
     []
   );

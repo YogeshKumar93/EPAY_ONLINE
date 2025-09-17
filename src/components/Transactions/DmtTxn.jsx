@@ -161,22 +161,56 @@ const DmtTxn = ({ query }) => {
         ? [
             {
               name: "Actions",
-              selector: (row) => (
-                <Box sx={{ background: "#000" }}>
-                  {" "}
-                  <IconButton
-                    color="error"
-                    onClick={() => {
-                      setSelectedTxn(row);
-                      setOpenCreate(true);
+              selector: (row, { hoveredRow, enableActionsHover }) => {
+                const isHovered = hoveredRow === row.id || !enableActionsHover;
+
+                return (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      minWidth: "80px", // fixed width
                     }}
                   >
-                    {" "}
-                    <ReportProblemIcon fontSize="small" />{" "}
-                  </IconButton>{" "}
-                </Box>
-              ),
-              width: "120px",
+                    {isHovered ? (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          gap: 1,
+                          transition: "opacity 0.2s ease-in-out",
+                        }}
+                      >
+                        <Tooltip title="Raise Complaint">
+                          <IconButton
+                            color="error"
+                            size="small"
+                            onClick={() => {
+                              setSelectedTxn(row);
+                              setOpenCreate(true);
+                            }}
+                          >
+                            <ReportProblemIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    ) : (
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: "#999",
+                          textAlign: "center",
+                          minWidth: "80px", // same as icon container
+                        }}
+                      >
+                        -
+                      </Typography>
+                    )}
+                  </Box>
+                );
+              },
+              width: "100px",
+              center: true,
             },
           ]
         : []),
@@ -193,6 +227,7 @@ const DmtTxn = ({ query }) => {
         endpoint={ApiEndpoints.GET_DMT_TXN}
         filters={filters}
         queryParam={queryParam}
+        enableActionsHover={true}
       />
 
       {/* ✅ Complaint Modal */}

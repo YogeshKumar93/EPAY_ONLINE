@@ -1,5 +1,5 @@
 import { useMemo, useContext, useState, useEffect, useRef } from "react";
-import { Tooltip, IconButton, Box } from "@mui/material";
+import { Tooltip, IconButton, Box, Typography } from "@mui/material";
 import { Edit } from "@mui/icons-material";
 import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
@@ -45,14 +45,15 @@ const Banks = ({ filters = [] }) => {
     setOpenDelete(true);
   };
 
-const handleStatement = (row) => {
- 
-  navigate(`/admin/bankstatements/${row.id}`, {
-    state: { bank_id: row.id, bank_name:row.bank_name, balance: row.balance },  
-  });
-};
-
-
+  const handleStatement = (row) => {
+    navigate(`/admin/bankstatements/${row.id}`, {
+      state: {
+        bank_id: row.id,
+        bank_name: row.bank_name,
+        balance: row.balance,
+      },
+    });
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -106,9 +107,7 @@ const handleStatement = (row) => {
       },
       {
         name: "IFSC Code",
-        selector: (row) => (
-          <div style={{ textAlign: "left" }}>{row.ifsc}</div>
-        ),
+        selector: (row) => <div style={{ textAlign: "left" }}>{row.ifsc}</div>,
         wrap: true,
       },
       {
@@ -127,34 +126,78 @@ const handleStatement = (row) => {
       },
       {
         name: "Actions",
-        selector: (row) => (
-          <Box sx={{ display: "flex", gap: 1 }}>
-            <Tooltip title="Statement">
-              <IconButton color="info" onClick={() => handleStatement(row)}>
-                <DescriptionIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
+        selector: (row, { hoveredRow, enableActionsHover }) => {
+          const isHovered = hoveredRow === row.id || !enableActionsHover;
 
-            <IconButton
-              size="small"
-              color="primary"
-              onClick={() => {
-                setSelectedRow(row);
-                setOpenEdit(true);
+          return (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth: "120px", // fixed width
               }}
             >
-              <Edit fontSize="small" />
-            </IconButton>
+              {isHovered ? (
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 1,
+                    transition: "opacity 0.2s ease-in-out",
+                  }}
+                >
+                  <Tooltip title="Statement">
+                    <IconButton
+                      color="info"
+                      size="small"
+                      onClick={() => handleStatement(row)}
+                    >
+                      <DescriptionIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
 
-            <Tooltip title="Delete">
-              <IconButton color="error" onClick={() => handleDelete(row)}>
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        ),
+                  <Tooltip title="Edit">
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={() => {
+                        setSelectedRow(row);
+                        setOpenEdit(true);
+                      }}
+                    >
+                      <Edit fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+
+                  {user?.role === "adm" && (
+                    <Tooltip title="Delete">
+                      <IconButton
+                        color="error"
+                        size="small"
+                        onClick={() => handleDelete(row)}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </Box>
+              ) : (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "#999",
+                    textAlign: "center",
+                    minWidth: "120px", // same as icon container
+                  }}
+                >
+                  -
+                </Typography>
+              )}
+            </Box>
+          );
+        },
+        width: "120px",
         center: true,
-        width: "150px", // ✅ more space for 3 icons
       },
     ],
     []

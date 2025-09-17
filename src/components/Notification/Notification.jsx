@@ -111,23 +111,37 @@ const [loading, setLoading] = useState(true); // initially true
         selector: (row) => <CommonStatus is_read={row.is_read}  />,
         center: true,
       },
-      {
-        name: "Actions",
-        selector: (row) => (
-          <Box sx={{ display: "flex", gap: 1 }}>
-            <Tooltip title="Edit">
-              <IconButton color="primary" onClick={() => handleEdit(row)}>
-                <EditIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Delete">
-              <IconButton color="error" onClick={() => handleDelete(row)}>
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
+     {
+      name: "Actions",
+      selector: (row, { hoveredRow, enableActionsHover }) => {
+        const isHovered = hoveredRow === row.id || !enableActionsHover;
+
+        return (
+          <Box sx={{ display: "flex", justifyContent: "center", minWidth: "120px" }}>
+            {isHovered ? (
+              <Box sx={{ display: "flex", gap: 1, transition: "opacity 0.2s" }}>
+                <Tooltip title="Edit">
+                  <IconButton color="primary" size="small" onClick={() => handleEdit(row)}>
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete">
+                  <IconButton color="error" size="small" onClick={() => handleDelete(row)}>
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            ) : (
+              <Typography variant="body2" sx={{ color: "#999", textAlign: "center", minWidth: "120px" }}>
+                -
+              </Typography>
+            )}
           </Box>
-        ),
+        );
       },
+      width: "120px",
+      center: true,
+    },
     ],
     []
   );
