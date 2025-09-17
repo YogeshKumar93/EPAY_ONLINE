@@ -63,89 +63,134 @@ const Templates = ({ filters = [], query }) => {
       alert("Delete failed: " + (error?.message || response?.message));
     }
   };
+const columns = useMemo(
+  () => [
+    {
+      name: "Date/Time",
+      selector: (row) => (
+        <Typography variant="body2" sx={{ textAlign: "left" }} noWrap>
+          {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
+        </Typography>
+      ),
+      wrap: false,
+      width: "150px",
+    },
+    {
+      name: "Template Id",
+      selector: (row) => (
+        <Tooltip title={row?.temp_id}>
+          <Typography variant="body2" sx={{ textAlign: "left" }} noWrap>
+            {row?.temp_id}
+          </Typography>
+        </Tooltip>
+      ),
+      width: "120px",
+    },
+    {
+      name: "Vendor",
+      selector: (row) => (
+        <Tooltip title={row?.vendor}>
+          <Typography variant="body2" sx={{ textAlign: "left" }} noWrap>
+            {row?.vendor || "-"}
+          </Typography>
+        </Tooltip>
+      ),
+      width: "150px",
+    },
+    {
+      name: "Name",
+      selector: (row) => (
+        <Tooltip title={row?.name}>
+          <Typography variant="body2" sx={{ textAlign: "left" }} noWrap>
+            {row?.name || "-"}
+          </Typography>
+        </Tooltip>
+      ),
+      width: "150px",
+    },
+    {
+      name: "Message",
+      selector: (row) => (
+        <Tooltip title={row?.message}>
+          <div style={{ textAlign: "left" }}>{row?.message || "-"}</div>
+        </Tooltip>
+      ),
+      width: "250px",
+      // wrap: true,
+    },
+    {
+      name: "Status",
+      selector: (row, { hoveredRow, enableActionsHover }) => {
+        const isHovered = hoveredRow === row.id || !enableActionsHover;
+        return (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 1,
+              minWidth: "120px",
+            }}
+          >
+            <CommonStatus value={row.status} />
+          </Box>
+        );
+      },
+      center: true,
+      width: "120px",
+    },
+    {
+      name: "Actions",
+      selector: (row, { hoveredRow, enableActionsHover }) => {
+        const isHovered = hoveredRow === row.id || !enableActionsHover;
+        return (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minWidth: "120px",
+              gap: 1,
+            }}
+          >
+            {isHovered ? (
+              <>
+                <IconButton
+                  color="primary"
+                  size="small"
+                  onClick={() => {
+                    setSelectedTemplate(row);
+                    setOpenEdit(true);
+                  }}
+                >
+                  <Edit fontSize="small" />
+                </IconButton>
+                <IconButton
+                  color="error"
+                  size="small"
+                  onClick={() => {
+                    setDeletingId(row.id);
+                    setDeleteConfirm(true);
+                  }}
+                >
+                  <Delete fontSize="small" />
+                </IconButton>
+              </>
+            ) : (
+              <Typography variant="body2" sx={{ color: "#999" }}>
+                -
+              </Typography>
+            )}
+          </Box>
+        );
+      },
+      width: "120px",
+      center: true,
+    },
+  ],
+  []
+);
 
-  const columns = useMemo(
-    () => [
-      {
-        name: "Date/Time",
-        selector: (row) => (
-          <div style={{ textAlign: "left" }}>
-            {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
-          </div>
-        ),
-        wrap: true,
-      },
-      {
-        name: "Template Id",
-        selector: (row) => (
-          <Tooltip title={row?.temp_id}>
-            <div style={{ textAlign: "left" }}>{row?.temp_id}</div>
-          </Tooltip>
-        ),
-        wrap: true,
-      },
-      {
-        name: "Vendor",
-        selector: (row) => (
-          <Tooltip title={row?.vendor}>
-            <div style={{ textAlign: "left" }}>{row?.vendor}</div>
-          </Tooltip>
-        ),
-        wrap: true,
-      },
-      {
-        name: "Name",
-        selector: (row) => (
-          <Tooltip title={row?.name}>
-            <div style={{ textAlign: "left" }}>{row?.name}</div>
-          </Tooltip>
-        ),
-        width: "150px",
-      },
-      {
-        name: "Message",
-        selector: (row) => (
-          <Tooltip title={row?.message}>
-            <div style={{ textAlign: "left" }}>{row?.message || "-"}</div>
-          </Tooltip>
-        ),
-        width: "250px",
-        wrap: true,
-      },
-      {
-        name: "Status",
-        selector: (row) =>
-          <CommonStatus value={row.status} />
-      },
-      {
-        name: "Actions",
-        selector: (row) => (
-          <>
-            <IconButton
-              color="primary"
-              onClick={() => {
-                setSelectedTemplate(row);
-                setOpenEdit(true);
-              }}
-            >
-              <Edit />
-            </IconButton>
-            <IconButton
-              color="error"
-              onClick={() => {
-                setDeletingId(row.id);
-                setDeleteConfirm(true);
-              }}
-            >
-              <Delete />
-            </IconButton>
-          </>
-        ),
-        width: "120px",
-      },
-    ],
-    []
-  );
 
   return (
     <Box>

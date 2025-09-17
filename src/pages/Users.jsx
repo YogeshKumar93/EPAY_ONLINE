@@ -1,5 +1,5 @@
 import { useMemo, useContext, useState, useRef, useEffect } from "react";
-import { Box, Tooltip, IconButton, Button } from "@mui/material";
+import { Box, Tooltip, IconButton, Button, Typography } from "@mui/material";
 import AuthContext from "../contexts/AuthContext";
 import { dateToTime, ddmmyy } from "../utils/DateUtils";
 import CommonTable from "../components/common/CommonTable";
@@ -194,7 +194,7 @@ const Users = ({ query }) => {
             <span
               style={{
                 color: row.is_active === 1 ? "green" : "red",
-                minWidth: "60px",
+                minWidth: "30px",
                 display: "inline-block",
               }}
             >
@@ -232,32 +232,46 @@ const Users = ({ query }) => {
       {
         name: "Actions",
         selector: (row, { hoveredRow, enableActionsHover }) => (
-          <Box sx={{ display: "flex", alignItems: "center", minWidth: "80px" }}>
-            {!enableActionsHover || hoveredRow === row.id ? (
-              <Box sx={{ display: "flex", gap: 1, transition: "opacity 0.2s" }}>
-                <Tooltip title="Edit User">
-                  <IconButton
-                    size="small"
-                    color="secondary"
-                    onClick={() => handleEdit(row)}
-                  >
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              minWidth: "80px", // fix width for stability
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                transition: "opacity 0.2s ease-in-out",
+                opacity: !enableActionsHover || hoveredRow === row.id ? 1 : 0,
+                visibility:
+                  !enableActionsHover || hoveredRow === row.id
+                    ? "visible"
+                    : "hidden",
+              }}
+            >
+              <Tooltip title="Edit User">
+                <IconButton
+                  size="small"
+                  color="secondary"
+                  onClick={() => handleEdit(row)}
+                >
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
 
-                <Tooltip title="Edit Permissions">
-                  <IconButton
-                    size="small"
-                    color="primary"
-                    onClick={() => handleOpenPermissions(row)}
-                  >
-                    <SettingsIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            ) : (
-              <span style={{ color: "#999" }}>-</span>
-            )}
+              <Tooltip title="Edit Permissions">
+                <IconButton
+                  size="small"
+                  color="primary"
+                  onClick={() => handleOpenPermissions(row)}
+                >
+                  <SettingsIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
           </Box>
         ),
       },
@@ -273,7 +287,7 @@ const Users = ({ query }) => {
         filters={filters}
         queryParam={query}
         onFetchRef={handleFetchRef}
-         enableActionsHover={true}
+        enableActionsHover={true}
         customHeader={
           <ReButton label="Add User" onClick={() => setOpenCreateUser(true)} />
         }

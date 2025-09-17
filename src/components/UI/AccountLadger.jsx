@@ -56,7 +56,12 @@ const AccountLadger = ({ query }) => {
       },
       {
         name: "Service",
-        selector: (row) => row.service,
+        selector: (row) => (
+          <div  style={{ fontWeight:500 ,color:"#000"}}>
+            {" "}
+            {row.service}
+          </div>
+        ),
         center: true,
       },
       {
@@ -84,7 +89,7 @@ const AccountLadger = ({ query }) => {
       {
         name: "Amount",
         selector: (row) => {
-          const isCredit = row.txn_type === "cr";
+          const isCredit = row.txn_type === "CR";
           const sign = isCredit ? "+" : "-";
           const color = isCredit ? "green" : "red";
 

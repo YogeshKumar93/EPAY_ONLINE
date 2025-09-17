@@ -15,7 +15,7 @@ import {
   virtuanAccountImage,
   walletLdgerImage,
   walletTransferImage,
-  bbpsImage ,
+  
 } from "../../iconsImports";
 
 // Normal User Navigation
@@ -175,7 +175,7 @@ export const customer_nav = [
   },
   { title: "AEPS", icon: aepsImage, icon2: "👥", to: "/customer/aeps" },
 
-  { title: "Bbps", icon: bbpsImage, icon2: "📒", to: "/customer/bbps" },
+  { title: "Bbps", icon: aepsImage, icon2: "📒", to: "/customer/bbps" },
 
   { title: "Cms", icon: transImage, icon2: "📒", to: "/customer/cms" },
 

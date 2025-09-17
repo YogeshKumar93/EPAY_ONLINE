@@ -212,14 +212,54 @@ const CommissionRule = ({ query }) => {
         width: "150px",
       },
       {
-        name: "Actions",
-        selector: (row) => (
-          <IconButton color="primary" onClick={() => handleEditClick(row)}>
-            <Edit />
-          </IconButton>
-        ),
-        width: "100px",
+      name: "Actions",
+      selector: (row, { hoveredRow, enableActionsHover }) => {
+        const isHovered = hoveredRow === row.id || !enableActionsHover;
+
+        return (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minWidth: "100px",
+            }}
+          >
+            {isHovered ? (
+              <Box sx={{ display: "flex", gap: 1, transition: "opacity 0.2s" }}>
+                <Tooltip title="Edit">
+                  <IconButton
+                    color="primary"
+                    size="small"
+                    onClick={() => handleEditClick(row)}
+                  >
+                    <Edit fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete">
+                  <IconButton
+                    color="error"
+                    size="small"
+                    onClick={() => handleDeleteClick(row)}
+                  >
+                    <Delete fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            ) : (
+              <Typography
+                variant="body2"
+                sx={{ color: "#999", textAlign: "center", minWidth: "100px" }}
+              >
+                -
+              </Typography>
+            )}
+          </Box>
+        );
       },
+      width: "120px",
+      center: true,
+    },
     ],
     []
   );

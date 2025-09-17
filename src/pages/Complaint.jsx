@@ -1,6 +1,6 @@
 import React from "react";
 import { useMemo, useContext, useState, useEffect, useRef } from "react";
-import { Tooltip, IconButton, Box,Button } from "@mui/material";
+import { Tooltip, IconButton, Box,Button, Typography } from "@mui/material";
 import { Edit } from "@mui/icons-material";
 import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
@@ -49,7 +49,7 @@ const Complaint = ({ filters = [] }) => {
     return [...filters, { field: "user_id", operator: "=", value: user?.id }];
   }, [filters, user]);
 
-  // ✅ table columns
+
   const columns = useMemo(
     () => [
       {
@@ -107,23 +107,35 @@ const Complaint = ({ filters = [] }) => {
         selector: (row) => <CommonStatus value={row.status} />,
         center: true,
       },
-      // ✅ Action button to open update modal
-      {
-        name: "Actions",
-        selector: (row) => (
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => {
-              setSelectedRow(row);
-              setOpenUpdate(true);
-            }}
-          >
-            Update
-          </Button>
-        ),
-        center: true,
+       {
+      name: "Actions",
+      selector: (row, { hoveredRow, enableActionsHover }) => {
+        const isHovered = hoveredRow === row.id || !enableActionsHover;
+
+        return (
+          <Box sx={{ display: "flex", justifyContent: "center", minWidth: "100px" }}>
+            {isHovered ? (
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => {
+                  setSelectedRow(row);
+                  setOpenUpdate(true);
+                }}
+              >
+                Update
+              </Button>
+            ) : (
+              <Typography variant="body2" sx={{ color: "#999", textAlign: "center" }}>
+                -
+              </Typography>
+            )}
+          </Box>
+        );
       },
+      center: true,
+      width: "100px",
+    },
     ],
     []
   );

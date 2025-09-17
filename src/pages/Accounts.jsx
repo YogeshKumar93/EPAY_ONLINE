@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Box, IconButton, Tooltip } from "@mui/material";
+import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -16,7 +16,7 @@ import CommonLoader from "../components/common/CommonLoader";
 import AuthContext from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-const Accounts = ({filters = []}) => {
+const Accounts = ({ filters = [] }) => {
   const [openCreate, setOpenCreate] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -25,7 +25,7 @@ const Accounts = ({filters = []}) => {
   const [loading, setLoading] = useState(false);
 
   const fetchUsersRef = useRef(null);
-  const authCtx = useContext(AuthContext)
+  const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const navigate = useNavigate();
 
@@ -39,18 +39,18 @@ const Accounts = ({filters = []}) => {
     }
   };
 
-  const handleAccountStatement = (row) =>{
-      navigate(`/admin/accountstatements/${row.id}`, {
-    state: { account_id: row.id },  
-  });
-  }
+  const handleAccountStatement = (row) => {
+    navigate(`/admin/accountstatements/${row.id}`, {
+      state: { account_id: row.id },
+    });
+  };
 
-   useEffect(() => {
-      const timer = setTimeout(() => {
-        setLoading(false);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // ✅ Add new account
   const handleSaveCreate = (newAccount) => {
@@ -59,58 +59,95 @@ const Accounts = ({filters = []}) => {
   };
 
   // ✅ Columns definition
-  const columns = [
-    { name: "Name", selector: (row) => row.name },
-    { name: "User ID", selector: (row) => row.user_id },
-    { name: "Establishment", selector: (row) => row.establishment },
-    { name: "Mobile", selector: (row) => row.mobile },
-    { name: "Type", selector: (row) => row.type },
-    { name: "ASM", selector: (row) => row.asm || "-" },
-    { name: "Credit Limit", selector: (row) => row.credit_limit },
-    { name: "Balance", selector: (row) => row.balance },
-    {
-      name: "Status",
-      selector: (row) => <CommonStatus value={row.status} />,
-    },
-    {
-      name: "Actions",
-      selector: (row) => (
-        <Box sx={{ display: "flex", gap: 1 }}>
+ const columns = [
+  { name: "Name", selector: (row) => row.name },
+  { name: "User ID", selector: (row) => row.user_id },
+  { name: "Establishment", selector: (row) => row.establishment },
+  { name: "Mobile", selector: (row) => row.mobile },
+  { name: "Type", selector: (row) => row.type },
+  { name: "ASM", selector: (row) => row.asm || "-" },
+  { name: "Credit Limit", selector: (row) => row.credit_limit },
+  { name: "Balance", selector: (row) => row.balance },
+  {
+    name: "Status",
+    selector: (row) => <CommonStatus value={row.status} />,
+  },
+  {
+    name: "Actions",
+    selector: (row, { hoveredRow, enableActionsHover }) => {
+      const isHovered = hoveredRow === row.id || !enableActionsHover;
 
-         <Tooltip title="Account Statement">
-                      <IconButton color="info" onClick={() => handleAccountStatement(row)}>
-                        <DescriptionIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-
-          <Tooltip title="Edit">
-            <IconButton
-              color="primary"
-              onClick={() => {
-                setSelectedAccount(row);
-                setOpenUpdate(true);
+      return (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minWidth: "120px", // stable width
+          }}
+        >
+          {isHovered ? (
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                transition: "opacity 0.2s ease-in-out",
               }}
             >
-              <EditIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Delete">
-            <IconButton
-              color="error"
-              onClick={() => {
-                setSelectedAccount(row);
-                setOpenDelete(true);
-              }}
+              <Tooltip title="Account Statement">
+                <IconButton
+                  color="info"
+                  size="small"
+                  onClick={() => handleAccountStatement(row)}
+                >
+                  <DescriptionIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="Edit">
+                <IconButton
+                  color="primary"
+                  size="small"
+                  onClick={() => {
+                    setSelectedAccount(row);
+                    setOpenUpdate(true);
+                  }}
+                >
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="Delete">
+                <IconButton
+                  color="error"
+                  size="small"
+                  onClick={() => {
+                    setSelectedAccount(row);
+                    setOpenDelete(true);
+                  }}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          ) : (
+            <Typography
+              variant="body2"
+              sx={{ color: "#999", textAlign: "center", minWidth: "120px" }}
             >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+              -
+            </Typography>
+          )}
         </Box>
-      ),
+      );
     },
-  ];
+    width: "120px",
+    center: true,
+  },
+];
 
-const queryParam = "";
+
+  const queryParam = "";
 
   return (
     <>
@@ -124,7 +161,7 @@ const queryParam = "";
             loading={loading}
             endpoint={ApiEndpoints.GET_ACCOUNTS}
             onFetchRef={handleFetchRef}
-              filters={filters}
+            filters={filters}
             queryParam={queryParam}
             customHeader={
               <ReButton

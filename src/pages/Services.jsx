@@ -1,5 +1,12 @@
 import { useMemo, useContext, useState, useRef } from "react";
-import { Box, Button, Tooltip, Chip, IconButton } from "@mui/material";
+import {
+  Box,
+  Button,
+  Tooltip,
+  Chip,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import { Edit } from "@mui/icons-material";
 import AuthContext from "../contexts/AuthContext";
 import { dateToTime, ddmmyy } from "../utils/DateUtils";
@@ -20,7 +27,6 @@ const Services = ({ query }) => {
   const [selectedService, setSelectedService] = useState(null);
   const [openMpinModal, setOpenMpinModal] = useState(false);
   const [actionType, setActionType] = useState(null); // "block" or "unblock"
-  const [hoveredRow, setHoveredRow] = useState(null); // Track hover state
 
   const handleLockUnlockClick = (service, action) => {
     setSelectedService(service);
@@ -38,7 +44,6 @@ const Services = ({ query }) => {
       fetchUsersRef.current();
     }
   };
-
   const columns = useMemo(
     () => [
       {
@@ -79,130 +84,159 @@ const Services = ({ query }) => {
       },
       {
         name: "Status",
-        selector: (row) => (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <span
-              style={{
-                color: row.is_active ? "#1EE0AC" : "#e85347",
-                minWidth: "60px",
-                display: "inline-block",
-              }}
-            >
-              {row.is_active ? "Active" : "Inactive"}
-            </span>
-            <Box
-              sx={{
-                opacity: hoveredRow === row.id ? 1 : 0,
-                transition: "opacity 0.2s",
-              }}
-            >
-              {row.is_active ? (
-                <Tooltip title="Click to Block">
-                  <LockOpen
-                    sx={{ color: "#1EE0AC", cursor: "pointer" }}
-                    onClick={() => handleLockUnlockClick(row, "block")}
-                  />
-                </Tooltip>
-              ) : (
-                <Tooltip title="Click to Unblock">
-                  <Lock
-                    sx={{ color: "#e85347", cursor: "pointer" }}
-                    onClick={() => handleLockUnlockClick(row, "unblock")}
-                  />
-                </Tooltip>
-              )}
+        selector: (row, { hoveredRow, enableActionsHover }) => {
+          const isHovered = hoveredRow === row.id || !enableActionsHover;
+          return (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <span
+                style={{
+                  color: row.is_active ? "#1EE0AC" : "#e85347",
+                  minWidth: "60px",
+                  display: "inline-block",
+                }}
+              >
+                {row.is_active ? "Active" : "Inactive"}
+              </span>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  opacity: isHovered ? 1 : 0,
+                  pointerEvents: isHovered ? "auto" : "none",
+                  transition: "opacity 0.2s",
+                }}
+              >
+                {row.is_active ? (
+                  <Tooltip title="Click to Block">
+                    <LockOpen
+                      sx={{ color: "#1EE0AC", cursor: "pointer" }}
+                      onClick={() => handleLockUnlockClick(row, "block")}
+                    />
+                  </Tooltip>
+                ) : (
+                  <Tooltip title="Click to Unblock">
+                    <Lock
+                      sx={{ color: "#e85347", cursor: "pointer" }}
+                      onClick={() => handleLockUnlockClick(row, "unblock")}
+                    />
+                  </Tooltip>
+                )}
+              </Box>
             </Box>
-          </Box>
-        ),
+          );
+        },
       },
       {
         name: "Api Status",
-        selector: (row) => (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <span
-              style={{
-                color: row.is_active_api ? "#1EE0AC" : "#e85347",
-                minWidth: "60px",
-                display: "inline-block",
-              }}
-            >
-              {row.is_active_api ? "Active" : "Inactive"}
-            </span>
-            <Box
-              sx={{
-                opacity: hoveredRow === row.id ? 1 : 0,
-                transition: "opacity 0.2s",
-              }}
-            >
-              {row.is_active_api ? (
-                <Tooltip title="API Active">
-                  <LockOpen sx={{ color: "#1EE0AC" }} />
-                </Tooltip>
-              ) : (
-                <Tooltip title="API Inactive">
-                  <Lock sx={{ color: "#e85347" }} />
-                </Tooltip>
-              )}
+        selector: (row, { hoveredRow, enableActionsHover }) => {
+          const isHovered = hoveredRow === row.id || !enableActionsHover;
+          return (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <span
+                style={{
+                  color: row.is_active_api ? "#1EE0AC" : "#e85347",
+                  minWidth: "60px",
+                  display: "inline-block",
+                }}
+              >
+                {row.is_active_api ? "Active" : "Inactive"}
+              </span>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  opacity: isHovered ? 1 : 0,
+                  pointerEvents: isHovered ? "auto" : "none",
+                  transition: "opacity 0.2s",
+                }}
+              >
+                {row.is_active_api ? (
+                  <Tooltip title="API Active">
+                    <LockOpen sx={{ color: "#1EE0AC" }} />
+                  </Tooltip>
+                ) : (
+                  <Tooltip title="API Inactive">
+                    <Lock sx={{ color: "#e85347" }} />
+                  </Tooltip>
+                )}
+              </Box>
             </Box>
-          </Box>
-        ),
+          );
+        },
       },
       {
         name: "User Status",
-        selector: (row) => (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <span
-              style={{
-                color: row.is_active_users ? "#1EE0AC" : "#e85347",
-                minWidth: "60px",
-                display: "inline-block",
-              }}
-            >
-              {row.is_active_users ? "Active" : "Inactive"}
-            </span>
-            <Box
-              sx={{
-                opacity: hoveredRow === row.id ? 1 : 0,
-                transition: "opacity 0.2s",
-              }}
-            >
-              {row.is_active_users ? (
-                <Tooltip title="User Active">
-                  <LockOpen sx={{ color: "#1EE0AC" }} />
-                </Tooltip>
-              ) : (
-                <Tooltip title="User Inactive">
-                  <Lock sx={{ color: "#e85347" }} />
-                </Tooltip>
-              )}
+        selector: (row, { hoveredRow, enableActionsHover }) => {
+          const isHovered = hoveredRow === row.id || !enableActionsHover;
+          return (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <span
+                style={{
+                  color: row.is_active_users ? "#1EE0AC" : "#e85347",
+                  minWidth: "60px",
+                  display: "inline-block",
+                }}
+              >
+                {row.is_active_users ? "Active" : "Inactive"}
+              </span>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  opacity: isHovered ? 1 : 0,
+                  pointerEvents: isHovered ? "auto" : "none",
+                  transition: "opacity 0.2s",
+                }}
+              >
+                {row.is_active_users ? (
+                  <Tooltip title="User Active">
+                    <LockOpen sx={{ color: "#1EE0AC" }} />
+                  </Tooltip>
+                ) : (
+                  <Tooltip title="User Inactive">
+                    <Lock sx={{ color: "#e85347" }} />
+                  </Tooltip>
+                )}
+              </Box>
             </Box>
-          </Box>
-        ),
+          );
+        },
       },
       {
         name: "Actions",
-        selector: (row) => (
-          <Box sx={{ display: "flex", alignItems: "center", minWidth: "80px" }}>
-            {/* Show dash when not hovered, edit icon when hovered */}
-            {hoveredRow === row.id ? (
-              <IconButton
-                color="primary"
-                onClick={() => {
-                  setSelectedService(row);
-                  setOpenEdit(true);
-                }}
-              >
-                <Edit />
-              </IconButton>
-            ) : (
-              <span style={{ color: "#999" }}>-</span>
-            )}
-          </Box>
-        ),
+        selector: (row, { hoveredRow, enableActionsHover }) => {
+          const isHovered = hoveredRow === row.id || !enableActionsHover;
+          return (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                minWidth: "80px",
+              }}
+            >
+              {isHovered ? (
+                <IconButton
+                  color="primary"
+                  size="small"
+                  onClick={() => {
+                    setSelectedService(row);
+                    setOpenEdit(true);
+                  }}
+                >
+                  <Edit />
+                </IconButton>
+              ) : (
+                <Typography variant="body2" sx={{ color: "#999" }}>
+                  -
+                </Typography>
+              )}
+            </Box>
+          );
+        },
         width: "100px",
       },
     ],
-    [hoveredRow]
+    []
   );
 
   const filters = useMemo(
@@ -219,15 +253,6 @@ const Services = ({ query }) => {
         endpoint={ApiEndpoints.GET_SERVICES}
         filters={filters}
         queryParam={query}
-        rowHoverHandlers={{
-          onMouseEnter: (row) => setHoveredRow(row.id),
-          onMouseLeave: () => setHoveredRow(null),
-        }}
-        rowProps={(row) => ({
-          onMouseEnter: () => setHoveredRow(row.id),
-          onMouseLeave: () => setHoveredRow(null),
-          style: { cursor: "pointer" },
-        })}
         customHeader={
           (user?.role !== "sadm" || user?.role !== "adm") && (
             <ReButton
