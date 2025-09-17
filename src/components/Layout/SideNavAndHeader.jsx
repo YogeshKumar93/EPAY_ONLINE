@@ -102,7 +102,7 @@ const roleRoutes = {
   Api: "/api-user/profile",
 };
 
-const userRole = currentUser?.role || "dd"; 
+ 
 
 const themeSettings = {
   drawerWidth: 240,
@@ -582,21 +582,21 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
 
             {/* Menu Items */}
          <Box sx={{ width: "350px", p: 2.5 }}>
-  <MenuItem onClick={() => navigate(roleRoutes[userRole])}>
+  <MenuItem onClick={() => navigate(roleRoutes[user?.role])}>
     <ListItemIcon>
       <PersonIcon fontSize="small" />
     </ListItemIcon>
     Manage Profile
   </MenuItem> 
 
-  <MenuItem onClick={() => navigate("/customer/logs")}>
+  <MenuItem onClick={() => navigate(`/${user?.role}/logs`)}>
     <ListItemIcon>
       <TimelineIcon fontSize="small" />
     </ListItemIcon>
     Logs Activity
   </MenuItem>
 
-  <MenuItem>
+  {/* <MenuItem>
     <ListItemIcon>
       <DarkModeIcon fontSize="small" />
     </ListItemIcon>
@@ -607,7 +607,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
       onChange={toggleDarkMode}
       sx={{ ml: "auto" }}
     />
-  </MenuItem>
+  </MenuItem> */}
 
   <Divider />
 
