@@ -10,15 +10,23 @@ import EditServiceModal from "../components/EditServiceModaL";
 import ReButton from "../components/common/ReButton";
 import CommonStatus from "../components/common/CommonStatus";
 import { Lock, LockOpen } from "@mui/icons-material";
+import BlockUnblockService from "./BlockUnblockService";
 
-
-const Services = ({  query }) => {
+const Services = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
 
   const [openCreate, setOpenCreate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
+  const [openMpinModal, setOpenMpinModal] = useState(false);
+  const [actionType, setActionType] = useState(null); // "block" or "unblock"
+
+  const handleLockUnlockClick = (service, action) => {
+    setSelectedService(service);
+    setActionType(action);
+    setOpenMpinModal(true);
+  };
 
   const fetchUsersRef = useRef(null);
 
@@ -70,44 +78,47 @@ const Services = ({  query }) => {
         width: "150px",
       },
       {
-  name: "Status",
-  selector: (row) =>
-    row.is_active ? (
-      <Tooltip title="Active">
-        <LockOpen sx={{ color: "green" }} />
-      </Tooltip>
-    ) : (
-      <Tooltip title="Inactive">
-        <Lock sx={{ color: "red" }} />
-      </Tooltip>
-    ),
-},
-{
-  name: "Api Status",
-  selector: (row) =>
-    row.is_active_api ? (
-      <Tooltip title="Active">
-        <LockOpen sx={{ color: "green" }} />
-      </Tooltip>
-    ) : (
-      <Tooltip title="Inactive">
-        <Lock sx={{ color: "red" }} />
-      </Tooltip>
-    ),
-},
-{
-  name: "User Status",
-  selector: (row) =>
-    row.is_active_users ? (
-      <Tooltip title="Active">
-        <LockOpen sx={{ color: "green" }} />
-      </Tooltip>
-    ) : (
-      <Tooltip title="Inactive">
-        <Lock sx={{ color: "red" }} />
-      </Tooltip>
-    ),
-},
+        name: "Status",
+        selector: (row) =>
+          row.is_active ? (
+            <LockOpen
+              sx={{ color: "green", cursor: "pointer" }}
+              onClick={() => handleLockUnlockClick(row, "block")}
+            />
+          ) : (
+            <Lock
+              sx={{ color: "red", cursor: "pointer" }}
+              onClick={() => handleLockUnlockClick(row, "unblock")}
+            />
+          ),
+      },
+
+      {
+        name: "Api Status",
+        selector: (row) =>
+          row.is_active_api ? (
+            <Tooltip title="Active">
+              <LockOpen sx={{ color: "green" }} />
+            </Tooltip>
+          ) : (
+            <Tooltip title="Inactive">
+              <Lock sx={{ color: "red" }} />
+            </Tooltip>
+          ),
+      },
+      {
+        name: "User Status",
+        selector: (row) =>
+          row.is_active_users ? (
+            <Tooltip title="Active">
+              <LockOpen sx={{ color: "green" }} />
+            </Tooltip>
+          ) : (
+            <Tooltip title="Inactive">
+              <Lock sx={{ color: "red" }} />
+            </Tooltip>
+          ),
+      },
 
       {
         name: "Actions",
@@ -128,9 +139,10 @@ const Services = ({  query }) => {
     []
   );
 
-  const filters = useMemo(()=>[
-    {id:"name", label:"Service Name", type:"textfield"},
-  ],[]);
+  const filters = useMemo(
+    () => [{ id: "name", label: "Service Name", type: "textfield" }],
+    []
+  );
 
   return (
     <Box>
@@ -165,6 +177,13 @@ const Services = ({  query }) => {
         onClose={() => setOpenEdit(false)}
         service={selectedService}
         onFetchRef={refreshUsers}
+      />
+      <BlockUnblockService
+        open={openMpinModal}
+        setOpen={setOpenMpinModal}
+        serviceId={selectedService?.id}
+        actionType={actionType}
+        onSuccess={refreshUsers}
       />
     </Box>
   );
