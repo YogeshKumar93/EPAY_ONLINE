@@ -7,6 +7,8 @@ export const setTitleFunc = (path, states) => {
     ? "Employees"
     : path === "/admin/transactions"
     ? "Transactions"
+    : path === "/customer/transfer"
+    ? "Transfer"
     : path === "/admin/scheme"
     ? "Schemes"
       : path === "/admin/prabhu"
