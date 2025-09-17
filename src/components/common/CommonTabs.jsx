@@ -57,7 +57,7 @@ const CommonTabs = ({ tabs = [], defaultTab = 0 }) => {
             },
             "& .Mui-selected": {
               backgroundColor: "#ebeef2",
-              color: "#9d72ff",
+              color: "#9d72f0",
               fontWeight: 550,
             },
           }}
