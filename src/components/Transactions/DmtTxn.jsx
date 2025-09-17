@@ -1,14 +1,21 @@
-import { useMemo, useCallback, useContext, useState } from "react";
-import { Box, Tooltip, Typography, Button, IconButton } from "@mui/material";
+import { useMemo, useContext, useState } from "react";
+import {
+  Box,
+  Tooltip,
+  IconButton,
+  Drawer,
+  Typography,
+} from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import AuthContext from "../../contexts/AuthContext";
 import { dateToTime1, ddmmyy, ddmmyyWithTime } from "../../utils/DateUtils";
 import CommonStatus from "../common/CommonStatus";
-import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import ComplaintForm from "../ComplaintForm";
-import DrawerDetails from "../common/DrawerDetails";
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import CloseIcon from "@mui/icons-material/Close";
+import TransactionDetailsCard from "../common/TransactionDetailsCard";
+import companylogo from '../../assets/Images/logo(1).png';
 
 const DmtTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
@@ -16,8 +23,10 @@ const DmtTxn = ({ query }) => {
 
   const [openCreate, setOpenCreate] = useState(false);
   const [selectedTxn, setSelectedTxn] = useState(null);
- const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
+
   const filters = useMemo(
     () => [
       {
@@ -43,22 +52,12 @@ const DmtTxn = ({ query }) => {
       {
         name: "Date",
         selector: (row) => (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              fontSize: "13px",
-            }}
-          >
+          <div style={{ display: "flex", flexDirection: "column", fontSize: "13px" }}>
             <Tooltip title={`Created: ${ddmmyyWithTime(row.created_at)}`} arrow>
-              <span>
-                {ddmmyy(row.created_at)} {dateToTime1(row.created_at)}
-              </span>
+              <span>{ddmmyy(row.created_at)} {dateToTime1(row.created_at)}</span>
             </Tooltip>
             <Tooltip title={`Updated: ${ddmmyyWithTime(row.updated_at)}`} arrow>
-              <span>
-                {ddmmyy(row.updated_at)} {dateToTime1(row.updated_at)}
-              </span>
+              <span>{ddmmyy(row.updated_at)} {dateToTime1(row.updated_at)}</span>
             </Tooltip>
           </div>
         ),
@@ -67,23 +66,18 @@ const DmtTxn = ({ query }) => {
       },
       {
         name: "Route",
-        selector: (row) => (
-          <div style={{ display: "flex", fontSize: "13px" }}>{row.route}</div>
-        ),
-
+        selector: (row) => <div style={{ fontSize: "13px" }}>{row.route}</div>,
         center: true,
         width: "100px",
       },
       {
         name: "TxnId/Ref",
         selector: (row) => (
-          <>
-            <div style={{ textAlign: "left", fontSize: "13px" }}>
-              {row.txn_id}
-              <br />
-              {row.client_ref}
-            </div>
-          </>
+          <div style={{ textAlign: "left", fontSize: "13px" }}>
+            {row.txn_id}
+            <br />
+            {row.client_ref}
+          </div>
         ),
         wrap: true,
       },
@@ -118,7 +112,6 @@ const DmtTxn = ({ query }) => {
         name: "CCF",
         selector: (row) => (
           <div style={{ color: "red", fontWeight: "600", textAlign: "right" }}>
-            {" "}
             {parseFloat(row.ccf).toFixed(2)}
           </div>
         ),
@@ -136,10 +129,7 @@ const DmtTxn = ({ query }) => {
       {
         name: "Comm",
         selector: (row) => (
-          <div
-            style={{ color: "green", fontWeight: "600", textAlign: "right" }}
-          >
-            {" "}
+          <div style={{ color: "green", fontWeight: "600", textAlign: "right" }}>
             {parseFloat(row.comm).toFixed(2)}
           </div>
         ),
@@ -149,7 +139,6 @@ const DmtTxn = ({ query }) => {
         name: "TDS",
         selector: (row) => (
           <div style={{ color: "red", fontWeight: "600", textAlign: "right" }}>
-            {" "}
             {parseFloat(row.tds).toFixed(2)}
           </div>
         ),
@@ -160,65 +149,40 @@ const DmtTxn = ({ query }) => {
         selector: (row) => <CommonStatus value={row.status} />,
         center: true,
       },
-      ...(user?.role === "adm"
+      ...(user?.role === "ret"
         ? [
             {
               name: "Actions",
-              selector: (row, { hoveredRow, enableActionsHover }) => {
-                const isHovered = hoveredRow === row.id || !enableActionsHover;
-
-                return (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      minWidth: "80px", // fixed width
-                    }}
-                  >
-                    {isHovered ? (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          gap: 1,
-                          transition: "opacity 0.2s ease-in-out",
-                        }}
-                      >
-                        <Tooltip title="Raise Complaint">
-                          <IconButton
-                            color="error"
-                            size="small"
-                            onClick={() => {
-                              setSelectedTxn(row);
-                              setOpenCreate(true);
-                            }}
-                          >
-                            <ReportProblemIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    ) : (
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: "#999",
-                          textAlign: "center",
-                          minWidth: "80px", // same as icon container
-                        }}
-                      >
-                        -
-                      </Typography>
-                    )}
-                  </Box>
-                );
-              },
+              selector: (row) => (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    minWidth: "80px",
+                  }}
+                >
+                  <Tooltip title="View Transaction">
+                    <IconButton
+                      color="info"
+                      onClick={() => {
+                        setSelectedRow(row);
+                        setDrawerOpen(true);
+                      }}
+                      size="small"
+                    >
+                      <VisibilityIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              ),
               width: "100px",
               center: true,
             },
           ]
         : []),
     ],
-    []
+    [user]
   );
 
   const queryParam = "";
@@ -233,19 +197,7 @@ const DmtTxn = ({ query }) => {
         enableActionsHover={true}
       />
 
-     <DrawerDetails
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        rowData={selectedRow}
-        
-        // fields={[
-        //   { label: "Gst", key: "gst" },
-        //   { label: "Api Response", key: "api_response" },
-         
-        // ]}
-      />
-
-      {/* ✅ Complaint Modal */}
+      {/* Complaint Modal */}
       {openCreate && selectedTxn && (
         <ComplaintForm
           open={openCreate}
@@ -254,6 +206,45 @@ const DmtTxn = ({ query }) => {
           type="dmt"
         />
       )}
+
+      {/* Transaction Details Drawer */}
+      <Drawer
+        anchor="right"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+       
+      >
+        <Box sx={{ width: 400,  display: "flex", flexDirection: "column", height: "100%" }}>
+          {selectedRow && (
+            <TransactionDetailsCard
+              amount={selectedRow.amount}
+              status={selectedRow.status}
+              onClose={() => setDrawerOpen(false)} // ✅ Close drawer
+             companyLogoUrl={companylogo}
+              dateTime={ddmmyyWithTime(selectedRow.created_at)}
+              message={selectedRow.message || "No message"}
+              details={[
+                { label: "Txn ID", value: selectedRow.txn_id },
+                { label: "Client Ref", value: selectedRow.client_ref },
+                { label: "Sender Mobile", value: selectedRow.sender_mobile },
+                { label: "Beneficiary Name", value: selectedRow.beneficiary_name },
+                { label: "Account Number", value: selectedRow.account_number },
+                { label: "IFSC Code", value: selectedRow.ifsc_code },
+                { label: "Bank Name", value: selectedRow.bank_name },
+                { label: "Route", value: selectedRow.route },
+                { label: "Charge", value: selectedRow.ccf },
+                { label: "GST", value: selectedRow.gst },
+                { label: "Commission", value: selectedRow.comm },
+                { label: "TDS", value: selectedRow.tds },
+              ]}
+              onRaiseIssue={() => {
+                setSelectedTxn(selectedRow.txn_id);
+                setOpenCreate(true);
+              }}
+            />
+          )}
+        </Box>
+      </Drawer>
     </>
   );
 };
