@@ -105,43 +105,25 @@ export const customer_nav = [
     icon2: "📊",
     to: "/customer/dashboard",
   },
-  {
-    title: "Fund Request",
-    icon: bankImage,
-    icon2: "🛠️",
-    to: "/customer/fund-request",
-  },
-  {
-    title: "Transactions",
-    icon: transImage,
-    icon2: "💳",
-    to: "/customer/transactions",
-  },
-  {
+   {
     title: "Money transfer",
     icon: bankImage,
     icon2: "🛠️",
     to: "/customer/money-transfer",
   },
-  {
+   {
     title: "Fund Transfer",
     icon: fundReqImage,
     icon2: "🛠️",
     to: "/customer/fund-transfer",
   },
-  // {
-  //   title: "W2W Transfer",
-  //   icon: "🛠️",
-  //   icon2: "🛠️",
-  //   to: "/customer/w2w-transfer",
-  // },
-  {
+   {
     title: "Wallet Transfer",
     icon: walletTransferImage,
     icon2: "🛠️",
     to: "/customer/wallet-transfer",
   },
-  {
+   {
     title: "Upi Transfer",
     icon: walletTransferImage,
     icon2: "🛠️",
@@ -154,6 +136,30 @@ export const customer_nav = [
     to: "/customer/recharge-bill",
   },
   {
+    title: "Transactions",
+    icon: transImage,
+    icon2: "💳",
+    to: "/customer/transactions",
+  },
+  {
+    title: "Fund Request",
+    icon: bankImage,
+    icon2: "🛠️",
+    to: "/customer/fund-request",
+  },
+  
+ 
+ 
+  // {
+  //   title: "W2W Transfer",
+  //   icon: "🛠️",
+  //   icon2: "🛠️",
+  //   to: "/customer/w2w-transfer",
+  // },
+ 
+ 
+  
+  {
     title: "Wallet Ledger",
     icon: bankImage,
     icon2: "📒",
@@ -165,13 +171,13 @@ export const customer_nav = [
 
   { title: "Cms", icon: transImage, icon2: "📒", to: "/customer/cms" },
 
-  {
-    title: "My Purchase",
-    icon: transImage,
-    icon2: "🛠️",
-    to: "/customer/purchase",
-  },
-  { title: "My Sale", icon: fundReqImage, icon2: "📒", to: "/customer/sale" },
+  // {
+  //   title: "My Purchase",
+  //   icon: transImage,
+  //   icon2: "🛠️",
+  //   to: "/customer/purchase",
+  // },
+  // { title: "My Sale", icon: fundReqImage, icon2: "📒", to: "/customer/sale" },
 
   {
     title: "Activity Logs",
