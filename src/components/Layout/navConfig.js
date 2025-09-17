@@ -105,11 +105,42 @@ export const customer_nav = [
     icon2: "📊",
     to: "/customer/dashboard",
   },
-  {
-    title: "Fund Request",
+   {
+    title: "Money transfer",
     icon: bankImage,
     icon2: "🛠️",
-    to: "/customer/fund-request",
+    to: "/customer/money-transfer",
+  },
+    {
+    title: "Transfer",
+     icon: fundReqImage,
+    icon2: "🛠️",
+     to: "/customer/transfer",
+    },
+
+  //  {
+  //   title: "Fund Transfer",
+  //   icon: fundReqImage,
+  //   icon2: "🛠️",
+  //   to: "/customer/fund-transfer",
+  // },
+   {
+    title: "Wallet Transfer",
+    icon: walletTransferImage,
+    icon2: "🛠️",
+    to: "/customer/wallet-transfer",
+  },
+  //  {
+  //   title: "Upi Transfer",
+  //   icon: walletTransferImage,
+  //   icon2: "🛠️",
+  //   to: "/customer/upi-transfer",
+  // },
+  {
+    title: "Recharge and bill",
+    icon: serviceImage,
+    icon2: "🛠️",
+    to: "/customer/recharge-bill",
   },
   {
     title: "Transactions",
@@ -118,41 +149,23 @@ export const customer_nav = [
     to: "/customer/transactions",
   },
   {
-    title: "Money transfer",
+    title: "Fund Request",
     icon: bankImage,
     icon2: "🛠️",
-    to: "/customer/money-transfer",
+    to: "/customer/fund-request",
   },
-  {
-    title: "Fund Transfer",
-    icon: fundReqImage,
-    icon2: "🛠️",
-    to: "/customer/fund-transfer",
-  },
+  
+ 
+ 
   // {
   //   title: "W2W Transfer",
   //   icon: "🛠️",
   //   icon2: "🛠️",
   //   to: "/customer/w2w-transfer",
   // },
-  {
-    title: "Wallet Transfer",
-    icon: walletTransferImage,
-    icon2: "🛠️",
-    to: "/customer/wallet-transfer",
-  },
-  {
-    title: "Upi Transfer",
-    icon: walletTransferImage,
-    icon2: "🛠️",
-    to: "/customer/upi-transfer",
-  },
-  {
-    title: "Recharge and bill",
-    icon: serviceImage,
-    icon2: "🛠️",
-    to: "/customer/recharge-bill",
-  },
+ 
+ 
+  
   {
     title: "Wallet Ledger",
     icon: bankImage,
@@ -165,13 +178,13 @@ export const customer_nav = [
 
   { title: "Cms", icon: transImage, icon2: "📒", to: "/customer/cms" },
 
-  {
-    title: "My Purchase",
-    icon: transImage,
-    icon2: "🛠️",
-    to: "/customer/purchase",
-  },
-  { title: "My Sale", icon: fundReqImage, icon2: "📒", to: "/customer/sale" },
+  // {
+  //   title: "My Purchase",
+  //   icon: transImage,
+  //   icon2: "🛠️",
+  //   to: "/customer/purchase",
+  // },
+  // { title: "My Sale", icon: fundReqImage, icon2: "📒", to: "/customer/sale" },
 
   {
     title: "Activity Logs",
