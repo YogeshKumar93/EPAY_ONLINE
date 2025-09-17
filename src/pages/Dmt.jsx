@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { 
-  Box, 
-  TextField, 
-  Divider, 
-  Typography, 
-  CircularProgress 
+import {
+  Box,
+  TextField,
+  Divider,
+  Typography,
+  CircularProgress,
 } from "@mui/material";
+import { useContext } from "react";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { apiErrorToast } from "../utils/ToastUtil";
@@ -15,7 +16,9 @@ import SelectedBeneficiary from "./SelectedBeneficiary";
 import { useToast } from "../utils/ToastContext";
 import RemitterRegister from "./RemitterRegister";
 import CommonLoader from "../components/common/CommonLoader";
- 
+
+import OutletDmt1 from "./OutletDnt1";
+import AuthContext from "../contexts/AuthContext";
 
 const Dmt = () => {
   const [mobile, setMobile] = useState("");
@@ -27,6 +30,10 @@ const Dmt = () => {
   const [openRegisterModal, setOpenRegisterModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
+  const { authUser } = useContext(AuthContext); // Get auth user data
+  const [openDmt1Modal, setOpenDmt1Modal] = useState(false);
+
+  const instId = authUser?.instId; // Check if instId exists
 
   // Fetch sender details
   const handleFetchSender = async (number = mobile) => {
@@ -67,11 +74,11 @@ const Dmt = () => {
   };
 
   useEffect(() => {
-      const timer = setTimeout(() => {
-        setLoading(false);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }, []);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Handle mobile input change
   const handleMobileChange = (e) => {
@@ -94,9 +101,17 @@ const Dmt = () => {
     if (selectedBeneficiary?.id === id) setSelectedBeneficiary(null);
   };
 
+  if (!instId) {
+    return (
+      <OutletDmt1
+        open={true}
+        handleClose={() => setOpenDmt1Modal(false)}
+        onSuccess={() => window.location.reload()}
+      />
+    );
+  }
   return (
     <Box>
-      {/* Mobile & Account Inputs */}
       <Box
         display="flex"
         flexDirection={{ xs: "column", sm: "row" }}
@@ -104,31 +119,16 @@ const Dmt = () => {
         gap={1}
         mb={1}
       >
-        {/* Mobile Number */}
-        <Box sx={{ flex: 1, position: "relative" }}>
-          <TextField
-            label="Mobile Number"
-            variant="outlined"
-            value={mobile}
-            onChange={handleMobileChange}
-            inputProps={{ maxLength: 10 }}
-            fullWidth
-            disabled={loading}
-          />
-          {loading && (
-            <CommonLoader loading={loading}  
-              size={24}
-              sx={{
-                position: "absolute",
-                top: "50%",
-                right: 16,
-                transform: "translateY(-50%)",
-              }}
-            />
-          )}
-        </Box>
+        <TextField
+          label="Mobile Number"
+          variant="outlined"
+          value={mobile}
+          onChange={handleMobileChange}
+          inputProps={{ maxLength: 10 }}
+          sx={{ flex: 1 }}
+          fullWidth
+        />
 
-        {/* OR Divider for small screens */}
         <Box
           sx={{
             display: { xs: "flex", sm: "none" },
@@ -144,7 +144,6 @@ const Dmt = () => {
           </Divider>
         </Box>
 
-        {/* Account Number */}
         <TextField
           label="Account Number"
           variant="outlined"
@@ -153,14 +152,11 @@ const Dmt = () => {
           inputProps={{ maxLength: 18 }}
           sx={{ flex: 1 }}
           fullWidth
-          disabled={loading}
         />
       </Box>
 
-      {/* OR Divider for medium+ screens */}
       <Divider sx={{ my: 1, display: { xs: "none", sm: "block" } }} />
 
-      {/* Remitter Register Modal */}
       {openRegisterModal && (
         <RemitterRegister
           open={openRegisterModal}
@@ -170,11 +166,10 @@ const Dmt = () => {
         />
       )}
 
-      {/* Main Content: Left & Right Columns */}
       <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={0.5}>
-        {/* Left column */}
         <Box flex="0 0 30%" display="flex" flexDirection="column">
           <RemitterDetails sender={sender} />
+
           {selectedBeneficiary && (
             <SelectedBeneficiary
               beneficiary={selectedBeneficiary}
@@ -186,7 +181,6 @@ const Dmt = () => {
           )}
         </Box>
 
-        {/* Right column */}
         <Box flex="0 0 70%">
           <Beneficiaries
             sender={sender}
