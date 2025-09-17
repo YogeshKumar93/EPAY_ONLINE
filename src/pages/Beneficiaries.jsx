@@ -306,14 +306,14 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
                       ) : (
                         <Button
                           size="small"
-                          variant="contained"
+                          variant="outlined"
                           onClick={() => {
                             setSelectedBeneficiary(b);
                             setVerifyOpen(true);
                           }}
                           sx={{
-                            backgroundColor: "#FFC107",
-                            color: "#000",
+                            backgroundColor: "#ff9d4d",
+                            color: "#fff",
                             borderRadius: 1,
                             border: "none",
                             textTransform: "none",
