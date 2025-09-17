@@ -1,5 +1,5 @@
 import { useMemo, useState, useContext, useEffect, useRef } from "react";
-import { Box, Button, Tooltip, Typography } from "@mui/material";
+import { Box, Button, IconButton, Tooltip, Typography } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import { currencySetter } from "../../utils/Currencyutil";
@@ -158,29 +158,45 @@ const FundRequest = () => {
       ? [
           {
             name: "Actions",
-            selector: (row) => (
-              <Box sx={{ display: "flex", gap: 1 }}>
-                <Tooltip title="approved">
-                  <Button
-                    color="success"
-                    size="small"
-                    onClick={() => handleOpen(row, "approved")}
+            width: "100px", // ✅ fix width to avoid jump
+            selector: (row, { hoveredRow, enableActionsHover }) => (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: 1,
+                }}
+              >
+                {enableActionsHover && hoveredRow !== row.id ? (
+                  // ✅ hover na ho tab dash dikhe (but same width occupy kare)
+                  <span
+                    style={{
+                      color: "#999",
+                      display: "inline-block",
+                      width: 60,
+                      textAlign: "center",
+                    }}
                   >
-                    <CheckCircleIcon fontSize="small" />
-                  </Button>
-                </Tooltip>
-                <Tooltip title="reject">
-                  <Button
-                    color="error"
-                    size="small"
-                    onClick={() => handleOpen(row, "rejected")}
-                  >
-                    <CancelIcon fontSize="small" />
-                  </Button>
-                </Tooltip>
+                    -
+                  </span>
+                ) : (
+                  // ✅ hover ya always case -> buttons
+                  <>
+                    <Tooltip title="Approve">
+                      <IconButton size="small" color="success">
+                        <CheckCircleIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Reject">
+                      <IconButton size="small" color="error">
+                        <CancelIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </>
+                )}
               </Box>
             ),
-            width: "120px",
           },
         ]
       : []),
@@ -223,6 +239,7 @@ const FundRequest = () => {
             endpoint={ApiEndpoints.GET_FUND_REQUESTS}
             filters={filters}
             onFetchRef={handleFetchRef}
+            enableActionsHover={true}
             customHeader={
               user?.role !== "sadm" &&
               user?.role !== "adm" && (

@@ -20,7 +20,6 @@ const Users = ({ query }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [openPermissions, setOpenPermissions] = useState(false);
   const [userMap, setUserMap] = useState({}); // id → name map
-  const [hoveredRow, setHoveredRow] = useState(null);
 
   // 🔐 Lock/Unlock Modal
   const [lockModalOpen, setLockModalOpen] = useState(false);
@@ -182,7 +181,7 @@ const Users = ({ query }) => {
       },
       {
         name: "Status",
-        selector: (row) => (
+        selector: (row, { hoveredRow, enableActionsHover }) => (
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <span
               style={{
@@ -193,51 +192,41 @@ const Users = ({ query }) => {
             >
               {row.is_active === 1 ? "Active" : "Inactive"}
             </span>
-            <Box
-              sx={{
-                opacity: hoveredRow === row.id ? 1 : 0,
-                transition: "opacity 0.2s",
-              }}
-            >
-              {row.is_active === 1 ? (
-                <Tooltip title="Click to Block">
-                  <IconButton
-                    size="small"
-                    onClick={() => handleOpenLockModal(row)}
-                    sx={{ color: "success.main" }}
-                  >
-                    <LockOpenIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              ) : (
-                <Tooltip title="Click to Unblock">
-                  <IconButton
-                    size="small"
-                    onClick={() => handleOpenLockModal(row)}
-                    sx={{ color: "error.main" }}
-                  >
-                    <LockOutlinedIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              )}
-            </Box>
+            {/* ✅ Hover/Always show based on prop */}
+            {(!enableActionsHover || hoveredRow === row.id) && (
+              <Box sx={{ transition: "opacity 0.2s" }}>
+                {row.is_active === 1 ? (
+                  <Tooltip title="Click to Block">
+                    <IconButton
+                      size="small"
+                      onClick={() => handleOpenLockModal(row)}
+                      sx={{ color: "success.main" }}
+                    >
+                      <LockOpenIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                ) : (
+                  <Tooltip title="Click to Unblock">
+                    <IconButton
+                      size="small"
+                      onClick={() => handleOpenLockModal(row)}
+                      sx={{ color: "error.main" }}
+                    >
+                      <LockOutlinedIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                )}
+              </Box>
+            )}
           </Box>
         ),
       },
       {
         name: "Actions",
-        selector: (row) => (
+        selector: (row, { hoveredRow, enableActionsHover }) => (
           <Box sx={{ display: "flex", alignItems: "center", minWidth: "80px" }}>
-            {/* Show dash when not hovered, icons when hovered */}
-            {hoveredRow === row.id ? (
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 1,
-                  opacity: 1,
-                  transition: "opacity 0.2s",
-                }}
-              >
+            {!enableActionsHover || hoveredRow === row.id ? (
+              <Box sx={{ display: "flex", gap: 1, transition: "opacity 0.2s" }}>
                 <Tooltip title="Edit User">
                   <IconButton
                     size="small"
@@ -265,7 +254,7 @@ const Users = ({ query }) => {
         ),
       },
     ],
-    [userMap, hoveredRow]
+    [userMap]
   );
 
   return (
@@ -276,15 +265,7 @@ const Users = ({ query }) => {
         filters={filters}
         queryParam={query}
         onFetchRef={handleFetchRef}
-        rowHoverHandlers={{
-          onMouseEnter: (row) => setHoveredRow(row.id),
-          onMouseLeave: () => setHoveredRow(null),
-        }}
-        rowProps={(row) => ({
-          onMouseEnter: () => setHoveredRow(row.id),
-          onMouseLeave: () => setHoveredRow(null),
-          style: { cursor: "pointer" },
-        })}
+         enableActionsHover={true}
         customHeader={
           <ReButton label="Add User" onClick={() => setOpenCreateUser(true)} />
         }

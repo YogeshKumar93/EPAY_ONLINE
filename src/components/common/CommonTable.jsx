@@ -141,8 +141,10 @@ const CommonTable = ({
   customHeader = null, // Add this line
   rowHoverHandlers, // Add this prop to accept hover handlers
   rowProps,
+  enableActionsHover = true,
 }) => {
   const { afterToday } = DateRangePicker;
+  const [hoveredRow, setHoveredRow] = useState(null);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -729,16 +731,8 @@ const CommonTable = ({
           }}
           className="table-row"
           // Add hover handlers if provided
-          onMouseEnter={
-            rowHoverHandlers?.onMouseEnter
-              ? () => rowHoverHandlers.onMouseEnter(row)
-              : undefined
-          }
-          onMouseLeave={
-            rowHoverHandlers?.onMouseLeave
-              ? () => rowHoverHandlers.onMouseLeave()
-              : undefined
-          }
+          onMouseEnter={() => enableActionsHover && setHoveredRow(row.id)} // ✅ hover sirf jab enableActionsHover true ho
+          onMouseLeave={() => enableActionsHover && setHoveredRow(null)}
         >
           {initialColumns.map((column, colIndex) => (
             <td
@@ -758,7 +752,10 @@ const CommonTable = ({
             >
               {column.selector ? (
                 <Box sx={{ display: "flex", alignItems: "center" }}>
-                  {column.selector(row)}
+                  {column.selector(row, {
+                    hoveredRow,
+                    enableActionsHover, // ✅ pass down as helper
+                  })}
                 </Box>
               ) : (
                 <Typography
@@ -781,7 +778,7 @@ const CommonTable = ({
         </tr>
       </React.Fragment>
     ));
-  }, [loading, data, initialColumns]);
+  }, [loading, data, initialColumns, hoveredRow, enableActionsHover]);
 
   // Memoized table headers
   const tableHeaders = useMemo(
