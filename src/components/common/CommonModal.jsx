@@ -421,37 +421,6 @@ const CommonFormField = ({
           />
         </Box>
       );
-
-    case "color":
-    case "color_code": // if schema only sends name= color_code but type=text
-      return (
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-          <Typography variant="body2" sx={{ fontWeight: 500 }}>
-            {label || "Color"}
-          </Typography>
-          <input
-            type="color"
-            name={name}
-            value={formData[name] || "#000000"} // default to black
-            onChange={(e) => handleChange(e)}
-            disabled={loading}
-            style={{
-              width: "100%",
-              height: "40px",
-              border: "1px solid #ccc",
-              borderRadius: "6px",
-              cursor: "pointer",
-              background: formData[name] || "#fff",
-            }}
-            {...props}
-          />
-          {/* optional hex code */}
-          <Typography variant="caption" color="text.secondary">
-            {formData[name] || "#000000"}
-          </Typography>
-        </Box>
-      );
-
     // Other field types remain the same
     default:
       return (
@@ -570,9 +539,8 @@ const CommonModal = ({
             sx={{
               color: "#1e293b",
               fontFamily: '"DM Sans", sans-serif',
-              fontWeight: 550,
+              fontWeight: 700,
               fontSize: { xs: "1.25rem", sm: "1.5rem" },
-              color:"#364a63",
             }}
           >
             {title}
@@ -666,13 +634,31 @@ const CommonModal = ({
               endIcon={button.endIcon}
               disabled={button.disabled}
               sx={{
-                fontFamily: '"DM Sans", sans-serif !important',
-                backgroundColor:
-                  button.text.toLowerCase() === "cancel"
-                    ? "#8094ae !important"
-                    : "#854fff",
-                color: "#fff",
+                borderRadius: 2,
+                fontFamily: '"DM Sans", sans-serif',
                 textTransform: "none",
+                fontWeight: 500,
+                fontSize: "0.9rem",
+                py: 1,
+                px: 3,
+                boxShadow: "none",
+                "&:hover": {
+                  boxShadow: "none",
+                },
+                ...(button.variant === "contained" &&
+                  button.text.toLowerCase() === "cancel" && {
+                    backgroundColor: "#8094ae !important",
+                    color: "#fff !important",
+                    "&:hover": {
+                      backgroundColor: "#8094ae !important",
+                    },
+                  }),
+                ...(button.variant === "contained" && {
+                  backgroundColor: "#854fff",
+                  "&:hover": {
+                    backgroundColor: "#854fff",
+                  },
+                }),
               }}
             >
               {button.text}
