@@ -225,6 +225,9 @@ if (response) {
           size="small"
           onClick={handleGetOtp}
           disabled={loading}
+          sx={{
+            backgroundColor:"#5c3ac8"
+          }}
         >
           {loading ? "Sending..." : "Get OTP"}
         </Button>

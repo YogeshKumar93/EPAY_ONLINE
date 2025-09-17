@@ -265,9 +265,10 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
                       <Button
                         size="small"
                         variant="contained"
-                        color="primary"
+                        // color="primary"
                         onClick={() => onSelect?.(b)}
                         sx={{
+                          backgroundColor: "#5c3ac8",
                           borderRadius: 1,
                           textTransform: "none",
                           fontSize: "0.75rem",
