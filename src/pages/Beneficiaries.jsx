@@ -57,13 +57,7 @@ import { apiErrorToast, okSuccessToast } from "../utils/ToastUtil";
 import DeleteBeneficiaryModal from "./DeleteBeneficiaryModal";
 import AuthContext from "../contexts/AuthContext";
 
-const Beneficiaries = ({
-  beneficiaries,
-  onSelect,
-  onDelete,
-  sender,
-  onSuccess,
-}) => {
+const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [open, setOpen] = useState(true);
@@ -295,7 +289,7 @@ const Beneficiaries = ({
                 secondaryAction={
                   b.id !== "na" && (
                     <Stack direction="row" spacing={1} alignItems="center">
-                      {b.verificationDt ? (
+                      {b.is_verified ? (
                         <Box display="flex" alignItems="center" gap={0.3}>
                           <CheckCircleIcon
                             sx={{ fontSize: 16, color: "success.main" }}
@@ -312,17 +306,16 @@ const Beneficiaries = ({
                       ) : (
                         <Button
                           size="small"
-                          variant="contained"
-                        
+                          variant="outlined"
                           onClick={() => {
                             setSelectedBeneficiary(b);
                             setVerifyOpen(true);
                           }}
                           sx={{
-                             backgroundColor: "#FFC107", 
-                             color:"#000",
+                            backgroundColor: "#ff9d4d",
+                            color: "#fff",
                             borderRadius: 1,
-                            border:"none",
+                            border: "none",
                             textTransform: "none",
                             fontSize: "0.75rem",
                             px: 1,
