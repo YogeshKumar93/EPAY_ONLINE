@@ -328,7 +328,7 @@ const Dmt2Beneficiaries = ({
                             fontSize: "0.75rem",
                             px: 1,
                             py: 0.2,
-                            minWidth: "unset", // prevents too wide button
+                           
                           }}
                         >
                           Verify
