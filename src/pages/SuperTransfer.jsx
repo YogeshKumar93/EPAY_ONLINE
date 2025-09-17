@@ -8,6 +8,7 @@ import SenderDetails from "./SenderDetails";
 import SenderRegisterModal from "./SenderRegisterModal";
 import VerifySenderModal from "./VerifySenderModal";
 import BeneficiaryDetails from "./BeneficiaryDetails";
+import CommonLoader from "../components/common/CommonLoader";
 
 const SuperTransfer = () => {
   const theme = useTheme();
@@ -19,14 +20,18 @@ const SuperTransfer = () => {
   const [openVerifyModal, setOpenVerifyModal] = useState(false);
   const [otpData, setOtpData] = useState(null);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
+const [loading, setLoading] = useState(false);
 
   // Fetch sender by mobile number
 const handleFetchSender = async (number = mobile) => {
   if (!number || number.length !== 10) return;
 
+  setLoading(true); // start loader
+
   const { error, response } = await apiCall("post", ApiEndpoints.GET_SENDER, {
     mobile_number: number,
   });
+   setLoading(false); // stop loader
 
   if (response) {
     // ✅ success path
@@ -62,6 +67,12 @@ const handleFetchSender = async (number = mobile) => {
   }
 };
 
+ useEffect(() => {
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }, []);
 
 const handleChange = (e) => {
   const value = e.target.value.replace(/\D/g, ""); // only digits allowed
@@ -88,6 +99,7 @@ const handleChange = (e) => {
   return (
     <Box >
       {/* Always show mobile input */}
+      <Box>
       <TextField
         label="Mobile Number"
         variant="outlined"
@@ -98,7 +110,18 @@ const handleChange = (e) => {
         inputProps={{ maxLength: 10 }}
         sx={{ mb: 1 }}
       />
-
+       {loading && (
+            <CommonLoader loading={loading}  
+              size={24}
+              sx={{
+                position: "absolute",
+                top: "50%",
+                right: 16,
+                transform: "translateY(-50%)",
+              }}
+            />
+          )}
+</Box>
       {/* Main Content (Sender + Beneficiaries) */}
       <Box
         display="flex"
