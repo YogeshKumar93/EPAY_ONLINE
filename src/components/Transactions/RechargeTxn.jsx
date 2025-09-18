@@ -14,10 +14,12 @@ import CloseIcon from "@mui/icons-material/Close";
  
 import companylogo from '../../assets/Images/logo(1).png';
 import TransactionDetailsCard from "../common/TransactionDetailsCard";
+import ComplaintForm from "../ComplaintForm";
  
 const RechargeTxn = ({  query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
+   const [openCreate, setOpenCreate] = useState(false);
    const [selectedTxn, setSelectedTxn] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [selectedRow, setSelectedRow] = useState(null);
@@ -41,7 +43,7 @@ const filters = useMemo(
     ],
     []
   );
-  const [openCreate, setOpenCreate] = useState(false);
+  
   const columns = useMemo(
     () => [
             
@@ -277,6 +279,7 @@ const filters = useMemo(
 
   return (
     <>
+      <Box sx={{ mx: -4 }}>  
       <CommonTable
         columns={columns}
         endpoint={ApiEndpoints.GET_RECHARGE_TXN}
@@ -284,7 +287,17 @@ const filters = useMemo(
         queryParam={queryParam}
          enableActionsHover={true}
       />
+</Box>
 
+   {/* Complaint Modal */}
+      {openCreate && selectedTxn && (
+        <ComplaintForm
+          open={openCreate}
+          onClose={() => setOpenCreate(false)}
+          txnId={selectedTxn}
+          type="dmt"
+        />
+      )}
          
 
       {/* Transaction Details Drawer */}
@@ -304,18 +317,13 @@ const filters = useMemo(
               dateTime={ddmmyyWithTime(selectedRow.created_at)}
               message={selectedRow.message || "No message"}
               details={[
-                { label: "Txn ID", value: selectedRow.txn_id },
-                { label: "Client Ref", value: selectedRow.client_ref },
-                { label: "Sender Mobile", value: selectedRow.sender_mobile },
-                { label: "Beneficiary Name", value: selectedRow.beneficiary_name },
+                { label: "Operator", value: selectedRow.operator },
+                { label: "Order Id", value: selectedRow.client_ref },
+                { label: " Mobile", value: selectedRow.mobile_number },
+                { label: "Amount", value: selectedRow.amount },
                 { label: "Account Number", value: selectedRow.account_number },
-                { label: "IFSC Code", value: selectedRow.ifsc_code },
-                { label: "Bank Name", value: selectedRow.bank_name },
-                { label: "Route", value: selectedRow.route },
-                { label: "Charge", value: selectedRow.ccf },
-                { label: "GST", value: selectedRow.gst },
-                { label: "Commission", value: selectedRow.comm },
-                { label: "TDS", value: selectedRow.tds },
+                { label: "Status", value: selectedRow.status },
+               
               ]}
               onRaiseIssue={() => {
                 setSelectedTxn(selectedRow.txn_id);

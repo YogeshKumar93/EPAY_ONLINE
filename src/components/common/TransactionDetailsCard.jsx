@@ -20,32 +20,7 @@ const statusColors = {
   Pending: "#e4bb32ff",
 };
 
-const handleDownload = async () => {
-    try {
-       
-      const response = await fetch("/sample.pdf");
-      if (!response.ok) throw new Error("File not found");
-
-      // 2. Convert to blob
-      const blob = await response.blob();
-
-      // 3. Create object URL
-      const url = window.URL.createObjectURL(blob);
-
-      // 4. Create a temporary <a> element
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "sample.pdf"); // File name
-      document.body.appendChild(link);
-
-      // 5. Trigger click & cleanup
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Download failed:", error);
-    }
-  };
+ 
 
 const TransactionDetailsCard = ({
   amount,
@@ -177,9 +152,10 @@ const TransactionDetailsCard = ({
       <IconButton size="small" onClick={onRaiseIssue} sx={{color:"#55a3f1ff"}}>
         <PanToolIcon fontSize="small" />
       </IconButton>
-  <IconButton size="small" onClick={handleDownload}>
-      <DownloadIcon fontSize="small" />
-    </IconButton>
+<IconButton size="small" onClick={() => window.print()}>
+  <DownloadIcon fontSize="small" />
+</IconButton>
+
 
 
     </Box>

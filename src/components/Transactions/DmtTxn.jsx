@@ -246,7 +246,7 @@ const DmtTxn = ({ query }) => {
               
                
                 { label: "Customer Number", value: selectedRow.sender_mobile },
-               
+               { label: "CCF", value: selectedRow.ccf },
                 { label: "Charge", value: selectedRow.ccf },
                 { label: "GST", value: selectedRow.gst },
               
