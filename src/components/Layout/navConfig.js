@@ -213,7 +213,7 @@ export const di_nav = [
     title: "Wallet Ledger",
     icon: bankImage,
     icon2: "📒",
-    to:"/di/wallet-ledger",
+    to: "/di/wallet-ledger",
   },
 ];
 
