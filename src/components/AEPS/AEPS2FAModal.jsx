@@ -1,36 +1,40 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
-  TextField,
-  Button,
-  Stack,
-  Grid,
-  Alert,
-  CircularProgress,
-  Chip,
   IconButton,
+  Stack,
+  Button,
+  Alert,
+  Grid,
+  TextField,
+  Chip,
+  LinearProgress,
+  CircularProgress,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-
+import {
+  Close as CloseIcon,
+  ErrorOutline as ErrorOutlineIcon,
+  CheckCircleOutline as CheckCircleOutlineIcon,
+  InfoOutlined as InfoOutlinedIcon,
+  Search as SearchIcon,
+  Fingerprint as FingerprintIcon,
+  SettingsInputAntenna as SettingsInputAntennaIcon,
+  Badge as BadgeIcon,
+  Grade as GradeIcon,
+  HighlightOff as HighlightOffIcon,
+} from "@mui/icons-material";
 import {
   CaptureFingerPrintAeps2,
   GetMFS100InfoLoad,
 } from "../../utils/MantraCapture";
-// import CloseIcon from "@mui/icons-material/Close";
-import SearchIcon from "@mui/icons-material/Search";
-import FingerprintIcon from "@mui/icons-material/Fingerprint";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import DevicesIcon from "@mui/icons-material/Devices";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+
 import { apiCall } from "../../api/apiClient";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import { useToast } from "../../utils/ToastContext";
 import { apiErrorToast } from "../../utils/ToastUtil";
 
-const AEPS2FAModal = ({ open, onClose }) => {
+const AEPS2FAModal = ({ open, onClose, title = "Title", buttons = [] }) => {
   const [aadhaar, setAadhaar] = useState("");
   const [rdDeviceList, setRdDeviceList] = useState([]);
   const [rdDevice, setRdDevice] = useState(null);
@@ -40,13 +44,43 @@ const AEPS2FAModal = ({ open, onClose }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const { showToast } = useToast();
-  // Detect devices when modal opens
 
+  const renderButtons = () => {
+    return buttons.map((btn, index) => (
+      <Button
+        key={index}
+        variant={btn.variant || "contained"}
+        onClick={btn.onClick}
+        disabled={btn.disabled}
+        startIcon={btn.icon}
+        sx={{
+          background: btn.bgcolor || "linear-gradient(135deg, #9d72f0 0%, #7b4dff 100%)",
+          color: btn.color || "white",
+          "&:hover": {
+            background: btn.hoverColor || "linear-gradient(135deg, #8c61e6 0%, #6b3dff 100%)",
+            boxShadow: "0 4px 10px rgba(157, 114, 240, 0.35)",
+            transform: "translateY(-1px)",
+          },
+          borderRadius: "10px",
+          px: 2,
+          py: 0.8,
+          textTransform: "none",
+          fontWeight: "600",
+          fontSize: "0.85rem",
+          boxShadow: "0 2px 6px rgba(157, 114, 240, 0.25)",
+          transition: "all 0.2s ease",
+          minWidth: "auto",
+        }}
+      >
+        {btn.label}
+      </Button>
+    ));
+  };
+  
   useEffect(() => {
-    if (open) {
-      detectDevice();
-    }
-  }, [open]);
+    detectDevice();
+  }, []);
+  
   const detectDevice = () => {
     setLoading(true);
     setError("");
@@ -126,19 +160,51 @@ const AEPS2FAModal = ({ open, onClose }) => {
     if (status === "ERROR") return "#f44336";
     return "#9e9e9e";
   };
+  
+  const statusPercentage = (status) => {
+    switch (status) {
+      case "DETECTING...":
+        return 10;
+      case "READY":
+        return 50;
+      case "SCANNING...":
+        return 75;
+      case "CONNECTED":
+        return 100;
+      case "ERROR":
+        return 100;
+      default:
+        return 0;
+    }
+  };
 
   return (
     <Box
       sx={{
-        p: { xs: 2, sm: 3 },
+        p: 2,
         borderRadius: 2,
         fontFamily: '"DM Sans", sans-serif',
-        maxWidth: 800,
-        mx: "auto",
+        width: "100%",
         background: "linear-gradient(135deg, #ffffff 0%, #f8f5ff 100%)",
-        boxShadow: "0 8px 24px rgba(157, 114, 240, 0.15)",
+        boxShadow: "0 10px 25px rgba(157, 114, 240, 0.15), 0 0 0 1px rgba(157, 114, 240, 0.05)",
         border: "1px solid rgba(157, 114, 240, 0.1)",
         position: "relative",
+        overflow: "hidden",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "4px",
+          background: "linear-gradient(90deg, #9d72f0, #7b4dff, #9d72f0)",
+          backgroundSize: "200% 100%",
+          animation: status !== "NOT READY" ? "shimmer 3s infinite linear" : "none",
+        },
+        "@keyframes shimmer": {
+          "0%": { backgroundPosition: "200% 0" },
+          "100%": { backgroundPosition: "-200% 0" },
+        },
       }}
     >
       {/* Header with gradient */}
@@ -146,11 +212,11 @@ const AEPS2FAModal = ({ open, onClose }) => {
         sx={{
           background: "linear-gradient(135deg, #9d72f0 0%, #7b4dff 100%)",
           color: "white",
-          p: 2.5,
-          borderRadius: "10px 10px 0 0",
-          mx: -3,
-          mt: -3,
-          mb: 3,
+          p: 2,
+          borderRadius: "12px 12px 0 0",
+          mx: -2,
+          mt: -2,
+          mb: 2,
           position: "relative",
         }}
       >
@@ -162,10 +228,10 @@ const AEPS2FAModal = ({ open, onClose }) => {
             right: 12,
             color: "white",
             opacity: 0.8,
-            transition: "opacity 0.2s",
+            transition: "all 0.2s",
             "&:hover": {
               opacity: 1,
-              background: "rgba(255,255,255,0.1)",
+              background: "rgba(255,255,255,0.15)",
             },
             p: 0.5,
           }}
@@ -173,84 +239,47 @@ const AEPS2FAModal = ({ open, onClose }) => {
           <CloseIcon />
         </IconButton>
 
-        <Typography
-          variant="h6"
-          sx={{
-            textAlign: "center",
-            fontWeight: "700",
-            letterSpacing: "0.3px",
-            fontSize: "1.25rem",
-          }}
-        >
-          AEPS 2 Factor Authentication
-        </Typography>
+        <Box>
+          <Typography
+            variant="h6"
+            sx={{
+              textAlign: "center",
+              fontWeight: 700,
+              fontSize: "1.1rem",
+              mb: 0.5,
+            }}
+          >
+            {title} 2FA
+          </Typography>
 
-        <Typography
-          variant="body2"
-          sx={{
-            textAlign: "center",
-            opacity: 0.9,
-            mt: 0.5,
-            fontWeight: "500",
-            fontSize: "0.85rem",
-          }}
-        >
-          Secure biometric verification
-        </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              textAlign: "center",
+              opacity: 0.9,
+              fontWeight: "500",
+              fontSize: "0.8rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <FingerprintIcon sx={{ fontSize: "16px", mr: 0.5 }} />
+            Secure biometric verification
+          </Typography>
+        </Box>
       </Box>
 
       {/* Buttons at top */}
       <Stack
         direction="row"
-        spacing={1.5}
+        spacing={1}
         justifyContent="center"
         alignItems="center"
-        sx={{ mb: 3 }}
+        sx={{ mb: 2 }}
+        flexWrap="wrap"
       >
-        <Button
-          variant="contained"
-          sx={{
-            bgcolor: "white",
-            color: "#9d72f0",
-            "&:hover": {
-              bgcolor: "#f5f2ff",
-              boxShadow: "0 4px 12px rgba(157, 114, 240, 0.25)",
-            },
-            borderRadius: "10px",
-            px: 3,
-            py: 1,
-            textTransform: "none",
-            fontWeight: "600",
-            fontSize: "0.9rem",
-            boxShadow: "0 3px 8px rgba(157, 114, 240, 0.15)",
-            transition: "all 0.2s ease",
-            minWidth: "auto",
-          }}
-        >
-          AEPS1
-        </Button>
-
-        <Button
-          variant="contained"
-          sx={{
-            bgcolor: "#9d72f0",
-            "&:hover": {
-              bgcolor: "#8c61e6",
-              boxShadow: "0 4px 12px rgba(157, 114, 240, 0.35)",
-            },
-            borderRadius: "10px",
-            px: 3,
-            py: 1,
-            textTransform: "none",
-            fontWeight: "600",
-            fontSize: "0.9rem",
-            boxShadow: "0 3px 8px rgba(157, 114, 240, 0.25)",
-            transition: "all 0.2s ease",
-            minWidth: "auto",
-          }}
-        >
-          AEPS2
-        </Button>
+        {renderButtons()}
       </Stack>
 
       {/* Error/Success Alerts */}
@@ -259,11 +288,11 @@ const AEPS2FAModal = ({ open, onClose }) => {
           severity="error"
           sx={{
             mb: 2,
-            borderRadius: 1.5,
+            borderRadius: 1,
             fontFamily: '"DM Sans", sans-serif',
             alignItems: "center",
             py: 0.5,
-            fontSize: "0.85rem",
+            fontSize: "0.8rem",
           }}
           icon={<ErrorOutlineIcon fontSize="small" />}
         >
@@ -275,11 +304,11 @@ const AEPS2FAModal = ({ open, onClose }) => {
           severity="success"
           sx={{
             mb: 2,
-            borderRadius: 1.5,
+            borderRadius: 1,
             fontFamily: '"DM Sans", sans-serif',
             alignItems: "center",
             py: 0.5,
-            fontSize: "0.85rem",
+            fontSize: "0.8rem",
           }}
           icon={<CheckCircleOutlineIcon fontSize="small" />}
         >
@@ -287,17 +316,16 @@ const AEPS2FAModal = ({ open, onClose }) => {
         </Alert>
       )}
 
-      <Grid container spacing={3}>
-        {/* Left Side Status Bar */}
+      <Grid container spacing={2}>
+        {/* Left Side Status Panel */}
         <Grid
           item
           xs={12}
-          md={4}
+          md={5}
           sx={{
             display: "flex",
             justifyContent: "center",
-            alignItems: "center",
-            flexDirection: "column",
+            alignItems: "flex-start",
           }}
         >
           <Box
@@ -306,91 +334,203 @@ const AEPS2FAModal = ({ open, onClose }) => {
               maxWidth: 240,
               bgcolor: "#faf8ff",
               borderRadius: 2,
-              p: 2,
+              p: 1.5,
               boxShadow: "0 4px 12px rgba(157, 114, 240, 0.08)",
               border: "1px solid rgba(157, 114, 240, 0.08)",
+              position: "relative",
             }}
           >
+            <Box
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: "3px",
+                background: getStatusColor(),
+                opacity: 0.3,
+              }}
+            />
+            
             <Typography
-              variant="subtitle1"
+              variant="subtitle2"
               sx={{
                 textAlign: "center",
-                mb: 1.5,
+                mb: 1,
                 color: "#5a4b81",
                 fontWeight: "600",
-                fontSize: "0.95rem",
+                fontSize: "0.9rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
+              <SettingsInputAntennaIcon sx={{ fontSize: "18px", mr: 0.5 }} />
               Device Status
             </Typography>
 
-            <Box
-              sx={{
-                width: "100%",
-                height: 160,
-                bgcolor: "#f5f2ff",
-                borderRadius: 1.5,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                p: 1.5,
-                position: "relative",
-                border: "1px dashed rgba(157, 114, 240, 0.2)",
-              }}
-            >
-              {loading && (
-                <CircularProgress
-                  size={28}
-                  thickness={4}
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    marginTop: "-14px",
-                    marginLeft: "-14px",
-                    color: "#9d72f0",
-                  }}
-                />
-              )}
+            {/* Status Indicator */}
+            <Box sx={{ position: "relative", mb: 1.5 }}>
               <Box
                 sx={{
-                  width: 20,
-                  height: 80,
+                  width: "100%",
+                  height: 18,
+                  bgcolor: "#eef2ff",
+                  borderRadius: 12,
+                  overflow: "hidden",
+                  position: "relative",
+                }}
+              >
+                <Box
+                  sx={{
+                    width: `${statusPercentage(status)}%`,
+                    height: "100%",
+                    background: `linear-gradient(90deg, ${getStatusColor()}99, ${getStatusColor()})`,
+                    transition: "width 0.5s ease",
+                  }}
+                />
+              </Box>
+              
+              {/* Status Indicators */}
+              <Box sx={{ 
+                display: "flex", 
+                justifyContent: "space-between", 
+                mt: 0.5,
+                px: 0.5
+              }}>
+                {["NOT READY", "READY", "CONNECTED"].map((text, i) => (
+                  <Typography
+                    key={i}
+                    variant="caption"
+                    sx={{
+                      color: status === text ? getStatusColor() : "#9e9e9e",
+                      fontWeight: status === text ? "700" : "500",
+                      fontSize: "0.6rem",
+                    }}
+                  >
+                    {text}
+                  </Typography>
+                ))}
+              </Box>
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mb: 1,
+              }}
+            >
+              <Box
+                sx={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
                   bgcolor: getStatusColor(),
-                  borderRadius: 1.5,
-                  transition: "all 0.3s ease",
-                  opacity: loading ? 0.5 : 1,
-                  boxShadow: `0 0 8px ${getStatusColor()}40`,
+                  mr: 0.5,
+                  boxShadow: `0 0 0 ${status !== "NOT READY" ? "3px" : "0"} ${getStatusColor()}40`,
                 }}
               />
               <Typography
-                variant="body1"
+                variant="body2"
                 sx={{
-                  mt: 1.5,
                   fontWeight: "700",
                   color: getStatusColor(),
-                  textAlign: "center",
-                  fontSize: "0.95rem",
+                  fontSize: "0.8rem",
                 }}
               >
                 {status}
               </Typography>
+            </Box>
 
-              {scanQuality && (
-                <Chip
-                  label={`Quality: ${scanQuality}`}
+            {scanQuality && (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  mt: 1,
+                  p: 1,
+                  bgcolor: "rgba(157, 114, 240, 0.05)",
+                  borderRadius: 1,
+                  border: "1px solid rgba(157, 114, 240, 0.08)",
+                }}
+              >
+                <Typography
+                  variant="caption"
                   sx={{
-                    mt: 1.5,
-                    bgcolor: "#9d72f0",
-                    color: "white",
-                    fontWeight: "500",
-                    height: 24,
-                    fontSize: "0.75rem",
+                    color: "#5a4b81",
+                    fontWeight: "600",
+                    mb: 0.5,
+                  }}
+                >
+                  Scan Quality
+                </Typography>
+                <LinearProgress
+                  variant="determinate"
+                  value={parseInt(scanQuality) || 0}
+                  sx={{
+                    height: 6,
+                    borderRadius: 3,
+                    width: "100%",
+                    mb: 0.5,
+                    bgcolor: "rgba(157, 114, 240, 0.2)",
+                    "& .MuiLinearProgress-bar": {
+                      background: "linear-gradient(90deg, #9d72f0, #7b4dff)",
+                      borderRadius: 3,
+                    },
+                  }}
+                />
+                <Chip
+                  label={`${scanQuality}%`}
+                  sx={{
+                    bgcolor: "rgba(157, 114, 240, 0.1)",
+                    color: "#5a4b81",
+                    fontWeight: "600",
+                    height: 20,
+                    fontSize: "0.7rem",
                   }}
                   size="small"
+                  icon={<GradeIcon sx={{ fontSize: "14px!important", color: "#ffc107" }} />}
                 />
-              )}
+              </Box>
+            )}
+            
+            {/* Device Connection Visualization */}
+            <Box sx={{ mt: 1.5, textAlign: "center" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: "50%",
+                    bgcolor: rdDevice ? "#4caf50" : "#9e9e9e",
+                    mr: 0.5,
+                    position: "relative",
+                    "&::after": rdDevice ? {
+                      content: '""',
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: 6,
+                      height: 6,
+                      borderRadius: "50%",
+                      bgcolor: "#fff",
+                    } : {},
+                  }}
+                />
+                <Typography variant="caption" sx={{ color: "#5a4b81", fontWeight: "500" }}>
+                  {rdDevice ? "Connected" : "Not Connected"}
+                </Typography>
+              </Box>
             </Box>
           </Box>
         </Grid>
@@ -401,98 +541,130 @@ const AEPS2FAModal = ({ open, onClose }) => {
             sx={{
               bgcolor: "#faf8ff",
               borderRadius: 2,
-              p: 2.5,
+              p: 1.5,
               boxShadow: "0 4px 12px rgba(157, 114, 240, 0.08)",
               border: "1px solid rgba(157, 114, 240, 0.08)",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
             }}
           >
             <Typography
-              variant="subtitle1"
+              variant="subtitle2"
               sx={{
-                mb: 2,
+                mb: 1.5,
                 color: "#5a4b81",
                 fontWeight: "600",
-                fontSize: "0.95rem",
+                fontSize: "0.9rem",
+                display: "flex",
+                alignItems: "center",
               }}
             >
+              <BadgeIcon sx={{ fontSize: "18px", mr: 1 }} />
               Authentication Details
             </Typography>
 
-            <Stack spacing={2}>
-              <TextField
-                label="Aadhaar Number"
-                value={aadhaar}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/\D/g, "");
-                  if (val.length <= 12) setAadhaar(val);
-                }}
-                size="small"
-                fullWidth
-                error={aadhaar.length > 0 && aadhaar.length !== 12}
-                helperText={
-                  aadhaar.length > 0 && aadhaar.length !== 12
-                    ? "Aadhaar must be 12 digits"
-                    : ""
-                }
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 1.5,
-                    fontFamily: '"DM Sans", sans-serif',
-                    fontSize: "0.9rem",
-                  },
-                  "& .MuiFormHelperText-root": {
-                    fontSize: "0.75rem",
-                    mx: 0,
-                    mt: 0.5,
-                  },
-                }}
-                inputProps={{
-                  maxLength: 12,
-                  style: { fontFamily: '"DM Sans", sans-serif' },
-                }}
-              />
+            <Stack spacing={1.5} sx={{ flex: 1 }}>
+              <Box>
+                <TextField
+                  label="Aadhaar Number"
+                  value={aadhaar}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, "");
+                    if (val.length <= 12) setAadhaar(val);
+                  }}
+                  size="small"
+                  fullWidth
+                  error={aadhaar.length > 0 && aadhaar.length !== 12}
+                  helperText={
+                    aadhaar.length > 0 && aadhaar.length !== 12
+                      ? "Aadhaar must be 12 digits"
+                      : ""
+                  }
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 1,
+                      fontFamily: '"DM Sans", sans-serif',
+                      fontSize: "0.9rem",
+                    },
+                    "& .MuiFormLabel-root": {
+                      fontFamily: '"DM Sans", sans-serif',
+                      fontSize: "0.9rem",
+                    },
+                    "& .MuiFormHelperText-root": {
+                      fontSize: "0.7rem",
+                      mx: 0,
+                      mt: 0.5,
+                    },
+                  }}
+                  inputProps={{
+                    maxLength: 12,
+                    style: { fontFamily: '"DM Sans", sans-serif' },
+                  }}
+                />
+              </Box>
 
-              <TextField
-                select
-                SelectProps={{ native: true }}
-                label="Select RD Device"
-                value={rdDevice ? rdDevice.info : ""}
-                onChange={(e) => {
-                  const selectedDevice = rdDeviceList.find(
-                    (d) => d.info === e.target.value
-                  );
-                  setRdDevice(selectedDevice);
-                  setStatus(
-                    selectedDevice ? selectedDevice.status : "NOT READY"
-                  );
-                }}
-                size="small"
-                fullWidth
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 1.5,
-                    fontFamily: '"DM Sans", sans-serif',
-                    fontSize: "0.9rem",
-                  },
-                }}
-              >
-                <option value="">-- Select Device --</option>
-                {rdDeviceList.map((d, i) => (
-                  <option key={i} value={d.info}>
-                    {d.info} ({d.status})
-                  </option>
-                ))}
-              </TextField>
+              <Box>
+                <TextField
+                  select
+                  SelectProps={{ native: true }}
+                  label="Select RD Device"
+                  value={rdDevice ? rdDevice.info : ""}
+                  onChange={(e) => {
+                    const selectedDevice = rdDeviceList.find(
+                      (d) => d.info === e.target.value
+                    );
+                    setRdDevice(selectedDevice);
+                    setStatus(
+                      selectedDevice ? selectedDevice.status : "NOT READY"
+                    );
+                  }}
+                  size="small"
+                  fullWidth
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 1,
+                      fontFamily: '"DM Sans", sans-serif',
+                      fontSize: "0.9rem",
+                    },
+                    "& .MuiFormLabel-root": {
+                      fontFamily: '"DM Sans", sans-serif',
+                      fontSize: "0.9rem",
+                    },
+                  }}
+                >
+                  <option value="">-- Select Device --</option>
+                  {rdDeviceList.map((d, i) => (
+                    <option key={i} value={d.info}>
+                      {d.info} ({d.status})
+                    </option>
+                  ))}
+                </TextField>
+                <Typography variant="caption" sx={{ color: "#9e9e9e", mt: 0.5, display: "block" }}>
+                  {rdDeviceList.length} device(s) detected
+                </Typography>
+              </Box>
 
               <TextField
                 label="Device Info"
-                value={rdDevice ? rdDevice.info : ""}
+                value={rdDevice ? rdDevice.info : "No device selected"}
                 size="small"
-                InputProps={{ readOnly: true }}
+                InputProps={{
+                  readOnly: true,
+                  startAdornment: rdDevice ? (
+                    <CheckCircleOutlineIcon 
+                      sx={{ color: "#4caf50", mr: 1, fontSize: "18px" }} 
+                    />
+                  ) : (
+                    <HighlightOffIcon 
+                      sx={{ color: "#f44336", mr: 1, fontSize: "18px" }} 
+                    />
+                  ),
+                }}
                 fullWidth
                 sx={{
                   "& .MuiOutlinedInput-root": {
-                    borderRadius: 1.5,
+                    borderRadius: 1,
                     fontFamily: '"DM Sans", sans-serif',
                     bgcolor: "#f5f2ff",
                     fontSize: "0.9rem",
@@ -500,15 +672,15 @@ const AEPS2FAModal = ({ open, onClose }) => {
                 }}
               />
 
-              <Stack direction="row" spacing={1.5} sx={{ mt: 1 }}>
+              <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
                 <Button
                   variant="outlined"
                   onClick={detectDevice}
                   disabled={loading}
                   startIcon={<SearchIcon sx={{ fontSize: "18px" }} />}
                   sx={{
-                    borderRadius: 1.5,
-                    py: 0.75,
+                    borderRadius: 1,
+                    py: 0.8,
                     textTransform: "none",
                     fontWeight: "600",
                     color: "#9d72f0",
@@ -518,7 +690,7 @@ const AEPS2FAModal = ({ open, onClose }) => {
                       bgcolor: "#f5f2ff",
                     },
                     flex: 1,
-                    fontSize: "0.85rem",
+                    fontSize: "0.8rem",
                   }}
                 >
                   Detect
@@ -531,21 +703,25 @@ const AEPS2FAModal = ({ open, onClose }) => {
                   }
                   startIcon={<FingerprintIcon sx={{ fontSize: "18px" }} />}
                   sx={{
-                    borderRadius: 1.5,
-                    py: 0.75,
+                    borderRadius: 1,
+                    py: 0.8,
                     textTransform: "none",
                     fontWeight: "600",
-                    bgcolor: "#9d72f0",
+                    background: "linear-gradient(135deg, #9d72f0 0%, #7b4dff 100%)",
                     "&:hover": {
-                      bgcolor: "#8c61e6",
-                      boxShadow: "0 4px 12px rgba(157, 114, 240, 0.35)",
+                      background: "linear-gradient(135deg, #8c61e6 0%, #6b3dff 100%)",
+                      boxShadow: "0 4px 10px rgba(157, 114, 240, 0.3)",
                     },
                     flex: 2,
-                    boxShadow: "0 3px 8px rgba(157, 114, 240, 0.25)",
-                    fontSize: "0.85rem",
+                    boxShadow: "0 2px 6px rgba(157, 114, 240, 0.25)",
+                    fontSize: "0.8rem",
                   }}
                 >
-                  Start Scan
+                  {loading ? (
+                    <CircularProgress size={16} sx={{ color: "white", mr: 0.5 }} />
+                  ) : (
+                    "Start Scan"
+                  )}
                 </Button>
               </Stack>
             </Stack>
@@ -554,36 +730,31 @@ const AEPS2FAModal = ({ open, onClose }) => {
       </Grid>
 
       {/* Note at bottom */}
-      <Typography
-        variant="caption"
+      <Box
         sx={{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          mt: 2.5,
-          color: "text.secondary",
-          px: 1,
-          fontFamily: '"DM Sans", sans-serif',
-          fontSize: "0.75rem",
+          mt: 2,
+          p: 1,
+          bgcolor: "rgba(157, 114, 240, 0.03)",
+          borderRadius: 1,
+          border: "1px solid rgba(157, 114, 240, 0.08)",
         }}
       >
-        <InfoOutlinedIcon sx={{ fontSize: "14px", mr: 0.5 }} />
-        Connect scanner for scanning. Status turns{" "}
-        <Box
-          component="span"
-          sx={{ color: "#4caf50", fontWeight: "bold", mx: 0.5 }}
+        <InfoOutlinedIcon sx={{ fontSize: "16px", mr: 1, color: "#9d72f0" }} />
+        <Typography
+          variant="caption"
+          sx={{
+            color: "#5a4b81",
+            fontFamily: '"DM Sans", sans-serif',
+            fontSize: "0.75rem",
+          }}
         >
-          green
-        </Box>
-        when connected,{" "}
-        <Box
-          component="span"
-          sx={{ color: "#f44336", fontWeight: "bold", mx: 0.5 }}
-        >
-          red
-        </Box>{" "}
-        when not.
-      </Typography>
+          Connect scanner. Status turns <span style={{ color: "#4caf50", fontWeight: "bold" }}>green</span> when connected,{" "}
+          <span style={{ color: "#f44336", fontWeight: "bold" }}>red</span> when not.
+        </Typography>
+      </Box>
     </Box>
   );
 };
