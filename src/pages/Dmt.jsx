@@ -101,96 +101,141 @@ const Dmt = () => {
     if (selectedBeneficiary?.id === id) setSelectedBeneficiary(null);
   };
 
-  // if (!instId) {
-  //   return (
-  //     <OutletDmt1
-  //       open={true}
-  //       handleClose={() => setOpenDmt1Modal(false)}
-  //       onSuccess={() => window.location.reload()}
-  //     />
-  //   );
-  // }
+  <OutletDmt1
+    open={openDmt1Modal}
+    handleClose={() => setOpenDmt1Modal(false)}
+    onSuccess={() => {
+      setOpenDmt1Modal(false);
+      window.location.reload(); // optional, depending on your logic
+    }}
+  />;
+
   return (
     <Box>
-      <Box
-        display="flex"
-        flexDirection={{ xs: "column", sm: "row" }}
-        alignItems="center"
-        gap={1}
-        mb={1}
-      >
-        <TextField
-          label="Mobile Number"
-          variant="outlined"
-          value={mobile}
-          onChange={handleMobileChange}
-          inputProps={{ maxLength: 10 }}
-          sx={{ flex: 1 }}
-          fullWidth
-        />
-
+      {instId ? (
         <Box
-          sx={{
-            display: { xs: "flex", sm: "none" },
-            justifyContent: "center",
-            width: "100%",
-            my: 0.5,
-          }}
+          textAlign="center"
+          mt={4}
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          gap={2}
         >
-          <Divider sx={{ width: "30%", textAlign: "center" }}>
-            <Typography variant="body2" color="text.secondary">
-              OR
-            </Typography>
-          </Divider>
-        </Box>
+          <Typography variant="h6" color="text.secondary">
+            You need to complete Outlet Registration to use DMT1.
+          </Typography>
+          <button
+            onClick={() => setOpenDmt1Modal(true)}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#1976d2",
+              color: "#fff",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            Register Outlet
+          </button>
 
-        <TextField
-          label="Account Number"
-          variant="outlined"
-          value={account}
-          onChange={(e) => setAccount(e.target.value.replace(/\D/g, ""))}
-          inputProps={{ maxLength: 18 }}
-          sx={{ flex: 1 }}
-          fullWidth
-        />
-      </Box>
-
-      <Divider sx={{ my: 1, display: { xs: "none", sm: "block" } }} />
-
-      {openRegisterModal && (
-        <RemitterRegister
-          open={openRegisterModal}
-          onClose={() => setOpenRegisterModal(false)}
-          mobile={mobile}
-          onSuccess={setSender}
-        />
-      )}
-
-      <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={0.5}>
-        <Box flex="0 0 30%" display="flex" flexDirection="column">
-          <RemitterDetails sender={sender} />
-
-          {selectedBeneficiary && (
-            <SelectedBeneficiary
-              beneficiary={selectedBeneficiary}
-              senderId={sender.id}
-              sender={sender}
-              senderMobile={sender.mobileNumber}
-              referenceKey={sender.referenceKey}
-            />
-          )}
-        </Box>
-
-        <Box flex="0 0 70%">
-          <Beneficiaries
-            sender={sender}
-            onSuccess={handleFetchSender}
-            beneficiaries={beneficiaries}
-            onSelect={setSelectedBeneficiary}
-            onDelete={handleDeleteBeneficiary}
+          <OutletDmt1
+            open={openDmt1Modal}
+            handleClose={() => setOpenDmt1Modal(false)}
+            onSuccess={() => {
+              setOpenDmt1Modal(false);
+              window.location.reload(); // Or refresh instId via context if dynamic
+            }}
           />
         </Box>
-      </Box>
+      ) : (
+        <>
+          {/* ✅ Full DMT UI goes here when instId is present */}
+
+          <Box
+            display="flex"
+            flexDirection={{ xs: "column", sm: "row" }}
+            alignItems="center"
+            gap={1}
+            mb={1}
+          >
+            <TextField
+              label="Mobile Number"
+              variant="outlined"
+              value={mobile}
+              onChange={handleMobileChange}
+              inputProps={{ maxLength: 10 }}
+              sx={{ flex: 1 }}
+              fullWidth
+            />
+
+            <Box
+              sx={{
+                display: { xs: "flex", sm: "none" },
+                justifyContent: "center",
+                width: "100%",
+                my: 0.5,
+              }}
+            >
+              <Divider sx={{ width: "30%", textAlign: "center" }}>
+                <Typography variant="body2" color="text.secondary">
+                  OR
+                </Typography>
+              </Divider>
+            </Box>
+
+            <TextField
+              label="Account Number"
+              variant="outlined"
+              value={account}
+              onChange={(e) => setAccount(e.target.value.replace(/\D/g, ""))}
+              inputProps={{ maxLength: 18 }}
+              sx={{ flex: 1 }}
+              fullWidth
+            />
+          </Box>
+
+          <Divider sx={{ my: 1, display: { xs: "none", sm: "block" } }} />
+
+          {openRegisterModal && (
+            <RemitterRegister
+              open={openRegisterModal}
+              onClose={() => setOpenRegisterModal(false)}
+              mobile={mobile}
+              onSuccess={setSender}
+            />
+          )}
+
+          <Box
+            display="flex"
+            flexDirection={{ xs: "column", md: "row" }}
+            gap={0.5}
+          >
+            <Box flex="0 0 30%" display="flex" flexDirection="column">
+              <RemitterDetails sender={sender} />
+
+              {selectedBeneficiary && (
+                <SelectedBeneficiary
+                  beneficiary={selectedBeneficiary}
+                  senderId={sender.id}
+                  sender={sender}
+                  senderMobile={sender.mobileNumber}
+                  referenceKey={sender.referenceKey}
+                />
+              )}
+            </Box>
+
+            <Box flex="0 0 70%">
+              <Beneficiaries
+                sender={sender}
+                onSuccess={handleFetchSender}
+                beneficiaries={beneficiaries}
+                onSelect={setSelectedBeneficiary}
+                onDelete={handleDeleteBeneficiary}
+              />
+            </Box>
+          </Box>
+        </>
+      )}
     </Box>
   );
 };

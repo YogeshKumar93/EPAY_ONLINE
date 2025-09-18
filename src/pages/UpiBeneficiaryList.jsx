@@ -8,11 +8,9 @@ import {
   ListItem,
   Button,
   IconButton,
-  Divider,
   Collapse,
   useTheme,
   useMediaQuery,
-  Chip,
   Avatar,
   Stack,
   Tooltip,
@@ -21,37 +19,37 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CommonModal from "../components/common/CommonModal";
+import VerifyUpiBene from "./VerifyUpiBene"; // import modal
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
 import { useSchemaForm } from "../hooks/useSchemaForm";
 import {
-  abhy2,
-  airtel2,
+  sbi2,
+  idbi2,
   axis2,
-  bandhan2,
-  bob2,
-  bom2,
-  canara2,
-  cbi2,
-  dbs2,
   hdfc2,
   icici2,
-  idbi2,
-  idib2,
-  indus2,
-  jk2,
   kotak2,
+  bob2,
   pnb2,
-  rbl2,
-  sbi2,
-  stand2,
+  bom2,
   union2,
+  dbs2,
+  rbl2,
   yes2,
+  indus2,
+  airtel2,
+  abhy2,
+  canara2,
+  bandhan2,
+  cbi2,
+  idib2,
+  stand2,
+  jk2,
 } from "../utils/iconsImports";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
   const theme = useTheme();
@@ -60,8 +58,9 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
   const [openModal, setOpenModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [openList, setOpenList] = useState(true);
+  const [verifyModal, setVerifyModal] = useState(false);
+  const [selectedBene, setSelectedBene] = useState(null);
 
-  // load schema
   const { schema, formData, handleChange, errors, setErrors, loading } =
     useSchemaForm(ApiEndpoints.GET_UPI_SCHEMA, openModal, {
       sender_id: sender?.id,
@@ -71,12 +70,10 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
     setSubmitting(true);
     setErrors({});
     try {
-      // Construct account_number from prefix & suffix
       const accountNumber = `${formData.prefix || ""}@${formData.suffix || ""}`;
-
       const payload = {
         ...formData,
-        account_number: accountNumber, // ✅ Add this here
+        account_number: accountNumber,
         sender_id: sender.id,
         type: "UPI",
         mobile_number: sender?.mobile_number,
@@ -146,7 +143,6 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
     JAKA: jk2,
   };
 
-  // show actual list or placeholder N/A
   const beneficiaries =
     sender?.beneficiary?.length > 0
       ? sender.beneficiary
@@ -198,10 +194,10 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
                 onClick={() => setOpenModal(true)}
                 startIcon={<PersonAddIcon sx={{ fontSize: 16 }} />}
                 sx={{
-                  minWidth: "auto", // shrink width
-                  px: 0.8, // smaller horizontal padding
-                  py: 0.3, // smaller vertical padding
-                  fontSize: "0.65rem", // smaller text
+                  minWidth: "auto",
+                  px: 0.8,
+                  py: 0.3,
+                  fontSize: "0.65rem",
                   borderRadius: 1,
                   textTransform: "none",
                   fontWeight: 500,
@@ -252,9 +248,8 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
                 }}
                 secondaryAction={
                   b.id !== "na" && (
-                    <Stack direction="row" spacing={4} alignItems="center">
-                      {/* Verified text with tick */}
-                      {b.is_verified === 1 && (
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      {b.is_verified === 1 ? (
                         <Box display="flex" alignItems="center" gap={0.3}>
                           <CheckCircleIcon
                             sx={{ fontSize: 16, color: "success.main" }}
@@ -268,13 +263,30 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
                             Verified
                           </Typography>
                         </Box>
+                      ) : (
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="warning"
+                          onClick={() => {
+                            setSelectedBene(b);
+                            setVerifyModal(true);
+                          }}
+                          sx={{
+                            borderRadius: 1,
+                            textTransform: "none",
+                            fontSize: "0.7rem",
+                            px: 1,
+                            py: 0.2,
+                          }}
+                        >
+                          Verify
+                        </Button>
                       )}
 
-                      {/* Pay button */}
                       <Button
                         size="small"
                         variant="contained"
-                        // color="primary"
                         onClick={() => onSelect?.(b)}
                         sx={{
                           color: "#fff",
@@ -289,7 +301,6 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
                         Send Money
                       </Button>
 
-                      {/* Delete button */}
                       <IconButton
                         edge="end"
                         size="small"
@@ -318,7 +329,6 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
                   gap={1.5}
                   width="100%"
                 >
-                  {/* Bank logo */}
                   {bankImageMapping[b.bank_name] ? (
                     <Box
                       component="img"
@@ -348,7 +358,6 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
                     </Avatar>
                   )}
 
-                  {/* Details */}
                   <Box flexGrow={1} minWidth={0}>
                     <Box display="flex" alignItems="center" gap={1} mb={0.5}>
                       <Typography
@@ -365,35 +374,13 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
                       </Typography>
                     </Box>
 
-                    <Stack
-                      direction={isMobile ? "column" : "row"}
-                      spacing={isMobile ? 0.5 : 2}
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ fontSize: "0.75rem" }}
                     >
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        display="flex"
-                        alignItems="center"
-                        sx={{ fontSize: "0.75rem" }}
-                      >
-                        <Box component="span" fontWeight="500" mr={0.5}>
-                          IFSC:
-                        </Box>
-                        {b.ifsc_code}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        display="flex"
-                        alignItems="center"
-                        sx={{ fontSize: "0.75rem" }}
-                      >
-                        <Box component="span" fontWeight="500" mr={0.5}>
-                          A/C:
-                        </Box>
-                        {b.account_number}
-                      </Typography>
-                    </Stack>
+                      UPI: {b.account_number}
+                    </Typography>
                   </Box>
                 </Box>
               </ListItem>
@@ -432,6 +419,20 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
               sx: { borderRadius: 1 },
             },
           ]}
+        />
+      )}
+
+      {/* Verify UPI Beneficiary Modal */}
+      {verifyModal && selectedBene && (
+        <VerifyUpiBene
+          open={verifyModal}
+          onClose={() => setVerifyModal(false)}
+          mobile={sender?.mobile_number}
+          beneId={selectedBene.id}
+          onSuccess={() => {
+            setVerifyModal(false);
+            onSuccess?.(sender.mobile_number);
+          }}
         />
       )}
     </Card>

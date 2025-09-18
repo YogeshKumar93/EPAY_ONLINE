@@ -130,9 +130,7 @@ const UpiBeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
       <Box sx={{ mx: 2, my: 2, p: 2, bgcolor: "#f0f8ff", borderRadius: 2 }}>
         {[
           { label: "Name", value: beneficiary.beneficiary_name },
-          { label: "Account Number", value: beneficiary.account_number },
-          { label: "Bank", value: beneficiary.bank_name },
-          { label: "IFSC", value: beneficiary.ifsc_code },
+          { label: "UpiId", value: beneficiary.account_number },
         ].map((item, index) => (
           <Box key={index} display="flex" mb={1}>
             {/* Label column with fixed width */}
@@ -171,9 +169,9 @@ const UpiBeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
                     size="small"
                     onClick={handleGetOtp}
                     disabled={loading}
-                                    sx={{
-            backgroundColor:"#5c3ac8"
-          }}
+                    sx={{
+                      backgroundColor: "#5c3ac8",
+                    }}
                   >
                     {loading ? "Sending..." : "Get OTP"}
                   </Button>

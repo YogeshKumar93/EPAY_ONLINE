@@ -48,15 +48,15 @@ const UpiTransfer = () => {
       const data = response?.data || response?.response?.data;
 
       if (response)
-        okSuccessToastAlt(response.message || "Sender fetched successfully");
+        if (data && data?.is_active === 1) {
+          // okSuccessToast(response.message || "Sender fetched successfully");
 
-      if (data && data?.is_active === 1) {
-        setSender(data);
-        setOpenRegisterModal(false);
-      } else {
-        setSender(null);
-        setOpenRegisterModal(true);
-      }
+          setSender(data);
+          setOpenRegisterModal(false);
+        } else {
+          setSender(null);
+          setOpenRegisterModal(true);
+        }
     } catch (error) {
       apiErrorToast(error);
       console.error("Error fetching sender:", error);
