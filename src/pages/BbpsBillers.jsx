@@ -178,7 +178,7 @@ const BbpsBillers = ({ category, onBack }) => {
                   <CardContent
                     sx={{
                       textAlign: "center",
-                
+
                       width: "100%",
                       height: "100%",
                       display: "flex",
@@ -210,8 +210,6 @@ const BbpsBillers = ({ category, onBack }) => {
                         sx={{
                           maxWidth: "100%",
                           textOverflow: "ellipsis",
-                          
-                          
                         }}
                       >
                         {biller.billerName}
@@ -219,13 +217,11 @@ const BbpsBillers = ({ category, onBack }) => {
                     </Tooltip>
 
                     <Typography
-                      variant="caption" 
+                      variant="caption"
                       sx={{
-                        
                         color:
                           biller.billerStatus === "ACTIVE" ? "green" : "red",
                         fontWeight: "bold",
-                        
                       }}
                     >
                       {biller.billerStatus}

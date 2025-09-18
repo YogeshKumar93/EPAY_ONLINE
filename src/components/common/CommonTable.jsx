@@ -467,7 +467,7 @@ const CommonTable = ({
             />
           ) : filter.type === "daterange" ? (
             <Box
-              sx={{ display: "flex", flexDirection: "column", minWidth: 250 }}
+              sx={{ display: "flex", flexDirection: "column", minWidth: 200 }}
             >
               <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>
                 {filter.label}
@@ -738,13 +738,13 @@ const CommonTable = ({
             <td
               key={colIndex}
               style={{
-                padding: "16px 20px",
+                padding: "6px 10px",
                 verticalAlign: "middle",
                 textAlign: "left",
-                fontSize: "14.5px",
-                lineHeight: "1.6",
+                fontSize: "13px",
+                lineHeight: "1",
                 fontFamily: "DM Sans, sans-serif",
-                fontWeight: 500,
+                fontWeight: 400,
 
                 color: "#646e84",
                 border: "none", // Remove default borders
@@ -791,11 +791,11 @@ const CommonTable = ({
             boxShadow: " rgba(0,0,0,0.08)", // ✅ same as row
             borderRadius: "8px",
             marginBottom: "12px",
-            padding: "16px 20px",
+            padding: "12px 16px",
             verticalAlign: "middle",
             textAlign: "left",
             fontSize: "14.5px",
-            lineHeight: "1.6",
+            lineHeight: "1.3",
             fontFamily: "DM Sans, sans-serif",
             fontWeight: 600,
             color: "#526484", // header ka thoda dark color
@@ -924,7 +924,7 @@ const CommonTable = ({
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          mb: 2,
+          mb: 1,
         }}
       >
         <Typography variant="h5">{title}</Typography>
@@ -998,7 +998,7 @@ const CommonTable = ({
                   </tr>
                   <tr
                     style={{
-                      height: "12px",
+                      height: "10px",
                       boxShadow: "0px 2px 8px rgba(0,0,0,0.08)",
                     }}
                   />{" "}

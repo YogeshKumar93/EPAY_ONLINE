@@ -715,7 +715,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
         }}
         className="content"
       >
-        <Toolbar sx={{ minHeight: "64px !important" }} />
+        <Toolbar sx={{ minHeight: "60px !important" }} />
         <Outlet />
       </MainContent>
     </Box>

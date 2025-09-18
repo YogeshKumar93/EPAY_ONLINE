@@ -1,5 +1,5 @@
 import { useMemo,  useContext, useState } from "react";
-import { Box, Tooltip,  IconButton } from "@mui/material";
+import { Box, Tooltip,  IconButton, Drawer } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import AuthContext from "../../contexts/AuthContext";
@@ -10,11 +10,20 @@ import LaptopIcon from "@mui/icons-material/Laptop";
 import DrawerDetails from "../common/DrawerDetails";
 import VisibilityIcon from '@mui/icons-material/Visibility';
  
+import CloseIcon from "@mui/icons-material/Close";
+ 
+import companylogo from '../../assets/Images/logo(1).png';
+import TransactionDetailsCard from "../common/TransactionDetailsCard";
+import ComplaintForm from "../ComplaintForm";
+ 
 const RechargeTxn = ({  query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
+   const [openCreate, setOpenCreate] = useState(false);
+   const [selectedTxn, setSelectedTxn] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [selectedRow, setSelectedRow] = useState(null);
+
 const filters = useMemo(
     () => [
       {
@@ -34,7 +43,7 @@ const filters = useMemo(
     ],
     []
   );
-  const [openCreate, setOpenCreate] = useState(false);
+  
   const columns = useMemo(
     () => [
             
@@ -229,24 +238,39 @@ const filters = useMemo(
           </div>,
         center: true,
       },
+      ...(user?.role === "ret"
+  ? [
       {
         name: "Actions",
-        selector: (row) =>
-             <>
-            <IconButton
-              color="info"
-              onClick={() => {
-                setSelectedRow(row);
-                setDrawerOpen(true);
-              }}
-              size="small"
-            >
-              <VisibilityIcon />
-            </IconButton>
-            </>,
+        selector: (row) => (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              minWidth: "80px",
+            }}
+          >
+            <Tooltip title="View Transaction">
+              <IconButton
+                color="info"
+                onClick={() => {
+                  setSelectedRow(row);
+                  setDrawerOpen(true);
+                }}
+                size="small"
+              >
+                <VisibilityIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        ),
+        width: "100px",
         center: true,
       },
-    
+    ]
+  : [])
+
     ],
     []
   );
@@ -255,23 +279,61 @@ const filters = useMemo(
 
   return (
     <>
+      <Box sx={{ mx: -4 }}>  
       <CommonTable
         columns={columns}
         endpoint={ApiEndpoints.GET_RECHARGE_TXN}
         filters={filters}
         queryParam={queryParam}
+         enableActionsHover={true}
       />
-        <DrawerDetails
+</Box>
+
+   {/* Complaint Modal */}
+      {openCreate && selectedTxn && (
+        <ComplaintForm
+          open={openCreate}
+          onClose={() => setOpenCreate(false)}
+          txnId={selectedTxn}
+          type="dmt"
+        />
+      )}
+         
+
+      {/* Transaction Details Drawer */}
+      <Drawer
+        anchor="right"
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        rowData={selectedRow}
-        
-        fields={[
-          { label: "Gst", key: "gst" },
-          { label: "Api Response", key: "api_response" },
-         
-        ]}
-      />
+       
+      >
+        <Box sx={{ width: 400,  display: "flex", flexDirection: "column", height: "100%" }}>
+          {selectedRow && (
+            <TransactionDetailsCard
+              amount={selectedRow.amount}
+              status={selectedRow.status}
+              onClose={() => setDrawerOpen(false)} // ✅ Close drawer
+             companyLogoUrl={companylogo}
+              dateTime={ddmmyyWithTime(selectedRow.created_at)}
+              message={selectedRow.message || "No message"}
+              details={[
+                { label: "Operator", value: selectedRow.operator },
+                { label: "Order Id", value: selectedRow.client_ref },
+                { label: " Mobile", value: selectedRow.mobile_number },
+                { label: "Amount", value: selectedRow.amount },
+                { label: "Account Number", value: selectedRow.account_number },
+                { label: "Status", value: selectedRow.status },
+               
+              ]}
+              onRaiseIssue={() => {
+                setSelectedTxn(selectedRow.txn_id);
+                setOpenCreate(true);
+              }}
+            />
+          )}
+        </Box>
+      </Drawer>
+
     </>
   );
 };

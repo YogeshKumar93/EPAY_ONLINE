@@ -5,20 +5,43 @@ const ToastContext = createContext();
 
 export const useToast = () => useContext(ToastContext);
 
+// 🔑 Normalizer (copied from apiErrorToast logic)
+const normalizeMessage = (message) => {
+  if (!message) return "Something went wrong";
+
+  if (typeof message === "string") return message;
+
+  if (typeof message === "object") {
+    return Object.values(message).flat().join(" | ");
+  }
+
+  return String(message);
+};
+
 export const ToastProvider = ({ children }) => {
   const [toast, setToast] = useState({
     open: false,
     message: "",
-    severity: "info", // default
+    severity: "info",
     loading: false,
   });
 
   const showToast = useCallback((message, severity = "info") => {
-    setToast({ open: true, message, severity, loading: false });
+    setToast({
+      open: true,
+      message: normalizeMessage(message), // ✅ normalize here
+      severity,
+      loading: false,
+    });
   }, []);
 
   const showLoadingToast = useCallback((message = "Loading...") => {
-    setToast({ open: true, message, severity: "info", loading: true });
+    setToast({
+      open: true,
+      message: normalizeMessage(message),
+      severity: "info",
+      loading: true,
+    });
   }, []);
 
   const hideToast = useCallback(() => {

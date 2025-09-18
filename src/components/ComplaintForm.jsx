@@ -80,65 +80,68 @@ const ComplaintForm = ({ txnId, onSuccess, open, onClose, type }) => {
 
   return (
     <CommonModal open={open} onClose={onClose}>
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
-        sx={{
-          p: 2,
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          maxWidth: 450,
-        }}
-      >
-        <Typography variant="h6">Raise a Complaint</Typography>
+   <Box
+  component="form"
+  onSubmit={handleSubmit}
+  sx={{
+    p: 3,
+    display: "flex",
+    flexDirection: "column",
+    gap: 2,
+    maxWidth: 700, // increase width to fit two fields side by side
+  }}
+>
+  <Typography variant="h6">Raise a Complaint</Typography>
 
-        {/* Transaction ID (auto-filled, readonly) */}
-        <TextField
-          label="Transaction ID"
-          value={txnId.id || ""}
-          InputProps={{ readOnly: true }}
-          fullWidth
-          variant="outlined"
-        />
+  {/* Row with fields side by side */}
+  <Box sx={{ display: "flex", gap: 2 }}>
+    <TextField
+      label="Transaction ID"
+      value={txnId.id || ""}
+      InputProps={{ readOnly: true }}
+      variant="outlined"
+      sx={{ flex: 1 }} // take equal space
+    />
 
-        {/* Complaint message */}
-        <TextField
-          label="Complaint Message"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          fullWidth
-          required
-          multiline
-          rows={3}
-          placeholder="Enter your complaint details..."
-        />
+    <TextField
+      label="Complaint Message"
+      value={message}
+      onChange={(e) => setMessage(e.target.value)}
+      required
+      multiline
+      rows={3}
+      placeholder="Enter your complaint details..."
+      variant="outlined"
+      sx={{ flex: 2 }} // optional: make this field wider
+    />
+  </Box>
 
-        {/* Submit button */}
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          disabled={loading}
-        >
-          {loading ? <CircularProgress size={24} /> : "Submit Complaint"}
-        </Button>
+  {/* Submit button */}
+  <Button
+    type="submit"
+    variant="contained"
+    color="primary"
+    disabled={loading}
+  >
+    {loading ? <CircularProgress size={24} /> : "Submit Complaint"}
+  </Button>
 
-        {/* Snackbar */}
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={4000}
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        >
-          <Alert
-            severity={snackbar.type || "info"}
-            onClose={() => setSnackbar({ ...snackbar, open: false })}
-          >
-            {snackbar.text}
-          </Alert>
-        </Snackbar>
-      </Box>
+  {/* Snackbar */}
+  <Snackbar
+    open={snackbar.open}
+    autoHideDuration={4000}
+    onClose={() => setSnackbar({ ...snackbar, open: false })}
+    anchorOrigin={{ vertical: "top", horizontal: "right" }}
+  >
+    <Alert
+      severity={snackbar.type || "info"}
+      onClose={() => setSnackbar({ ...snackbar, open: false })}
+    >
+      {snackbar.text}
+    </Alert>
+  </Snackbar>
+</Box>
+
     </CommonModal>
   );
 };
