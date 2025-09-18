@@ -56,6 +56,7 @@ const numberToWords = (num) => {
 
 const PrintDmt = () => {
   const [receiptType, setReceiptType] = useState("large");
+  const [orientation, setOrientation] = useState("portrait"); // portrait / landscape
   const location = useLocation();
   const data = location.state?.txnData;
 
@@ -88,6 +89,7 @@ const PrintDmt = () => {
     <>
       <style>{`
         @media print {
+          @page { size: ${orientation}; margin: 10mm; }
           body * { visibility: hidden; }
           .receipt-container, .receipt-container * { visibility: visible; }
           .receipt-container { position: absolute; left: 0; top: 0; width: 100%; padding: 2; margin: 0; box-shadow: none; }
@@ -103,12 +105,16 @@ const PrintDmt = () => {
         .status-failed { font-weight: 700; color: red; }
       `}</style>
 
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", minHeight: "100vh",  pt: 4 }}>
-        {/* Receipt Type Toggle */}
+      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", minHeight: "100vh", pt: 4 }}>
+        {/* Receipt Type & Orientation Toggle */}
         <Box display="flex" justifyContent="center" mb={2} className="no-print">
           <RadioGroup row value={receiptType} onChange={(e) => setReceiptType(e.target.value)}>
             <FormControlLabel value="large" control={<Radio />} label="Large Receipt" />
             <FormControlLabel value="small" control={<Radio />} label="Small Receipt" />
+          </RadioGroup>
+          <RadioGroup row value={orientation} onChange={(e) => setOrientation(e.target.value)} sx={{ ml: 3 }}>
+            <FormControlLabel value="portrait" control={<Radio />} label="Portrait" />
+            <FormControlLabel value="landscape" control={<Radio />} label="Landscape" />
           </RadioGroup>
         </Box>
 
@@ -135,30 +141,7 @@ const PrintDmt = () => {
             </Box>
           </Box>
 
-          {/* Transaction Summary Button */}
-          {receiptType === "large" && (
-            <Box sx={{ display: "flex", justifyContent: "center", my: 3 }} className="no-print">
-              <Button variant="outlined" sx={{
-                borderRadius: "10px",
-                textTransform: "none",
-                px: 3,
-                py: 1,
-                border: "2px solid #2b9bd7",
-                color: "#2b9bd7",
-                fontWeight: "bold",
-                background: "#fff",
-                "&:hover": {
-                  background: "rgba(43,155,215,0.1)",
-                  border: "2px solid #2386ba",
-                  color: "#2386ba",
-                }
-              }}>
-                Transaction Summary
-              </Button>
-            </Box>
-          )}
-
-          {/* Receipt Table */}
+          {/* Receipt Table & Summary */}
           {receiptType === "large" ? (
             <>
               <Box className="table-container" mt={3}>
@@ -186,14 +169,12 @@ const PrintDmt = () => {
           ) : (
             // Small Receipt
             <Box mt={2} sx={{ border: "1px solid #e0e0e0", borderRadius: 2, overflow: "hidden" }}>
-              {[
-                { label: "Date", value: ddmmyyWithTime(data.created_at) },
+              {[{ label: "Date", value: ddmmyyWithTime(data.created_at) },
                 { label: "Txn ID", value: data.txn_id },
                 { label: "Beneficiary", value: data.beneficiary_name },
                 { label: "Account No", value: data.account_number },
                 { label: "Amount", value: `₹ ${data.amount}`, type: "amount" },
-                { label: "Status", value: data.status, type: "status" },
-              ].map((item,i) => (
+                { label: "Status", value: data.status, type: "status" }].map((item,i) => (
                 <Box key={i} display="flex" justifyContent="space-between" sx={{ px: 1, py: 1.3, borderBottom: i !== 5 ? "1px solid #f0f0f0" : "none", bgcolor: i % 2 === 0 ? "#fafafa" : "transparent" }}>
                   <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.85rem" }}>{item.label}:</Typography>
                   <Typography variant="body2" sx={{
