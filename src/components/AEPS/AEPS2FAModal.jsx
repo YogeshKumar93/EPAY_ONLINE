@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -8,8 +8,16 @@ import {
   TextField,
   Typography,
   Stack,
+  CircularProgress,
+  Alert,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+
+// Import the Mantra SDK functions
+import { 
+  CaptureFingerPrintAeps2, 
+  GetMFS100InfoLoad 
+} from "../../utils/MantraCapture";
 
 const AEPS2FAModal = ({ open, onClose }) => {
   const [aadhaar, setAadhaar] = useState("");
@@ -17,33 +25,85 @@ const AEPS2FAModal = ({ open, onClose }) => {
   const [rdDevice, setRdDevice] = useState(null);
   const [status, setStatus] = useState("NOT READY");
   const [scanQuality, setScanQuality] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  // Detect devices when modal opens
+  useEffect(() => {
+    if (open) {
+      detectDevice();
+    }
+  }, [open]);
 
   const detectDevice = () => {
-    setTimeout(() => {
-      const devices = [
-        {
-          status: "READY",
-          rdport: "COM3",
-          info: "Mantra MFS100 on COM3",
-        },
-      ];
-      setRdDeviceList(devices);
-      if (devices.length > 0) {
-        setRdDevice(devices[0]);
-        setStatus(devices[0].status);
+    setLoading(true);
+    setError("");
+    setRdDeviceList([]);
+    setRdDevice(null);
+    setStatus("DETECTING...");
+    
+    GetMFS100InfoLoad(
+      setLoading,
+      (devices) => {
+        setLoading(false);
+        if (devices && devices.length > 0) {
+          setRdDeviceList(devices);
+          
+          // Auto-select the first READY device if available
+          const readyDevice = devices.find(d => d.status === "READY");
+          if (readyDevice) {
+            setRdDevice(readyDevice);
+            setStatus(readyDevice.status);
+          } else {
+            setStatus("NOT READY");
+          }
+        } else {
+          setError("No fingerprint devices detected");
+          setStatus("NOT READY");
+        }
+      },
+      (error) => {
+        setLoading(false);
+        setError("Failed to detect devices: " + error);
+        setStatus("NOT READY");
       }
-    }, 1000);
+    );
   };
 
   const startScan = () => {
-    if (!rdDevice) return alert("Please select RD device first");
-    if (!aadhaar) return alert("Enter Aadhaar Number first");
+    if (!rdDevice) {
+      setError("Please select a device first");
+      return;
+    }
+    
+    if (!aadhaar || aadhaar.length !== 12) {
+      setError("Please enter a valid 12-digit Aadhaar number");
+      return;
+    }
 
+    setLoading(true);
+    setError("");
+    setSuccess("");
     setStatus("SCANNING...");
-    setTimeout(() => {
-      setStatus("CONNECTED");
-      setScanQuality("85");
-    }, 2000);
+    
+    CaptureFingerPrintAeps2(
+      rdDevice.rdport,
+      (qualityMessage, data) => {
+        setLoading(false);
+        setStatus("CONNECTED");
+        setScanQuality(data.qScore);
+        setSuccess(`Fingerprint captured successfully! ${qualityMessage}`);
+        
+        // Here you would typically send the captured data to your backend
+        console.log("Fingerprint data:", data);
+      },
+      (error) => {
+        setLoading(false);
+        setStatus("ERROR");
+        setError("Scan failed: " + error);
+      }
+    );
   };
 
   // Status color logic
@@ -51,6 +111,8 @@ const AEPS2FAModal = ({ open, onClose }) => {
     if (status === "CONNECTED") return "green";
     if (status === "SCANNING...") return "orange";
     if (status === "READY") return "blue";
+    if (status === "DETECTING...") return "purple";
+    if (status === "ERROR") return "red";
     return "gray";
   };
 
@@ -60,10 +122,13 @@ const AEPS2FAModal = ({ open, onClose }) => {
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: { xs: "95vw", sm: "70vw", md: "60vw" },
+    maxWidth: 800,
     bgcolor: "background.paper",
     boxShadow: 24,
     borderRadius: 3,
     p: 3,
+    maxHeight: "90vh",
+    overflow: "auto",
   };
 
   return (
@@ -132,6 +197,18 @@ const AEPS2FAModal = ({ open, onClose }) => {
           </Button>
         </Stack>
 
+        {/* Error/Success Alerts */}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+        {success && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            {success}
+          </Alert>
+        )}
+
         <Grid container spacing={3}>
           {/* Left Side Status Bar */}
           <Grid
@@ -143,7 +220,7 @@ const AEPS2FAModal = ({ open, onClose }) => {
             <Box
               sx={{
                 width: 60,
-                height: "100%",
+                height: 200,
                 bgcolor: "#f5f5f5",
                 borderRadius: 2,
                 display: "flex",
@@ -151,8 +228,21 @@ const AEPS2FAModal = ({ open, onClose }) => {
                 alignItems: "center",
                 justifyContent: "center",
                 p: 2,
+                position: "relative",
               }}
             >
+              {loading && (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    marginTop: "-12px",
+                    marginLeft: "-12px",
+                  }}
+                />
+              )}
               <Box
                 sx={{
                   width: 20,
@@ -160,6 +250,7 @@ const AEPS2FAModal = ({ open, onClose }) => {
                   bgcolor: getStatusColor(),
                   borderRadius: 2,
                   transition: "all 0.3s ease",
+                  opacity: loading ? 0.5 : 1,
                 }}
               />
               <Typography
@@ -183,30 +274,40 @@ const AEPS2FAModal = ({ open, onClose }) => {
                 }}
                 size="small"
                 fullWidth
+                error={aadhaar.length > 0 && aadhaar.length !== 12}
+                helperText={
+                  aadhaar.length > 0 && aadhaar.length !== 12
+                    ? "Aadhaar must be 12 digits"
+                    : ""
+                }
               />
 
               <TextField
                 select
                 SelectProps={{ native: true }}
                 label="Select RD Device"
-                value={rdDevice?.info || ""}
-                onChange={(e) =>
-                  setRdDevice(rdDeviceList.find((d) => d.info === e.target.value))
-                }
+                value={rdDevice ? rdDevice.info : ""}
+                onChange={(e) => {
+                  const selectedDevice = rdDeviceList.find(
+                    (d) => d.info === e.target.value
+                  );
+                  setRdDevice(selectedDevice);
+                  setStatus(selectedDevice ? selectedDevice.status : "NOT READY");
+                }}
                 size="small"
                 fullWidth
               >
                 <option value="">-- Select Device --</option>
                 {rdDeviceList.map((d, i) => (
                   <option key={i} value={d.info}>
-                    {d.info}
+                    {d.info} ({d.status})
                   </option>
                 ))}
               </TextField>
 
               <TextField
                 label="Device Info"
-                value={rdDevice?.info || ""}
+                value={rdDevice ? rdDevice.info : ""}
                 size="small"
                 InputProps={{ readOnly: true }}
                 fullWidth
@@ -221,13 +322,17 @@ const AEPS2FAModal = ({ open, onClose }) => {
               />
 
               <Stack direction="row" spacing={2}>
-                <Button variant="outlined" onClick={detectDevice}>
+                <Button 
+                  variant="outlined" 
+                  onClick={detectDevice}
+                  disabled={loading}
+                >
                   Detect Device
                 </Button>
                 <Button
                   variant="contained"
                   onClick={startScan}
-                  disabled={!rdDevice || !aadhaar}
+                  disabled={!rdDevice || !aadhaar || aadhaar.length !== 12 || loading}
                   sx={{ bgcolor: "#1CA895", textTransform: "none" }}
                 >
                   Start Scan
@@ -249,7 +354,9 @@ const AEPS2FAModal = ({ open, onClose }) => {
         >
           Note: Connect scanner for scanning the impression.  
           (When scanner is connected, the status bar turns{" "}
-          <span style={{ color: "green", fontWeight: "bold" }}>green</span>)
+          <span style={{ color: "green", fontWeight: "bold" }}>green</span>.
+          If not connected, it shows{" "}
+          <span style={{ color: "red", fontWeight: "bold" }}>red</span>)
         </Typography>
       </Box>
     </Modal>

@@ -4,7 +4,7 @@ import { Box, Grid, Tooltip, Typography } from "@mui/material";
 const CommenCardBill = ({ title, img, onClick, isSelected = false }) => {
   let imageSrc;
   try {
-    imageSrc = require(`../assests/operators/${img}.png`);
+    // imageSrc = require(`../assests/operators/${img}.png`);
   } catch (error) {
     imageSrc = null;
   }
