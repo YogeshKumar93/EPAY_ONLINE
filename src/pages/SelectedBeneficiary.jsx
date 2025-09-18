@@ -165,7 +165,11 @@ const SelectedBeneficiary = ({
           txnID: response?.data?.rrn,
           message: response?.message,
         });
-        navigate("/print-dmt", { state: { txnData: txnDetails } }),
+        sessionStorage.setItem("txnData", JSON.stringify(txnDetails));
+
+// Open PrintDmt in a new tab
+window.open("/print-dmt", "_blank");
+
           setAmount("");
         setOtp("");
         setMpin("");

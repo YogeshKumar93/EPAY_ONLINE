@@ -84,9 +84,14 @@ const PrintDmt = () => {
   const [receiptType, setReceiptType] = useState("large");
   const [orientation, setOrientation] = useState("portrait"); // portrait / landscape
   const location = useLocation();
-  const data = location.state?.txnData;
+  let data = location.state?.txnData;
 const authCtx = useContext(AuthContext);
 const user = authCtx.user;
+  if (!data) {
+    const storedData = sessionStorage.getItem("txnData");
+    if (storedData) data = JSON.parse(storedData);
+  }
+
 
   if (!data) {
     return (
