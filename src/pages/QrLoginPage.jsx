@@ -19,6 +19,8 @@ import {
   VisibilityOff,
   PhoneAndroid,
   Lock,
+  FiberManualRecord,
+  InfoOutlined,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { set, useForm } from "react-hook-form";
@@ -191,292 +193,399 @@ const QrLoginPage = () => {
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
   return (
-    <>
-      {/* Logo Top Left */}
+ <>
+  {/* Logo Top Left */}
+  <Box
+    sx={{
+      position: "absolute",
+      top: { xs: 16, sm: 20, md: 24 },
+      left: { xs: 16, sm: 20, md: 24 },
+      zIndex: 10,
+    }}
+  >
+    <Box
+      component="img"
+      src={biggpayLogo}
+      alt="Logo"
+      sx={{
+        width: { xs: "70px", sm: "80px", md: "90px" },
+        objectFit: "contain",
+        cursor: "pointer",
+        transition: "transform 0.3s ease",
+        "&:hover": { transform: "scale(1.05)" },
+      }}
+      onClick={() => navigate("/login")}
+    />
+  </Box>
+
+  {/* Fullscreen container */}
+  <Grid
+    container
+    sx={{
+      minHeight: "100vh",
+      width: "100vw",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      background: "linear-gradient(135deg, #f8f9ff 0%, #f0f3ff 100%)",
+      overflow: "hidden",
+      position: "relative",
+      py: { xs: 3, md: 0 },
+      px: { xs: 2, sm: 3 },
+    }}
+  >
+    {/* Animated background elements
+    // <Box
+    //   sx={{
+    //     position: "absolute",
+    //     top: "-10%",
+    //     right: "-5%",
+    //     width: "300px",
+    //     height: "300px",
+    //     borderRadius: "50%",
+    //     // background: "linear-gradient(135deg, rgba(133, 79, 255, 0.1) 0%, rgba(133, 79, 255, 0.05) 100%)",
+    //     zIndex: 0,
+    //   }}
+    // />
+    // <Box
+    //   sx={{
+    //     position: "absolute",
+    //     bottom: "-10%",
+    //     left: "-5%",
+    //     width: "250px",
+    //     height: "250px",
+    //     borderRadius: "50%",
+    //     // background: "linear-gradient(135deg, rgba(133, 79, 255, 0.1) 0%, rgba(133, 79, 255, 0.05) 100%)",
+    //     zIndex: 0,
+    //   }}
+    // /> */}
+    
+    <Grid
+      item
+      xs={12}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 1,
+        width: "100%",
+      }}
+    >
+      {/* Main Content Card - Modern Design */}
       <Box
         sx={{
-          position: "absolute",
-          top: { xs: 16, sm: 20, md: 24 },
-          left: { xs: 16, sm: 20, md: 24 },
-          zIndex: 10,
-        }}
-      >
-        <Box
-          component="img"
-          src={biggpayLogo}
-          alt="Logo"
-          sx={{
-            width: { xs: "70px", sm: "80px", md: "90px" },
-            objectFit: "contain",
-            cursor: "pointer",
-            transition: "transform 0.3s ease",
-            "&:hover": { transform: "scale(1.05)" },
-          }}
-          onClick={() => navigate("/login")}
-        />
-      </Box>
-
-      {/* Fullscreen container */}
-      <Grid
-        container
-        sx={{
-          minHeight: "100vh",
-          width: "100vw",
+          width: { xs: "100%", sm: "90%", md: "85%", lg: "75%" },
+          maxWidth: "1000px",
+          background: "#fff",
+          borderRadius: { xs: "16px", md: "20px" },
+          // boxShadow: "0 20px 40px rgba(133, 79, 255, 0.15), 0 8px 20px rgba(133, 79, 255, 0.08)",
+          p: { xs: 3, sm: 4, md: 4.5 },
           display: "flex",
-          justifyContent: "center",
+          flexDirection: { xs: "column", md: "row" },
           alignItems: "center",
-          background: "linear-gradient(135deg, #f4f7fb 0%, #e9f0fa 100%)",
-          overflow: "hidden",
+          justifyContent: "space-between",
+          gap: { xs: 3, md: 5 },
           position: "relative",
-          py: { xs: 3, md: 0 },
-          px: { xs: 2, sm: 3 },
+          overflow: "hidden",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "6px",
+            background: "linear-gradient(90deg, #854fff 0%, #6a31ff 100%)",
+            borderRadius: "10px 10px 0 0",
+          }
         }}
       >
-        <Grid
-          item
-          xs={12}
+        {/* Left: QR Box */}
+        <Box
           sx={{
+            flex: { md: 1 },
             display: "flex",
-            alignItems: "center",
+            flexDirection: "column",
             justifyContent: "center",
-            zIndex: 1,
-            width: "100%",
+            alignItems: "center",
+            width: { xs: "100%", md: "auto" },
+            p: { xs: 0, md: 2 },
           }}
         >
-          {/* Main Content Card - More Compact */}
-          <Box
+          <Typography
             sx={{
-              width: { xs: "100%", sm: "90%", md: "80%", lg: "70%" },
-              maxWidth: "950px",
-              background: "#fff",
-              borderRadius: { xs: "12px", md: "16px" },
-              boxShadow:
-                "0 12px 30px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04)",
-              p: { xs: 2.5, sm: 3.5, md: 4 },
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: { xs: 3, md: 4 },
+              fontSize: { xs: "22px", sm: "24px", md: "26px" },
+              fontWeight: 700,
+              background: "linear-gradient(135deg, #854fff 0%, #6a31ff 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              mb: { xs: 1.5, md: 2 },
+              textAlign: "center",
             }}
           >
-            {/* Left: QR Box */}
-            <Box
-              sx={{
-                flex: { md: 1 },
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                width: { xs: "100%", md: "auto" },
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: { xs: "20px", sm: "22px", md: "24px" },
-                  fontWeight: 700,
-                  background:
-                    "linear-gradient(135deg, #0052CC 0%, #3385ff 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  mb: { xs: 1.5, md: 2 },
-                  textAlign: "center",
-                }}
-              >
-                Secure QR Login
-              </Typography>
+            Secure QR Login
+          </Typography>
 
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{
-                  mb: { xs: 2, md: 2.5 },
-                  textAlign: "center",
-                  fontSize: { xs: "0.9rem", sm: "1rem" },
-                }}
-              >
-                Scan this QR with your <strong>IMPS GURU</strong> app to login
-                instantly
-              </Typography>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              mb: { xs: 2.5, md: 3 },
+              textAlign: "center",
+              fontSize: { xs: "0.9rem", sm: "1rem" },
+              maxWidth: "300px",
+            }}
+          >
+            Scan this QR with your <strong style={{ color: "#854fff" }}>IMPS GURU</strong> app to login instantly
+          </Typography>
 
-              <Box
-                sx={{
-                  background: "#fff",
-                  p: { xs: 2, sm: 2.5 },
-                  borderRadius: "12px",
-                  boxShadow: "0 6px 20px rgba(0,82,204,0.08)",
-                  border: "1px solid rgba(0, 82, 204, 0.1)",
-                  position: "relative",
-                  width: "fit-content",
-                }}
-              >
-                <QRCode
-                  value={qrToken}
-                  size={160}
-                  level="H"
-                  includeMargin
-                  imageSettings={{
-                    src: biggpayLogo,
-                    height: 34,
-                    width: 34,
-                    excavate: true,
-                  }}
-                />
-              </Box>
-            </Box>
-
-            {/* Vertical Divider - Only on medium screens and up */}
-            <Box
-              sx={{
-                display: { xs: "none", md: "block" },
-                width: "1px",
-                height: "220px",
-                background:
-                  "linear-gradient(to bottom, transparent, rgba(0,0,0,0.1), transparent)",
-                mx: 1,
+          <Box
+            sx={{
+              background: "#fff",
+              p: { xs: 2.5, sm: 3 },
+              borderRadius: "16px",
+              boxShadow: "0 10px 25px rgba(133, 79, 255, 0.15)",
+              border: "1px solid rgba(133, 79, 255, 0.12)",
+              position: "relative",
+              width: "fit-content",
+              mb: 2,
+            }}
+          >
+            <QRCode
+              value={qrToken}
+              size={180}
+              level="H"
+              includeMargin
+              imageSettings={{
+                src: biggpayLogo,
+                height: 36,
+                width: 36,
+                excavate: true,
               }}
             />
+          </Box>
+          
+          {/* Animated scanning indicator */}
+          <Box
+            sx={{
+              width: "200px",
+              height: "4px",
+              background: "linear-gradient(90deg, transparent, rgba(133, 79, 255, 0.5), transparent)",
+              borderRadius: "4px",
+              animation: "scan 2s infinite linear",
+              mt: 1,
+              "@keyframes scan": {
+                "0%": { transform: "translateX(-100%)" },
+                "100%": { transform: "translateX(100%)" },
+              }
+            }}
+          />
+          
+          {/* Status indicator */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mt: 2,
+              color: "#854fff",
+            }}
+          >
+            <FiberManualRecord sx={{ fontSize: "12px", mr: 1 }} />
+            <Typography variant="caption" sx={{ fontWeight: 500 }}>
+              Waiting for scan...
+            </Typography>
+          </Box>
+        </Box>
 
-            {/* Right: Instructions */}
-            <Box
-              sx={{
-                flex: { md: 1 },
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-                width: { xs: "100%", md: "auto" },
-              }}
-            >
-              <Typography
-                variant="h6"
-                sx={{
-                  fontSize: { xs: "16px", sm: "18px" },
-                  fontWeight: 600,
-                  color: "text.primary",
-                  mb: { xs: 0.5, md: 1 },
-                }}
-              >
-                How to login:
-              </Typography>
+        {/* Vertical Divider - Only on medium screens and up */}
+        <Box
+          sx={{
+            display: { xs: "none", md: "block" },
+            width: "1px",
+            height: "260px",
+            background: "linear-gradient(to bottom, transparent, rgba(133, 79, 255, 0.2), transparent)",
+            mx: 1,
+          }}
+        />
 
+        {/* Right: Instructions */}
+        <Box
+          sx={{
+            flex: { md: 1.2 },
+            display: "flex",
+            flexDirection: "column",
+            gap: 2.5,
+            width: { xs: "100%", md: "auto" },
+            p: { xs: 0, md: 1 },
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              fontSize: { xs: "18px", sm: "20px" },
+              fontWeight: 600,
+              color: "#333",
+              mb: { xs: 1, md: 1.5 },
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
+            <InfoOutlined sx={{ color: "#854fff", fontSize: "22px" }} />
+            How to login:
+          </Typography>
+
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2.5,
+              position: "relative",
+              pl: 0.5,
+            }}
+          >
+            {[
+              "Open the IMPS GURU app on your phone",
+              "Tap on 'Scan QR' in the app side menu",
+              "Point your camera at this QR code",
+              "Confirm login on your device",
+            ].map((step, index, arr) => (
               <Box
+                key={index}
                 sx={{
                   display: "flex",
-                  flexDirection: "column",
-                  gap: 2,
+                  alignItems: "flex-start",
                   position: "relative",
-                  pl: 0.5,
+                  transition: "transform 0.2s",
+                  "&:hover": {
+                    transform: "translateX(5px)",
+                  }
                 }}
               >
-                {[
-                  "Open the IMPS GURU app on your phone",
-                  "Tap on 'Scan QR' in the app side menu",
-                  "Point your camera at this QR code",
-                  "Confirm login on your device",
-                ].map((step, index, arr) => (
+                {/* Circle + Vertical Line */}
+                <Box
+                  sx={{
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    mr: 2.5,
+                    mt: 0.2,
+                  }}
+                >
+                  {/* Circle */}
                   <Box
-                    key={index}
                     sx={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: "50%",
+                      background: "linear-gradient(135deg, #854fff 0%, #6a31ff 100%)",
                       display: "flex",
-                      alignItems: "flex-start",
-                      position: "relative",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "white",
+                      fontSize: 13,
+                      fontWeight: "bold",
+                      zIndex: 1,
+                      boxShadow: "0 4px 8px rgba(133, 79, 255, 0.3)",
                     }}
                   >
-                    {/* Circle + Vertical Line */}
+                    {index + 1}
+                  </Box>
+
+                  {/* Line (connector) - only show between steps */}
+                  {index < arr.length - 1 && (
                     <Box
                       sx={{
-                        position: "relative",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        mr: 2,
-                        mt: 0.2,
+                        position: "absolute",
+                        top: "30px",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        width: "2px",
+                        height: "38px",
+                        background: "rgba(133, 79, 255, 0.2)",
+                        zIndex: 0,
                       }}
-                    >
-                      {/* Circle */}
-                      <Box
-                        sx={{
-                          width: 26,
-                          height: 26,
-                          borderRadius: "50%",
-                          background:
-                            "linear-gradient(135deg, #0052CC 0%, #3385ff 100%)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "white",
-                          fontSize: 12,
-                          fontWeight: "bold",
-                          zIndex: 1,
-                          boxShadow: "0 3px 6px rgba(0, 82, 204, 0.2)",
-                        }}
-                      >
-                        {index + 1}
-                      </Box>
+                    />
+                  )}
+                </Box>
 
-                      {/* Line (connector) - only show between steps */}
-                      {index < arr.length - 1 && (
-                        <Box
-                          sx={{
-                            position: "absolute",
-                            top: "26px",
-                            left: "50%",
-                            transform: "translateX(-50%)",
-                            width: "2px",
-                            height: "32px",
-                            background: "rgba(0,82,204,0.2)",
-                            zIndex: 0,
-                          }}
-                        />
-                      )}
-                    </Box>
-
-                    {/* Step Text */}
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        lineHeight: 1.5,
-                        fontSize: { xs: "0.9rem", sm: "1rem" },
-                        pt: 0.2,
-                      }}
-                    >
-                      {step}
-                    </Typography>
-                  </Box>
-                ))}
-              </Box>
-
-              {/* Security Note */}
-              <Box
-                sx={{
-                  mt: 2,
-                  pt: 2,
-                  borderTop: "1px solid rgba(0,0,0,0.06)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                }}
-              >
-                <Lock
-                  sx={{
-                    fontSize: "1rem",
-                    color: "text.secondary",
-                    opacity: 0.7,
-                  }}
-                />
+                {/* Step Text */}
                 <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ fontSize: "0.8rem" }}
+                  variant="body2"
+                  sx={{
+                    lineHeight: 1.5,
+                    fontSize: { xs: "0.95rem", sm: "1.05rem" },
+                    pt: 0.3,
+                    color: "#444",
+                  }}
                 >
-                  Your login is encrypted and secure
+                  {step}
                 </Typography>
               </Box>
-            </Box>
+            ))}
           </Box>
-        </Grid>
-      </Grid>
-    </>
+
+          {/* Security Note */}
+          <Box
+            sx={{
+              mt: 3,
+              pt: 2.5,
+              borderTop: "1px solid rgba(133, 79, 255, 0.1)",
+              display: "flex",
+              alignItems: "center",
+              gap: 1.5,
+              background: "rgba(133, 79, 255, 0.03)",
+              p: 1.5,
+              borderRadius: "8px",
+            }}
+          >
+            <Lock
+              sx={{
+                fontSize: "1.1rem",
+                color: "#854fff",
+              }}
+            />
+            <Typography
+              variant="caption"
+              sx={{ 
+                fontSize: "0.85rem",
+                color: "#666",
+                fontWeight: 500,
+              }}
+            >
+              Your login is encrypted and secure. We never share your data with third parties.
+            </Typography>
+          </Box>
+          
+          {/* Alternative login option */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              mt: 1,
+            }}
+          >
+            <Button
+              variant="text"
+              size="small"
+              onClick={() => navigate("/login")}
+              sx={{
+                color: "#854fff",
+                fontSize: "0.85rem",
+                fontWeight: 500,
+                "&:hover": {
+                  background: "rgba(133, 79, 255, 0.05)",
+                }
+              }}
+            >
+              Use password login instead
+            </Button>
+          </Box>
+        </Box>
+      </Box>
+    </Grid>
+  </Grid>
+</>
   );
 };
 

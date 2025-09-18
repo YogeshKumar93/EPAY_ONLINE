@@ -158,43 +158,44 @@ const FundRequest = () => {
       ? [
           {
             name: "Actions",
-            selector: (row, { hoveredRow, enableActionsHover }) => (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 1,
-                  width: "120px", // ✅ fixed width
-                }}
-              >
+            selector: (row, { hoveredRow, enableActionsHover }) => {
+              const isHovered = enableActionsHover && hoveredRow === row.id;
+
+              return (
                 <Box
                   sx={{
                     display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                     gap: 1,
-                    opacity:
-                      enableActionsHover && hoveredRow === row.id ? 1 : 0, // ✅ only fade
-                    pointerEvents:
-                      enableActionsHover && hoveredRow === row.id
-                        ? "auto"
-                        : "none", // ✅ no click
-                    transition: "opacity 0.2s ease-in-out", // ✅ smooth fade
+                    width: "120px", // fixed width
                   }}
                 >
-                  <Tooltip title="Approve">
-                    <Button size="small" color="success">
-                      <CheckCircleIcon fontSize="small" />
-                    </Button>
-                  </Tooltip>
-                  <Tooltip title="Reject">
-                    <Button size="small" color="error">
-                      <CancelIcon fontSize="small" />
-                    </Button>
-                  </Tooltip>
+                  {isHovered ? (
+                    <Box sx={{ display: "flex", gap: 1 }}>
+                      <Tooltip title="Approve">
+                        <Button size="small" color="success">
+                          <CheckCircleIcon fontSize="small" />
+                        </Button>
+                      </Tooltip>
+                      <Tooltip title="Reject">
+                        <Button size="small" color="error">
+                          <CancelIcon fontSize="small" />
+                        </Button>
+                      </Tooltip>
+                    </Box>
+                  ) : (
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "#999", textAlign: "center", width: "100%" }}
+                    >
+                      -
+                    </Typography>
+                  )}
                 </Box>
-              </Box>
-            ),
-            width: "120px", // ✅ fix column width too
+              );
+            },
+            width: "120px",
           },
         ]
       : []),

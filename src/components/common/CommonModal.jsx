@@ -161,7 +161,7 @@
 // };
 
 // export default CommonModal;
- 
+
 // CommonModal.js
 
 import React, { useState, useEffect } from "react";
@@ -224,7 +224,7 @@ const CommonFormField = ({
         );
         console.log(`API response for ${name}:`, res);
 
-       const rawData = res?.response?.data || res?.data || []; // Changed from res?.data?.data
+        const rawData = res?.response?.data || res?.data || []; // Changed from res?.data?.data
         console.log(`Raw data for ${name}:`, rawData);
 
         const mapped = apiOptions.mapOptions
@@ -278,49 +278,51 @@ const CommonFormField = ({
           {...props}
         />
       );
-case "autocomplete":
-  return (
-    <Autocomplete
-      options={finalOptions}
-      getOptionLabel={(opt) => {
-        if (!opt) return "";
-        if (typeof opt === "string") return opt;
-        return opt.label ?? opt.name ?? opt.bank_name ?? String(opt.value ?? "");
-      }}
-      value={
-        finalOptions.find(
-          (opt) =>
-            opt?.value === formData[name] ||
-            opt?.id === formData[name] ||
-            opt?.bank_id === formData[name]
-        ) || null
-      }
-      onChange={(e, newValue) => {
-        handleChange({
-          target: {
-            name,
-            value:
-              newValue?.value ??
-              newValue?.id ??
-              newValue?.bank_id ??
-              newValue ??
-              "",
-          },
-        });
-      }}
-      loading={optionsLoading}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          label={label}
-          fullWidth
-          {...getErrorProps()}
+    case "autocomplete":
+      return (
+        <Autocomplete
+          options={finalOptions}
+          getOptionLabel={(opt) => {
+            if (!opt) return "";
+            if (typeof opt === "string") return opt;
+            return (
+              opt.label ?? opt.name ?? opt.bank_name ?? String(opt.value ?? "")
+            );
+          }}
+          value={
+            finalOptions.find(
+              (opt) =>
+                opt?.value === formData[name] ||
+                opt?.id === formData[name] ||
+                opt?.bank_id === formData[name]
+            ) || null
+          }
+          onChange={(e, newValue) => {
+            handleChange({
+              target: {
+                name,
+                value:
+                  newValue?.value ??
+                  newValue?.id ??
+                  newValue?.bank_id ??
+                  newValue ??
+                  "",
+              },
+            });
+          }}
+          loading={optionsLoading}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={label}
+              fullWidth
+              {...getErrorProps()}
+            />
+          )}
+          disabled={loading || optionsLoading}
+          {...props}
         />
-      )}
-      disabled={loading || optionsLoading}
-      {...props}
-    />
-  );
+      );
 
     case "select":
     case "dropdown":
@@ -460,7 +462,7 @@ case "autocomplete":
           type={type || "text"}
           value={formData[name] || ""}
           onChange={handleChange}
-disabled={field.disabled || loading}
+          disabled={field.disabled || loading}
           {...getErrorProps()}
           {...props}
         />
@@ -483,7 +485,7 @@ const CommonModal = ({
   showCloseButton = true,
   closeOnBackdropClick = true,
   maxWidth,
-  dividers = false,
+  dividers = true,
   fieldConfig = [],
   formData = {},
   handleChange = () => {},
@@ -524,15 +526,22 @@ const CommonModal = ({
   return (
     <Dialog
       open={open}
-      onClose={closeOnBackdropClick ? onClose : null}
+      onClose={onClose}
       fullScreen={fullScreen}
       maxWidth={getMaxWidth()}
       fullWidth
       aria-labelledby="modal-title"
       PaperProps={{
         sx: {
-          borderRadius: 2,
-          boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+          borderRadius: { xs: 0, sm: 2 },
+          boxShadow: { xs: "none", sm: "0 10px 40px rgba(0,0,0,0.1)" },
+          bgcolor: "#FFFFFF",
+          fontFamily: '"DM Sans", sans-serif !important',
+          maxHeight: "90vh",
+          overflow: "hidden",
+          "& *": {
+            fontFamily: '"DM Sans", sans-serif !important',
+          },
         },
       }}
     >
@@ -545,20 +554,27 @@ const CommonModal = ({
           alignItems: "center",
           borderBottom: dividers ? 1 : 0,
           borderColor: "divider",
-          bgcolor: "#014C50",
-          color: "white",
+          color: "#344357",
+          fontFamily: '"DM Sans", sans-serif',
+          backgroundColor: "#f8fafc",
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexGrow: 1,
-          }}
-        >
-          <Box sx={{ mr: 1.5, display: "flex" }}>{getIcon()}</Box>
-          <Typography variant="h5" component="h2" id="modal-title">
+        <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
+          <Box sx={{ mr: 1.5, display: "flex", color: "#4f46e5" }}>
+            {getIcon()}
+          </Box>
+          <Typography
+            variant="h5"
+            component="h2"
+            id="modal-title"
+            sx={{
+              color: "#1e293b",
+              fontFamily: '"DM Sans", sans-serif',
+              fontWeight: 550,
+              fontSize: { xs: "1.25rem", sm: "1.5rem" },
+              color:"#364a63",
+            }}
+          >
             {title}
           </Typography>
         </Box>
@@ -568,6 +584,9 @@ const CommonModal = ({
             onClick={onClose}
             sx={{
               color: (theme) => theme.palette.grey[500],
+              "&:hover": {
+                backgroundColor: "rgba(0,0,0,0.04)",
+              },
             }}
           >
             <CloseIcon />
@@ -576,11 +595,34 @@ const CommonModal = ({
       </DialogTitle>
 
       {/* Content */}
-      <DialogContent dividers={dividers} sx={{ p: 3 }}>
+      {/* Content */}
+      <DialogContent
+        dividers={dividers}
+        sx={{
+          p: 4,
+          backgroundColor: "#ffffff",
+          overflowY: "auto",
+          maxHeight: "calc(90vh - 140px)",
+        }}
+      >
         {fieldConfig.length > 0 ? (
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)" }, // ✅ 2 fields per row on sm+, 1 per row on xs
+              gap: 3, // spacing between fields
+              alignItems: "start",
+              mt: 1.4,
+            }}
+          >
             {fieldConfig.map((field, i) => (
-              <Box key={i} sx={{ flex: "1 1 calc(50% - 16px)" }}>
+              <Box
+                key={i}
+                sx={{
+                  gridColumn: field.fullWidth ? "1 / -1" : "auto", // fullWidth fields span both columns
+                  minWidth: 0,
+                }}
+              >
                 <CommonFormField
                   field={field}
                   formData={formData}
@@ -600,12 +642,18 @@ const CommonModal = ({
       {footerButtons && footerButtons.length > 0 && (
         <DialogActions
           sx={{
-            p: 2,
+            p: { xs: 2, sm: 3 },
             gap: 1,
             borderTop: dividers ? 1 : 0,
             borderColor: "divider",
-            bgcolor: "#014C50",
-            color: "white",
+            bgcolor: "#f8fafc",
+            color: "#344357",
+            fontFamily: '"DM Sans", sans-serif',
+            flexDirection: { xs: "column", sm: "row" },
+            "& > *": {
+              width: { xs: "100%", sm: "auto" },
+              mx: { xs: 0, sm: 0.5 },
+            },
           }}
         >
           {footerButtons.map((button, index) => (
@@ -617,7 +665,15 @@ const CommonModal = ({
               startIcon={button.startIcon}
               endIcon={button.endIcon}
               disabled={button.disabled}
-              sx={{ borderRadius: 2 }}
+              sx={{
+                fontFamily: '"DM Sans", sans-serif !important',
+                backgroundColor:
+                  button.text.toLowerCase() === "cancel"
+                    ? "#8094ae !important"
+                    : "#854fff",
+                color: "#fff",
+                textTransform: "none",
+              }}
             >
               {button.text}
             </Button>

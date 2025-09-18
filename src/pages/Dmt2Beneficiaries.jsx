@@ -341,6 +341,7 @@ const Dmt2Beneficiaries = ({
                         color="primary"
                         onClick={() => onSelect?.(b)}
                         sx={{
+                          backgroundColor:"#5c3ac8",
                           borderRadius: 1,
                           textTransform: "none",
                           fontSize: isMobile ? "0.6rem" : "0.75rem",

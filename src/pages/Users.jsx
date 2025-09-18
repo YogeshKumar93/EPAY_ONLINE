@@ -191,15 +191,15 @@ const Users = ({ query }) => {
         name: "Status",
         selector: (row, { hoveredRow, enableActionsHover }) => (
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <span
-              style={{
+            <Typography
+              sx={{
                 color: row.is_active === 1 ? "green" : "red",
                 minWidth: "30px",
                 display: "inline-block",
               }}
             >
               {row.is_active === 1 ? "Active" : "Inactive"}
-            </span>
+            </Typography>
             {/* ✅ Hover/Always show based on prop */}
             {(!enableActionsHover || hoveredRow === row.id) && (
               <Box sx={{ transition: "opacity 0.2s" }}>
@@ -229,52 +229,61 @@ const Users = ({ query }) => {
           </Box>
         ),
       },
-      {
-        name: "Actions",
-        selector: (row, { hoveredRow, enableActionsHover }) => (
+  {
+  name: "Actions",
+  selector: (row, { hoveredRow, enableActionsHover }) => {
+    const isHovered = !enableActionsHover || hoveredRow === row.id;
+
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minWidth: "80px", // fix width for stability
+        }}
+      >
+        {isHovered ? (
           <Box
             sx={{
               display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              minWidth: "80px", // fix width for stability
+              gap: 1,
+              transition: "opacity 0.2s ease-in-out",
             }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                gap: 1,
-                transition: "opacity 0.2s ease-in-out",
-                opacity: !enableActionsHover || hoveredRow === row.id ? 1 : 0,
-                visibility:
-                  !enableActionsHover || hoveredRow === row.id
-                    ? "visible"
-                    : "hidden",
-              }}
-            >
-              <Tooltip title="Edit User">
-                <IconButton
-                  size="small"
-                  color="secondary"
-                  onClick={() => handleEdit(row)}
-                >
-                  <EditIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
+            <Tooltip title="Edit User">
+              <IconButton
+                size="small"
+                color="secondary"
+                onClick={() => handleEdit(row)}
+              >
+                <EditIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
 
-              <Tooltip title="Edit Permissions">
-                <IconButton
-                  size="small"
-                  color="primary"
-                  onClick={() => handleOpenPermissions(row)}
-                >
-                  <SettingsIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            </Box>
+            <Tooltip title="Edit Permissions">
+              <IconButton
+                size="small"
+                color="primary"
+                onClick={() => handleOpenPermissions(row)}
+              >
+                <SettingsIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
           </Box>
-        ),
-      },
+        ) : (
+          <Typography
+            variant="body2"
+            sx={{ color: "#999", textAlign: "center", minWidth: "80px" }}
+          >
+            -
+          </Typography>
+        )}
+      </Box>
+    );
+  },
+}
+
     ],
     [userMap]
   );

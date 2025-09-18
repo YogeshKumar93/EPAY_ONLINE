@@ -276,6 +276,7 @@ const SelectedBeneficiary = ({
                   onClick={handleGetOtp}
                   disabled={loading}
                   sx={{
+                    backgroundColor: "#5c3ac8",
                     minWidth: "60px",
                     px: 1,
                     py: 0.5,

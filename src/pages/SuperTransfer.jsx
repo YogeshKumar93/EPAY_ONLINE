@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { Box, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
@@ -20,76 +26,75 @@ const SuperTransfer = () => {
   const [openVerifyModal, setOpenVerifyModal] = useState(false);
   const [otpData, setOtpData] = useState(null);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
-const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Fetch sender by mobile number
-const handleFetchSender = async (number = mobile) => {
-  if (!number || number.length !== 10) return;
+  const handleFetchSender = async (number = mobile) => {
+    if (!number || number.length !== 10) return;
 
-  setLoading(true); // start loader
+    setLoading(true); // start loader
 
-  const { error, response } = await apiCall("post", ApiEndpoints.GET_SENDER, {
-    mobile_number: number,
-  });
-   setLoading(false); // stop loader
+    const { error, response } = await apiCall("post", ApiEndpoints.GET_SENDER, {
+      mobile_number: number,
+    });
+    setLoading(false); // stop loader
 
-  if (response) {
-    // ✅ success path
-    const data = response?.data || response?.response?.data;
+    if (response) {
+      // ✅ success path
+      const data = response?.data || response?.response?.data;
 
-    if (response)
-      // okSuccessToast(response.message || "Sender fetched successfully");
+      if (response)
+        if (data && data?.is_active === 1) {
+          // okSuccessToast(response.message || "Sender fetched successfully");
 
-    if (data && data?.is_active === 1) {
-      setSender(data);
-      setOpenRegisterModal(false);
-    } else {
-      setSender(null);
-      setOpenRegisterModal(true);
+          setSender(data);
+          setOpenRegisterModal(false);
+        } else {
+          setSender(null);
+          setOpenRegisterModal(true);
+        }
+    } else if (error) {
+      // ❌ error path
+      console.log("error from API:", error);
+
+      if (error?.message === "The number is inactive") {
+        // 👉 open verify modal instead of register
+        setSender(null);
+        setOpenRegisterModal(false);
+
+        setOtpData({
+          mobile_number: error?.errors?.mobile_number || number,
+          otp_ref: error?.errors?.otp_ref,
+        });
+        setOpenVerifyModal(true);
+      } else {
+        apiErrorToast(error?.message || "Something went wrong");
+      }
     }
-  } else if (error) {
-    // ❌ error path
-    console.log("error from API:", error);
+  };
 
-    if (error?.message === "The number is inactive") {
-      // 👉 open verify modal instead of register
-      setSender(null);
-      setOpenRegisterModal(false);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
-      setOtpData({
-        mobile_number: error?.errors?.mobile_number || number,
-        otp_ref: error?.errors?.otp_ref,
-      });
-      setOpenVerifyModal(true);
-    } else {
-      apiErrorToast(error?.message || "Something went wrong");
+  const handleChange = (e) => {
+    const value = e.target.value.replace(/\D/g, ""); // only digits allowed
+
+    if (value.length <= 10) {
+      setMobile(value);
+
+      if (value.length === 10) {
+        handleFetchSender(value);
+      } else {
+        // clear data if input is not 10 digits
+        setSender(null);
+        setSelectedBeneficiary(null);
+      }
     }
-  }
-};
-
- useEffect(() => {
-      const timer = setTimeout(() => {
-        setLoading(false);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }, []);
-
-const handleChange = (e) => {
-  const value = e.target.value.replace(/\D/g, ""); // only digits allowed
-
-  if (value.length <= 10) {
-    setMobile(value);
-
-    if (value.length === 10) {
-      handleFetchSender(value);
-    } else {
-      // clear data if input is not 10 digits
-      setSender(null);
-      setSelectedBeneficiary(null);
-    }
-  }
-};
-
+  };
 
   const handleSenderRegistered = ({ mobile_number, otp_ref, sender_id }) => {
     setOtpData({ mobile_number, otp_ref, sender_id });
@@ -97,40 +102,37 @@ const handleChange = (e) => {
   };
 
   return (
-    <Box >
+    <Box>
       {/* Always show mobile input */}
       <Box>
-      <TextField
-        label="Mobile Number"
-        variant="outlined"
-        fullWidth
-        value={mobile}
-          autoComplete="on"   // <-- enable autocomplete for phone numbers
-        onChange={handleChange}
-        inputProps={{ maxLength: 10 }}
-        sx={{ mb: 1 }}
-      />
-       {loading && (
-            <CommonLoader loading={loading}  
-              size={24}
-              sx={{
-                position: "absolute",
-                top: "50%",
-                right: 16,
-                transform: "translateY(-50%)",
-              }}
-            />
-          )}
-</Box>
+        <TextField
+          label="Mobile Number"
+          variant="outlined"
+          fullWidth
+          value={mobile}
+          autoComplete="on" // <-- enable autocomplete for phone numbers
+          onChange={handleChange}
+          inputProps={{ maxLength: 10 }}
+          sx={{ mb: 1 }}
+        />
+        {loading && (
+          <CommonLoader
+            loading={loading}
+            size={24}
+            sx={{
+              position: "absolute",
+              top: "50%",
+              right: 16,
+              transform: "translateY(-50%)",
+            }}
+          />
+        )}
+      </Box>
       {/* Main Content (Sender + Beneficiaries) */}
-      <Box
-        display="flex"
-        flexDirection={isMobile ? "column" : "row"}
-        gap={0.5}
-      >
+      <Box display="flex" flexDirection={isMobile ? "column" : "row"} gap={0.5}>
         {/* Left: Sender Details + Selected Beneficiary */}
         <Box flex={isMobile ? "1 1 100%" : "0 0 30%"}>
-            <SenderDetails sender={sender} />
+          <SenderDetails sender={sender} />
 
           {selectedBeneficiary && (
             <BeneficiaryDetails
@@ -143,12 +145,11 @@ const handleChange = (e) => {
 
         {/* Right: Beneficiary List */}
         <Box flex={isMobile ? "1 1 100%" : "0 0 70%"}>
-            <BeneficiaryList
-              sender={sender}
-              onSuccess={() => handleFetchSender()}
-              onSelect={(b) => setSelectedBeneficiary(b)}
-            />
-  
+          <BeneficiaryList
+            sender={sender}
+            onSuccess={() => handleFetchSender()}
+            onSelect={(b) => setSelectedBeneficiary(b)}
+          />
         </Box>
       </Box>
 
