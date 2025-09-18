@@ -197,10 +197,7 @@ export default function AppRoutes() {
                 path="customer/money-transfer"
                 element={<MoneyTransfer />}
               />
-              {/* <Route
-                path="customer/fund-transfer"
-                element={<SuperTransfer />}
-              /> */}
+          
               <Route
                 path="customer/wallet-transfer"
                 element={<Wallet2WalletTransfer />}
@@ -241,6 +238,7 @@ export default function AppRoutes() {
                 path="di/wallet-transfer"
                 element={<Wallet2WalletTransfer />}
               />
+                  <Route path="di/profile" element={<ProfilePage />} />
             </>
           )}
 
@@ -249,6 +247,7 @@ export default function AppRoutes() {
               <Route path="asm/dashboard" element={<Dashboard />} />
               <Route path="asm/users" element={<Users />} />
               <Route path="asm/transcations" element={<Transaction />} />
+                  <Route path="di/profile" element={<ProfilePage />} />
             </>
           )}
 
@@ -257,6 +256,7 @@ export default function AppRoutes() {
               <Route path="zsm/dashboard" element={<Dashboard />} />
               <Route path="zsm/users" element={<Users />} />
               <Route path="zsm/transcations" element={<Transaction />} />
+                  <Route path="zsm/profile" element={<ProfilePage />} />
             </>
           )}
 
@@ -265,6 +265,7 @@ export default function AppRoutes() {
               <Route path="api/dashboard" element={<Dashboard />} />
               <Route path="api/users" element={<Users />} />
               <Route path="api/transcations" element={<Transaction />} />
+                  <Route path="api/profile" element={<ProfilePage />} />
             </>
           )}
 
@@ -273,6 +274,7 @@ export default function AppRoutes() {
               <Route path="md/dashboard" element={<MD_Dashboard />} />
               <Route path="md/users" element={<Users />} />
               <Route path="md/transcations" element={<Transaction />} />
+                  <Route path="md/profile" element={<ProfilePage />} />
             </>
           )}
 

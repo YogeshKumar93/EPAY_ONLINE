@@ -134,7 +134,6 @@ const Wallet2WalletTransfer = ({ filters = [] }) => {
 
   return (
     <Box>
-      {/* LEFT: W2W Transfer Form */}
       <Box
         sx={{
           flex: 1, // chhota portion
@@ -143,10 +142,9 @@ const Wallet2WalletTransfer = ({ filters = [] }) => {
           display: "flex",
         }}
       >
-        {user.role === "adm" ||
-          (user.role === "adm" && (
-            <W2wTransfer type="w2w" handleFetchRef={refreshTransfer} />
-          ))}
+        {user.role !== "adm" && (
+          <W2wTransfer type="w2w" handleFetchRef={refreshTransfer} />
+        )}
       </Box>
 
       <Box sx={{}}>
