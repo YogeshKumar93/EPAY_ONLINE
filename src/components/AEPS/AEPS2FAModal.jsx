@@ -34,8 +34,16 @@ import ApiEndpoints from "../../api/ApiEndpoints";
 import { useToast } from "../../utils/ToastContext";
 import { apiErrorToast } from "../../utils/ToastUtil";
 
-const AEPS2FAModal = ({ open, onClose, title = "Title", buttons = [] }) => {
-  const [aadhaar, setAadhaar] = useState("");
+const AEPS2FAModal = ({
+  open,
+  onClose,
+  title = "Title",
+  buttons = [],
+  fingerData,
+  aadhaar,
+  setAadhaar,
+}) => {
+  // const [aadhaar, setAadhaar] = useState("");
   const [rdDeviceList, setRdDeviceList] = useState([]);
   const [rdDevice, setRdDevice] = useState(null);
   const [status, setStatus] = useState("NOT READY");
@@ -54,10 +62,13 @@ const AEPS2FAModal = ({ open, onClose, title = "Title", buttons = [] }) => {
         disabled={btn.disabled}
         startIcon={btn.icon}
         sx={{
-          background: btn.bgcolor || "linear-gradient(135deg, #9d72f0 0%, #7b4dff 100%)",
+          background:
+            btn.bgcolor || "linear-gradient(135deg, #9d72f0 0%, #7b4dff 100%)",
           color: btn.color || "white",
           "&:hover": {
-            background: btn.hoverColor || "linear-gradient(135deg, #8c61e6 0%, #6b3dff 100%)",
+            background:
+              btn.hoverColor ||
+              "linear-gradient(135deg, #8c61e6 0%, #6b3dff 100%)",
             boxShadow: "0 4px 10px rgba(157, 114, 240, 0.35)",
             transform: "translateY(-1px)",
           },
@@ -76,11 +87,11 @@ const AEPS2FAModal = ({ open, onClose, title = "Title", buttons = [] }) => {
       </Button>
     ));
   };
-  
+
   useEffect(() => {
     detectDevice();
   }, []);
-  
+
   const detectDevice = () => {
     setLoading(true);
     setError("");
@@ -142,6 +153,7 @@ const AEPS2FAModal = ({ open, onClose, title = "Title", buttons = [] }) => {
 
         // Here you would typically send the captured data to your backend
         console.log("Fingerprint data:", data);
+        fingerData(data);
       },
       (error) => {
         setLoading(false);
@@ -160,7 +172,7 @@ const AEPS2FAModal = ({ open, onClose, title = "Title", buttons = [] }) => {
     if (status === "ERROR") return "#f44336";
     return "#9e9e9e";
   };
-  
+
   const statusPercentage = (status) => {
     switch (status) {
       case "DETECTING...":
@@ -186,7 +198,8 @@ const AEPS2FAModal = ({ open, onClose, title = "Title", buttons = [] }) => {
         fontFamily: '"DM Sans", sans-serif',
         width: "100%",
         background: "linear-gradient(135deg, #ffffff 0%, #f8f5ff 100%)",
-        boxShadow: "0 10px 25px rgba(157, 114, 240, 0.15), 0 0 0 1px rgba(157, 114, 240, 0.05)",
+        boxShadow:
+          "0 10px 25px rgba(157, 114, 240, 0.15), 0 0 0 1px rgba(157, 114, 240, 0.05)",
         border: "1px solid rgba(157, 114, 240, 0.1)",
         position: "relative",
         overflow: "hidden",
@@ -199,7 +212,8 @@ const AEPS2FAModal = ({ open, onClose, title = "Title", buttons = [] }) => {
           height: "4px",
           background: "linear-gradient(90deg, #9d72f0, #7b4dff, #9d72f0)",
           backgroundSize: "200% 100%",
-          animation: status !== "NOT READY" ? "shimmer 3s infinite linear" : "none",
+          animation:
+            status !== "NOT READY" ? "shimmer 3s infinite linear" : "none",
         },
         "@keyframes shimmer": {
           "0%": { backgroundPosition: "200% 0" },
@@ -351,7 +365,7 @@ const AEPS2FAModal = ({ open, onClose, title = "Title", buttons = [] }) => {
                 opacity: 0.3,
               }}
             />
-            
+
             <Typography
               variant="subtitle2"
               sx={{
@@ -390,14 +404,16 @@ const AEPS2FAModal = ({ open, onClose, title = "Title", buttons = [] }) => {
                   }}
                 />
               </Box>
-              
+
               {/* Status Indicators */}
-              <Box sx={{ 
-                display: "flex", 
-                justifyContent: "space-between", 
-                mt: 0.5,
-                px: 0.5
-              }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mt: 0.5,
+                  px: 0.5,
+                }}
+              >
                 {["NOT READY", "READY", "CONNECTED"].map((text, i) => (
                   <Typography
                     key={i}
@@ -429,7 +445,9 @@ const AEPS2FAModal = ({ open, onClose, title = "Title", buttons = [] }) => {
                   borderRadius: "50%",
                   bgcolor: getStatusColor(),
                   mr: 0.5,
-                  boxShadow: `0 0 0 ${status !== "NOT READY" ? "3px" : "0"} ${getStatusColor()}40`,
+                  boxShadow: `0 0 0 ${
+                    status !== "NOT READY" ? "3px" : "0"
+                  } ${getStatusColor()}40`,
                 }}
               />
               <Typography
@@ -492,11 +510,15 @@ const AEPS2FAModal = ({ open, onClose, title = "Title", buttons = [] }) => {
                     fontSize: "0.7rem",
                   }}
                   size="small"
-                  icon={<GradeIcon sx={{ fontSize: "14px!important", color: "#ffc107" }} />}
+                  icon={
+                    <GradeIcon
+                      sx={{ fontSize: "14px!important", color: "#ffc107" }}
+                    />
+                  }
                 />
               </Box>
             )}
-            
+
             {/* Device Connection Visualization */}
             <Box sx={{ mt: 1.5, textAlign: "center" }}>
               <Box
@@ -514,20 +536,25 @@ const AEPS2FAModal = ({ open, onClose, title = "Title", buttons = [] }) => {
                     bgcolor: rdDevice ? "#4caf50" : "#9e9e9e",
                     mr: 0.5,
                     position: "relative",
-                    "&::after": rdDevice ? {
-                      content: '""',
-                      position: "absolute",
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      width: 6,
-                      height: 6,
-                      borderRadius: "50%",
-                      bgcolor: "#fff",
-                    } : {},
+                    "&::after": rdDevice
+                      ? {
+                          content: '""',
+                          position: "absolute",
+                          top: "50%",
+                          left: "50%",
+                          transform: "translate(-50%, -50%)",
+                          width: 6,
+                          height: 6,
+                          borderRadius: "50%",
+                          bgcolor: "#fff",
+                        }
+                      : {},
                   }}
                 />
-                <Typography variant="caption" sx={{ color: "#5a4b81", fontWeight: "500" }}>
+                <Typography
+                  variant="caption"
+                  sx={{ color: "#5a4b81", fontWeight: "500" }}
+                >
                   {rdDevice ? "Connected" : "Not Connected"}
                 </Typography>
               </Box>
@@ -640,7 +667,10 @@ const AEPS2FAModal = ({ open, onClose, title = "Title", buttons = [] }) => {
                     </option>
                   ))}
                 </TextField>
-                <Typography variant="caption" sx={{ color: "#9e9e9e", mt: 0.5, display: "block" }}>
+                <Typography
+                  variant="caption"
+                  sx={{ color: "#9e9e9e", mt: 0.5, display: "block" }}
+                >
                   {rdDeviceList.length} device(s) detected
                 </Typography>
               </Box>
@@ -652,12 +682,12 @@ const AEPS2FAModal = ({ open, onClose, title = "Title", buttons = [] }) => {
                 InputProps={{
                   readOnly: true,
                   startAdornment: rdDevice ? (
-                    <CheckCircleOutlineIcon 
-                      sx={{ color: "#4caf50", mr: 1, fontSize: "18px" }} 
+                    <CheckCircleOutlineIcon
+                      sx={{ color: "#4caf50", mr: 1, fontSize: "18px" }}
                     />
                   ) : (
-                    <HighlightOffIcon 
-                      sx={{ color: "#f44336", mr: 1, fontSize: "18px" }} 
+                    <HighlightOffIcon
+                      sx={{ color: "#f44336", mr: 1, fontSize: "18px" }}
                     />
                   ),
                 }}
@@ -707,9 +737,11 @@ const AEPS2FAModal = ({ open, onClose, title = "Title", buttons = [] }) => {
                     py: 0.8,
                     textTransform: "none",
                     fontWeight: "600",
-                    background: "linear-gradient(135deg, #9d72f0 0%, #7b4dff 100%)",
+                    background:
+                      "linear-gradient(135deg, #9d72f0 0%, #7b4dff 100%)",
                     "&:hover": {
-                      background: "linear-gradient(135deg, #8c61e6 0%, #6b3dff 100%)",
+                      background:
+                        "linear-gradient(135deg, #8c61e6 0%, #6b3dff 100%)",
                       boxShadow: "0 4px 10px rgba(157, 114, 240, 0.3)",
                     },
                     flex: 2,
@@ -718,7 +750,10 @@ const AEPS2FAModal = ({ open, onClose, title = "Title", buttons = [] }) => {
                   }}
                 >
                   {loading ? (
-                    <CircularProgress size={16} sx={{ color: "white", mr: 0.5 }} />
+                    <CircularProgress
+                      size={16}
+                      sx={{ color: "white", mr: 0.5 }}
+                    />
                   ) : (
                     "Start Scan"
                   )}
@@ -751,8 +786,11 @@ const AEPS2FAModal = ({ open, onClose, title = "Title", buttons = [] }) => {
             fontSize: "0.75rem",
           }}
         >
-          Connect scanner. Status turns <span style={{ color: "#4caf50", fontWeight: "bold" }}>green</span> when connected,{" "}
-          <span style={{ color: "#f44336", fontWeight: "bold" }}>red</span> when not.
+          Connect scanner. Status turns{" "}
+          <span style={{ color: "#4caf50", fontWeight: "bold" }}>green</span>{" "}
+          when connected,{" "}
+          <span style={{ color: "#f44336", fontWeight: "bold" }}>red</span> when
+          not.
         </Typography>
       </Box>
     </Box>
