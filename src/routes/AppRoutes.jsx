@@ -233,33 +233,13 @@ export default function AppRoutes() {
             <>
               <Route path="di/dashboard" element={<AdminTransactions />} />
               <Route path="di/users" element={<Users />} />
-              <Route path="di/services" element={<Dashboard />} />
-              <Route path="di/allServices" element={<AllServices />} />
-              <Route
-                path="customer/wallet-ledger"
-                element={<AccountLadger />}
-              />
 
-              <Route path="customer/logs" element={<RetailerLogs />} />
+              <Route path="di/wallet-ledger" element={<AccountLadger />} />
+              <Route path="di/transactions" element={<Transaction />} />
               <Route
-                path="customer/money-transfer"
-                element={<DmtContainer />}
+                path="di/wallet-transfer"
+                element={<Wallet2WalletTransfer />}
               />
-              <Route
-                path="customer/recharge-bill"
-                element={<RechargeAndBill />}
-              />
-              <Route path="customer/purchase" element={<MyPurchase />} />
-              <Route path="customer/fund-request" element={<FundRequest />} />
-              <Route path="customer/sale" element={<MySale />} />
-
-              <Route path="customer/profile" element={<ProfilePage />} />
-
-              <Route
-                path="customer/*"
-                element={<Navigate to="/customer/dashboard" replace />}
-              />
-              <Route path="customer/accounts" element={<Accounts />} />
             </>
           )}
 

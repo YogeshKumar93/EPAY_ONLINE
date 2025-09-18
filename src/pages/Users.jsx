@@ -16,7 +16,7 @@ import { apiCall } from "../api/apiClient";
 const Users = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const fetchUsersRef = useRef(null);
-
+  const userRole = authCtx?.user;
   const [selectedUser, setSelectedUser] = useState(null);
   const [openPermissions, setOpenPermissions] = useState(false);
   const [userMap, setUserMap] = useState({}); // id → name map
@@ -140,74 +140,81 @@ const Users = ({ query }) => {
         ),
         width: "100px",
       },
- {
-  name: "Status",
-  selector: (row, { hoveredRow, enableActionsHover }) => {
-    const isHovered = enableActionsHover && hoveredRow === row.id;
+      {
+        name: "Status",
+        selector: (row, { hoveredRow, enableActionsHover }) => {
+          const isHovered = enableActionsHover && hoveredRow === row.id;
 
-    return (
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: "120px" }}>
-        {/* Status text */}
-        <Typography
-          sx={{
-            color: row.is_active === 1 ? "green" : "red",
-            minWidth: "60px", // Reserve space
-          }}
-        >
-          {row.is_active === 1 ? "Active" : "Inactive"}
-        </Typography>
-
-        {/* Lock icon container */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 0.5,
-            opacity: isHovered ? 1 : 0, // fade effect
-            pointerEvents: isHovered ? "auto" : "none", // only clickable on hover
-            transition: "opacity 0.2s ease-in-out",
-            minWidth: "40px", // reserve space
-          }}
-        >
-          {row.is_active === 1 ? (
-            <Tooltip title="Click to Block">
-              <IconButton
-                size="small"
-                onClick={() => handleOpenLockModal(row)}
-                sx={{ color: "success.main" }}
+          return (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                minWidth: "120px",
+              }}
+            >
+              {/* Status text */}
+              <Typography
+                sx={{
+                  color: row.is_active === 1 ? "green" : "red",
+                  minWidth: "60px", // Reserve space
+                }}
               >
-                <LockOpenIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          ) : (
-            <Tooltip title="Click to Unblock">
-              <IconButton
-                size="small"
-                onClick={() => handleOpenLockModal(row)}
-                sx={{ color: "error.main" }}
-              >
-                <LockOutlinedIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          )}
-        </Box>
+                {row.is_active === 1 ? "Active" : "Inactive"}
+              </Typography>
 
-        {/* Dash overlay when not hovered */}
-        {!isHovered && (
-          <Typography
-            variant="body2"
-            sx={{
-              color: "#999",
-              position: "absolute",
-            }}
-          >
-            -
-          </Typography>
-        )}
-      </Box>
-    );
-  },
-},
+              {/* Lock icon container */}
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                  opacity: isHovered ? 1 : 0, // fade effect
+                  pointerEvents: isHovered ? "auto" : "none", // only clickable on hover
+                  transition: "opacity 0.2s ease-in-out",
+                  minWidth: "40px", // reserve space
+                }}
+              >
+                {row.is_active === 1 ? (
+                  <Tooltip title="Click to Block">
+                    <IconButton
+                      size="small"
+                      onClick={() => handleOpenLockModal(row)}
+                      sx={{ color: "success.main" }}
+                    >
+                      <LockOpenIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                ) : (
+                  <Tooltip title="Click to Unblock">
+                    <IconButton
+                      size="small"
+                      onClick={() => handleOpenLockModal(row)}
+                      sx={{ color: "error.main" }}
+                    >
+                      <LockOutlinedIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                )}
+              </Box>
+
+              {/* Dash overlay when not hovered */}
+              {!isHovered && (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "#999",
+                    position: "absolute",
+                  }}
+                >
+                  -
+                </Typography>
+              )}
+            </Box>
+          );
+        },
+      },
 
       {
         name: "Actions",
@@ -224,34 +231,38 @@ const Users = ({ query }) => {
               }}
             >
               {/* Buttons always take space; just change opacity */}
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 1,
-                  opacity: isHovered ? 1 : 0, // fade effect
-                  pointerEvents: isHovered ? "auto" : "none",
-                  transition: "opacity 0.2s ease-in-out",
-                }}
-              >
-                <Tooltip title="Edit User">
-                  <IconButton
-                    size="small"
-                    color="secondary"
-                    onClick={() => handleEdit(row)}
-                  >
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Edit Permissions">
-                  <IconButton
-                    size="small"
-                    color="primary"
-                    onClick={() => handleOpenPermissions(row)}
-                  >
-                    <SettingsIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              </Box>
+
+              {userRole.role == "adm" && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 1,
+                    opacity: isHovered ? 1 : 0, // fade effect
+                    pointerEvents: isHovered ? "auto" : "none",
+                    transition: "opacity 0.2s ease-in-out",
+                  }}
+                >
+                  <Tooltip title="Edit User">
+                    <IconButton
+                      size="small"
+                      color="secondary"
+                      onClick={() => handleEdit(row)}
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Edit Permissions">
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={() => handleOpenPermissions(row)}
+                    >
+                      <SettingsIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              )}
+
               {/* Show dash for non-hover state visually */}
               {!isHovered && (
                 <Typography
