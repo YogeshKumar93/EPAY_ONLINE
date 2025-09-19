@@ -16,6 +16,7 @@ import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
 import AuthContext from "../contexts/AuthContext";
 import OTPInput from "react-otp-input";
 import { useToast } from "../utils/ToastContext";
+import { showSuccessToast } from "../components/common/ShowSuccessToast";
 
 const UpiBeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
   const [amount, setAmount] = useState("");
@@ -95,7 +96,28 @@ const UpiBeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
       );
 
       if (response) {
-        okSuccessToast("Payout successful!");
+        // okSuccessToast("Payout successful!");
+        const txnDetails = {
+          txnID: response?.data,
+          amount,
+
+          senderMobile,
+          beneficiary: {
+            name: beneficiary.beneficiary_name,
+            account: beneficiary.account_number,
+            bank: beneficiary.bank_name,
+            ifsc: beneficiary.ifsc_code,
+            mobile: beneficiary.mobile_number,
+          },
+          date: new Date().toLocaleString(),
+        };
+
+  showSuccessToast({
+          txnID: response?.data,
+          message: response?.message,
+          redirectUrl: "/print-dmt", // can be anything
+        });
+        sessionStorage.setItem("txnData", JSON.stringify(txnDetails));
         setAmount("");
         setOtp("");
         setMpin("");
