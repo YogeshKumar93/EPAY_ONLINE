@@ -109,6 +109,8 @@ const ApiEndpoints = {
   GET_COMPLAINS: "complains/getComplains",
   CREATE_COMPLAINTS: "complains/createComplains",
   UPDATE_COMPLAINTS: "complains/updateComplains",
+  AEPS_LOGIN: "aeps/outletLogin",
+  AEPS_LOGIN_STATUS: "aeps/outletLoginStatus",
 
   // ****************************** NEW API'S ABOVE ******************************
   GET_COMMISSION_RULE: "commission/getCommissions",

@@ -45,7 +45,7 @@ const VerifyUpiBene = ({
     );
 
     if (response) {
-      okSuccessToast(response?.message || "Beneficiary verified successfully");
+      okSuccessToast(response?.data || "Beneficiary verified successfully");
       onClose();
       onSuccess?.();
     } else {

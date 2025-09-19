@@ -130,7 +130,7 @@ const UpiBeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
       <Box sx={{ mx: 2, my: 2, p: 2, bgcolor: "#f0f8ff", borderRadius: 2 }}>
         {[
           { label: "Name", value: beneficiary.beneficiary_name },
-          { label: "UpiId", value: beneficiary.account_number },
+          { label: "VPA", value: beneficiary.account_number },
         ].map((item, index) => (
           <Box key={index} display="flex" mb={1}>
             {/* Label column with fixed width */}

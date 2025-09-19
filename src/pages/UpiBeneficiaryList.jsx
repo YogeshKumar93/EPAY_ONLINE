@@ -379,7 +379,7 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
                       color="text.secondary"
                       sx={{ fontSize: "0.75rem" }}
                     >
-                      UPI: {b.account_number}
+                      VPA: {b.account_number}
                     </Typography>
                   </Box>
                 </Box>

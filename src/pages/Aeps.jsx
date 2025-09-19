@@ -1,221 +1,184 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Button, Modal, Typography } from "@mui/material";
-import myImage from "../assets/Images/aeps-guidelines-new.png"; 
-import myLogo from "../assets/Images/logo(1).png"; 
+import myImage from "../assets/Images/aeps-guidelines-new.png";
+import myLogo from "../assets/Images/logo(1).png";
 import atmIcon from "../assets/Images/aeps_print.png";
 import CloseIcon from "@mui/icons-material/Close";
 import AEPS2FAModal from "../components/AEPS/AEPS2FAModal";
+import { apiCall } from "../api/apiClient";
+import ApiEndpoints from "../api/ApiEndpoints";
+import { apiErrorToast } from "../utils/ToastUtil";
+import { useToast } from "../utils/ToastContext";
+import AepsMainComponent from "../components/AepsMain";
+import Aeps1 from "./Aeps1";
 
-// Styles
 const style = {
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: "50%",
   bgcolor: "background.paper",
-  boxShadow: 24,
   borderRadius: 2,
-  outline: "none",
-};
-
-const secondModalStyle = {
-  ...style,
-  width: "40%",
-  textAlign: "center",
-  p: 4,
+  boxShadow: 24,
+  p: 3,
 };
 
 const Aeps = () => {
-  const [open, setOpen] = useState(false);
-  const [openSecond, setOpenSecond] = useState(false);
-  const [openAEPS2FA, setOpenAEPS2FA] = useState(false);
-  const [twoFAStatus, setTwoFAStatus] = useState("LOGINREQUIRED");
+  const [step, setStep] = useState(1); // 1 = Terms, 2 = AEPS select, 3 = AEPS1, 4 = AEPS2
 
-  // First modal
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
-  const handleAccept = () => {
-    setOpen(false);
-    setOpenSecond(true);
-  };
-
-  const handleSecondClose = () => setOpenSecond(false);
-
-  // AEPS1 click → open AEPS2FA modal
-  const handleAeps1 = () => {
-    setOpenSecond(false);
-    setOpenAEPS2FA(true);
-  };
-
-  const handleAeps2 = () => alert("AEPS2 Selected 🎉");
-
-  return (
-    <div>
-      <Button variant="contained" onClick={handleOpen}>
-        Open AEPS Modal
-      </Button>
-
-      {/* First Modal */}
-      <Modal open={open} onClose={handleClose}>
-        <Box sx={style}>
-          <Box
-            component="img"
-            src={myImage}
-            alt="Guidelines"
-            sx={{
-              width: "100%",
-              borderTopLeftRadius: 8,
-              borderTopRightRadius: 8,
-            }}
-          />
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              p: 2,
-              borderTop: "1px solid #ddd",
-            }}
+  // Step 1 → Terms & Conditions
+  if (step === 1) {
+    return (
+      <Box sx={{ p: 3, textAlign: "center" }}>
+        <Box
+          component="img"
+          src={myImage}
+          alt="Guidelines"
+          sx={{
+            width: "100%",
+            maxWidth: 600,
+            borderRadius: 2,
+            mb: 2,
+          }}
+        />
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            borderTop: "1px solid #ddd",
+            pt: 2,
+          }}
+        >
+          <Box component="img" src={myLogo} alt="Logo" sx={{ height: 40 }} />
+          <Button
+            variant="contained"
+            sx={{ bgcolor: "#9d72f0", "&:hover": { bgcolor: "#8756e5" } }}
+            onClick={() => setStep(2)}
           >
-            <Box component="img" src={myLogo} alt="Logo" sx={{ height: 40 }} />
-            <Button variant="contained" color="primary" onClick={handleAccept}>
-              Accept
-            </Button>
-          </Box>
+            Accept
+          </Button>
         </Box>
-      </Modal>
+      </Box>
+    );
+  }
 
-      {/* Second Modal (Choose AEPS type) */}
-      <Modal open={openSecond} onClose={handleSecondClose}>
-        <Box sx={secondModalStyle} position="relative">
-          <CloseIcon
-            onClick={handleSecondClose}
-            sx={{
-              position: "absolute",
-              top: 16,
-              right: 16,
-              cursor: "pointer",
-              color: "gray",
-              fontSize: 30,
-            }}
-          />
-          <Typography
-            variant="h5"
-            sx={{ mb: 3, fontWeight: "bold", color: "#1CA895", textAlign: "center" }}
-          >
-            Choose Your AEPS Service
-          </Typography>
+  // Step 2 → AEPS Selection
+  if (step === 2) {
+    return (
+      <Box sx={{ textAlign: "center", mt: 5 }}>
+        <Typography
+          variant="h5"
+          sx={{ mb: 3, fontWeight: "bold", color: "#9d72f0" }}
+        >
+          Choose Your AEPS Service
+        </Typography>
 
-          <Box
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            gap: 4,
+            flexWrap: "wrap",
+          }}
+        >
+          {/* AEPS1 */}
+          <Button
+            onClick={() => setStep(3)}
             sx={{
+              width: 140,
+              height: 160,
+              bgcolor: "#9d72f0",
+              color: "#fff",
+              borderRadius: 3,
+              boxShadow: 3,
               display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
+              flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
-              gap: 15,
-              mt: 2,
+              gap: 1,
+              "&:hover": {
+                bgcolor: "#8756e5",
+                boxShadow: 6,
+              },
             }}
           >
-            {/* AEPS1 Button */}
-            <Button
-              variant="contained"
+            <Box
+              component="img"
+              src={atmIcon}
+              alt="ATM"
               sx={{
-                bgcolor: "#1CA895",
-                "&:hover": { bgcolor: "#138f79" },
-                px: { xs: 8, sm: 8 },
-                py: { xs: 2, sm: 3 },
-                borderRadius: "12px",
-                width: { xs: "100%", sm: "120px" },
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 1,
+                height: 60,
+                width: 60,
+                bgcolor: "#fff",
+                borderRadius: "50%",
+                p: 1,
               }}
-              onClick={handleAeps1}
-            >
-              <Box
-                component="img"
-                src={atmIcon}
-                alt="ATM"
-                sx={{
-                  height: { xs: 80, sm: 100 },
-                  width: { xs: 80, sm: 100 },
-                  bgcolor: "#fff",
-                  borderRadius: "50%",
-                  p: 1,
-                }}
-              />
-              <Box
-                component="span"
-                sx={{
-                  fontSize: "24px",
-                  fontWeight: "bold",
-                  color: "#fff",
-                }}
-              >
-                AEPS1
-              </Box>
-            </Button>
+            />
+            <Typography sx={{ fontWeight: "bold", fontSize: 16 }}>
+              AEPS1
+            </Typography>
+          </Button>
 
-            {/* AEPS2 Button */}
-            <Button
-              variant="outlined"
+          {/* AEPS2 */}
+          <Button
+            onClick={() => setStep(4)}
+            sx={{
+              width: 140,
+              height: 160,
+              border: "2px solid #9d72f0",
+              borderRadius: 3,
+              boxShadow: 3,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: 1,
+              "&:hover": {
+                borderColor: "#8756e5",
+                color: "#8756e5",
+                boxShadow: 6,
+              },
+            }}
+          >
+            <Box
+              component="img"
+              src={atmIcon}
+              alt="ATM"
               sx={{
-                borderColor: "#1CA895",
-                color: "#1CA895",
-                "&:hover": { borderColor: "#138f79", color: "#138f79" },
-                px: { xs: 4, sm: 4 },
-                py: { xs: 2, sm: 3 },
-                borderRadius: "12px",
-                width: { xs: "100%", sm: "120px" },
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 1,
+                height: 60,
+                width: 60,
+                bgcolor: "#fff",
+                borderRadius: "50%",
+                p: 1,
               }}
-              onClick={handleAeps2}
-            >
-              <Box
-                component="img"
-                src={atmIcon}
-                alt="ATM"
-                sx={{
-                  height: { xs: 80, sm: 100 },
-                  width: { xs: 80, sm: 100 },
-                  bgcolor: "#fff",
-                  borderRadius: "50%",
-                  p: 1,
-                }}
-              />
-              <Box
-                component="span"
-                sx={{
-                  fontSize: "24px",
-                  fontWeight: "bold",
-                }}
-              >
-                AEPS2
-              </Box>
-            </Button>
-          </Box>
+            />
+            <Typography sx={{ fontWeight: "bold", fontSize: 16 }}>
+              AEPS2
+            </Typography>
+          </Button>
         </Box>
-      </Modal>
+      </Box>
+    );
+  }
 
-      {/* AEPS2FA Modal */}
-      {openAEPS2FA && (
-        <AEPS2FAModal
-          open={openAEPS2FA}
-          onClose={() => setOpenAEPS2FA(false)}
-          isAepsOne={true}
-          isAepsTwo={false}
-          twoFAStatus={twoFAStatus}
-          setTwoFAStatus={setTwoFAStatus}
-        />
-      )}
-    </div>
-  );
+  // Step 3 → AEPS1 Component
+  if (step === 3) {
+    return <Aeps1 />;
+  }
+
+  // Step 4 → AEPS2 Component (abhi example ke liye simple text)
+  if (step === 4) {
+    return (
+      <Box sx={{ textAlign: "center", mt: 5 }}>
+        <Typography variant="h4" color="primary">
+          AEPS2 Component Coming Soon 🚀
+        </Typography>
+      </Box>
+    );
+  }
+
+  return null;
 };
 
 export default Aeps;

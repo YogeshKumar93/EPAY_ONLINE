@@ -199,10 +199,7 @@ export default function AppRoutes() {
                 path="customer/money-transfer"
                 element={<MoneyTransfer />}
               />
-              {/* <Route
-                path="customer/fund-transfer"
-                element={<SuperTransfer />}
-              /> */}
+          
               <Route
                 path="customer/wallet-transfer"
                 element={<Wallet2WalletTransfer />}
@@ -236,33 +233,14 @@ export default function AppRoutes() {
             <>
               <Route path="di/dashboard" element={<AdminTransactions />} />
               <Route path="di/users" element={<Users />} />
-              <Route path="di/services" element={<Dashboard />} />
-              <Route path="di/allServices" element={<AllServices />} />
-              <Route
-                path="customer/wallet-ledger"
-                element={<AccountLadger />}
-              />
 
-              <Route path="customer/logs" element={<RetailerLogs />} />
+              <Route path="di/wallet-ledger" element={<AccountLadger />} />
+              <Route path="di/transactions" element={<Transaction />} />
               <Route
-                path="customer/money-transfer"
-                element={<DmtContainer />}
+                path="di/wallet-transfer"
+                element={<Wallet2WalletTransfer />}
               />
-              <Route
-                path="customer/recharge-bill"
-                element={<RechargeAndBill />}
-              />
-              <Route path="customer/purchase" element={<MyPurchase />} />
-              <Route path="customer/fund-request" element={<FundRequest />} />
-              <Route path="customer/sale" element={<MySale />} />
-
-              <Route path="customer/profile" element={<ProfilePage />} />
-
-              <Route
-                path="customer/*"
-                element={<Navigate to="/customer/dashboard" replace />}
-              />
-              <Route path="customer/accounts" element={<Accounts />} />
+                  <Route path="di/profile" element={<ProfilePage />} />
             </>
           )}
 
@@ -271,6 +249,7 @@ export default function AppRoutes() {
               <Route path="asm/dashboard" element={<Dashboard />} />
               <Route path="asm/users" element={<Users />} />
               <Route path="asm/transcations" element={<Transaction />} />
+                  <Route path="di/profile" element={<ProfilePage />} />
             </>
           )}
 
@@ -279,6 +258,7 @@ export default function AppRoutes() {
               <Route path="zsm/dashboard" element={<Dashboard />} />
               <Route path="zsm/users" element={<Users />} />
               <Route path="zsm/transcations" element={<Transaction />} />
+                  <Route path="zsm/profile" element={<ProfilePage />} />
             </>
           )}
 
@@ -287,6 +267,7 @@ export default function AppRoutes() {
               <Route path="api/dashboard" element={<Dashboard />} />
               <Route path="api/users" element={<Users />} />
               <Route path="api/transcations" element={<Transaction />} />
+                  <Route path="api/profile" element={<ProfilePage />} />
             </>
           )}
 
@@ -295,6 +276,7 @@ export default function AppRoutes() {
               <Route path="md/dashboard" element={<MD_Dashboard />} />
               <Route path="md/users" element={<Users />} />
               <Route path="md/transcations" element={<Transaction />} />
+                  <Route path="md/profile" element={<ProfilePage />} />
             </>
           )}
 

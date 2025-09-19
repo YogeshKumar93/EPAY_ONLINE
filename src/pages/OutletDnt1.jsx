@@ -28,7 +28,6 @@ const OutletDmt1 = ({ open, handleClose, onSuccess }) => {
       latitude: location?.lat || "",
       longitude: location?.long || "",
     };
-
     const { error, response } = await apiCall(
       "post",
       ApiEndpoints.DMT1_OUTLET_INITIATE,
@@ -40,12 +39,19 @@ const OutletDmt1 = ({ open, handleClose, onSuccess }) => {
         response?.message || "DMT1 Outlet initiated successfully",
         "success"
       );
-      if (onSuccess) onSuccess();
-      handleClose();
+
+      // 🔑 Save the init payload + required otpReferenceId + hash
+      setInitPayload({
+        ...payload,
+        otpReferenceID: response?.data?.otpReferenceID,
+        hash: response?.data?.hash,
+        hash2: response?.data?.hash,
+      });
+
+      setOtpModalOpen(true); // Open OTP modal
     } else {
       if (error) {
-        setInitPayload(payload); // Store initial payload for OTP validation
-        setOtpModalOpen(true); // Open OTP modal
+        showToast(error, "error");
       } else {
         showToast(error?.message || "Failed to initiate DMT1 outlet", "error");
         handleClose();
@@ -53,12 +59,13 @@ const OutletDmt1 = ({ open, handleClose, onSuccess }) => {
     }
     setSubmitting(false);
   };
+
   const handleOtpSubmit = async () => {
     const { error, response } = await apiCall(
       "post",
       ApiEndpoints.VALIDATE_DMT1_OUTLET,
       {
-        ...initPayload,
+        ...initPayload, // includes formData + otpReferenceId + hash
         otp,
       }
     );
@@ -89,76 +96,35 @@ const OutletDmt1 = ({ open, handleClose, onSuccess }) => {
   );
 
   return (
-    <>
-      {!otpModalOpen && (
-        <CommonModal
-          open={open}
-          onClose={handleClose}
-          title="Outlet Registration"
-          iconType="info"
-          size="medium"
-          layout="two-column"
-          dividers
-          fieldConfig={visibleFields}
-          formData={formData}
-          handleChange={handleChange}
-          errors={errors}
-          loading={loading || submitting}
-          footerButtons={[
-            {
-              text: "Cancel",
-              variant: "outlined",
-              onClick: handleClose,
-              disabled: submitting,
-            },
-            {
-              text: submitting ? "Submitting..." : "Submit",
-              variant: "contained",
-              color: "primary",
-              onClick: handleSubmit,
-              disabled: submitting,
-            },
-          ]}
-        />
-      )}
-
-      {otpModalOpen && (
-        <CommonModal
-          open={otpModalOpen}
-          onClose={() => setOtpModalOpen(false)}
-          title="OTP Verification"
-          iconType="lock"
-          size="small"
-          layout="single-column"
-          dividers
-          fieldConfig={[
-            {
-              name: "otp",
-              label: "Enter OTP",
-              type: "text",
-              required: true,
-            },
-          ]}
-          formData={{ otp }}
-          handleChange={(e) => setOtp(e.target.value)}
-          errors={{}}
-          loading={submitting}
-          footerButtons={[
-            {
-              text: "Cancel",
-              variant: "outlined",
-              onClick: () => setOtpModalOpen(false),
-            },
-            {
-              text: "Verify OTP",
-              variant: "contained",
-              color: "primary",
-              onClick: handleOtpSubmit,
-            },
-          ]}
-        />
-      )}
-    </>
+    <CommonModal
+      open={open}
+      onClose={handleClose}
+      title="Enable DMT1 Outlet"
+      iconType="info"
+      size="medium"
+      layout="two-column"
+      dividers
+      fieldConfig={visibleFields}
+      formData={formData}
+      handleChange={handleChange}
+      errors={errors}
+      loading={loading || submitting}
+      footerButtons={[
+        {
+          text: "Cancel",
+          variant: "outlined",
+          onClick: handleClose,
+          disabled: submitting,
+        },
+        {
+          text: submitting ? "Submitting..." : "Submit",
+          variant: "contained",
+          color: "primary",
+          onClick: handleSubmit,
+          disabled: submitting,
+        },
+      ]}
+    />
   );
 };
 

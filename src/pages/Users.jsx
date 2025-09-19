@@ -16,7 +16,7 @@ import { apiCall } from "../api/apiClient";
 const Users = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const fetchUsersRef = useRef(null);
-
+  const userRole = authCtx?.user;
   const [selectedUser, setSelectedUser] = useState(null);
   const [openPermissions, setOpenPermissions] = useState(false);
   const [userMap, setUserMap] = useState({}); // id → name map
@@ -123,7 +123,7 @@ const Users = ({ query }) => {
           </Tooltip>
         ),
       },
-       {
+      {
         name: "Role",
         selector: (row) => (
           <Tooltip title={row?.role}>
@@ -141,68 +141,41 @@ const Users = ({ query }) => {
         width: "100px",
       },
       {
-        name: "Establishment",
-        selector: (row) => (
-          <Tooltip title={row?.establishment}>
-            <div style={{ textAlign: "left" }}>{row?.establishment}</div>
-          </Tooltip>
-        ),
-        width: "150px",
-      },
-      {
-        name: "Parent",
-        selector: (row) => {
-          if (!row.parent) return "-";
-          const parentName = userMap[row.parent];
-          return (
-            <Tooltip title={`Parent ID: ${row.parent}`}>
-              <div style={{ textAlign: "left" }}>
-                {parentName || `ID ${row.parent}`}
-              </div>
-            </Tooltip>
-          );
-        },
-      },
-      {
-        name: "W1",
-        selector: (row) => (
-          <Tooltip title={row?.w1}>
-            <div style={{ textAlign: "left" }}>{row?.w1}</div>
-          </Tooltip>
-        ),
-      },
-      {
-        name: "W2",
-        selector: (row) => (
-          <Tooltip title={row?.w2}>
-            <div style={{ textAlign: "left" }}>{row?.w2}</div>
-          </Tooltip>
-        ),
-      },
-      {
-        name: "Lien",
-        selector: (row) => (
-          <Tooltip title={row?.lien}>
-            <div style={{ textAlign: "left" }}>{row?.lien}</div>
-          </Tooltip>
-        ),
-      },
-      {
         name: "Status",
-        selector: (row, { hoveredRow, enableActionsHover }) => (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Typography
+        selector: (row, { hoveredRow, enableActionsHover }) => {
+          const isHovered = enableActionsHover && hoveredRow === row.id;
+
+          return (
+            <Box
               sx={{
-                color: row.is_active === 1 ? "green" : "red",
-                minWidth: "30px",
-                display: "inline-block",
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                minWidth: "120px",
               }}
             >
-              {row.is_active === 1 ? "Active" : "Inactive"}
-            </Typography>
-            {/* ✅ Hover/Always show based on prop */}
-            {(!enableActionsHover || hoveredRow === row.id) && (
-              <Box sx={{ transition: "opacity 0.2s" }}>
+              {/* Status text */}
+              <Typography
+                sx={{
+                  color: row.is_active === 1 ? "green" : "red",
+                  minWidth: "60px", // Reserve space
+                }}
+              >
+                {row.is_active === 1 ? "Active" : "Inactive"}
+              </Typography>
+
+              {/* Lock icon container */}
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                  opacity: isHovered ? 1 : 0, // fade effect
+                  pointerEvents: isHovered ? "auto" : "none", // only clickable on hover
+                  transition: "opacity 0.2s ease-in-out",
+                  minWidth: "40px", // reserve space
+                }}
+              >
                 {row.is_active === 1 ? (
                   <Tooltip title="Click to Block">
                     <IconButton
@@ -225,65 +198,87 @@ const Users = ({ query }) => {
                   </Tooltip>
                 )}
               </Box>
-            )}
-          </Box>
-        ),
+
+              {/* Dash overlay when not hovered */}
+              {!isHovered && (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "#999",
+                    position: "absolute",
+                  }}
+                >
+                  -
+                </Typography>
+              )}
+            </Box>
+          );
+        },
       },
-  {
-  name: "Actions",
-  selector: (row, { hoveredRow, enableActionsHover }) => {
-    const isHovered = !enableActionsHover || hoveredRow === row.id;
 
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minWidth: "80px", // fix width for stability
-        }}
-      >
-        {isHovered ? (
-          <Box
-            sx={{
-              display: "flex",
-              gap: 1,
-              transition: "opacity 0.2s ease-in-out",
-            }}
-          >
-            <Tooltip title="Edit User">
-              <IconButton
-                size="small"
-                color="secondary"
-                onClick={() => handleEdit(row)}
-              >
-                <EditIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
+      {
+        name: "Actions",
+        selector: (row, { hoveredRow, enableActionsHover }) => {
+          const isHovered = enableActionsHover && hoveredRow === row.id;
 
-            <Tooltip title="Edit Permissions">
-              <IconButton
-                size="small"
-                color="primary"
-                onClick={() => handleOpenPermissions(row)}
-              >
-                <SettingsIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        ) : (
-          <Typography
-            variant="body2"
-            sx={{ color: "#999", textAlign: "center", minWidth: "80px" }}
-          >
-            -
-          </Typography>
-        )}
-      </Box>
-    );
-  },
-}
+          return (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth: "100px", // Fixed width to prevent table shift
+              }}
+            >
+              {/* Buttons always take space; just change opacity */}
 
+              {userRole.role == "adm" && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 1,
+                    opacity: isHovered ? 1 : 0, // fade effect
+                    pointerEvents: isHovered ? "auto" : "none",
+                    transition: "opacity 0.2s ease-in-out",
+                  }}
+                >
+                  <Tooltip title="Edit User">
+                    <IconButton
+                      size="small"
+                      color="secondary"
+                      onClick={() => handleEdit(row)}
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Edit Permissions">
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={() => handleOpenPermissions(row)}
+                    >
+                      <SettingsIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              )}
+
+              {/* Show dash for non-hover state visually */}
+              {!isHovered && (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "#999",
+                    position: "absolute", // overlay dash without affecting layout
+                  }}
+                >
+                  -
+                </Typography>
+              )}
+            </Box>
+          );
+        },
+      },
     ],
     [userMap]
   );

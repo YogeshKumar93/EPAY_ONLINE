@@ -15,7 +15,6 @@ import {
   virtuanAccountImage,
   walletLdgerImage,
   walletTransferImage,
-  
 } from "../../iconsImports";
 
 // Normal User Navigation
@@ -106,18 +105,18 @@ export const customer_nav = [
     icon2: "📊",
     to: "/customer/dashboard",
   },
-   {
+  {
     title: "Money transfer",
     icon: bankImage,
     icon2: "🛠️",
     to: "/customer/money-transfer",
   },
-    {
+  {
     title: "Transfer",
-     icon: fundReqImage,
+    icon: fundReqImage,
     icon2: "🛠️",
-     to: "/customer/transfer",
-    },
+    to: "/customer/transfer",
+  },
 
   //  {
   //   title: "Fund Transfer",
@@ -125,7 +124,7 @@ export const customer_nav = [
   //   icon2: "🛠️",
   //   to: "/customer/fund-transfer",
   // },
-   {
+  {
     title: "Wallet Transfer",
     icon: walletTransferImage,
     icon2: "🛠️",
@@ -155,23 +154,19 @@ export const customer_nav = [
     icon2: "🛠️",
     to: "/customer/fund-request",
   },
-  
- 
- 
+
   // {
   //   title: "W2W Transfer",
   //   icon: "🛠️",
   //   icon2: "🛠️",
   //   to: "/customer/w2w-transfer",
   // },
- 
- 
-  
+
   {
     title: "Wallet Ledger",
     icon: bankImage,
     icon2: "📒",
-    to: "/customer/account-ledger",
+    to: "/customer/wallet-ledger",
   },
   { title: "AEPS", icon: aepsImage, icon2: "👥", to: "/customer/aeps" },
 
@@ -203,10 +198,22 @@ export const di_nav = [
   },
   { title: "Users", icon: usersImage, icon2: "👥", to: "/di/users" },
   {
-    title: "All Services",
+    title: "Transaction",
     icon: serviceImage,
     icon2: "🛠️",
-    to: "/di/allServices",
+    to: "/di/transactions",
+  },
+  {
+    title: "Wallet Transfer",
+    icon: walletTransferImage,
+    icon2: "🛠️",
+    to: "/di/wallet-transfer",
+  },
+  {
+    title: "Wallet Ledger",
+    icon: bankImage,
+    icon2: "📒",
+    to: "/di/wallet-ledger",
   },
 ];
 

@@ -112,7 +112,7 @@ const Dmt = () => {
 
   return (
     <Box>
-      {instId ? (
+      {!instId ? (
         <Box
           textAlign="center"
           mt={4}
