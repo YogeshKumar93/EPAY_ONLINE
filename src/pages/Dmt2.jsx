@@ -27,13 +27,13 @@ const Dmt2 = () => {
   const handleFetchSender = async (number = mobile) => {
     if (!number || number.length !== 10) return;
 
-     setLoading(true); // start loader
+    setLoading(true); // start loader
     const { error, response } = await apiCall("post", ApiEndpoints.DMT2, {
       mobile_number: number,
       latitude: location?.lat || "",
       longitude: location?.long || "",
     });
-     setLoading(false); // stop loader
+    setLoading(false); // stop loader
 
     if (response) {
       const data = response?.data || response?.response?.data;
@@ -61,12 +61,12 @@ const Dmt2 = () => {
     }
   };
 
-   useEffect(() => {
-        const timer = setTimeout(() => {
-          setLoading(false);
-        }, 1000);
-        return () => clearTimeout(timer);
-      }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleChange = (e) => {
     const value = e.target.value.replace(/\D/g, "");
@@ -90,26 +90,27 @@ const Dmt2 = () => {
   return (
     <Box>
       <Box>
-      <TextField
-        label="Mobile Number"
-        variant="outlined"
-        fullWidth
-        value={mobile}
-        onChange={handleChange}
-        inputProps={{ maxLength: 10 }}
-        sx={{ mb: 1 }}
-      />
-{loading && (
-            <CommonLoader loading={loading}  
-              size={24}
-              sx={{
-                position: "absolute",
-                top: "50%",
-                right: 16,
-                transform: "translateY(-50%)",
-              }}
-            />
-          )}
+        <TextField
+          label="Mobile Number"
+          variant="outlined"
+          fullWidth
+          value={mobile}
+          onChange={handleChange}
+          inputProps={{ maxLength: 10 }}
+          sx={{ mb: 1 }}
+        />
+        {loading && (
+          <CommonLoader
+            loading={loading}
+            size={24}
+            sx={{
+              position: "absolute",
+              top: "50%",
+              right: 16,
+              transform: "translateY(-50%)",
+            }}
+          />
+        )}
       </Box>
 
       {openRegisterModal && (

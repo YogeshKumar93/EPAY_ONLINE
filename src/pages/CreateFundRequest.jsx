@@ -1,25 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import dayjs from "dayjs"; // ✅ for date formatting
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CommonModal from "../components/common/CommonModal";
 import { useSchemaForm } from "../hooks/useSchemaForm";
-import { PATTERNS, isValid } from "../utils/validators";
 import { useToast } from "../utils/ToastContext";
 
-const CreateFundRequest = ({ open, handleClose, handleSave,onFetchRef }) => {
-  const { schema, formData, handleChange, errors, setErrors, loading } =
-    useSchemaForm(ApiEndpoints.GET_FUNDREQUEST_SCHEMA, open);
+const CreateFundRequest = ({ open, handleClose, handleSave, onFetchRef }) => {
+  const {
+    schema,
+    formData,
+    handleChange,
+    errors,
+    setErrors,
+    loading,
+    setFormData,
+  } = useSchemaForm(ApiEndpoints.GET_FUNDREQUEST_SCHEMA, open);
 
   const [submitting, setSubmitting] = useState(false);
   const { showToast } = useToast();
+
+  // ✅ Set default date when modal opens
+  useEffect(() => {
+    if (open && !formData.date) {
+      setFormData((prev) => ({
+        ...prev,
+        date: dayjs().format("YYYY-MM-DD"), // API-friendly format
+      }));
+    }
+  }, [open, formData.date, setFormData]);
 
   // ✅ Validation
   const validateForm = () => {
     const newErrors = {};
     if (!formData.bank_name) newErrors.bank_name = "Bank is required";
     if (!formData.mode) newErrors.mode = "Mode is required";
-        if (!formData.bank_ref_id) newErrors.bank_ref_id = "bank_ref_id is required";
-
+    if (!formData.bank_ref_id)
+      newErrors.bank_ref_id = "bank_ref_id is required";
     if (!formData.date) newErrors.date = "Date is required";
     if (
       !formData.amount ||
@@ -38,7 +55,6 @@ const CreateFundRequest = ({ open, handleClose, handleSave,onFetchRef }) => {
   // ✅ Submit
   const handleSubmit = async () => {
     if (!validateForm()) return;
-
     setSubmitting(true);
     try {
       const { error, response } = await apiCall(
@@ -49,7 +65,6 @@ const CreateFundRequest = ({ open, handleClose, handleSave,onFetchRef }) => {
 
       if (response) {
         handleSave(response.data);
-
         showToast(
           response?.message || "Fund request created successfully",
           "success"
@@ -93,9 +108,7 @@ const CreateFundRequest = ({ open, handleClose, handleSave,onFetchRef }) => {
       format: "DD/MM/YYYY",
     },
   };
-  visibleFields = visibleFields.map((f) =>
-    f.name === "date" ? dateField : f
-  );
+  visibleFields = visibleFields.map((f) => (f.name === "date" ? dateField : f));
 
   return (
     <CommonModal

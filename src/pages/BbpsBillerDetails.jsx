@@ -94,42 +94,71 @@ const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
     }
   };
 
-  // Pay Bill
-  const handlePayBill = async () => {
-    if (!billData) {
-      apiErrorToast("No bill data available to pay");
-      return;
-    }
+console.log("The biller id ins",billerId)
+const handlePayBill = (event) => {
+  event.preventDefault();
 
-    setPayingBill(true);
-    try {
-      const payload = {
-        biller_id: billerId,
-        bill_amount: billData.BillAmount,
-        customer_name: billData.CustomerName,
-        bill_number: billData.BillNumber,
-        ip: ip || "0.0.0.0",
-        ...inputValues,
-      };
-
-      const { error, response } = await apiCall(
-        "post",
-        ApiEndpoints.BBPS_PAY_BILL,
-        payload
-      );
-
-      if (response) {
-        const txnId = response?.data?.txnId || response?.txnId;
-        alert(`Bill Paid Successfully! Transaction ID: ${txnId}`);
-      } else if (error) {
-        apiErrorToast(error?.message || "Failed to pay bill");
-      }
-    } catch (err) {
-      apiErrorToast(err.message || "Failed to pay bill");
-    } finally {
-      setPayingBill(false);
-    }
+  const data = {
+    billerId: billerId,
+    biller_name: biller_name,
+    amount: billValue,
+    pan: pan || undefined,
+    pf: "web",
+    cat: categoryName?.categoryKey,
+    mpin: mpinVal,
+    latitude: location.lat,
+    longitude: location.long,
+    enquiryReferenceId: billData?.enquiryReferenceId || "15486sfdgyf",
   };
+
+  // ✅ Map all dynamic params from API
+  if (params && params.length > 0) {
+    params.forEach((item) => {
+      const propertyName = item.name; // example: param1, param2, etc
+      let value = document.getElementById(propertyName)?.value;
+
+      // Convert numeric params to Number
+      if (item.inputType === "NUMERIC" && value) {
+        value = Number(value);
+      }
+
+      data[propertyName] = value;
+    });
+  }
+
+  // ✅ Special case: always add param2 as amount (if required)
+  if (!data.param2 && billValue) {
+    data.param2 = Number(billValue);
+  }
+
+  console.log("Pay Bill Data Payload 👉", data);
+
+  if (validateApiCall()) {
+    postJsonData(
+      ApiEndpoints.BBPS_PAY_BILL,
+      data,
+      setPayRequest,
+      (res) => {
+        okSuccessToast(res.data.message);
+        getRecentData();
+        setBillDetails(false);
+        setMpinVal(false);
+        setErr("");
+        refreshUser();
+      },
+      (error) => {
+        setMpinVal(false);
+        apiErrorToast(error);
+        getRecentData();
+        setErr("");
+        refreshUser();
+      }
+    );
+  } else {
+    setErr({ message: "Kindly wait some time before another request" });
+  }
+};
+
 
   if (detailsLoading)
     return (
@@ -154,11 +183,11 @@ const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
     <Box
       maxWidth="1200px"
       mx="auto"
-      px={{ xs: 1.5, sm: 3,md:1.5 }}
+      px={{ xs: 1.5, sm: 3, md: 1.5 }}
       py={{ xs: 2, sm: 4, md: 0 }}
     >
       {/* Back Button + Header */}
-      <Box display="flex" alignItems="center"mb={(1)}  gap={2}>
+      <Box display="flex" alignItems="center" mb={1} gap={2}>
         <IconButton
           onClick={onBack}
           sx={{
@@ -179,7 +208,6 @@ const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
               height: 55,
               objectFit: "contain",
               borderRadius: "8px",
-            
             }}
           />
         )}
@@ -198,19 +226,16 @@ const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
         </Typography>
       </Box>
 
-    
-    {/* Cards Layout */}
-<Box
-  sx={{
-    display: "flex",
-    flexDirection: { xs: "column", md: billData ? "row" : "column" },
-    justifyContent: billData ? "flex-start" : "center", // <-- Center before fetch
-   alignItems: billData ? "flex-start" : "center", // <-- center horizontally
-    gap: { xs: 2, md: 3 },
-    
-  }}
->
-
+      {/* Cards Layout */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: billData ? "row" : "column" },
+          justifyContent: billData ? "flex-start" : "center", // <-- Center before fetch
+          alignItems: billData ? "flex-start" : "center", // <-- center horizontally
+          gap: { xs: 2, md: 3 },
+        }}
+      >
         {/* BILLER INPUT CARD */}
         <Card
           sx={{
@@ -222,40 +247,40 @@ const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
             flexShrink: 0,
           }}
         >
-          <CardContent sx={{ p: { xs: 2, sm: 2 } ,height:"300px" ,}}>
-       <Box
-  display="flex"
-  alignItems="center"
-  gap={2}
-  sx={{
-    p: 2,
-    borderRadius: "8px",
-    background: "#e6f0ff", // light blue background
-  }}
->
-  {selectedBillerIdImage && (
-    <Box
-      component="img"
-      src={selectedBillerIdImage}
-      alt={billerDetails?.billerInfo?.name || "Biller"}
-      sx={{
-        width: 55,
-        height: 55,
-        objectFit: "contain",
-        borderRadius: "8px",
-      }}
-    />
-  )}
+          <CardContent sx={{ p: { xs: 2, sm: 2 }, height: "300px" }}>
+            <Box
+              display="flex"
+              alignItems="center"
+              gap={2}
+              sx={{
+                p: 2,
+                borderRadius: "8px",
+                background: "#e6f0ff", // light blue background
+              }}
+            >
+              {selectedBillerIdImage && (
+                <Box
+                  component="img"
+                  src={selectedBillerIdImage}
+                  alt={billerDetails?.billerInfo?.name || "Biller"}
+                  sx={{
+                    width: 55,
+                    height: 55,
+                    objectFit: "contain",
+                    borderRadius: "8px",
+                  }}
+                />
+              )}
 
-  <Typography
-    variant="h5"
-    fontWeight="bold"
-    color="#000"
-    sx={{ fontSize: { xs: "1.1rem", sm: "1.5rem" } }}
-  >
-    {billerDetails?.billerInfo?.name || "Biller"}
-  </Typography>
-</Box>
+              <Typography
+                variant="h5"
+                fontWeight="bold"
+                color="#000"
+                sx={{ fontSize: { xs: "1.1rem", sm: "1.5rem" } }}
+              >
+                {billerDetails?.billerInfo?.name || "Biller"}
+              </Typography>
+            </Box>
 
             <Divider sx={{ mb: 4 }} />
 
@@ -267,7 +292,6 @@ const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
                   label={param.desc}
                   variant="outlined"
                   size="medium"
-                 
                   value={inputValues[param.name] || ""}
                   onChange={(e) => handleChange(param.name, e.target.value)}
                   inputProps={{
@@ -402,10 +426,15 @@ const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
                     variant="outlined"
                     value={billData.BillAmount || ""}
                     onChange={(e) =>
-                      setBillData((prev) => ({ ...prev, BillAmount: e.target.value }))
+                      setBillData((prev) => ({
+                        ...prev,
+                        BillAmount: e.target.value,
+                      }))
                     }
                     InputProps={{
-                      startAdornment: <Typography sx={{ mr: 0.5 }}>₹</Typography>,
+                      startAdornment: (
+                        <Typography sx={{ mr: 0.5 }}>₹</Typography>
+                      ),
                     }}
                     sx={{
                       "& .MuiOutlinedInput-root": {
@@ -427,7 +456,7 @@ const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
                   py: { xs: 1, sm: 1.4 },
                   fontWeight: "bold",
                   fontSize: { xs: "0.9rem", sm: "1rem" },
-                  background:"#3b82f6",
+                  background: "#3b82f6",
                   boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
                   "&:hover": {
                     background: " #2563eb)",

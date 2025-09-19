@@ -11,7 +11,7 @@ import {
 } from "../../utils/DateUtils";
 import AddIcon from "@mui/icons-material/Add";
 import CreateFundRequest from "../../pages/CreateFundRequest";
-
+import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import FundRequestModal from "../../pages/FundRequestModal";
 import AuthContext from "../../contexts/AuthContext";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -154,51 +154,78 @@ const FundRequest = () => {
       center: true,
     },
 
-    ...(user?.role === "adm"
-      ? [
-          {
-            name: "Actions",
-            selector: (row, { hoveredRow, enableActionsHover }) => {
-              const isHovered = enableActionsHover && hoveredRow === row.id;
+    {
+      name: "Actions",
+      selector: (row, { hoveredRow, enableActionsHover }) => {
+        if (user?.role !== "adm") {
+          return null; // 🚫 hide for non-admins
+        }
 
-              return (
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 1,
-                    width: "120px", // fixed width
-                  }}
-                >
-                  {isHovered ? (
-                    <Box sx={{ display: "flex", gap: 1 }}>
-                      <Tooltip title="Approve">
-                        <Button size="small" color="success">
-                          <CheckCircleIcon fontSize="small" />
-                        </Button>
-                      </Tooltip>
-                      <Tooltip title="Reject">
-                        <Button size="small" color="error">
-                          <CancelIcon fontSize="small" />
-                        </Button>
-                      </Tooltip>
-                    </Box>
-                  ) : (
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "#999", textAlign: "center", width: "100%" }}
+        const isHovered = enableActionsHover && hoveredRow === row.id;
+
+        return (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 1,
+              width: "120px",
+            }}
+          >
+            {isHovered ? (
+              <>
+                {/* ✅ Show Approve/Reject only if status is not approved/rejected */}
+                {row.status !== "approved" && row.status !== "rejected" && (
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <Tooltip title="Approve">
+                      <Button
+                        size="small"
+                        color="success"
+                        onClick={() => handleOpen(row, "approved")}
+                      >
+                        <CheckCircleIcon fontSize="small" />
+                      </Button>
+                    </Tooltip>
+                    <Tooltip title="Reject">
+                      <Button
+                        size="small"
+                        color="error"
+                        onClick={() => handleOpen(row, "rejected")}
+                      >
+                        <CancelIcon fontSize="small" />
+                      </Button>
+                    </Tooltip>
+                  </Box>
+                )}
+
+                {/* ✅ Show Reopen button if rejected */}
+                {row.status === "rejected" && (
+                  <Tooltip title="Reopen">
+                    <Button
+                      size="small"
+                      color="warning"
+                      onClick={() => handleOpen(row, "reopen")}
                     >
-                      -
-                    </Typography>
-                  )}
-                </Box>
-              );
-            },
-            width: "120px",
-          },
-        ]
-      : []),
+                      <OpenInFullIcon fontSize="small" />{" "}
+                      {/* you can import from @mui/icons-material */}
+                    </Button>
+                  </Tooltip>
+                )}
+              </>
+            ) : (
+              <Typography
+                variant="body2"
+                sx={{ color: "#999", textAlign: "center", width: "100%" }}
+              >
+                -
+              </Typography>
+            )}
+          </Box>
+        );
+      },
+      width: "120px",
+    },
   ]);
 
   // ✅ Filters

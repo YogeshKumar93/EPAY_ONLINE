@@ -42,6 +42,7 @@ const AEPS2FAModal = ({
   fingerData,
   aadhaar,
   setAadhaar,
+  onFingerSuccess,
 }) => {
   // const [aadhaar, setAadhaar] = useState("");
   const [rdDeviceList, setRdDeviceList] = useState([]);
@@ -154,6 +155,9 @@ const AEPS2FAModal = ({
         // Here you would typically send the captured data to your backend
         console.log("Fingerprint data:", data);
         fingerData(data);
+        if (onFingerSuccess) {
+          onFingerSuccess(data);
+        }
       },
       (error) => {
         setLoading(false);

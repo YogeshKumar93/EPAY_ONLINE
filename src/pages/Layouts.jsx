@@ -1,5 +1,12 @@
 import { useMemo, useContext, useState, useRef } from "react";
-import { Box, Button, Tooltip, Chip, IconButton, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Tooltip,
+  Chip,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import { Edit } from "@mui/icons-material";
 import AuthContext from "../contexts/AuthContext";
 import { dateToTime, ddmmyy } from "../utils/DateUtils";
@@ -23,8 +30,8 @@ const Layouts = ({ filters = [], query }) => {
   const user = authCtx?.user;
   // const [openEdit, setOpenEdit] = useState(false);
   // const [selectedService, setSelectedService] = useState(null);
- 
- const fetchUsersRef = useRef(null);
+
+  const fetchUsersRef = useRef(null);
 
   const handleFetchRef = (fetchFn) => {
     fetchUsersRef.current = fetchFn;
@@ -86,43 +93,55 @@ const Layouts = ({ filters = [], query }) => {
         ),
         width: "150px",
       },
-  {
-      name: "Actions",
-      selector: (row, { hoveredRow, enableActionsHover }) => {
-        const isHovered = hoveredRow === row.id || !enableActionsHover;
+      {
+        name: "Actions",
+        selector: (row, { hoveredRow, enableActionsHover }) => {
+          const isHovered = hoveredRow === row.id || !enableActionsHover;
 
-        return (
-          <Box sx={{ display: "flex", justifyContent: "center", minWidth: "120px" }}>
-            {isHovered ? (
-              <Box sx={{ display: "flex", gap: 1, transition: "opacity 0.2s" }}>
-                <Tooltip title="Edit">
-                  <IconButton color="primary" size="small" onClick={() => handleEdit(row)}>
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            ) : (
-              <Typography
-                variant="body2"
-                sx={{ color: "#999", textAlign: "center", minWidth: "120px" }}
-              >
-                -
-              </Typography>
-            )}
-          </Box>
-        );
+          return (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                minWidth: "120px",
+              }}
+            >
+              {isHovered ? (
+                <Box
+                  sx={{ display: "flex", gap: 1, transition: "opacity 0.2s" }}
+                >
+                  <Tooltip title="Edit">
+                    <IconButton
+                      color="primary"
+                      size="small"
+                      onClick={() => handleEdit(row)}
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              ) : (
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#999", textAlign: "center", minWidth: "120px" }}
+                >
+                  -
+                </Typography>
+              )}
+            </Box>
+          );
+        },
+        width: "120px",
+        center: true,
       },
-      width: "120px",
-      center: true,
-    },
     ],
     []
   );
 
   return (
-    <Box sx={{ }}>
+    <Box sx={{}}>
       <CommonTable
-     onFetchRef={handleFetchRef} 
+        onFetchRef={handleFetchRef}
         columns={columns}
         // endpoint={ApiEndpoints.GET_COLOURS}
         endpoint={ApiEndpoints.GET_COLOURS}
@@ -142,7 +161,7 @@ const Layouts = ({ filters = [], query }) => {
         open={openCreate}
         handleClose={() => setOpenCreate(false)}
         handleSave={handleSaveCreate}
-        onFetchRef={refreshUsers} 
+        onFetchRef={refreshUsers}
       />
 
       <UpdateLayouts
@@ -154,7 +173,7 @@ const Layouts = ({ filters = [], query }) => {
         }}
         handleSave={handleSaveUpdate}
         // selectedAccount={selectedAccount}
-        onFetchRef={refreshUsers} 
+        onFetchRef={refreshUsers}
       />
     </Box>
   );

@@ -1,219 +1,149 @@
-export const setTitleFunc = (path, states) => {
-  return path === "/admin/dashboard"
-    ? "Dashboard"
-    : path === "/admin/users"
-    ? "Users"
-    : path === "/admin/employees"
-    ? "Employees"
-    : path === "/admin/transactions"
-    ? "Transactions"
-    : path === "/customer/transfer"
-    ? "Transfer"
-    : path === "/admin/scheme"
-    ? "Schemes"
-      : path === "/admin/prabhu"
-    ? "Prabhu Transfer"
-    : path === "/admin/login_history"
-    ? "Login History"
-    : path === "/admin/fund-request"
-    ? "Fund Requests"
-     : path === "/customer/fund-request"
-    ? "Fund Requests"
-     : path === "/customer/recharge-bill"
-    ? "Recharge and Bill"
-    : path === "/admin/accounts"
-    ? "Accounts"
-  : path === "/admin/bankings"
-    ? "Bankings"
-    : path === "/admin/banks"
-    ? "Banks"
-    : path === "/admin/settings"
-    ? "Settings"
-    : path === "/admin/messages"
-    ? "Messages"
-     : path === "/admin/services"
-    ? "Services"
-     : path === "/admin/templates"
-    ? "Templates"
-       : path === "/admin/commissionrule"
-    ? "Commission Rules"
-     : path === "/admin/logs"
-    ? "Logs"
-       : path === "/customer/logs"
-    ? "Logs"
-     : path === "/customer/retailerlogs"
-    ? "Activity Logs"
-      : path === "/admin/selectlayout"
-    ? "Layout"
-    : path === "/admin/my-profile"
-    ? "My Profile"
-    : path === "/admin/accountStatement"
-    ? "Account Statement " + states.acc_name + " (" + states.mobile + ")"
-    : path === "/customer/khata-statement"
-    ? "Khata Statement " + states.name + " (" + states.id + ")"
-    : path === "/admin/bankStatement"
-    ? states.bank_name + " Bank Statement"
-    : path === "/admin/operators"
-    ? "Operators"
-    : path === "/admin/account-ledger"
-    ? "Account Ledger"
-    : path === "/admin/wallet-ledger"
-    ? "Wallet Ledger"
-    : path === "/admin/wallet-transfer"
-    ? "Wallet Transfer"
-    : path === "/admin/notification"
-    ? "Notifications"
-    : path === "/admin/prabhu-transactions"
-    ? "Prabhu Transactions"
-    : path === "/admin/prabhu-customers"
-    ? "Prabhu Customers"
-    : path === "/admin/routes"
-    ? "Routes"
-    : path === "/admin/plans"
-    ? "Plans"
-    : path === "/admin/complaint"
-    ? "Complaints"
-    : path === "/admin/risk"
-    ? "Risk"
-     : path === "/admin/banking"
-    ? "Banking"
-        : path === "/admin/Services"
-    ? "Services"
-    : path === "/admin/pg-orders"
-    ? "PG Orders"
-    : path === "/admin/employees"
-    ? "Employees"
-    : path === "/admin/virtual_accounts"
-    ? "Virtual Accounts"
-    : path === "/asm/dashboard"
-    ? "Dashboard"
-    : path === "/zsm/dashboard"
-    ? "Dashboard"
-    : path === "/asm/users"
-    ? "Users"
-    : path === "/zsm/users"
-    ? "Users"
-    : path === "/asm/transactions"
-    ? "Transactions"
-    : path === "/zsm/transactions"
-    ? "Transactions"
-    : path === "/asm/cred-req"
-    ? "Fund Requests"
-    : path === "/zsm/cred-req"
-    ? "Fund Requests"
-    : path === "/asm/my-profile"
-    ? "My Profile"
-    : path === "/zsm/my-profile"
-    ? "My Profile"
-    : path === "/ad/dashboard"
-    ? "Dashboard"
-    : path === "/md/dashboard"
-    ? "Dashboard"
-    : path === "/ad/users"
-    ? "Users"
-    : path === "/md/users"
-    ? "Users"
-    : path === "/ad/cred-req"
-    ? "Fund Requests"
-    : path === "/md/cred-req"
-    ? "Fund Requests"
-    : path === "/ad/transactions"
-    ? "Transactions"
-    : path === "/md/transactions"
-    ? "Transactions"
-    : path === "/ad/sale"
-    ? "My Sale"
-    : path === "/md/sale"
-    ? "My Sale"
-    : path === "/ad/purchase"
-    ? "My Purchase"
-    : path === "/md/purchase"
-    ? "My Purchase"
-    : path === "/ad/ledger"
-    ? "My Ledger"
-    : path === "/md/ledger"
-    ? "My Ledger"
-    : path === "/md/ledger"
-    ? "My Ledger"
-    : path === "/ad/my-profile"
-    ? "My Ledger"
-    : path === "/md/my-profile"
-    ? "My Profile"
-    : path === "/ad/khata-book"
-    ? "Khata Book"
-    : path === "/md/khata-book"
-    ? "Khata Book"
-    : path === "/customer/dashboard"
-    ? "Dashboard"
-    : path === "/customer/recharge"
-    ? "Recharge/Bill Payments"
-    : path === "/customer/cred-req"
-    ? "Fund Requests"
-    : path === "/customer/transactions"
-    ? "Transactions"
-    : path === "/customer/account-ledger"
-    ? "Account Ledger"
-    : path === "/customer/sale"
-    ? "Sales"
-    : path === "/customer/purchase"
-    ? "Purchase"
-    : path === "/customer/money-transfer"
-    ? "Money Transfer"
-    : path === "/customer/express-transfer"
-    ? "Express Transfer"
-    : path === "/customer/fund-transfer"
-    ? "Fund Transfer"
-    : path === "/customer/settlements"
-    ? "Settlements"
-    : path === "/customer/nepal-transfer"
-    ? "Nepal Transfer"
-    : path === "/customer/upi-transfer"
-    ? "UPI Transfer"
-    : path === "/customer/bbps"
-    ? "BBPS Services"
-    : path === "/customer/aeps"
-    ? "AEPS Services"
-    : path === "/customer/wallet-transfer"
-    ? "Wallet Transfer"
-     : path === "/customer/wallet_transfer"
-    ? "Wallet Transfer"
-      : path === "/customer/payment_transfer"
-    ? "Payments"
-     : path === "/customer/cms_new"
-    ? "CMS "
-      : path === "/customer/money_transfer"
-    ? "Money Transfer"
-    : path === "/customer/complaints"
-    ? "My Complaints"
-    : path === "/customer/cms"
-    ? "Cash Management System"
-    : path === "/customer/khata-book"
-    ? "Khata Book"
-    : path === "/customer/my-profile"
-    ? "My Profile"
-    : path === "/customer/services"
-    ? "Services"
-     : path === "/customer/recharge_new"
-    ? "Recharge/Bill"
-     : path === "/customer/loginHistory"
-    ? "Login History"
-       : path === "/customer/invoice"
-    ? "Invoices"
-        : path === "/admin/invoice"
-    ? "Invoices"
-   : path === "/customer/account-ledger"
-    ? "Account Ledger"
-    : path === "/api-user/dashboard"
-    ? "Dashboard"
-    : path === "/api-user/transactions"
-    ? "Transaction"
-    : path === "/api-user/cred-req"
-    ? "Fund Requests"
-     : path === "/api-user/invoice"
-    ? "Invoices"
-    : path === "/customer/travel"
-    ? "Travel Booking"
-    : path === "/api-user/my-profile"
-    ? "My Profile"
-    : "";
+// ✅ Title Map role wise
+const titleMap = {
+  admin: {
+    "/admin/dashboard": "Dashboard",
+    "/admin/users": "Users",
+    "/admin/employees": "Employees",
+    "/admin/transactions": "Transactions",
+    "/admin/scheme": "Schemes",
+    "/admin/prabhu": "Prabhu Transfer",
+    "/admin/login_history": "Login History",
+    "/admin/fund-request": "Fund Requests",
+    "/admin/accounts": "Accounts",
+    "/admin/bankings": "Bankings",
+    "/admin/banks": "Banks",
+    "/admin/settings": "Settings",
+    "/admin/messages": "Messages",
+    "/admin/services": "Services",
+    "/admin/templates": "Templates",
+    "/admin/commissionrule": "Commission Rules",
+    "/admin/logs": "Logs",
+    "/admin/selectlayout": "Layout",
+    "/admin/my-profile": "My Profile",
+    "/admin/operators": "Operators",
+    "/admin/account-ledger": "Account Ledger",
+    "/admin/wallet-ledger": "Wallet Ledger",
+    "/admin/wallet-transfer": "Wallet Transfer",
+    "/admin/notification": "Notifications",
+    "/admin/prabhu-transactions": "Prabhu Transactions",
+    "/admin/prabhu-customers": "Prabhu Customers",
+    "/admin/routes": "Routes",
+    "/admin/plans": "Plans",
+    "/admin/complaint": "Complaints",
+    "/admin/risk": "Risk",
+    "/admin/banking": "Banking",
+    "/admin/pg-orders": "PG Orders",
+    "/admin/virtual_accounts": "Virtual Accounts",
+    "/admin/invoice": "Invoices",
+  },
+
+  customer: {
+    "/customer/dashboard": "Dashboard",
+    "/customer/recharge": "Recharge/Bill Payments",
+    "/customer/fund-request": "Fund Requests",
+    "/customer/transactions": "Transactions",
+    "/customer/account-ledger": "Account Ledger",
+    "/customer/sale": "Sales",
+    "/customer/purchase": "Purchase",
+    "/customer/money-transfer": "Money Transfer",
+    "/customer/express-transfer": "Express Transfer",
+    "/customer/fund-transfer": "Fund Transfer",
+    "/customer/settlements": "Settlements",
+    "/customer/nepal-transfer": "Nepal Transfer",
+    "/customer/upi-transfer": "UPI Transfer",
+    "/customer/bbps": "BBPS Services",
+    "/customer/aeps": "AEPS Services",
+    "/customer/wallet-transfer": "Wallet Transfer",
+    "/customer/payment_transfer": "Payments",
+    "/customer/cms": "Cash Management System",
+    "/customer/complaints": "My Complaints",
+    "/customer/khata-book": "Khata Book",
+    "/customer/my-profile": "My Profile",
+    "/customer/services": "Services",
+    "/customer/loginHistory": "Login History",
+    "/customer/invoice": "Invoices",
+    "/customer/travel": "Travel Booking",
+  },
+
+  asm: {
+    "/asm/dashboard": "Dashboard",
+    "/asm/users": "Users",
+    "/asm/transactions": "Transactions",
+    "/asm/cred-req": "Fund Requests",
+    "/asm/my-profile": "My Profile",
+  },
+
+  zsm: {
+    "/zsm/dashboard": "Dashboard",
+    "/zsm/users": "Users",
+    "/zsm/transactions": "Transactions",
+    "/zsm/cred-req": "Fund Requests",
+    "/zsm/my-profile": "My Profile",
+  },
+
+  md: {
+    "/md/dashboard": "Dashboard",
+    "/md/users": "Users",
+    "/md/cred-req": "Fund Requests",
+    "/md/transactions": "Transactions",
+    "/md/sale": "My Sale",
+    "/md/purchase": "My Purchase",
+    "/md/ledger": "My Ledger",
+    "/md/my-profile": "My Profile",
+    "/md/khata-book": "Khata Book",
+  },
+
+  ad: {
+    "/ad/dashboard": "Dashboard",
+    "/ad/users": "Users",
+    "/ad/cred-req": "Fund Requests",
+    "/ad/transactions": "Transactions",
+    "/ad/sale": "My Sale",
+    "/ad/purchase": "My Purchase",
+    "/ad/ledger": "My Ledger",
+    "/ad/my-profile": "My Profile",
+    "/ad/khata-book": "Khata Book",
+  },
+
+  "api-user": {
+    "/api-user/dashboard": "Dashboard",
+    "/api-user/transactions": "Transaction",
+    "/api-user/cred-req": "Fund Requests",
+    "/api-user/invoice": "Invoices",
+    "/api-user/my-profile": "My Profile",
+  },
+
+  // ✅ New DI role
+  di: {
+    "/di/dashboard": "Dashboard",
+    "/di/users": "Users",
+    "/di/transactions": "Transactions",
+    "/di/cred-req": "Fund Requests",
+    "/di/wallet-transfer": "Wallet Transfer",
+    "/di/wallet-ledger": "Wallet Ledger",
+    "/di/my-profile": "My Profile",
+  },
+};
+
+// ✅ Dynamic title generator
+export const setTitleFunc = (path, states = {}) => {
+  let role = path.split("/")[1];
+
+  const roleMap = titleMap[role] || {};
+
+
+  let title = roleMap[path] || "";
+
+
+  if (path === "/admin/accountStatement") {
+    return `Account Statement ${states.acc_name} (${states.mobile})`;
+  }
+  if (path === "/customer/khata-statement") {
+    return `Khata Statement ${states.name} (${states.id})`;
+  }
+  if (path === "/admin/bankStatement") {
+    return `${states.bank_name} Bank Statement`;
+  }
+
+  return title;
 };

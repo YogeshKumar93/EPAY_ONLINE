@@ -9,12 +9,13 @@ import Plans from "./Plans";
 import Notification from "../components/Notification/Notification";
 
 // Icons
-import DescriptionIcon from "@mui/icons-material/Description";     // Template
-import RuleIcon from "@mui/icons-material/Rule";                   // Comm Rules
-import HttpIcon from "@mui/icons-material/Http";                   // WebHooks
-import ListAltIcon from "@mui/icons-material/ListAlt";             // Logs
-import AssignmentIcon from "@mui/icons-material/Assignment";       // Plans
+import DescriptionIcon from "@mui/icons-material/Description"; // Template
+import RuleIcon from "@mui/icons-material/Rule"; // Comm Rules
+import HttpIcon from "@mui/icons-material/Http"; // WebHooks
+import ListAltIcon from "@mui/icons-material/ListAlt"; // Logs
+import AssignmentIcon from "@mui/icons-material/Assignment"; // Plans
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive"; // Notifications
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 
 export const Settings = () => {
   const tabItems = [
@@ -23,7 +24,12 @@ export const Settings = () => {
     { label: "WebHooks", icon: <HttpIcon />, component: <WebHooks /> },
     { label: "Logs", icon: <ListAltIcon />, component: <Logs /> },
     { label: "Plans", icon: <AssignmentIcon />, component: <Plans /> },
-    { label: "Notifications", icon: <NotificationsActiveIcon />, component: <Notification /> },
+    {
+      label: "Notifications",
+      icon: <NotificationsActiveIcon />,
+      component: <Notification />,
+    },
+    { label: "Color Layout", icon: <SwapHorizIcon />, component: <Layouts /> },
   ];
 
   return <CommonTabs tabs={tabItems} defaultTab={0} />;

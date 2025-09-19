@@ -69,6 +69,7 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 
 import EmailIcon from "@mui/icons-material/Email";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import WalletCard from "../WalletCard";
 
 // ✅ Default male avatar image (replace with your own asset if available)
 
@@ -92,6 +93,7 @@ const roleRoutes = {
   adm: "/admin/profile",
   sadm: "/admin/profile",
   Asm: "/asm/profile",
+  di: "/di/profile",
   dd: "/customer/profile",
   ret: "/customer/profile",
   Ret: "/customer/profile",
@@ -101,8 +103,6 @@ const roleRoutes = {
   Md: "/md/profile",
   Api: "/api-user/profile",
 };
-
- 
 
 const themeSettings = {
   drawerWidth: 240,
@@ -390,35 +390,31 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
       >
         {renderNavItems(navigationItems)}
         <MenuItem
-  disableRipple
-  onClick={() => {
-    handleLogout();
-    navigate("/login");
-  }}
-  sx={{
-    width: "100%",
-     
-    
-    px:8,
-    display: "flex",
-    
-    alignItems: "center",
-    color: "#9769ff",
-    borderRadius: "4px",
-    mb: 0,
-    "&:hover": {
-      backgroundColor: "#ebeef2", // hover bg
-      color: "#9769ff",           // hover text
-    },
-    gap: 1, // space between icon and text
-  }}
->
-  <LogoutIcon fontSize="small" /> Logout
-</MenuItem>
+          disableRipple
+          onClick={() => {
+            handleLogout();
+            navigate("/login");
+          }}
+          sx={{
+            width: "100%",
 
+            px: 8,
+            display: "flex",
+
+            alignItems: "center",
+            color: "#9769ff",
+            borderRadius: "4px",
+            mb: 0,
+            "&:hover": {
+              backgroundColor: "#ebeef2", // hover bg
+              color: "#9769ff", // hover text
+            },
+            gap: 1, // space between icon and text
+          }}
+        >
+          <LogoutIcon fontSize="small" /> Logout
+        </MenuItem>
       </List>
-
-      
     </Box>
   );
 
@@ -460,6 +456,12 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
           >
             {title}
           </Typography>
+
+          <Box sx={{ display: "flex", gap: 2, mr: 2 }}>
+            <WalletCard label="W1" amount={`₹${user?.w1 || 0}`} />
+            <WalletCard label="W2" amount={`₹${user?.w2 || 0}`} />
+          </Box>
+
           <IconButton onClick={refreshUser}>
             <RefreshIcon sx={{ color: "yellow" }} />
           </IconButton>
@@ -493,7 +495,14 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             </IconButton>
 
             {/* Role + Name as separate text (not clickable) */}
-            <Box onClick={handleUserMenuOpen} sx={{ display: "flex", flexDirection: "column",   cursor: "pointer"  }}>
+            <Box
+              onClick={handleUserMenuOpen}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+            >
               <Typography
                 variant="caption"
                 sx={{
@@ -542,7 +551,6 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                 borderRadius: "6px",
                 overflow: "hidden",
                 minWidth: 320,
-               
               },
             }}
           >
@@ -551,13 +559,13 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
               sx={{
                 px: 3.5,
                 py: 2,
-                 fontStyle:"revert",
+                fontStyle: "revert",
                 display: "flex",
                 alignItems: "center",
                 gap: 2,
-                 color:"#220ad7ff",
-                bgcolor:"#e6eef4ff",
-                borderTop:"6px solid #9769FF ",
+                color: "#220ad7ff",
+                bgcolor: "#e6eef4ff",
+                borderTop: "6px solid #9769FF ",
               }}
             >
               <Avatar
@@ -582,33 +590,32 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             <Divider />
 
             {/* Menu Items */}
-         <Box sx={{ width: "350px", p: 2.5 }}>
-  <MenuItem onClick={() => navigate(roleRoutes[user?.role])}>
-    <ListItemIcon>
-      <PersonIcon fontSize="small" />
-    </ListItemIcon>
-    Manage Profile
-  </MenuItem> 
+            <Box sx={{ width: "350px", p: 2.5 }}>
+              <MenuItem onClick={() => navigate(roleRoutes[user?.role])}>
+                <ListItemIcon>
+                  <PersonIcon fontSize="small" />
+                </ListItemIcon>
+                Manage Profile
+              </MenuItem>
 
-<MenuItem
-  onClick={() => {
-    if (user?.role === "adm") {
-      navigate("/logs");
-    } else if (user?.role === "ret") {
-      navigate("/customer/retailerlogs");
-    } else {
-      navigate(`/${user?.role}/logs`); // fallback for other roles
-    }
-  }}
->
-  <ListItemIcon>
-    <TimelineIcon fontSize="small" />
-  </ListItemIcon>
-  Logs Activity
-</MenuItem>
+              <MenuItem
+                onClick={() => {
+                  if (user?.role === "adm") {
+                    navigate("/logs");
+                  } else if (user?.role === "ret") {
+                    navigate("/customer/retailerlogs");
+                  } else {
+                    navigate(`/${user?.role}/logs`); // fallback for other roles
+                  }
+                }}
+              >
+                <ListItemIcon>
+                  <TimelineIcon fontSize="small" />
+                </ListItemIcon>
+                Logs Activity
+              </MenuItem>
 
-
-  {/* <MenuItem>
+              {/* <MenuItem>
     <ListItemIcon>
       <DarkModeIcon fontSize="small" />
     </ListItemIcon>
@@ -621,17 +628,15 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
     />
   </MenuItem> */}
 
-  <Divider />
+              <Divider />
 
-  <MenuItem onClick={handleLogout}>
-    <ListItemIcon>
-      <LogoutIcon fontSize="small" />
-    </ListItemIcon>
-    Sign Out
-  </MenuItem>
-</Box>
-
-
+              <MenuItem onClick={handleLogout}>
+                <ListItemIcon>
+                  <LogoutIcon fontSize="small" />
+                </ListItemIcon>
+                Sign Out
+              </MenuItem>
+            </Box>
           </Menu>
         </Toolbar>
       </AppBar>

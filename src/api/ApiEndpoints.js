@@ -112,6 +112,8 @@ const ApiEndpoints = {
   AEPS_LOGIN: "aeps/outletLogin",
   AEPS_LOGIN_STATUS: "aeps/outletLoginStatus",
 
+  BBPS_PAY_BILL: "/bbps/payBill",
+
   // ****************************** NEW API'S ABOVE ******************************
   GET_COMMISSION_RULE: "commission/getCommissions",
   GET_NOTIFICATION: "notification/getNotification",

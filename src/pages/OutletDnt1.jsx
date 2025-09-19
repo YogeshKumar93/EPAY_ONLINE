@@ -5,7 +5,7 @@ import { useSchemaForm } from "../hooks/useSchemaForm";
 import { useToast } from "../utils/ToastContext";
 import AuthContext from "../contexts/AuthContext";
 import { apiCall } from "../api/apiClient";
-
+import MpinInput from "./MpinInput";
 const OutletDmt1 = ({ open, handleClose, onSuccess }) => {
   const { schema, formData, handleChange, errors, loading } = useSchemaForm(
     ApiEndpoints.DMT1_OUTLET_INITIATE_SCHEMA,
@@ -16,11 +16,10 @@ const OutletDmt1 = ({ open, handleClose, onSuccess }) => {
   const { showToast } = useToast();
   const { location } = useContext(AuthContext);
   const [otpModalOpen, setOtpModalOpen] = useState(false);
-  const [otp, setOtp] = useState("");
   const [initPayload, setInitPayload] = useState(null);
+  const [otpError, setOtpError] = useState("");
 
   // ✅ Submit Handler
-
   const handleSubmit = async () => {
     setSubmitting(true);
     const payload = {
@@ -40,7 +39,7 @@ const OutletDmt1 = ({ open, handleClose, onSuccess }) => {
         "success"
       );
 
-      // 🔑 Save the init payload + required otpReferenceId + hash
+      // 🔑 Save payload for OTP validation
       setInitPayload({
         ...payload,
         otpReferenceID: response?.data?.otpReferenceID,
@@ -48,25 +47,23 @@ const OutletDmt1 = ({ open, handleClose, onSuccess }) => {
         hash2: response?.data?.hash,
       });
 
-      setOtpModalOpen(true); // Open OTP modal
+      setOtpModalOpen(true); // ✅ open MPIN/OTP dialog
     } else {
-      if (error) {
-        showToast(error, "error");
-      } else {
-        showToast(error?.message || "Failed to initiate DMT1 outlet", "error");
-        handleClose();
-      }
+      showToast(error?.message || "Failed to initiate DMT1 outlet", "error");
+      handleClose();
     }
     setSubmitting(false);
   };
 
-  const handleOtpSubmit = async () => {
+  // ✅ OTP Submit handler
+  const handleOtpSubmit = async (pin) => {
+    setOtpError("");
     const { error, response } = await apiCall(
       "post",
       ApiEndpoints.VALIDATE_DMT1_OUTLET,
       {
         ...initPayload, // includes formData + otpReferenceId + hash
-        otp,
+        otp: pin,
       }
     );
 
@@ -76,11 +73,11 @@ const OutletDmt1 = ({ open, handleClose, onSuccess }) => {
       setOtpModalOpen(false);
       handleClose();
     } else {
-      showToast(error?.message || "OTP Validation Failed", "error");
+      setOtpError(error?.message || "OTP Validation Failed");
     }
   };
 
-  // ✅ Required fields (if you only want some fields from schema)
+  // ✅ Required fields
   const requiredFields = [
     "mobile",
     "pan",
@@ -90,41 +87,54 @@ const OutletDmt1 = ({ open, handleClose, onSuccess }) => {
     "aadhaar",
   ];
 
-  // ✅ Pick only required fields from schema
   const visibleFields = schema.filter((field) =>
     requiredFields.includes(field.name)
   );
 
   return (
-    <CommonModal
-      open={open}
-      onClose={handleClose}
-      title="Enable DMT1 Outlet"
-      iconType="info"
-      size="medium"
-      layout="two-column"
-      dividers
-      fieldConfig={visibleFields}
-      formData={formData}
-      handleChange={handleChange}
-      errors={errors}
-      loading={loading || submitting}
-      footerButtons={[
-        {
-          text: "Cancel",
-          variant: "outlined",
-          onClick: handleClose,
-          disabled: submitting,
-        },
-        {
-          text: submitting ? "Submitting..." : "Submit",
-          variant: "contained",
-          color: "primary",
-          onClick: handleSubmit,
-          disabled: submitting,
-        },
-      ]}
-    />
+    <>
+      {/* Main Outlet Form */}
+      <CommonModal
+        open={open}
+        onClose={handleClose}
+        title="Enable DMT1 Outlet"
+        iconType="info"
+        size="medium"
+        layout="two-column"
+        dividers
+        fieldConfig={visibleFields}
+        formData={formData}
+        handleChange={handleChange}
+        errors={errors}
+        loading={loading || submitting}
+        footerButtons={[
+          {
+            text: "Cancel",
+            variant: "outlined",
+            onClick: handleClose,
+            disabled: submitting,
+          },
+          {
+            text: submitting ? "Submitting..." : "Submit",
+            variant: "contained",
+            color: "primary",
+            onClick: handleSubmit,
+            disabled: submitting,
+          },
+        ]}
+      />
+
+      {/* ✅ OTP / MPIN Dialog */}
+      <MpinInput
+        open={otpModalOpen}
+        onClose={() => setOtpModalOpen(false)}
+        title="Enter OTP"
+        length={6}
+        onSubmit={handleOtpSubmit}
+        submitting={submitting}
+        errorMsg={otpError}
+      />
+    </>
   );
 };
 
