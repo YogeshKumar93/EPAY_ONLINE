@@ -239,7 +239,8 @@ const Dmt2Beneficiaries = ({
         onClick={() => setOpen((prev) => !prev)}
       >
         <Typography variant="subtitle1" fontWeight="bold">
-          Beneficiary List ({beneficiaries?.length || 0})
+          Beneficiary List
+          {sender && <>({beneficiaries?.length || 0})</>}
         </Typography>
 
         <Box ml={isMobile ? 1 : "auto"}>
@@ -315,20 +316,18 @@ const Dmt2Beneficiaries = ({
                         <Button
                           size="small"
                           variant="contained"
-                         
                           onClick={() => {
                             setSelectedBeneficiary(b);
                             setVerifyOpen(true);
                           }}
                           sx={{
                             borderRadius: 1,
-                            color:"#000",
-                            backgroundColor: "#FFC107", 
+                            color: "#000",
+                            backgroundColor: "#FFC107",
                             textTransform: "none",
                             fontSize: "0.75rem",
                             px: 1,
                             py: 0.2,
-                           
                           }}
                         >
                           Verify
@@ -341,7 +340,7 @@ const Dmt2Beneficiaries = ({
                         color="primary"
                         onClick={() => onSelect?.(b)}
                         sx={{
-                          backgroundColor:"#5c3ac8",
+                          backgroundColor: "#5c3ac8",
                           borderRadius: 1,
                           textTransform: "none",
                           fontSize: isMobile ? "0.6rem" : "0.75rem",

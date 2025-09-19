@@ -6,13 +6,13 @@ import { CircularProgress } from "@mui/material";
 import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
 import numWords from "num-words";
 
-const FundRequestModal = ({ open, handleClose, row, status,onFetchRef }) => {
+const FundRequestModal = ({ open, handleClose, row, status, onFetchRef }) => {
   const [formData, setFormData] = useState({
     amount: "",
     amountInWords: "",
     remarks: "",
-    status:"",
-    id:"",
+    status: "",
+    id: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -37,49 +37,40 @@ const FundRequestModal = ({ open, handleClose, row, status,onFetchRef }) => {
 
   const onSubmit = async () => {
     setLoading(true);
-    try {
-      const payload = {
-        id: row?.id,
-       
-        status,
- 
-     
-        amount: formData.amount,
-        remarks: formData.remarks,
-      };
+    const payload = {
+      id: row?.id,
 
-      const response = await apiCall(
-        "POST",
-        ApiEndpoints.UPDATE_FUND_REQUEST,
-        payload
-        
-      );
+      status,
 
-      if (response) {
-        okSuccessToast("Fund Request updated successfully!");
-        onFetchRef();
-        handleClose();
-      } else {
-        apiErrorToast("Failed to update Fund Request");
-      }
-    } catch (err) {
-      console.error(err);
-      apiErrorToast("Something went wrong");
-    } finally {
-      setLoading(false);
+      amount: formData.amount,
+      remarks: formData.remarks,
+    };
+
+    const { error, response } = await apiCall(
+      "POST",
+      ApiEndpoints.UPDATE_FUND_REQUEST,
+      payload
+    );
+
+    if (response) {
+      okSuccessToast(response?.message);
+      onFetchRef();
+      handleClose();
+    } else {
+      handleClose();
+      apiErrorToast(error?.message || "fund request fialed");
     }
   };
 
-useEffect(() => {
-  if (open) {
-    setFormData({
-      amount: row?.amount || "1000",
-      amountInWords: row?.amount ? numWords(row.amount) : "",
-      remarks: row?.remarks || "",
-    });
-  }
-}, [open, row]);
-
+  useEffect(() => {
+    if (open) {
+      setFormData({
+        amount: row?.amount || "1000",
+        amountInWords: row?.amount ? numWords(row.amount) : "",
+        remarks: row?.remarks || "",
+      });
+    }
+  }, [open, row]);
 
   const footerButtons = [
     {
@@ -93,7 +84,9 @@ useEffect(() => {
       variant: "contained",
       onClick: onSubmit,
       disabled: loading,
-      startIcon: loading ? <CircularProgress size={20} color="inherit" /> : null,
+      startIcon: loading ? (
+        <CircularProgress size={20} color="inherit" />
+      ) : null,
     },
   ];
 

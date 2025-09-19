@@ -943,15 +943,19 @@ const CommonTable = ({
         <Box sx={{ display: "flex", alignItems: "center" }}>
           {/* ✅ Show Refresh only if no filters are used */}
           {availableFilters.length === 0 && refresh && (
-            <Tooltip title="Refresh">
-              <IconButton
-                onClick={handleManualRefresh}
-                disabled={loading}
-                sx={{ ml: 1 }}
-              >
-                {loading ? <CircularProgress size={24} /> : <CachedIcon />}
-              </IconButton>
-            </Tooltip>
+            <>
+              <Box sx={{ marginLeft: "auto" }}>{customHeader}</Box>
+
+              <Tooltip title="Refresh">
+                <IconButton
+                  onClick={handleManualRefresh}
+                  disabled={loading}
+                  sx={{ ml: 1 }}
+                >
+                  {loading ? <CircularProgress size={24} /> : <CachedIcon />}
+                </IconButton>
+              </Tooltip>
+            </>
           )}
         </Box>
       </Box>
