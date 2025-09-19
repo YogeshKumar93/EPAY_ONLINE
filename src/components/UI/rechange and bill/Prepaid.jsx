@@ -84,10 +84,14 @@ const Prepaid = () => {
   const handleRecharge = async () => {
     if (!selectedPlan || !mobileNumber)
       return apiErrorToast("Please select a plan and enter mobile number");
+      if (!location?.lat || !location?.long) {
+    return apiErrorToast("Location not available, please enable GPS.");
+  }
+
 
     const payload = {
       mobile_number: mobileNumber,
-      operator: selectedPlan.id,
+     operator: selectedService?.id,
       amount: selectedPlan.price,
       latitude: location?.lat || "",
       longitude: location?.long || "",

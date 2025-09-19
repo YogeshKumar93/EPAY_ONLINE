@@ -25,6 +25,7 @@ export const BusinessInformation = ({ open, onClose }) => {
     activeTab === 5
   );
   const kyc = useSchemaForm(ApiEndpoints.KYC_SCHEMA, activeTab === 6);
+  const agreement = useSchemaForm(ApiEndpoints.AGGREEMENTS, activeTab === 7);
 
   const tabs = [
     { label: "Basic", data: basic, submitApi: ApiEndpoints.CREATE_BASIC },
@@ -42,6 +43,7 @@ export const BusinessInformation = ({ open, onClose }) => {
       submitApi: ApiEndpoints.CREATE_DOCUMENTS,
     },
     { label: "KYC", data: kyc, submitApi: ApiEndpoints.CREATE_KYC },
+       { label: "Service Agreement", data: agreement, submitApi: ApiEndpoints.AGGREEMENTS },
   ];
 
   const currentTab = tabs[activeTab];
@@ -89,6 +91,7 @@ export const BusinessInformation = ({ open, onClose }) => {
             5: 4, // Bank
             4: 5, // Documents
             3: 6, // KYC
+            2: 7, // Agreement
           };
 
           const tabIndex = valueToTabIndex[nextStep] ?? 0;
