@@ -111,7 +111,7 @@ const ApiEndpoints = {
   UPDATE_COMPLAINTS: "complains/updateComplains",
   AEPS_LOGIN: "aeps/outletLogin",
   AEPS_LOGIN_STATUS: "aeps/outletLoginStatus",
-
+  AEPS_BALANCE_ENQUIRY: "/aeps/balanceEnquiry",
   BBPS_PAY_BILL: "/bbps/payBill",
 
   // ****************************** NEW API'S ABOVE ******************************

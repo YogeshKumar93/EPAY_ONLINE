@@ -21,7 +21,7 @@ const style = {
   width: "50%",
   bgcolor: "background.paper",
   boxShadow: 24,
-borderRadius: 2,
+  borderRadius: 2,
   outline: "none",
 };
 
@@ -74,6 +74,7 @@ const Aeps1 = () => {
 
       const payload = {
         AadharNumber: aadhaar,
+        errInfo: scanData.errInfo,
         pidDataType: scanData.type,
         pidData: scanData.pidData,
         ci: scanData.cI,
@@ -170,29 +171,31 @@ const Aeps1 = () => {
       ) : (
         <div>
           {/* ✅ 2FA Modal */}
-          <AEPS2FAModal
-            title="AEPS1"
-            open={openAEPS2FA}
-            onClose={() => setOpenAEPS2FA(false)}
-            isAepsOne
-            isAepsTwo={false}
-            twoFAStatus={twoFAStatus}
-            setTwoFAStatus={setTwoFAStatus}
-            fingerData={setFingerScanData}
-            onFingerSuccess={AepsLogin}
-            aadhaar={aadhaar}
-            setAadhaar={setAadhaar} // ✅ fixed
-            buttons={[
-              {
-                label: "AEPS1",
-                variant: "outlined",
-                bgcolor: "white",
-                color: "#9d72f0",
-                hoverColor: "#f5f2ff",
-                onClick: () => console.log("AEPS1 Clicked"),
-              },
-            ]}
-          />
+          {!openAepsMain && (
+            <AEPS2FAModal
+              title="AEPS1"
+              open={openAEPS2FA}
+              onClose={() => setOpenAEPS2FA(false)}
+              isAepsOne
+              isAepsTwo={false}
+              twoFAStatus={twoFAStatus}
+              setTwoFAStatus={setTwoFAStatus}
+              fingerData={setFingerScanData}
+              onFingerSuccess={AepsLogin}
+              aadhaar={aadhaar}
+              setAadhaar={setAadhaar} // ✅ fixed
+              buttons={[
+                {
+                  label: "AEPS1",
+                  variant: "outlined",
+                  bgcolor: "white",
+                  color: "#9d72f0",
+                  hoverColor: "#f5f2ff",
+                  onClick: () => console.log("AEPS1 Clicked"),
+                },
+              ]}
+            />
+          )}
 
           {/* ✅ Main AEPS Component */}
           {openAepsMain && <AepsMainComponent />}

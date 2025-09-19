@@ -11,6 +11,7 @@ import {
   Chip,
   LinearProgress,
   CircularProgress,
+  MenuItem,
 } from "@mui/material";
 import {
   Close as CloseIcon,
@@ -38,13 +39,16 @@ const AEPS2FAModal = ({
   open,
   onClose,
   title = "Title",
+  formData,
+  setFormData,
+  banks = [],
   buttons = [],
   fingerData,
   aadhaar,
   setAadhaar,
   onFingerSuccess,
 }) => {
-  // const [aadhaar, setAadhaar] = useState("");
+
   const [rdDeviceList, setRdDeviceList] = useState([]);
   const [rdDevice, setRdDevice] = useState(null);
   const [status, setStatus] = useState("NOT READY");
@@ -152,8 +156,6 @@ const AEPS2FAModal = ({
         setScanQuality(data.qScore);
         setSuccess(`Fingerprint captured successfully! ${qualityMessage}`);
 
-        // Here you would typically send the captured data to your backend
-        console.log("Fingerprint data:", data);
         fingerData(data);
         if (onFingerSuccess) {
           onFingerSuccess(data);
@@ -602,13 +604,13 @@ const AEPS2FAModal = ({
                   value={aadhaar}
                   onChange={(e) => {
                     const val = e.target.value.replace(/\D/g, "");
-                    if (val.length <= 12) setAadhaar(val);
+                    if (val?.length <= 12) setAadhaar(val);
                   }}
                   size="small"
                   fullWidth
-                  error={aadhaar.length > 0 && aadhaar.length !== 12}
+                  error={aadhaar?.length > 0 && aadhaar?.length !== 12}
                   helperText={
-                    aadhaar.length > 0 && aadhaar.length !== 12
+                    aadhaar?.length > 0 && aadhaar?.length !== 12
                       ? "Aadhaar must be 12 digits"
                       : ""
                   }
@@ -706,6 +708,43 @@ const AEPS2FAModal = ({
                 }}
               />
 
+              <TextField
+                select
+                label="Select Bank"
+                value={formData.bank}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, bank: e.target.value }))
+                }
+                fullWidth
+                size="small"
+              >
+                {banks.map((b, i) => (
+                  <MenuItem key={i} value={b}>
+                    {b}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <TextField
+                label="Mobile"
+                value={formData.mobile}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, mobile: e.target.value }))
+                }
+                fullWidth
+                size="small"
+              />
+              {/* Amount only for Cash Withdrawal */}
+              {formData.activeTab === 0 && (
+                <TextField
+                  label="Amount"
+                  value={formData.amount}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, amount: e.target.value }))
+                  }
+                  fullWidth
+                  size="small"
+                />
+              )}
               <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
                 <Button
                   variant="outlined"
