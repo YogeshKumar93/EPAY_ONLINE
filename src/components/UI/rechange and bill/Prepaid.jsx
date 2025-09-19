@@ -236,6 +236,8 @@ const Prepaid = () => {
     </Slide>
   )}
 
+
+ {/* Step 2 */}
 {step === 2 && (
   <Slide direction="right" in mountOnEnter unmountOnExit>
     <Box>
