@@ -24,9 +24,8 @@ const style = {
 };
 
 const Aeps = () => {
-  const [step, setStep] = useState(1); // 1 = Terms, 2 = AEPS select, 3 = AEPS1, 4 = AEPS2
+  const [step, setStep] = useState(1);
 
-  // Step 1 → Terms & Conditions
   if (step === 1) {
     return (
       <Box sx={{ p: 3, textAlign: "center" }}>

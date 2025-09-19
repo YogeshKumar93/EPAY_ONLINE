@@ -127,14 +127,14 @@ const titleMap = {
 
 // ✅ Dynamic title generator
 export const setTitleFunc = (path, states = {}) => {
-  let role = path.split("/")[1]; // e.g. /admin/... → "admin"
+  let role = path.split("/")[1];
 
   const roleMap = titleMap[role] || {};
 
-  // Default title lookup
+
   let title = roleMap[path] || "";
 
-  // Special cases jaha title me states aata hai
+
   if (path === "/admin/accountStatement") {
     return `Account Statement ${states.acc_name} (${states.mobile})`;
   }
