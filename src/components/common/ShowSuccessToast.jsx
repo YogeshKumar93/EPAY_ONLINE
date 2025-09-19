@@ -1,4 +1,3 @@
-// components/common/ShowSuccessToast.js
 import Swal from "sweetalert2";
 import Logo from "../../assets/logo.png";
 import { bgImage } from "../../iconsImports";
@@ -7,7 +6,7 @@ const triggerConfetti = () => {
   console.log("Confetti animation triggered!");
 };
 
-export const showSuccessToast = ({ txnID, message, navigateUrl }) => {
+export const showSuccessToast = ({ txnID, message }) => {
   Swal.fire({
     title: "",
     html: `
@@ -113,9 +112,8 @@ export const showSuccessToast = ({ txnID, message, navigateUrl }) => {
       const btn = document.getElementById("print-receipt");
       if (btn) {
         btn.addEventListener("click", () => {
-          if (navigateUrl) {
-            window.location.href = navigateUrl; // 🔹 Navigate on click
-          }
+          // ✅ Always open new tab for receipt
+          window.open("/print-dmt", "_blank");
         });
       }
       triggerConfetti();

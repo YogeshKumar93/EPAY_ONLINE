@@ -21,6 +21,7 @@ import {
 import AuthContext from "../contexts/AuthContext";
 import { useToast } from "../utils/ToastContext";
 import ResetMpin from "../components/common/ResetMpin";
+import { showSuccessToast } from "../components/common/ShowSuccessToast";
 
 const Dmt2SelectedBene = ({
   beneficiary,
@@ -149,7 +150,30 @@ const Dmt2SelectedBene = ({
         payload
       );
       if (response) {
-        okSuccessToast(response?.message); // pass full details
+        const txnDetails = {
+          txnID: response?.data,
+          amount,
+          transferMode,
+          senderMobile,
+          beneficiary: {
+            name: beneficiary.beneficiary_name,
+            account: beneficiary.account_number,
+            bank: beneficiary.bank_name,
+            ifsc: beneficiary.ifsc_code,
+            mobile: beneficiary.mobile_number,
+          },
+          date: new Date().toLocaleString(),
+        };
+
+        // okSuccessToastAlt(txnDetails); // pass full details
+        showSuccessToast({
+          txnID: response?.data,
+          message: response?.message,
+        });
+        sessionStorage.setItem("txnData", JSON.stringify(txnDetails));
+
+        // Open PrintDmt in a new tab
+        window.open("/print-dmt", "_blank");
         setAmount("");
         setOtp("");
         setMpin("");
@@ -251,9 +275,8 @@ const Dmt2SelectedBene = ({
                   size="small"
                   onClick={handleGetOtp}
                   disabled={loading}
-                
                   sx={{
-                     backgroundColor:"#5c3ac8",
+                    backgroundColor: "#5c3ac8",
                     minWidth: "60px",
                     px: 1,
                     py: 0.5,
