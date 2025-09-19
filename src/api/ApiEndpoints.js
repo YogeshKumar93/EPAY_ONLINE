@@ -94,6 +94,7 @@ const ApiEndpoints = {
   DELETE_LOG: "auditlog/deleteAuditLog",
   GET_LOG: "auditlog/getAuditLog",
   GET_WALLETLEDGER: "walletledger/getWalletLedgers",
+  GET_WALLETLEDGER_2: "walletledger/getWalletLedger2",
 
   // ****************************** NEW API'S ABOVE ******************************
 

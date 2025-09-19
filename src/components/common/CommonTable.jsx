@@ -428,9 +428,9 @@ const CommonTable = ({
   const handleManualRefresh = useCallback(() => {
     fetchData(true);
   }, [fetchData]);
-  // useEffect(() => {
-  //   if (onFetchRef) onFetchRef(fetchData);
-  // }, [fetchData, onFetchRef]);
+  useEffect(() => {
+    if (onFetchRef) onFetchRef(fetchData);
+  }, [fetchData, onFetchRef]);
 
   const renderFilterInputs = useCallback(
     () =>

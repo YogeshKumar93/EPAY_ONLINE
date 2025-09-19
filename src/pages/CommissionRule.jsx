@@ -19,7 +19,7 @@ import ReButton from "../components/common/ReButton";
 import CreateCommissionRule from "./CreateCommissionRule";
 import EditCommissionModal from "../components/EditCommissionModal";
 import { apiCall } from "../api/apiClient";
-
+import DeleteIcon from "@mui/icons-material/Delete";
 const CommissionRule = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
@@ -27,24 +27,22 @@ const CommissionRule = ({ query }) => {
   const [openCreate, setOpenCreate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
- 
+
   const [plans, setPlans] = useState([]);
-  
+
   const fetchUsersRef = useRef(null);
-  
-    const handleFetchRef = (fetchFn) => {
-      fetchUsersRef.current = fetchFn;
-    };
-    const refreshUsers = () => {
-      if (fetchUsersRef.current) {
-        fetchUsersRef.current();
-      }
-    };
-   
+
+  const handleFetchRef = (fetchFn) => {
+    fetchUsersRef.current = fetchFn;
+  };
+  const refreshUsers = () => {
+    if (fetchUsersRef.current) {
+      fetchUsersRef.current();
+    }
+  };
 
   // ✅ Fetch plans only once (lazy load)
   const fetchPlans = async () => {
-
     // if (plansLoaded) return;
     try {
       const { response } = await apiCall(
@@ -88,7 +86,6 @@ const CommissionRule = ({ query }) => {
 
   const handleSaveCreate = () => {
     setOpenCreate(false);
-  
   };
 
   const handleEditClick = (row) => {
@@ -98,7 +95,6 @@ const CommissionRule = ({ query }) => {
 
   const handleEditSuccess = () => {
     setOpenEdit(false);
-    
   };
 
   const columns = useMemo(
@@ -212,63 +208,65 @@ const CommissionRule = ({ query }) => {
         width: "150px",
       },
       {
-      name: "Actions",
-      selector: (row, { hoveredRow, enableActionsHover }) => {
-        const isHovered = hoveredRow === row.id || !enableActionsHover;
+        name: "Actions",
+        selector: (row, { hoveredRow, enableActionsHover }) => {
+          const isHovered = hoveredRow === row.id || !enableActionsHover;
 
-        return (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              minWidth: "100px",
-            }}
-          >
-            {isHovered ? (
-              <Box sx={{ display: "flex", gap: 1, transition: "opacity 0.2s" }}>
-                <Tooltip title="Edit">
-                  <IconButton
-                    color="primary"
-                    size="small"
-                    onClick={() => handleEditClick(row)}
-                  >
-                    <Edit fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Delete">
-                  <IconButton
-                    color="error"
-                    size="small"
-                    onClick={() => handleDeleteClick(row)}
-                  >
-                    <Delete fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            ) : (
-              <Typography
-                variant="body2"
-                sx={{ color: "#999", textAlign: "center", minWidth: "100px" }}
-              >
-                -
-              </Typography>
-            )}
-          </Box>
-        );
+          return (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minWidth: "100px",
+              }}
+            >
+              {isHovered ? (
+                <Box
+                  sx={{ display: "flex", gap: 1, transition: "opacity 0.2s" }}
+                >
+                  <Tooltip title="Edit">
+                    <IconButton
+                      color="primary"
+                      size="small"
+                      onClick={() => handleEditClick(row)}
+                    >
+                      <Edit fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  {/* <Tooltip title="Delete">
+                    <IconButton
+                      color="error"
+                      size="small"
+                      onClick={() => handleDeleteClick(row)}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip> */}
+                </Box>
+              ) : (
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#999", textAlign: "center", minWidth: "100px" }}
+                >
+                  -
+                </Typography>
+              )}
+            </Box>
+          );
+        },
+        width: "120px",
+        center: true,
       },
-      width: "120px",
-      center: true,
-    },
     ],
     []
   );
 
   return (
-    <Box sx={{ p:1 }}>
+    <Box sx={{ p: 1 }}>
       {/* Services Table */}
       <CommonTable
-       onFetchRef={handleFetchRef} 
+        onFetchRef={handleFetchRef}
         columns={columns}
         endpoint={ApiEndpoints.GET_COMMISSION_RULE}
         filters={filters}
@@ -287,7 +285,7 @@ const CommissionRule = ({ query }) => {
         open={openCreate}
         handleClose={() => setOpenCreate(false)}
         handleSave={handleSaveCreate}
-         onFetchRef={refreshUsers}
+        onFetchRef={refreshUsers}
       />
 
       {/* Edit Commission Rule Modal */}
@@ -296,7 +294,7 @@ const CommissionRule = ({ query }) => {
         onClose={() => setOpenEdit(false)}
         commissionRule={selectedRow} // Pass the selected row data
         onSuccess={handleEditSuccess}
-         onFetchRef={refreshUsers}
+        onFetchRef={refreshUsers}
       />
     </Box>
   );

@@ -108,8 +108,9 @@ const QrLoginPage = () => {
           const userData = userResult.response.data;
           authCtx.saveUser(userData);
           localStorage.setItem("user", JSON.stringify(userData));
-          localStorage.setItem("location", JSON.stringify(location));
-
+          if (authCtx.location) {
+            localStorage.setItem("location", JSON.stringify(authCtx.location));
+          }
           switch (userData.role) {
             case "adm":
             case "sadm":

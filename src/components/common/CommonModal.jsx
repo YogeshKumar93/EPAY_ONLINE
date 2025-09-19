@@ -421,6 +421,87 @@ const CommonFormField = ({
           />
         </Box>
       );
+    case "file":
+    case "image":
+      const fileValue = formData[name];
+      const [preview, setPreview] = useState(
+        typeof fileValue === "string" ? fileValue : null
+      );
+
+      const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Generate preview
+        const objectUrl = URL.createObjectURL(file);
+        setPreview(objectUrl);
+
+        // Convert file to Base64
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          handleChange({
+            target: {
+              name,
+              value: reader.result, // Base64 string
+            },
+          });
+        };
+        reader.readAsDataURL(file);
+      };
+
+      useEffect(() => {
+        // Clean up object URL
+        return () => {
+          if (preview && fileValue instanceof File) {
+            URL.revokeObjectURL(preview);
+          }
+        };
+      }, [preview, fileValue]);
+
+      return (
+        <Box>
+          <Button
+            variant="contained"
+            component="label"
+            disabled={loading}
+            sx={{ mb: 1 }}
+          >
+            Upload {label || "File"}
+            <input
+              type="file"
+              name={name}
+              accept="image/*"
+              hidden
+              onChange={handleFileChange}
+              {...props}
+            />
+          </Button>
+
+          {preview && (
+            <Box sx={{ mt: 1 }}>
+              <Typography variant="body2" sx={{ mb: 0.5 }}>
+                Selected File:
+              </Typography>
+              <img
+                src={preview}
+                alt="preview"
+                style={{
+                  width: 100,
+                  height: 100,
+                  objectFit: "cover",
+                  borderRadius: 8,
+                }}
+              />
+            </Box>
+          )}
+
+          {errors[name] && (
+            <Typography variant="caption" color="error">
+              {errors[name]}
+            </Typography>
+          )}
+        </Box>
+      );
 
     default:
       return (
