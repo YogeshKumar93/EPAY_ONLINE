@@ -267,13 +267,15 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
                         <Button
                           size="small"
                           variant="outlined"
-                          color="warning"
+                        
                           onClick={() => {
                             setSelectedBene(b);
                             setVerifyModal(true);
                           }}
                           sx={{
                             borderRadius: 1,
+                              color: "#000",
+                            backgroundColor: "#FFC107",
                             textTransform: "none",
                             fontSize: "0.7rem",
                             px: 1,
