@@ -6,10 +6,12 @@ import {
   Paper,
   Button,
   IconButton,
+  Stack,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import DownloadIcon from "@mui/icons-material/Download";
 import PanToolIcon from "@mui/icons-material/PanTool"; // This is the hand icon
+import { ArrowDropDownIcon } from "@mui/x-date-pickers";
 
 // Status color mapping
 const statusColors = {
@@ -17,6 +19,8 @@ const statusColors = {
   Failed: "#a42f39ff",
   Pending: "#e4bb32ff",
 };
+
+ 
 
 const TransactionDetailsCard = ({
   amount,
@@ -112,12 +116,19 @@ const TransactionDetailsCard = ({
 
       {/* Message */}
       {message && (
-        <Box p={2}>
-          <Typography variant="body2" color="text.secondary">
-            {message}
-          </Typography>
-        </Box>
-      )}
+  <Box p={2}>
+    <Stack spacing={2.5}> {/* spacing controls gap between lines */}
+      <Typography color="text.secondary" sx={{ fontSize: 12, mt: -1 }}>
+        {status}
+      </Typography>
+
+      <Box display="flex" alignItems="center" gap={0.5}>
+        <Typography>Show Timeline</Typography>
+        <ArrowDropDownIcon fontSize="small" />
+      </Box>
+    </Stack>
+  </Box>
+)}
 
       <Divider />
 
@@ -134,16 +145,19 @@ const TransactionDetailsCard = ({
       mb: 2,
     }}
   >
-    <Typography variant="subtitle1">
+    <Typography variant="subtitle1" sx={{fontWeight:"600"}}>
       Transaction Details
     </Typography>
     <Box sx={{ display: "flex", gap: 1 }}>
-      <IconButton size="small" onClick={onRaiseIssue}>
+      <IconButton size="small" onClick={onRaiseIssue} sx={{color:"#55a3f1ff"}}>
         <PanToolIcon fontSize="small" />
       </IconButton>
-      <IconButton size="small" onClick={() => console.log("Download clicked")}>
-        <DownloadIcon fontSize="small" />
-      </IconButton>
+<IconButton size="small" onClick={() => window.print()}>
+  <DownloadIcon fontSize="small" />
+</IconButton>
+
+
+
     </Box>
   </Box>
 
@@ -154,8 +168,8 @@ const TransactionDetailsCard = ({
       sx={{
         display: "flex",
         justifyContent: "space-between",
-        py: 1,
-        borderBottom: "1px solid #eee",
+        py: 0.25,
+        // borderBottom: "1px solid #eee",
         
       }}
     >

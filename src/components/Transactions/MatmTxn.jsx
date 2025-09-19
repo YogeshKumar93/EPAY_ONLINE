@@ -1,15 +1,25 @@
 import { useMemo, useCallback, useContext, useState } from "react";
-import { Box, Tooltip, Typography, Button } from "@mui/material";
+import { Box, Tooltip, Typography, Button, Drawer } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import AuthContext from "../../contexts/AuthContext";
 import { dateToTime1, ddmmyy, ddmmyyWithTime } from "../../utils/DateUtils";
 import CommonStatus from "../common/CommonStatus";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import CloseIcon from "@mui/icons-material/Close";
+ 
+import companylogo from '../../assets/Images/logo(1).png';
+import TransactionDetailsCard from "../common/TransactionDetailsCard";
 
 const MatmTxn = ({  query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const [openCreate, setOpenCreate] = useState(false);
+  const [selectedTxn, setSelectedTxn] = useState(null);
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+
 const filters = useMemo(
     () => [
       {
@@ -184,7 +194,38 @@ const filters = useMemo(
         center: true,
       },
      
-     
+       ...(user?.role === "ret"
+        ? [
+            {
+              name: "Actions",
+              selector: (row) => (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    minWidth: "80px",
+                  }}
+                >
+                  <Tooltip title="View Transaction">
+                    <IconButton
+                      color="info"
+                      onClick={() => {
+                        setSelectedRow(row);
+                        setDrawerOpen(true);
+                      }}
+                      size="small"
+                    >
+                      <VisibilityIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              ),
+              width: "100px",
+              center: true,
+            },
+          ]
+        : []),
     ],
     []
   );
@@ -198,7 +239,48 @@ const filters = useMemo(
         endpoint={ApiEndpoints.GET_MATM_TXN}
         filters={filters}
         queryParam={queryParam}
+         enableActionsHover={true}
       />
+
+    {/* MATM Details Drawer */}
+      <Drawer
+        anchor="right"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+       
+      >
+        <Box sx={{ width: 400,  display: "flex", flexDirection: "column", height: "100%" }}>
+          {selectedRow && (
+            <TransactionDetailsCard
+              amount={selectedRow.amount}
+              status={selectedRow.status}
+              onClose={() => setDrawerOpen(false)} // ✅ Close drawer
+             companyLogoUrl={companylogo}
+              dateTime={ddmmyyWithTime(selectedRow.created_at)}
+              message={selectedRow.message || "No message"}
+              details={[
+                { label: "Txn ID", value: selectedRow.txn_id },
+                { label: "Client Ref", value: selectedRow.client_ref },
+                { label: "Sender Mobile", value: selectedRow.sender_mobile },
+                { label: "Beneficiary Name", value: selectedRow.beneficiary_name },
+                { label: "Account Number", value: selectedRow.account_number },
+                { label: "IFSC Code", value: selectedRow.ifsc_code },
+                { label: "Bank Name", value: selectedRow.bank_name },
+                { label: "Route", value: selectedRow.route },
+                { label: "Charge", value: selectedRow.ccf },
+                { label: "GST", value: selectedRow.gst },
+                { label: "Commission", value: selectedRow.comm },
+                { label: "TDS", value: selectedRow.tds },
+              ]}
+              onRaiseIssue={() => {
+                setSelectedTxn(selectedRow.txn_id);
+                setOpenCreate(true);
+              }}
+            />
+          )}
+        </Box>
+      </Drawer>
+
     </>
   );
 };

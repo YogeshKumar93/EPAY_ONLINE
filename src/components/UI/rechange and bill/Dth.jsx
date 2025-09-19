@@ -2,15 +2,17 @@ import { useContext, useEffect, useState } from "react";
 import {
   Grid,
   Card,
-  CardContent,
   Typography,
   CircularProgress,
   Box,
   TextField,
   Button,
   Avatar,
-  Paper,
+  Dialog,
+  DialogContent,
+  IconButton,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import { apiCall } from "../../../api/apiClient";
 import ApiEndpoints from "../../../api/ApiEndpoints";
 import { apiErrorToast, okSuccessToast } from "../../../utils/ToastUtil";
@@ -53,15 +55,11 @@ const Dth = () => {
         customer_id: customerId,
         operator: selectedService.id,
         amount,
-         latitude: location?.lat || "",
-    longitude: location?.long || "",
+        latitude: location?.lat || "",
+        longitude: location?.long || "",
       };
 
-      const { error, response } = await apiCall(
-        "post",
-        ApiEndpoints.RECHARGE,
-        payload
-      );
+      const { error } = await apiCall("post", ApiEndpoints.RECHARGE, payload);
 
       if (error) {
         apiErrorToast(error);
@@ -93,6 +91,7 @@ const Dth = () => {
 
   return (
     <Box sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
+      {/* Service Cards Grid */}
       <Grid container spacing={3}>
         {services.map((service) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={service.id}>
@@ -111,7 +110,7 @@ const Dth = () => {
               }}
               onClick={() => setSelectedService(service)}
             >
-              <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+              <Box sx={{ display: "flex", justifyContent: "center", mb: 2, bgcolor: "#f5f5f5", borderRadius: 6, p: 1 }}>
                 <Avatar
                   src={operatorImages[service.code]}
                   alt={service.name}
@@ -131,53 +130,59 @@ const Dth = () => {
         ))}
       </Grid>
 
-      {selectedService && (
-        <Paper
-          elevation={6}
-          sx={{
-            mt: 5,
-            p: { xs: 2, sm: 3 },
-            maxWidth: 400,
-            mx: "auto",
-            borderRadius: 3,
-            background: "#f5f5f5",
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: 700, mb: 2, textAlign: "center" }}
-          >
-            Selected Service: {selectedService.name}
-          </Typography>
+      {/* Modal for Selected Service */}
+      <Dialog
+        open={!!selectedService}
+        onClose={() => setSelectedService(null)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogContent>
+          <Box sx={{ position: "relative", p: 3, borderRadius: 4, boxShadow: 3,    border: "2px solid",      // 👈 border thickness
+    borderColor: "primary.main",}}>
+            <IconButton
+              onClick={() => setSelectedService(null)}
+              sx={{ position: "absolute", top: -2, right: -8, color: "blue" }}
+            >
+              <CloseIcon />
+            </IconButton>
 
-          <TextField
-            fullWidth
-            label="Customer ID / Number"
-            value={customerId}
-            onChange={(e) => setCustomerId(e.target.value)}
-            sx={{ mb: 2 }}
-          />
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 700, mb: 2, textAlign: "center" }}
+            >
+              Selected Service: {selectedService?.name}
+            </Typography>
 
-          <TextField
-            fullWidth
-            label="Amount"
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            sx={{ mb: 3 }}
-          />
+            <TextField
+              fullWidth
+              label="Customer ID / Number"
+              value={customerId}
+              onChange={(e) => setCustomerId(e.target.value)}
+              sx={{ mb: 2 }}
+            />
 
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ py: 1.5, fontWeight: 600 }}
-            onClick={handleRecharge}
-          >
-            Recharge
-          </Button>
-        </Paper>
-      )}
+            <TextField
+              fullWidth
+              label="Amount"
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              sx={{ mb: 3 }}
+            />
+
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ py: 1.5, fontWeight: 600 }}
+              onClick={handleRecharge}
+            >
+              Recharge
+            </Button>
+          </Box>
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };

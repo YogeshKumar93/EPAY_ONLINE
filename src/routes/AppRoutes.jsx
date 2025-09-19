@@ -114,6 +114,7 @@ export default function AppRoutes() {
 
         <Route path="/login" element={<QrLoginPage />} />
         <Route path="/print-receipt" element={<DmtReceipt1 />} />
+         <Route path="/print-dmt" element={<PrintDmt />} />
 
         {/* Protected layout */}
         <Route
@@ -216,7 +217,7 @@ export default function AppRoutes() {
               <Route path="customer/bbps" element={<Bbps />} />
               <Route path="customer/profile" element={<ProfilePage />} />
               <Route path="customer/cms" element={<Cms />} />
-              <Route path="customer/print-dmt" element={<PrintDmt />} />
+              {/* <Route path="customer/print-dmt" element={<PrintDmt />} /> */}
 
               <Route
                 path="customer/*"

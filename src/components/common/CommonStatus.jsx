@@ -40,11 +40,11 @@ const CommonStatus = ({ value, is_read }) => {
         backgroundColor: colors.bg,
         color: colors.text,
         borderRadius: "999px", // pill shape
-        px: 2,
+        px: 1,
         py: 0.5,
-        fontSize: "0.8rem",
-        fontWeight: 500,
-        minWidth: "90px",
+        fontSize: ".5rem",
+        fontWeight: 400,
+        minWidth: "80px",
         justifyContent: "center",
       }}
     >
@@ -57,7 +57,7 @@ const CommonStatus = ({ value, is_read }) => {
           backgroundColor: colors.dot,
         }}
       />
-      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+      <Typography variant="body2" sx={{ fontWeight: 400, fontSize: ".7rem" }}>
         {statusText}
       </Typography>
     </Box>
