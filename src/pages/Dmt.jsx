@@ -30,10 +30,10 @@ const Dmt = () => {
   const [openRegisterModal, setOpenRegisterModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
-  const { authUser } = useContext(AuthContext); // Get auth user data
+  const { user } = useContext(AuthContext); // Get auth user data
   const [openDmt1Modal, setOpenDmt1Modal] = useState(false);
 
-  const instId = authUser?.instId; // Check if instId exists
+  const instId = user?.instId; // Check if instId exists
 
   // Fetch sender details
   const handleFetchSender = async (number = mobile) => {
@@ -109,7 +109,7 @@ const Dmt = () => {
       window.location.reload(); // optional, depending on your logic
     }}
   />;
-
+console.log("THe insti fin dmt1",instId)
   return (
     <Box>
       {!instId ? (

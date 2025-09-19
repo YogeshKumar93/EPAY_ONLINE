@@ -21,7 +21,7 @@ const style = {
   width: "50%",
   bgcolor: "background.paper",
   boxShadow: 24,
-  borderRadius: 2,
+borderRadius: 2,
   outline: "none",
 };
 
@@ -35,8 +35,8 @@ const Aeps1 = () => {
   const [openDmt1Modal, setOpenDmt1Modal] = useState(false);
 
   const { showToast } = useToast();
-  const { authUser } = useContext(AuthContext);
-  const instId = authUser?.instId; // Check if instId exists
+  const { user, location } = useContext(AuthContext);
+  const instId = user?.instId; // Check if instId exists
 
   const checkAepsLoginStatus = async () => {
     try {
@@ -65,11 +65,43 @@ const Aeps1 = () => {
     }
   };
 
-  const AepsLogin = async () => {
+  const AepsLogin = async (scanData = fingerScanData) => {
     try {
+      if (!aadhaar || !scanData) {
+        showToast("Please provide Aadhaar and Fingerprint data", "error");
+        return;
+      }
+
+      const payload = {
+        AadharNumber: aadhaar,
+        pidDataType: scanData.type,
+        pidData: scanData.pidData,
+        ci: scanData.cI,
+        dc: scanData.dC,
+        dpId: scanData.dpId,
+        fCount: scanData.fCount,
+        hmac: scanData.hMac,
+        mc: scanData.mC,
+        mi: scanData.mI,
+        nmPoints: scanData.nmPoints,
+        qScore: scanData.qScore,
+        rdsId: scanData.rdsId,
+        rdsVer: scanData.rdsVer,
+        sessionKey: scanData.sessionKey,
+        srno: scanData.srno,
+        pf: scanData.pf,
+        latitude: location.lat,
+        longitude: location.long,
+        operator: 22,
+        type: "DAILY_LOGIN",
+      };
+
+      console.log("AEPS Login Payload:", payload);
+
       const { error, response } = await apiCall(
         "post",
-        ApiEndpoints.AEPS_LOGIN
+        ApiEndpoints.AEPS_LOGIN,
+        payload
       );
 
       if (error) {
@@ -147,6 +179,7 @@ const Aeps1 = () => {
             twoFAStatus={twoFAStatus}
             setTwoFAStatus={setTwoFAStatus}
             fingerData={setFingerScanData}
+            onFingerSuccess={AepsLogin}
             aadhaar={aadhaar}
             setAadhaar={setAadhaar} // ✅ fixed
             buttons={[
