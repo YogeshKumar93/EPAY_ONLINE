@@ -115,7 +115,7 @@ const UpiBeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
       showSuccessToast({
           txnID: response?.data,
           message: response?.message,
-          redirectUrl: "/print-dmt", // can be anything
+          redirectUrl: "/print-dmt", 
         });
         sessionStorage.setItem("txnData", JSON.stringify(txnDetails));
         setAmount("");
