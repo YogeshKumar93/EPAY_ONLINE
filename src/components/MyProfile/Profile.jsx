@@ -173,7 +173,7 @@ const[businessModal,setBusinessModal]=useState(false)
           sx={{
             borderRadius: { xs: 2, sm: 4 },
             overflow: "hidden",
-            background: "linear-gradient(145deg, #f9fafc, #eef1f7)",
+              background: "linear-gradient(90deg, #FFD700, #FFA500, #FFD700)",
             boxShadow: "0 8px 25px rgba(0,0,0,0.08)",
             transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease",
             "&:hover": {
@@ -188,7 +188,7 @@ const[businessModal,setBusinessModal]=useState(false)
               p: { xs: 2, sm: 3, md: 4 },
               borderRadius: "12px 12px 0 0",
               mb: { xs: 2, sm: 3, md: 4 },
-              background: "linear-gradient(145deg, #1E3A8A, #15296d)",
+              background: "#9D72F0",
               color: "white",
               position: "relative",
               overflow: "hidden",

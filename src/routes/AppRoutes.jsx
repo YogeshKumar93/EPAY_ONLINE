@@ -64,8 +64,14 @@ import MD_Dashboard from "../pages/Dashboard";
 import { Transfer } from "../pages/Transfer";
 import DmtReceipt1 from "../pages/DmtReceipt1";
 import PrintDmt from "../pages/printDmt";
+import AdminDistributorAgreement from "../pages/AdminDistributorAgreement";
+import AdminAgreement from "../pages/AdminAgreement";
+import RetailerAgreement from "../pages/RetailerAgreement";
+import DistributorAgreement from "../pages/DistributorAgreement";
+import IndemnityLetter from "../pages/IndemnityLetter ";
 import WalletCard from "../components/WalletCard";
 import { WalletLedgers } from "../components/WalletLedgers";
+import MdDashboard from "../pages/MdDashboard";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading, user } = useContext(AuthContext);
@@ -117,6 +123,21 @@ export default function AppRoutes() {
         <Route path="/qrLogin" element={<QrLoginPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/print-receipt" element={<DmtReceipt1 />} />
+         <Route path="/print-dmt" element={<PrintDmt />} />
+          <Route path="/adminagreement" element={<AdminAgreement />} />
+           <Route
+            path="/admindistributoragreement"
+            element={<AdminDistributorAgreement />}
+          />
+       <Route path="/retaileragreement" element={<RetailerAgreement />} />
+         <Route path="/distributoragreement" element={<DistributorAgreement />} />
+
+             <Route path="/indemnityLetter" element={<IndemnityLetter />} />
+          
+          
+         
+        
+         
         <Route path="/print-dmt" element={<PrintDmt />} />
 
         {/* Protected layout */}
@@ -177,6 +198,8 @@ export default function AppRoutes() {
               />
               <Route path="admin/login_history" element={<Login_History />} />
 
+              
+
               {/* 
               <Route
                 path="admin/*"
@@ -232,7 +255,8 @@ export default function AppRoutes() {
           )}
           {isDi && (
             <>
-              <Route path="di/dashboard" element={<AdminTransactions />} />
+               <Route path="di/dashboard" element={<MdDashboard />} />
+              {/* <Route path="di/dashboard" element={<AdminTransactions />} /> */}
               <Route path="di/users" element={<Users />} />
 
               <Route path="di/wallet-ledger" element={<AccountLadger />} />
@@ -274,7 +298,7 @@ export default function AppRoutes() {
 
           {isMd && (
             <>
-              <Route path="md/dashboard" element={<MD_Dashboard />} />
+                <Route path="md/dashboard" element={<MdDashboard />} />
               <Route path="md/users" element={<Users />} />
               <Route path="md/transcations" element={<Transaction />} />
               <Route path="md/profile" element={<ProfilePage />} />

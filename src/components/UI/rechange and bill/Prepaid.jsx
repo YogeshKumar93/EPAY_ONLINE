@@ -84,10 +84,14 @@ const Prepaid = () => {
   const handleRecharge = async () => {
     if (!selectedPlan || !mobileNumber)
       return apiErrorToast("Please select a plan and enter mobile number");
+      if (!location?.lat || !location?.long) {
+    return apiErrorToast("Location not available, please enable GPS.");
+  }
+
 
     const payload = {
       mobile_number: mobileNumber,
-      operator: selectedPlan.id,
+     operator: selectedService?.id,
       amount: selectedPlan.price,
       latitude: location?.lat || "",
       longitude: location?.long || "",
@@ -139,16 +143,25 @@ const Prepaid = () => {
   <Container maxWidth="xl" sx={{ py: 2, }}>
   {/* Step Indicator */}
   <Box sx={{ display: "flex", justifyContent: "center", mb: 5 }}>
+    
     <Box
       sx={{
         display: "flex",
         alignItems: "center",
-        maxWidth: 500,
+        maxWidth: 1000,
         width: "100%",
       }}
     >
+ <Button
+        startIcon={<ArrowBack />}
+        onClick={() => setStep(1)}
+        sx={{  display:"flex", justifyContent:"flex-start",mr:5 }}
+      >
+        Back to Operators
+      </Button>
+
       {[1, 2, 3, 4].map((s, i) => (
-        <Box key={s} sx={{ display: "flex", alignItems: "center", flex: 1 }}>
+        <Box key={s} sx={{ display: "flex", alignItems: "center", flex: 1, }}>
           <Box
             sx={{
               width: 40,
@@ -157,7 +170,7 @@ const Prepaid = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              backgroundColor: step >= s ? "primary.main" : "grey.300",
+              backgroundColor: step >= s ? "#9D72F0" : "grey.300",
               color: step >= s ? "white" : "grey.600",
               fontWeight: "bold",
               zIndex: 2,
@@ -171,7 +184,7 @@ const Prepaid = () => {
               sx={{
                 flex: 1,
                 height: 3,
-                backgroundColor: step > s ? "primary.main" : "grey.300",
+                backgroundColor: step > s ? "#9D72F0" : "grey.300",
                 ml: -1,
                 mr: -1,
                 zIndex: 1,
@@ -204,7 +217,7 @@ const Prepaid = () => {
                   "&:hover": { transform: "scale(1.05)" },
                   border:
                     selectedService?.id === service.id
-                      ? "2px solid #1976d2"
+                      ? "2px solid #9D72F0"
                       : "1px solid transparent",
                   boxShadow:
                     selectedService?.id === service.id
@@ -236,16 +249,12 @@ const Prepaid = () => {
     </Slide>
   )}
 
+
+ {/* Step 2 */}
 {step === 2 && (
   <Slide direction="right" in mountOnEnter unmountOnExit>
     <Box>
-      <Button
-        startIcon={<ArrowBack />}
-        onClick={() => setStep(1)}
-        sx={{ mb: 3 }}
-      >
-        Back to Operators
-      </Button>
+     
 
       {/* Flex layout for Left & Right */}
       <Box sx={{ display: "flex", gap: 3 }}>
@@ -272,11 +281,11 @@ const Prepaid = () => {
                         : "1px solid",
                     borderColor:
                       selectedService?.id === service.id
-                        ? "primary.main"
+                        ? "#9D72F0"
                         : "divider",
                     backgroundColor:
                       selectedService?.id === service.id
-                        ? "primary.light"
+                        ? "#9D72F0"
                         : "background.paper",
                   }}
                 >
@@ -291,7 +300,7 @@ const Prepaid = () => {
         {/* Right side - Plans */}
         <Box sx={{ flex: 1 }}>
           {selectedService ? (
-            <Box>
+            <Box  >
               {/* Operator header */}
               <Paper
                 sx={{ p: 2, mb: 1, display: "flex", alignItems: "center" }}
@@ -329,7 +338,7 @@ const Prepaid = () => {
                             : "1px solid",
                         borderColor:
                           selectedPlan?.id === plan.id
-                            ? "primary.main"
+                            ? "#9D72F0"
                             : "divider",
                       }}
                     >
@@ -419,21 +428,69 @@ const Prepaid = () => {
 
 
 
-  {/* Step 3: Confirmation */}
-  {step === 3 && (
-    <Fade in>
-      <Box maxWidth={500} mx="auto">
-        <Typography variant="h5" fontWeight="bold" textAlign="center" mb={3}>
+ {/* Step 3: Confirmation */}
+{step === 3 && (
+  <Fade in>
+    <Box sx={{ display: "flex", gap: 2 }}>
+      {/* Left box */}
+      <Box sx={{ flex: "0 0 30%" }}>
+        <Paper sx={{ p: 2, borderRadius: 2, height: "100%" }}>
+          <Typography variant="h6" fontWeight="bold" mb={2}>
+            Select Operator
+          </Typography>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            {services.map((service) => (
+              <Box
+                key={service.id}
+                onClick={() => fetchPlans(service)}
+                sx={{
+                  p: 1.5,
+                  display: "flex",
+                  alignItems: "center",
+                  borderRadius: 2,
+                  cursor: "pointer",
+                  border:
+                    selectedService?.id === service.id ? "2px solid" : "1px solid",
+                  borderColor:
+                    selectedService?.id === service.id
+                      ? "#9D72F0"
+                      : "divider",
+                  backgroundColor:
+                    selectedService?.id === service.id
+                      ? "#9D72F0"
+                      : "background.paper",
+                }}
+              >
+                <Avatar src={operatorImages[service.code]} sx={{ mr: 2 }} />
+                <Typography>{service.name}</Typography>
+              </Box>
+            ))}
+          </Box>
+        </Paper>
+      </Box>
+
+      {/* Right box */}
+      <Box sx={{ flex: 1   }}>
+        <Typography
+          variant="h5"
+          fontWeight="bold"
+          textAlign="center"
+          mb={3}
+        >
           Confirm Recharge
         </Typography>
-        <Paper sx={{ p: 4, borderRadius: 2 }}>
+        <Paper sx={{ p: 2, borderRadius: 2 }}>
           {/* Operator info */}
-          <Box display="flex" alignItems="center" mb={3}>
+          <Box display="flex" alignItems="center"  gap={2} sx={{
+                p: 2,
+                borderRadius: "8px",
+                background: "#e6f0ff", // light blue background
+              }}>
             <Avatar
               src={operatorImages[selectedService?.code]}
               sx={{ width: 50, height: 50, mr: 2 }}
             />
-            <Box>
+            <Box >
               <Typography variant="h6">{selectedService?.name}</Typography>
               <Typography variant="body2" color="text.secondary">
                 Prepaid Mobile
@@ -450,7 +507,7 @@ const Prepaid = () => {
             </Typography>
             <Box display="flex" justifyContent="space-between">
               <Typography variant="h6">{selectedPlan?.name}</Typography>
-              <Typography variant="h6" color="primary.main">
+              <Typography variant="h6" color="#9D72F0">
                 ₹{selectedPlan?.price}
               </Typography>
             </Box>
@@ -488,8 +545,10 @@ const Prepaid = () => {
           </Box>
         </Paper>
       </Box>
-    </Fade>
-  )}
+    </Box>
+  </Fade>
+)}
+
 
   {/* Step 4: Success */}
   {step === 4 && (

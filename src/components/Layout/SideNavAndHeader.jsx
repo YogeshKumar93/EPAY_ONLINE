@@ -393,7 +393,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
           disableRipple
           onClick={() => {
             handleLogout();
-            navigate("/login");
+            navigate("/qrLogin");
           }}
           sx={{
             width: "100%",
@@ -417,7 +417,18 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
       </List>
     </Box>
   );
+  const walletConfig = [
+    { match: ["di", "md"], wallets: ["w1", "w3"] },
+    { match: ["ret", "dd"], wallets: ["w1", "w2"] },
+    { match: ["api"], wallets: ["w1"] },
+  ];
 
+  const getWallets = (role) => {
+    const found = walletConfig.find((cfg) =>
+      cfg.match.some((m) => role?.includes(m))
+    );
+    return found?.wallets || [];
+  };
   return (
     <Box
       sx={{ display: "flex", backgroundColor: "#f5f5f5" }}
@@ -456,12 +467,15 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
           >
             {title}
           </Typography>
-
           <Box sx={{ display: "flex", gap: 2, mr: 2 }}>
-            <WalletCard label="W1" amount={`₹${user?.w1 || 0}`} />
-            <WalletCard label="W2" amount={`₹${user?.w2 || 0}`} />
+            {getWallets(user?.role).map((wallet) => (
+              <WalletCard
+                key={wallet}
+                label={wallet.toUpperCase()}
+                amount={`₹${user?.[wallet]/100 || 0}`}
+              />
+            ))}
           </Box>
-
           <IconButton onClick={refreshUser}>
             <RefreshIcon sx={{ color: "yellow" }} />
           </IconButton>
