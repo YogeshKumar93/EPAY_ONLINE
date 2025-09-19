@@ -460,6 +460,7 @@ const CommonModal = ({
   handleChange = () => {},
   errors = {},
   loading = false,
+  customContent = null, // 👈 NEW PROP
 }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
@@ -605,6 +606,7 @@ const CommonModal = ({
         ) : (
           children
         )}
+        {customContent && <Box sx={{ mt: 0 }}>{customContent}</Box>}
       </DialogContent>
 
       {/* Footer */}

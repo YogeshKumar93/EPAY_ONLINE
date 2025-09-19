@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import CommonModal from "../components/common/CommonModal";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Box, Typography } from "@mui/material";
 import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
 import numWords from "num-words";
-
+import OtpInput from "./OtpInput";
 const FundRequestModal = ({ open, handleClose, row, status, onFetchRef }) => {
   const [formData, setFormData] = useState({
     amount: "",
@@ -13,11 +13,13 @@ const FundRequestModal = ({ open, handleClose, row, status, onFetchRef }) => {
     remarks: "",
     status: "",
     id: "",
+    mpin: "", // ✅ now handled via OtpInput
   });
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
+  // ✅ Convert amount → words
   useEffect(() => {
     if (formData.amount) {
       setFormData((prev) => ({
@@ -29,21 +31,18 @@ const FundRequestModal = ({ open, handleClose, row, status, onFetchRef }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // ✅ API call
   const onSubmit = async () => {
     setLoading(true);
     const payload = {
       id: row?.id,
-
       status,
-
       amount: formData.amount,
       remarks: formData.remarks,
+      mpin: formData.mpin,
     };
 
     const { error, response } = await apiCall(
@@ -58,45 +57,45 @@ const FundRequestModal = ({ open, handleClose, row, status, onFetchRef }) => {
       handleClose();
     } else {
       handleClose();
-      apiErrorToast(error?.message || "fund request fialed");
+      apiErrorToast(error?.message || "Fund request failed");
     }
+    setLoading(false);
   };
 
+  // ✅ Set defaults when modal opens
   useEffect(() => {
     if (open) {
       setFormData({
         amount: row?.amount || "1000",
         amountInWords: row?.amount ? numWords(row.amount) : "",
         remarks: row?.remarks || "",
+        mpin: "",
       });
     }
   }, [open, row]);
 
+  // ✅ Footer buttons
   const footerButtons = [
-    {
-      text: "Cancel",
-      variant: "outlined",
-      onClick: handleClose,
-      disabled: loading,
-    },
+    // {
+    //   text: "Cancel",
+    //   variant: "outlined",
+    //   onClick: handleClose,
+    //   disabled: loading,
+    // },
     {
       text: "Submit",
       variant: "contained",
       onClick: onSubmit,
-      disabled: loading,
+      disabled: loading || formData.mpin.length !== 6,
       startIcon: loading ? (
         <CircularProgress size={20} color="inherit" />
       ) : null,
     },
   ];
 
+  // ✅ Normal fields
   const fieldConfig = [
-    {
-      name: "amount",
-      label: "Amount",
-      type: "number",
-      validation: { required: true, min: 1 },
-    },
+    { name: "amount", label: "Amount", type: "number" },
     {
       name: "amountInWords",
       label: "Amount in Words",
@@ -109,7 +108,6 @@ const FundRequestModal = ({ open, handleClose, row, status, onFetchRef }) => {
       type: "text",
       multiline: true,
       rows: 3,
-      validation: { required: false, maxLength: 200 },
     },
   ];
 
@@ -129,15 +127,24 @@ const FundRequestModal = ({ open, handleClose, row, status, onFetchRef }) => {
       footerButtons={footerButtons}
       size="medium"
       iconType="info"
-      layout="two-column"
-      showCloseButton={true}
-      closeOnBackdropClick={!loading}
       dividers={true}
       fieldConfig={fieldConfig}
       formData={formData}
       handleChange={handleChange}
       errors={errors}
       loading={loading}
+      // ✅ MPIN input section
+      customContent={
+        <Box sx={{ textAlign: "center", mt: 1 }}>
+          <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 500 }}>
+            Enter MPIN
+          </Typography>
+          <OtpInput
+            otp={formData.mpin}
+            setOtp={(val) => setFormData((prev) => ({ ...prev, mpin: val }))}
+          />
+        </Box>
+      }
     />
   );
 };
