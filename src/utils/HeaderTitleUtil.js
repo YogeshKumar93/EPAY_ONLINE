@@ -55,6 +55,8 @@ export const setTitleFunc = (path, states) => {
     ? states.bank_name + " Bank Statement"
     : path === "/admin/operators"
     ? "Operators"
+       : path === "/customer/wallet-ledger"
+    ? "Wallet Ledger"
     : path === "/admin/account-ledger"
     ? "Account Ledger"
     : path === "/admin/wallet-ledger"
