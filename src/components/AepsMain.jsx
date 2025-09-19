@@ -17,7 +17,9 @@ import ApiEndpoints from "../api/ApiEndpoints";
 import AuthContext from "../contexts/AuthContext";
 import { useToast } from "../utils/ToastContext";
 import Aeps2FaCommon from "./User/Aeps2FaCmmon";
-
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import ReceiptIcon from '@mui/icons-material/Receipt';
 const AepsMainComponent = () => {
   const [aadhaar, setAadhaar] = useState("");
   const [activeTab, setActiveTab] = useState(0);
@@ -53,8 +55,8 @@ const AepsMainComponent = () => {
   const [formData, setFormData] = useState({
     mobile: "",
     amount: 0,
-    bank:"",
-     bank_iin: "",
+    bank: "",
+    bank_iin: "",
     activeTab: 0,
   });
 
@@ -98,11 +100,11 @@ const AepsMainComponent = () => {
       rdsVer: scanData.rdsVer,
       sessionKey: scanData.sessionKey,
       srno: scanData.srno,
-        operator: activeTab === 0 ? 50 : 49,
+      operator: activeTab === 0 ? 50 : 49,
       latitude: location?.lat || 0,
       longitude: location?.long || 0,
       amount: formData.amount,
-       pf: "web", 
+      pf: "web",
       type:
         activeTab === 0
           ? "CASH_WITHDRAWAL"
@@ -136,25 +138,50 @@ const AepsMainComponent = () => {
   };
 
   return (
-    <Box sx={{}}>
+    <>
       <Tabs
         value={activeTab}
         onChange={handleTabChange}
         variant="fullWidth"
         sx={{
-          // mb: 1,
+          minHeight: "48px",
+          mb: 2,
           "& .MuiTabs-indicator": {
-            height: "4px",
-            borderRadius: "4px",
-            background: "linear-gradient(135deg,#9d72f0,#7b4dff)",
+            height: "3px",
+            borderRadius: "3px 3px 0 0",
+            background: "linear-gradient(135deg, #9d72f0, #7b4dff)",
+          },
+          "& .MuiTab-root": {
+            minHeight: "48px",
+            padding: "8px 12px",
+            fontSize: "0.85rem",
+            fontWeight: "600",
+            textTransform: "none",
+            color: "text.secondary",
+            transition: "all 0.2s ease",
+            "&.Mui-selected": {
+              color: "#7b4dff",
+              fontWeight: "700",
+            },
           },
         }}
       >
-        <Tab label="Cash Withdrawal" />
-        <Tab label="Balance Enquiry" />
-        <Tab label="Mini Statement" />
+        <Tab
+          label="Cash Withdrawal"
+          icon={<AccountBalanceWalletIcon sx={{ fontSize: "18px", mb: 0 }} />}
+          iconPosition="start"
+        />
+        <Tab
+          label="Balance Enquiry"
+          icon={<AccountBalanceIcon sx={{ fontSize: "18px", mb: 0 }} />}
+          iconPosition="start"
+        />
+        <Tab
+          label="Mini Statement"
+          icon={<ReceiptIcon sx={{ fontSize: "18px", mb: 0 }} />}
+          iconPosition="start"
+        />
       </Tabs>
-
       <Aeps2FaCommon
         open={aeps2FAOpen}
         onClose={() => setAeps2FAOpen(false)}
@@ -167,7 +194,7 @@ const AepsMainComponent = () => {
         fingerData={setFingerprintData}
         setAadhaar={setAadhaar}
       />
-    </Box>
+    </>
   );
 };
 export default AepsMainComponent;

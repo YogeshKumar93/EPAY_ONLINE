@@ -472,7 +472,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
               <WalletCard
                 key={wallet}
                 label={wallet.toUpperCase()}
-                amount={`₹${user?.[wallet] || 0}`}
+                amount={`₹${user?.[wallet]/100 || 0}`}
               />
             ))}
           </Box>
