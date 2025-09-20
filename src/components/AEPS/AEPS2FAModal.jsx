@@ -206,7 +206,7 @@ const AEPS2FAModal = ({
         return 0;
     }
   };
-  console.log("THe fomr naknadobtj", formData.banks);
+  console.log("THe fomr naknadobtj", formData?.banks);
   return (
     <Box
       sx={{
@@ -647,55 +647,7 @@ const AEPS2FAModal = ({
                   }}
                 />
               </Box>
-              <TextField
-                select
-                label="Select Bank"
-                value={formData.bank_iin || ""} // selected bank dikhega yaha
-                onChange={(e) => {
-                  const selectedIIN = e.target.value;
-                  const selectedBank = banks.find(
-                    (b) => b.bank_iin === selectedIIN
-                  );
 
-                  if (selectedBank) {
-                    setFormData((prev) => ({
-                      ...prev,
-                      bank: selectedBank.bank_name, // payload ke liye
-                      bank_iin: selectedBank.bank_iin, // payload ke liye
-                    }));
-                  }
-                }}
-                fullWidth
-                size="small"
-              >
-                {banks.map((bank) => (
-                  <MenuItem key={bank.bank_iin} value={bank.bank_iin}>
-                    {bank.bank_name} ({bank.bank_iin})
-                  </MenuItem>
-                ))}
-              </TextField>
-
-              <TextField
-                label="Mobile"
-                value={formData.mobile}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, mobile: e.target.value }))
-                }
-                fullWidth
-                size="small"
-              />
-              {/* Amount only for Cash Withdrawal */}
-              {formData.activeTab === 0 && (
-                <TextField
-                  label="Amount"
-                  value={formData.amount}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, amount: e.target.value }))
-                  }
-                  fullWidth
-                  size="small"
-                />
-              )}
               <Box>
                 <TextField
                   select

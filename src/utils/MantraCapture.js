@@ -217,7 +217,7 @@ function PostMFS100ClientDmt3(method, rdport, onSuccess, onFailed) {
 function PostMFS100ClientAeps2(method, rdport, onSuccess, onFailed) {
   var res;
   var XML =
-    '<PidOptions ver="1.0"><Opts env="P" fCount="1" fType="2" iCount="0" format="0" pCount="0" pidVer="2.0" timeout="15000" wadh="E0jzJ/P8UopUHAieZn8CKqS4WPMi5ZSYXgfnlfkWjrc=" posh="UNKNOWN" /></PidOptions>';
+    '<PidOptions ver="1.0"><Opts env="P" fCount="1" fType="2" iCount="0" format="0" pCount="0" pidVer="2.0" timeout="15000" wadh="" posh="UNKNOWN" /></PidOptions>';
   console.log("XML with aeps2:", XML);
 
   $.support.cors = true;

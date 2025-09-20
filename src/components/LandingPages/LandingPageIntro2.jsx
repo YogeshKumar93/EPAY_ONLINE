@@ -225,7 +225,7 @@ const LandingPageIntro2 = () => {
                       transition: "all 0.3s ease"
                     }}
                     endIcon={<ArrowForwardIcon />}
-                    onClick={() => navigate("/login")}
+                    onClick={() => navigate("/qrLogin")}
                   >
                     Get Started
                   </Button>

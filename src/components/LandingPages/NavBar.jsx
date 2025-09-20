@@ -54,7 +54,7 @@ const NavBar = () => {
 
           {/* Login Button */}
           <Link
-            to="/login"
+            to="/qrLogin"
             style={{
               padding: "0.5rem 1.2rem",
               borderRadius: "8px",

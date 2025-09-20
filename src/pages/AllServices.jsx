@@ -69,6 +69,7 @@ import AuthContext from "../contexts/AuthContext";
 import { Recharge } from "./Recharge";
 import UpiTransfer from "./UpiTransfer";
 import Bbps from "./Bbps";
+import Dmt from "./Dmt";
 
 const MenuCard = ({ icon, label, onClick, isActive, user }) => {
   return (
@@ -159,7 +160,6 @@ const MenuCard = ({ icon, label, onClick, isActive, user }) => {
     </Zoom>
   );
 };
-
 
 const SubMenuCard = ({ icon, label, onClick, isActive, user }) => {
   return (
@@ -257,20 +257,7 @@ export default function AllServices() {
       key: "moneyTransfer",
       label: "Money Transfer",
       icon: mt,
-      subMenu: [
-        user?.dmt1 === 1 && {
-          key: "dmt1",
-          label: "DMT 1",
-          icon: CompareArrowsIcon,
-          type: "dmt1",
-        },
-        user?.dmt2 === 1 && {
-          key: "dmt2",
-          label: "DMT 2",
-          icon: CompareArrowsIcon,
-          type: "dmt2",
-        },
-      ].filter(Boolean),
+      component: Dmt,
     },
 
     user?.dmt4 !== 0 && {

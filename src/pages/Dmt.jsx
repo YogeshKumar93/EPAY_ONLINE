@@ -109,7 +109,7 @@ const Dmt = () => {
       window.location.reload(); // optional, depending on your logic
     }}
   />;
-console.log("THe insti fin dmt1",instId)
+  console.log("THe insti fin dmt1", instId);
   return (
     <Box>
       {!instId ? (
