@@ -96,28 +96,28 @@ const UpiBeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
       );
 
       if (response) {
-        // okSuccessToast("Payout successful!");
-        const txnDetails = {
-          txnID: response?.data,
-          amount,
+        okSuccessToast("Payout successful!");
+      //   const txnDetails = {
+      //     txnID: response?.data,
+      //     amount,
 
-          senderMobile,
-          beneficiary: {
-            name: beneficiary.beneficiary_name,
-            account: beneficiary.account_number,
-            bank: beneficiary.bank_name,
-            ifsc: beneficiary.ifsc_code,
-            mobile: beneficiary.mobile_number,
-          },
-          date: new Date().toLocaleString(),
-        };
+      //     senderMobile,
+      //     beneficiary: {
+      //       name: beneficiary.beneficiary_name,
+      //       account: beneficiary.account_number,
+      //       bank: beneficiary.bank_name,
+      //       ifsc: beneficiary.ifsc_code,
+      //       mobile: beneficiary.mobile_number,
+      //     },
+      //     date: new Date().toLocaleString(),
+      //   };
 
-      showSuccessToast({
-          txnID: response?.data,
-          message: response?.message,
-          redirectUrl: "/print-dmt", 
-        });
-        sessionStorage.setItem("txnData", JSON.stringify(txnDetails));
+      // showSuccessToast({
+      //     txnID: response?.data,
+      //     message: response?.message,
+      //     redirectUrl: "/print-dmt", 
+      //   });
+      //   sessionStorage.setItem("txnData", JSON.stringify(txnDetails));
         setAmount("");
         setOtp("");
         setMpin("");
