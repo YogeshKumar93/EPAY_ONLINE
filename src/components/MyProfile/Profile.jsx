@@ -58,7 +58,7 @@ const ProfilePage = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({ ...user });
-const[businessModal,setBusinessModal]=useState(false)
+  const[businessModal,setBusinessModal]=useState(false)
 
   // Sync editedUser with user context when user changes
   useEffect(() => {

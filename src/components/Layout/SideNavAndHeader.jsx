@@ -561,10 +561,10 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             PaperProps={{
               elevation: 1,
               sx: {
-                mt: 2,
-                borderRadius: "6px",
+                mt: 1,
+                MozBorderRadiusBottom: "6px",
                 overflow: "hidden",
-                minWidth: 320,
+                minWidth: 280,
               },
             }}
           >
@@ -579,7 +579,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                 gap: 2,
                 color: "#220ad7ff",
                 bgcolor: "#e6eef4ff",
-                borderTop: "6px solid #9769FF ",
+                borderTop: "3px solid #9769FF ",
               }}
             >
               <Avatar
@@ -604,7 +604,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             <Divider />
 
             {/* Menu Items */}
-            <Box sx={{ width: "350px", p: 2.5 }}>
+            <Box sx={{ width: "320px", p: 2.5 }}>
               <MenuItem onClick={() => navigate(roleRoutes[user?.role])}>
                 <ListItemIcon>
                   <PersonIcon fontSize="small" />

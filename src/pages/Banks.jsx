@@ -122,81 +122,84 @@ const Banks = ({ filters = [] }) => {
         selector: (row) => <CommonStatus value={row.status} />,
         center: true,
       },
-      {
-        name: "Actions",
-        selector: (row, { hoveredRow, enableActionsHover }) => {
-          const isHovered = hoveredRow === row.id || !enableActionsHover;
+{
+  name: "Actions",
+  selector: (row, { hoveredRow, enableActionsHover }) => {
+    const isHovered = enableActionsHover && hoveredRow === row.id;
 
-          return (
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                minWidth: "120px", // fixed width
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minWidth: "120px",
+          position: "relative",
+        }}
+      >
+        {/* Icons are always rendered but hidden when not hovered */}
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            visibility: isHovered ? "visible" : "hidden", // keeps layout stable
+          }}
+        >
+          <Tooltip title="Statement">
+            <IconButton color="info" size="small" onClick={() => handleStatement(row)}>
+              <DescriptionIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Edit">
+            <IconButton
+              size="small"
+              color="primary"
+              onClick={() => {
+                setSelectedRow(row);
+                setOpenEdit(true);
               }}
             >
-              {isHovered ? (
-                <Box
-                  sx={{
-                    display: "flex",
-                    gap: 1,
-                    transition: "opacity 0.2s ease-in-out",
-                  }}
-                >
-                  <Tooltip title="Statement">
-                    <IconButton
-                      color="info"
-                      size="small"
-                      onClick={() => handleStatement(row)}
-                    >
-                      <DescriptionIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
+              <Edit fontSize="small" />
+            </IconButton>
+          </Tooltip>
 
-                  <Tooltip title="Edit">
-                    <IconButton
-                      size="small"
-                      color="primary"
-                      onClick={() => {
-                        setSelectedRow(row);
-                        setOpenEdit(true);
-                      }}
-                    >
-                      <Edit fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
+          {user?.role === "adm" && (
+            <Tooltip title="Delete">
+              <IconButton color="error" size="small" onClick={() => handleDelete(row)}>
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
+        </Box>
 
-                  {user?.role === "adm" && (
-                    <Tooltip title="Delete">
-                      <IconButton
-                        color="error"
-                        size="small"
-                        onClick={() => handleDelete(row)}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </Box>
-              ) : (
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: "#999",
-                    textAlign: "center",
-                    minWidth: "120px", // same as icon container
-                  }}
-                >
-                  -
-                </Typography>
-              )}
-            </Box>
-          );
-        },
-        width: "120px",
-        center: true,
-      },
+        {/* Overlay dash only when icons are hidden */}
+        {!isHovered && (
+          <Typography
+            variant="body2"
+            sx={{
+              color: "#999",
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              pointerEvents: "none",
+            }}
+          >
+            -
+          </Typography>
+        )}
+      </Box>
+    );
+  },
+  width: "120px",
+  center: true,
+}
+
+
+
+
+
     ],
     []
   );

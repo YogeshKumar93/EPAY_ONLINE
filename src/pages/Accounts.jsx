@@ -72,78 +72,89 @@ const Accounts = ({ filters = [] }) => {
     name: "Status",
     selector: (row) => <CommonStatus value={row.status} />,
   },
-  {
-    name: "Actions",
-    selector: (row, { hoveredRow, enableActionsHover }) => {
-      const isHovered = hoveredRow === row.id || !enableActionsHover;
+{
+  name: "Actions",
+  selector: (row, { hoveredRow, enableActionsHover }) => {
+    const isHovered = hoveredRow === row.id && enableActionsHover;
 
-      return (
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minWidth: "120px",
+          position: "relative",
+          height: 40, // reserve fixed height to prevent fluctuation
+        }}
+      >
+        {/* Icons always rendered, visibility toggled */}
         <Box
           sx={{
             display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            minWidth: "120px", // stable width
+            gap: 1,
+            visibility: isHovered ? "visible" : "hidden",
+            transition: "visibility 0.2s, opacity 0.2s",
           }}
         >
-          {isHovered ? (
-            <Box
-              sx={{
-                display: "flex",
-                gap: 1,
-                transition: "opacity 0.2s ease-in-out",
+          <Tooltip title="Account Statement">
+            <IconButton
+              color="info"
+              size="small"
+              onClick={() => handleAccountStatement(row)}
+            >
+              <DescriptionIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Edit">
+            <IconButton
+              color="primary"
+              size="small"
+              onClick={() => {
+                setSelectedAccount(row);
+                setOpenUpdate(true);
               }}
             >
-              <Tooltip title="Account Statement">
-                <IconButton
-                  color="info"
-                  size="small"
-                  onClick={() => handleAccountStatement(row)}
-                >
-                  <DescriptionIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
+              <EditIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
 
-              <Tooltip title="Edit">
-                <IconButton
-                  color="primary"
-                  size="small"
-                  onClick={() => {
-                    setSelectedAccount(row);
-                    setOpenUpdate(true);
-                  }}
-                >
-                  <EditIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-
-              <Tooltip title="Delete">
-                <IconButton
-                  color="error"
-                  size="small"
-                  onClick={() => {
-                    setSelectedAccount(row);
-                    setOpenDelete(true);
-                  }}
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          ) : (
-            <Typography
-              variant="body2"
-              sx={{ color: "#999", textAlign: "center", minWidth: "120px" }}
+          <Tooltip title="Delete">
+            <IconButton
+              color="error"
+              size="small"
+              onClick={() => {
+                setSelectedAccount(row);
+                setOpenDelete(true);
+              }}
             >
-              -
-            </Typography>
-          )}
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
         </Box>
-      );
-    },
-    width: "120px",
-    center: true,
+
+        {/* Dash always rendered, only visible when not hovered */}
+        <Typography
+          variant="body2"
+          sx={{
+            color: "#999",
+            textAlign: "center",
+            position: "absolute",
+            pointerEvents: "none",
+            visibility: isHovered ? "hidden" : "visible",
+          }}
+        >
+          -
+        </Typography>
+      </Box>
+    );
   },
+  width: "120px",
+  center: true,
+}
+
+
 ];
 
 

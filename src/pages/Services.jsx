@@ -87,42 +87,45 @@ const Services = ({ query }) => {
         selector: (row, { hoveredRow, enableActionsHover }) => {
           const isHovered = hoveredRow === row.id || !enableActionsHover;
           return (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <span
-                style={{
-                  color: row.is_active ? "#1EE0AC" : "#e85347",
-                  minWidth: "60px",
-                  display: "inline-block",
-                }}
-              >
-                {row.is_active ? "Active" : "Inactive"}
-              </span>
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 1,
-                  opacity: isHovered ? 1 : 0,
-                  pointerEvents: isHovered ? "auto" : "none",
-                  transition: "opacity 0.2s",
-                }}
-              >
-                {row.is_active ? (
-                  <Tooltip title="Click to Block">
-                    <LockOpen
-                      sx={{ color: "#1EE0AC", cursor: "pointer" }}
-                      onClick={() => handleLockUnlockClick(row, "block")}
-                    />
-                  </Tooltip>
-                ) : (
-                  <Tooltip title="Click to Unblock">
-                    <Lock
-                      sx={{ color: "#e85347", cursor: "pointer" }}
-                      onClick={() => handleLockUnlockClick(row, "unblock")}
-                    />
-                  </Tooltip>
-                )}
-              </Box>
-            </Box>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+  <span
+    style={{
+      color: row.is_active ? "#1EE0AC" : "#e85347",
+      minWidth: "60px",
+      display: "inline-block",
+    }}
+  >
+    {row.is_active ? "Active" : "Inactive"}
+  </span>
+  <Box
+    sx={{
+      display: "flex",
+      gap: 1,
+      width: "40px", // <-- reserve width
+      justifyContent: "center",
+      visibility: isHovered ? "visible" : "hidden", // <-- use visibility
+      transition: "visibility 0.2s, opacity 0.2s",
+      opacity: isHovered ? 1 : 0,
+    }}
+  >
+    {row.is_active ? (
+      <Tooltip title="Click to Block">
+        <LockOpen
+          sx={{ color: "#1EE0AC", cursor: "pointer" }}
+          onClick={() => handleLockUnlockClick(row, "block")}
+        />
+      </Tooltip>
+    ) : (
+      <Tooltip title="Click to Unblock">
+        <Lock
+          sx={{ color: "#e85347", cursor: "pointer" }}
+          onClick={() => handleLockUnlockClick(row, "unblock")}
+        />
+      </Tooltip>
+    )}
+  </Box>
+</Box>
+
           );
         },
       },
@@ -131,36 +134,45 @@ const Services = ({ query }) => {
         selector: (row, { hoveredRow, enableActionsHover }) => {
           const isHovered = hoveredRow === row.id || !enableActionsHover;
           return (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <span
-                style={{
-                  color: row.is_active_api ? "#1EE0AC" : "#e85347",
-                  minWidth: "60px",
-                  display: "inline-block",
-                }}
-              >
-                {row.is_active_api ? "Active" : "Inactive"}
-              </span>
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 1,
-                  opacity: isHovered ? 1 : 0,
-                  pointerEvents: isHovered ? "auto" : "none",
-                  transition: "opacity 0.2s",
-                }}
-              >
-                {row.is_active_api ? (
-                  <Tooltip title="API Active">
-                    <LockOpen sx={{ color: "#1EE0AC" }} />
-                  </Tooltip>
-                ) : (
-                  <Tooltip title="API Inactive">
-                    <Lock sx={{ color: "#e85347" }} />
-                  </Tooltip>
-                )}
-              </Box>
-            </Box>
+           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+  <span
+    style={{
+      color: row.is_active ? "#1EE0AC" : "#e85347",
+      minWidth: "60px",
+      display: "inline-block",
+    }}
+  >
+    {row.is_active ? "Active" : "Inactive"}
+  </span>
+  <Box
+    sx={{
+      display: "flex",
+      gap: 1,
+      width: "40px", // <-- reserve width
+      justifyContent: "center",
+      visibility: isHovered ? "visible" : "hidden", // <-- use visibility
+      transition: "visibility 0.2s, opacity 0.2s",
+      opacity: isHovered ? 1 : 0,
+    }}
+  >
+    {row.is_active ? (
+      <Tooltip title="Click to Block">
+        <LockOpen
+          sx={{ color: "#1EE0AC", cursor: "pointer" }}
+          onClick={() => handleLockUnlockClick(row, "block")}
+        />
+      </Tooltip>
+    ) : (
+      <Tooltip title="Click to Unblock">
+        <Lock
+          sx={{ color: "#e85347", cursor: "pointer" }}
+          onClick={() => handleLockUnlockClick(row, "unblock")}
+        />
+      </Tooltip>
+    )}
+  </Box>
+</Box>
+
           );
         },
       },
@@ -169,36 +181,45 @@ const Services = ({ query }) => {
         selector: (row, { hoveredRow, enableActionsHover }) => {
           const isHovered = hoveredRow === row.id || !enableActionsHover;
           return (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <span
-                style={{
-                  color: row.is_active_users ? "#1EE0AC" : "#e85347",
-                  minWidth: "60px",
-                  display: "inline-block",
-                }}
-              >
-                {row.is_active_users ? "Active" : "Inactive"}
-              </span>
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 1,
-                  opacity: isHovered ? 1 : 0,
-                  pointerEvents: isHovered ? "auto" : "none",
-                  transition: "opacity 0.2s",
-                }}
-              >
-                {row.is_active_users ? (
-                  <Tooltip title="User Active">
-                    <LockOpen sx={{ color: "#1EE0AC" }} />
-                  </Tooltip>
-                ) : (
-                  <Tooltip title="User Inactive">
-                    <Lock sx={{ color: "#e85347" }} />
-                  </Tooltip>
-                )}
-              </Box>
-            </Box>
+           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+  <span
+    style={{
+      color: row.is_active ? "#1EE0AC" : "#e85347",
+      minWidth: "60px",
+      display: "inline-block",
+    }}
+  >
+    {row.is_active ? "Active" : "Inactive"}
+  </span>
+  <Box
+    sx={{
+      display: "flex",
+      gap: 1,
+      width: "40px", // <-- reserve width
+      justifyContent: "center",
+      visibility: isHovered ? "visible" : "hidden", // <-- use visibility
+      transition: "visibility 0.2s, opacity 0.2s",
+      opacity: isHovered ? 1 : 0,
+    }}
+  >
+    {row.is_active ? (
+      <Tooltip title="Click to Block">
+        <LockOpen
+          sx={{ color: "#1EE0AC", cursor: "pointer" }}
+          onClick={() => handleLockUnlockClick(row, "block")}
+        />
+      </Tooltip>
+    ) : (
+      <Tooltip title="Click to Unblock">
+        <Lock
+          sx={{ color: "#e85347", cursor: "pointer" }}
+          onClick={() => handleLockUnlockClick(row, "unblock")}
+        />
+      </Tooltip>
+    )}
+  </Box>
+</Box>
+
           );
         },
       },
@@ -207,30 +228,35 @@ const Services = ({ query }) => {
         selector: (row, { hoveredRow, enableActionsHover }) => {
           const isHovered = hoveredRow === row.id || !enableActionsHover;
           return (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                minWidth: "80px",
-              }}
-            >
-              {isHovered ? (
-                <IconButton
-                  color="primary"
-                  size="small"
-                  onClick={() => {
-                    setSelectedService(row);
-                    setOpenEdit(true);
-                  }}
-                >
-                  <Edit />
-                </IconButton>
-              ) : (
-                <Typography variant="body2" sx={{ color: "#999" }}>
-                  -
-                </Typography>
-              )}
-            </Box>
+           <Box
+  sx={{
+    display: "flex",
+    justifyContent: "center",
+    minWidth: "80px",
+  }}
+>
+  <IconButton
+    color="primary"
+    size="small"
+    onClick={() => {
+      setSelectedService(row);
+      setOpenEdit(true);
+    }}
+    sx={{
+      visibility: isHovered ? "visible" : "hidden",
+      transition: "visibility 0.2s, opacity 0.2s",
+      opacity: isHovered ? 1 : 0,
+    }}
+  >
+    <Edit />
+  </IconButton>
+  {!isHovered && (
+    <Typography variant="body2" sx={{ color: "#999", position: "absolute" }}>
+      -
+    </Typography>
+  )}
+</Box>
+
           );
         },
         width: "100px",

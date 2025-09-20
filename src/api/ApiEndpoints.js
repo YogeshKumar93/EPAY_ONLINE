@@ -99,6 +99,10 @@ const ApiEndpoints = {
   CREATE_PURPOSE: "payout/createPurpose",
   AEPS2_SCHEMA: "aeps/aeps2Schema",
 
+  GET_NEWS: "news/getNews",
+  CREATE_NEWS: "news/createNews",
+  DELETE_NEWS: "news/deleteNews",
+
   // ****************************** NEW API'S ABOVE ******************************
 
   GET_FUND_REQUESTS: "fundrequest/getFundRequests",
