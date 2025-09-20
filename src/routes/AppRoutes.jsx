@@ -123,8 +123,8 @@ export default function AppRoutes() {
           <Route path="landingpageintro2" element={<LandingPageIntro2 />} />
           <Route path="landingpageintro3" element={<LandingPageIntro3 />} /> 
 
-        <Route path="/qrLogin" element={<QrLoginPage />} />
-        <Route path="/login" element={<Login />} />
+        {/* <Route path="/qrLogin" element={<QrLoginPage />} />
+        <Route path="/login" element={<Login />} /> */}
         <Route path="/print-receipt" element={<DmtReceipt1 />} />
          <Route path="/print-dmt" element={<PrintDmt />} />
           <Route path="/print-dmt2" element={<PrintDmt2 />} />
