@@ -72,6 +72,7 @@ import IndemnityLetter from "../pages/IndemnityLetter ";
 import WalletCard from "../components/WalletCard";
 import { WalletLedgers } from "../components/WalletLedgers";
 import MdDashboard from "../pages/MdDashboard";
+import News from "../pages/News";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading, user } = useContext(AuthContext);
@@ -192,6 +193,8 @@ export default function AppRoutes() {
               <Route path="admin/statements" element={<Statements />} />
               <Route path="admin/complaint" element={<Complaint />} />
               <Route path="admin/risk" element={<Risk />} />
+               <Route path="admin/news" element={<News />} />
+                
               <Route
                 path="admin/virtual_accounts"
                 element={<Virtual_Accounts />}

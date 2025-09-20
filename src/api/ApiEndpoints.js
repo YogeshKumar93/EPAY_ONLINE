@@ -96,6 +96,10 @@ const ApiEndpoints = {
   GET_WALLETLEDGER: "walletledger/getWalletLedgers",
   GET_WALLETLEDGER_2: "walletledger/getWalletLedger2",
 
+  GET_NEWS: "news/getNews",
+  CREATE_NEWS: "news/createNews",
+  DELETE_NEWS: "news/deleteNews",
+
   // ****************************** NEW API'S ABOVE ******************************
 
   GET_FUND_REQUESTS: "fundrequest/getFundRequests",
