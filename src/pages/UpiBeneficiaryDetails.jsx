@@ -1,21 +1,15 @@
-import { useContext, useState, useEffect } from "react";
-import {
-  Box,
-  Typography,
-  Paper,
-  TextField,
-  Button,
-  InputAdornment,
-} from "@mui/material";
+import React, { useContext, useState, useEffect } from "react";
+import { Box, Typography, Button, TextField } from "@mui/material";
+import OTPInput from "react-otp-input";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
 import AuthContext from "../contexts/AuthContext";
-import OTPInput from "react-otp-input";
 import { useToast } from "../utils/ToastContext";
 import ResetMpin from "../components/common/ResetMpin";
+import CommonModal from "../components/common/CommonModal";
 
-const UpiBeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
+const UpiBeneficiaryDetails = ({ open, onClose, beneficiary, senderMobile, senderId }) => {
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [otpRef, setOtpRef] = useState(null);
@@ -26,6 +20,7 @@ const UpiBeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
   const [loadingPurposes, setLoadingPurposes] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [openResetModal, setOpenResetModal] = useState(false);
+
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const { location } = useContext(AuthContext);
@@ -34,18 +29,13 @@ const UpiBeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
   if (!beneficiary) return null;
   const username = `GURU1${user?.id}`;
 
-  // --- Fetch Purposes on mount ---
   useEffect(() => {
     const fetchPurposes = async () => {
       setLoadingPurposes(true);
       try {
-        const { error, response } = await apiCall(
-          "post",
-          ApiEndpoints.GET_PURPOSES
-        );
-        if (error) {
-          apiErrorToast(error);
-        } else {
+        const { error, response } = await apiCall("post", ApiEndpoints.GET_PURPOSES);
+        if (error) apiErrorToast(error);
+        else {
           const purposesData = response?.data || [];
           setPurposes(purposesData);
           if (purposesData.length > 0) setSelectedPurpose(purposesData[0].id);
@@ -56,73 +46,11 @@ const UpiBeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
         setLoadingPurposes(false);
       }
     };
-
     fetchPurposes();
   }, []);
 
-  const handleGetOtp = async () => {
-    if (!amount || parseFloat(amount) <= 0) {
-      apiErrorToast("Please enter a valid amount");
-      return;
-    }
-    setLoading(true);
-    try {
-      const payload = {
-        mobile_number: senderMobile,
-        beneficiary_id: beneficiary.id,
-        amount,
-      };
-      const { error, response } = await apiCall(
-        "post",
-        ApiEndpoints.PAYOUT_OTP,
-        payload
-      );
-      if (error) {
-        apiErrorToast(error);
-      } else {
-        showToast("OTP sent successfully!", "success");
-        setOtpRef(response?.data?.otp_ref || null);
-      }
-    } catch (err) {
-      apiErrorToast(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-  const handleResendOtp = async () => {
-    setResendLoading(true);
-    try {
-      const payload = {
-        mobile_number: senderMobile,
-        beneficiary_id: beneficiary.id,
-        amount,
-      };
-      const { error, response } = await apiCall(
-        "post",
-        ApiEndpoints.PAYOUT_OTP,
-        payload
-      );
-      if (error) apiErrorToast(error);
-      else {
-        showToast("OTP resent successfully!", "success");
-        setOtpRef(response?.data?.otp_ref || null);
-        setOtp(""); // clear old OTP
-      }
-    } catch (err) {
-      apiErrorToast(err);
-    } finally {
-      setResendLoading(false);
-    }
-  };
   const handleProceed = async () => {
-    if (!otp || otp.length !== 6) {
-      apiErrorToast("Please enter the 6-digit OTP");
-      return;
-    }
-    if (!mpin || mpin.length !== 6) {
-      apiErrorToast("Please enter the 6-digit M-PIN");
-      return;
-    }
+    if (!mpin || mpin.length !== 6) return apiErrorToast("Please enter the 6-digit M-PIN");
 
     setLoading(true);
     try {
@@ -138,48 +66,18 @@ const UpiBeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
         latitude: location?.lat || "",
         longitude: location?.long || "",
         amount,
-        otp,
-        otp_ref: otpRef,
         mop: "UPI",
         mpin,
-        purpose_id: selectedPurpose, // ✅ include selected purpose
+        purpose_id: selectedPurpose,
       };
 
-      const { error, response } = await apiCall(
-        "post",
-        ApiEndpoints.PAYOUT,
-        payload
-      );
-
+      const { error, response } = await apiCall("post", ApiEndpoints.PAYOUT, payload);
       if (response) {
         okSuccessToast("Payout successful!");
-      //   const txnDetails = {
-      //     txnID: response?.data,
-      //     amount,
-
-      //     senderMobile,
-      //     beneficiary: {
-      //       name: beneficiary.beneficiary_name,
-      //       account: beneficiary.account_number,
-      //       bank: beneficiary.bank_name,
-      //       ifsc: beneficiary.ifsc_code,
-      //       mobile: beneficiary.mobile_number,
-      //     },
-      //     date: new Date().toLocaleString(),
-      //   };
-
-      // showSuccessToast({
-      //     txnID: response?.data,
-      //     message: response?.message,
-      //     redirectUrl: "/print-dmt", 
-      //   });
-      //   sessionStorage.setItem("txnData", JSON.stringify(txnDetails));
-        setAmount("");
-        setOtp("");
-        setMpin("");
-        setOtpRef(null);
+        setAmount(""); setOtp(""); setMpin(""); setOtpRef(null);
+        onClose();
       } else {
-        apiErrorToast(error || "Something went wrong");
+        showToast(error?.message || "Something went wrong","error");
       }
     } catch (err) {
       apiErrorToast(err);
@@ -188,176 +86,88 @@ const UpiBeneficiaryDetails = ({ beneficiary, senderMobile, senderId }) => {
     }
   };
 
-  // --- UI Section ---
-  return (
-    <Paper sx={{ p: 0, mt: 2, borderRadius: 2, overflow: "hidden" }}>
-      {/* Header */}
-      <Box
-        sx={{
-          background: "#9d72ff",
-          color: "#fff",
-          textAlign: "center",
-          py: 1,
-        }}
+  const customContent = (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <Box sx={{ bgcolor: "#f0f8ff", p: 2, borderRadius: 2 }}>
+        <Box display="flex" mb={1}>
+          <Typography variant="body2" fontWeight={500} sx={{ width: "120px" }}>Name</Typography>
+          <Typography variant="body2">{beneficiary.beneficiary_name}</Typography>
+        </Box>
+        <Box display="flex">
+          <Typography variant="body2" fontWeight={500} sx={{ width: "120px" }}>VPA</Typography>
+          <Typography variant="body2">{beneficiary.account_number}</Typography>
+        </Box>
+      </Box>
+
+      <TextField
+        label="Purpose"
+        select
+        size="small"
+        value={selectedPurpose}
+        onChange={(e) => setSelectedPurpose(e.target.value)}
+        SelectProps={{ native: true }}
+        fullWidth
       >
-        <Typography variant="subtitle1" fontWeight="bold">
-          Selected Beneficiary
-        </Typography>
-      </Box>
+        {loadingPurposes ? <option>Loading...</option> :
+          purposes.map((p) => <option key={p.id} value={p.id}>{p.type}</option>)}
+      </TextField>
 
-      {/* Beneficiary Details */}
-      <Box sx={{ mx: 0, my: 0, p: 2, bgcolor: "#f0f8ff", borderRadius: 2 }}>
-        {[
-          { label: "Name", value: beneficiary.beneficiary_name },
-          { label: "VPA", value: beneficiary.account_number },
-        ].map((item, index) => (
-          <Box key={index} display="flex" mb={1}>
-            <Typography
-              variant="body2"
-              fontWeight="500"
-              color="#4B5563"
-              sx={{ width: "190px", flexShrink: 0 }}
-            >
-              {item.label}
-            </Typography>
-            <Typography variant="body2" color="#111827">
-              {item.value}
-            </Typography>
-          </Box>
-        ))}
-      </Box>
-
-      {/* Purpose Dropdown + Amount */}
-      <Box mt={2} px={2} pb={2} display="flex" flexDirection="column" gap={2}>
-        <TextField
-          label="Purpose"
-          select
-          size="small"
-          value={selectedPurpose}
-          onChange={(e) => setSelectedPurpose(e.target.value)}
-          SelectProps={{ native: true }}
-          fullWidth
-        >
-          {loadingPurposes ? (
-            <option>Loading...</option>
-          ) : (
-            purposes.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.type}
-              </option>
-            ))
-          )}
-        </TextField>
-
-        {!otpRef ? (
-          <TextField
-            label="Amount"
-            type="number"
-            variant="outlined"
-            size="small"
-            fullWidth
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <Button
-                    variant="contained"
-                    size="small"
-                    onClick={handleGetOtp}
-                    disabled={loading}
-                    sx={{ backgroundColor: "#5c3ac8" }}
-                  >
-                    {loading ? "Sending..." : "Get OTP"}
-                  </Button>
-                </InputAdornment>
-              ),
-            }}
-          />
-        ) : (
-          <>
-            {/* OTP Input */}
-            <Box>
-              <Typography variant="body2" mb={0.5}>
-                Enter OTP
-              </Typography>
-              <OTPInput
-                value={otp}
-                onChange={setOtp}
-                numInputs={6}
-                inputType="tel"
-                renderInput={(props) => <input {...props} />}
-                inputStyle={{
-                  width: "40px",
-                  height: "40px",
-                  margin: "0 5px",
-                  fontSize: "18px",
-                  border: "1px solid #D0D5DD",
-                  borderRadius: "6px",
-                  outline: "none",
-                  textAlign: "center",
-                }}
-              />
-              <Button
-                variant="text"
-                size="small"
-                sx={{ mt: 1 }}
-                onClick={handleResendOtp}
-                disabled={resendLoading}
-              >
-                {resendLoading ? "Resending..." : "Resend OTP"}
-              </Button>
-            </Box>
-
-            {/* M-PIN Input */}
-            <Box>
-              <Typography variant="body2" mb={0.5}>
-                Enter M-PIN
-              </Typography>
-              <OTPInput
-                value={mpin}
-                onChange={setMpin}
-                numInputs={6}
-                inputType="password"
-                renderInput={(props) => <input {...props} />}
-                inputStyle={{
-                  width: "40px",
-                  height: "40px",
-                  margin: "0 5px",
-                  fontSize: "18px",
-                  border: "1px solid #D0D5DD",
-                  borderRadius: "6px",
-                  outline: "none",
-                  textAlign: "center",
-                }}
-              />
-              <Button
-                variant="text"
-                size="small"
-                sx={{ mt: 1 }}
-                onClick={() => setOpenResetModal(true)} // ✅ open modal
-              >
-                Reset Mpin
-              </Button>
-            </Box>
-
-            <Button
-              variant="contained"
-              color="success"
-              onClick={handleProceed}
-              disabled={loading}
-            >
-              {loading ? "Processing..." : "Proceed"}
-            </Button>
-          </>
-        )}
-      </Box>
-      <ResetMpin
-        open={openResetModal}
-        onClose={() => setOpenResetModal(false)}
-        username={username}
+      <TextField
+        label="Amount"
+        type="number"
+        size="small"
+        fullWidth
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
       />
-    </Paper>
+
+      <Box>
+        <Typography variant="body2" mb={0.5}>Enter M-PIN</Typography>
+        <OTPInput
+          value={mpin}
+          onChange={setMpin}
+          numInputs={6}
+          inputType="password"
+          renderInput={(props) => <input {...props} />}
+          inputStyle={{
+            width: "40px", height: "40px", margin: "0 5px",
+            fontSize: "18px", border: "1px solid #D0D5DD",
+            borderRadius: "6px", textAlign: "center"
+          }}
+        />
+        <Button variant="text" size="small" onClick={() => setOpenResetModal(true)}>Reset M-PIN</Button>
+      </Box>
+    </Box>
+  );
+
+  return (
+    <>
+      <CommonModal
+        open={open}
+        onClose={onClose}
+        title="Send Money"
+        iconType="info"
+        size="small"
+        customContent={customContent}
+        footerButtons={[
+          {
+            text: "Cancel",
+            variant: "outlined",
+            onClick: onClose,
+            disabled: loading,
+          },
+          {
+            text: loading ? "Processing..." : "Proceed",
+            variant: "contained",
+            color: "success",
+            onClick: handleProceed,
+            disabled: loading,
+          },
+        ]}
+      />
+
+      <ResetMpin open={openResetModal} onClose={() => setOpenResetModal(false)} username={username} />
+    </>
   );
 };
 

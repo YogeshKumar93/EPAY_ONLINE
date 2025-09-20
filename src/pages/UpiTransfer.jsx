@@ -92,77 +92,84 @@ const UpiTransfer = () => {
   };
 
   return (
-    <Box p={0}>
-      {/* Always show mobile input */}
-      <Box>
-        <TextField
-          label="Mobile Number"
-          variant="outlined"
-          fullWidth
-          value={mobile}
-          autoComplete="on" // <-- enable autocomplete for phone numbers
-          onChange={handleChange}
-          inputProps={{ maxLength: 10 }}
-          sx={{ mb: 1 }}
+ <Box p={0}>
+  {/* Always show mobile input */}
+  <Box position="relative">
+    <TextField
+      label="Mobile Number"
+      variant="outlined"
+      fullWidth
+      value={mobile}
+      autoComplete="on"
+      onChange={handleChange}
+      inputProps={{ maxLength: 10 }}
+      sx={{ mb: 1 }}
+    />
+    {loading && (
+      <CommonLoader
+        loading={loading}
+        size={24}
+        sx={{
+          position: "absolute",
+          top: "50%",
+          right: 16,
+          transform: "translateY(-50%)",
+        }}
+      />
+    )}
+  </Box>
+
+  {/* Sender Details - Full width */}
+  <Box mb={1}>
+    <SenderDetails sender={sender} />
+  </Box>
+
+  {/* Beneficiaries - 70/30 split */}
+  <Box display="flex" flexDirection={isMobile ? "column" : "row"} gap={1}>
+    {/* Left: Beneficiary List - 70% */}
+   {/* Beneficiary List - Full width */}
+<Box width="100%">
+  <UpiBeneficiaryList
+    sender={sender}
+    onSuccess={() => handleFetchSender()}
+    onSelect={(b) => setSelectedBeneficiary(b)}
+  />
+</Box>
+
+
+    {/* Right: Beneficiary Details - 30% */}
+    {/* {selectedBeneficiary && (
+      <Box flex={isMobile ? "1 1 100%" : "0 0 30%"}>
+        <UpiBeneficiaryDetails
+          beneficiary={selectedBeneficiary}
+          senderMobile={mobile}
         />
-        {loading && (
-          <CommonLoader
-            loading={loading}
-            size={24}
-            sx={{
-              position: "absolute",
-              top: "50%",
-              right: 16,
-              transform: "translateY(-50%)",
-            }}
-          />
-        )}
       </Box>
-      {/* Main Content (Sender + Beneficiaries) */}
-      <Box display="flex" flexDirection={isMobile ? "column" : "row"} gap={0.5}>
-        {/* Left: Sender Details + Selected Beneficiary */}
-        <Box flex={isMobile ? "1 1 100%" : "0 0 30%"}>
-          <SenderDetails sender={sender} />
+    )} */}
+  </Box>
 
-          {selectedBeneficiary && (
-            <UpiBeneficiaryDetails
-              beneficiary={selectedBeneficiary}
-              senderMobile={mobile}
-            />
-          )}
-        </Box>
+  {/* Register Modal */}
+  {openRegisterModal && (
+    <SenderRegisterModal
+      open={openRegisterModal}
+      onClose={() => setOpenRegisterModal(false)}
+      mobile={mobile}
+      onRegistered={handleSenderRegistered}
+    />
+  )}
 
-        {/* Right: Beneficiary List */}
-        <Box flex={isMobile ? "1 1 100%" : "0 0 70%"}>
-          <UpiBeneficiaryList
-            sender={sender}
-            onSuccess={() => handleFetchSender()}
-            onSelect={(b) => setSelectedBeneficiary(b)}
-          />
-        </Box>
-      </Box>
+  {/* Verify Modal */}
+  {openVerifyModal && otpData && (
+    <VerifySenderModal
+      open={openVerifyModal}
+      onClose={() => setOpenVerifyModal(false)}
+      mobile={otpData.mobile_number}
+      otpRef={otpData.otp_ref}
+      otpData={otpData}
+    />
+  )}
+</Box>
 
-      {/* Register Modal */}
-      {openRegisterModal && (
-        <SenderRegisterModal
-          open={openRegisterModal}
-          onClose={() => setOpenRegisterModal(false)}
-          mobile={mobile}
-          onRegistered={handleSenderRegistered}
-        />
-      )}
-
-      {/* Verify Modal */}
-      {openVerifyModal && otpData && (
-        <VerifySenderModal
-          open={openVerifyModal}
-          onClose={() => setOpenVerifyModal(false)}
-          mobile={otpData.mobile_number}
-          otpRef={otpData.otp_ref}
-          otpData={otpData}
-        />
-      )}
-    </Box>
   );
 };
 

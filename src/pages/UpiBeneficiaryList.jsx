@@ -50,6 +50,7 @@ import {
   stand2,
   jk2,
 } from "../utils/iconsImports";
+import UpiBeneficiaryDetails from "./UpiBeneficiaryDetails";
 
 const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
   const theme = useTheme();
@@ -60,6 +61,8 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
   const [openList, setOpenList] = useState(true);
   const [verifyModal, setVerifyModal] = useState(false);
   const [selectedBene, setSelectedBene] = useState(null);
+const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+const [selectedForDetails, setSelectedForDetails] = useState(null);
 
   const { schema, formData, handleChange, errors, setErrors, loading } =
     useSchemaForm(ApiEndpoints.GET_UPI_SCHEMA, openModal, {
@@ -286,22 +289,26 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
                         </Button>
                       )}
 
-                      <Button
-                        size="small"
-                        variant="contained"
-                        onClick={() => onSelect?.(b)}
-                        sx={{
-                          color: "#fff",
-                          backgroundColor: "#5c3ac8",
-                          borderRadius: 1,
-                          textTransform: "none",
-                          fontSize: "0.75rem",
-                          px: 1,
-                          py: 0.2,
-                        }}
-                      >
-                        Send Money
-                      </Button>
+                    <Button
+  size="small"
+  variant="contained"
+  onClick={() => {
+    setSelectedForDetails(b); // set the selected beneficiary
+    setDetailsModalOpen(true); // open modal
+  }}
+  sx={{
+    color: "#fff",
+    backgroundColor: "#5c3ac8",
+    borderRadius: 1,
+    textTransform: "none",
+    fontSize: "0.75rem",
+    px: 1,
+    py: 0.2,
+  }}
+>
+  Send Money
+</Button>
+
 
                       <IconButton
                         edge="end"
@@ -438,6 +445,17 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
           }}
         />
       )}
+    {selectedForDetails && (
+  <UpiBeneficiaryDetails
+    open={detailsModalOpen}
+    onClose={() => setDetailsModalOpen(false)}
+    beneficiary={selectedForDetails}
+    senderMobile={sender?.mobile_number}
+    senderId={sender?.id}
+  />
+)}
+
+
     </Card>
   );
 };

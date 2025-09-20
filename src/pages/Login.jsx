@@ -23,12 +23,12 @@ import AuthContext from "../contexts/AuthContext";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { apiCall } from "../api/apiClient";
 import { ReTextField } from "../components/common/ReTextField";
-import backImg from "../assets/Images/BackgroundLogin2.png";
+import backImg from "../assets/Images/LoginPge.png";
 import VerifyMpinLogin from "../components/UI/VerifyMpinLogin";
 import { getGeoLocation } from "../utils/GeoLocationUtil";
 import { okErrorToast } from "../utils/ToastUtil";
 import ForgotPassword from "../components/common/ForgotPassword";
-import biggpayLogo from "../assets/logo(1).png";
+import biggpayLogo from "../assets/Images/PPALogo.jpeg";
 import lockicon from "../assets/lock.png";
 import mobilelogin from "../assets/mobile.png";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -183,8 +183,11 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
     backgroundSize: "auto 88%", // <-- height is 50% of container
     backgroundPosition: "center",
     display: { xs: "none", md: "block" },
-    backgroundColor: "#0052CC",
+    backgroundColor: "#5224a3ff",
     width: "55%",
+    border: "3px solid #4adc51ff",
+  boxShadow: "#3d27a1ff"
+
   }}
 />
 

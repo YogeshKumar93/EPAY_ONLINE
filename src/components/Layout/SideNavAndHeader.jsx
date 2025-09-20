@@ -62,7 +62,7 @@ import { setTitleFunc } from "../../utils/HeaderTitleUtil";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import defaultMaleAvatar from "../../assets/Images/male_avtar.jpg";
 import defaultMaleAvatar2 from "../../assets/Images/male_avtar2.jpg";
-import logo from "../../assets/Images/logo(1).png"; // adjust path
+import logo from "../../assets/Images/PPALogo.jpeg"; // adjust path
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 // import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -246,12 +246,12 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             sx={{
               position: "relative",
               backgroundColor: isItemActive ? "#ebeef2" : "transparent",
-              color: isItemActive ? "#9769ff" : "#6e82a5",
+              color: isItemActive ? "#5210c1" : "#6e82a5",
               borderRadius: "4px",
               mb: 0,
               "&:hover": {
                 backgroundColor: "#ebeef2", // hover pe bhi active jaisa bg
-                color: "#9769ff", // hover pe bhi active jaisa text color
+                color: "#5210c1", // hover pe bhi active jaisa text color
                 "& .MuiListItemIcon-root img": {
                   filter:
                     "invert(41%) sepia(83%) saturate(7421%) hue-rotate(261deg) brightness(97%) contrast(101%)",
@@ -266,9 +266,9 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                     top: 0,
                     height: "100%",
                     width: "4px",
-                    backgroundColor: "#9769ff", // left border only for active
+                    backgroundColor: "#5210c1", // left border only for active
                     borderRadius: "2px",
-                    color: "#9769ff",
+                    color: "#5210c1",
                   }
                 : {},
             }}
@@ -302,10 +302,10 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                       fontFamily: "DM Sans, sans-serif",
                       fontWeight: 550,
                       fontSize: "15px",
-                      color: isItemActive ? "#9769ff" : "#6e82a5", // ✅ active text color
+                      color: isItemActive ? "#5210c1" : "#6e82a5", // ✅ active text color
                     },
                     ".MuiListItem-root:hover & .MuiTypography-root": {
-                      color: "#9769ff",
+                      color: "#5210c1",
                     },
                   }}
                 />
@@ -351,6 +351,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
           height: "64px",
           borderBottom: `1px solid rgba(0, 0, 0, 0.12)`,
           minHeight: "64px", // Matching the header height
+          width: "100%",
         }}
       >
         {desktopOpen && (
@@ -359,7 +360,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             src={logo}
             alt="App Logo"
             sx={{
-              height: 30, // adjust as needed
+              height: 50, // adjust as needed
               width: "auto",
             }}
           />
@@ -402,12 +403,12 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             display: "flex",
 
             alignItems: "center",
-            color: "#9769ff",
+            color: "#5210c1",
             borderRadius: "4px",
             mb: 0,
             "&:hover": {
               backgroundColor: "#ebeef2", // hover bg
-              color: "#9769ff", // hover text
+              color: "#5210c1", // hover text
             },
             gap: 1, // space between icon and text
           }}
@@ -463,7 +464,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             variant="h5"
             noWrap
             component="div"
-            sx={{ flexGrow: 1, color: "#9769FF", fontWeight: 700 }}
+            sx={{ flexGrow: 1, color: "#5210c1", fontWeight: 700 }}
           >
             {title}
           </Typography>
@@ -501,7 +502,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                 sx={{
                   width: 30,
                   height: 30,
-                  bgcolor: "#9769FF",
+                  bgcolor: "#5210c1",
                 }}
               >
                 <PersonOutlineIcon sx={{ color: "#FFF", fontSize: 20 }} />
@@ -521,7 +522,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                 variant="caption"
                 sx={{
                   fontWeight: 500,
-                  color: "#9769FF",
+                  color: "#5210c1",
                   fontSize: "11px",
                   lineHeight: 1,
                 }}
@@ -546,7 +547,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                   onClick={handleUserMenuOpen}
                   sx={{ p: 0, ml: 1, width: 20, height: 20 }}
                 >
-                  <ExpandMoreIcon sx={{ fontSize: 20, color: "#9769FF" }} />
+                  <ExpandMoreIcon sx={{ fontSize: 20, color: "#5210c1" }} />
                 </IconButton>
               </Box>
             </Box>
@@ -579,7 +580,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                 gap: 2,
                 color: "#220ad7ff",
                 bgcolor: "#e6eef4ff",
-                borderTop: "3px solid #9769FF ",
+                borderTop: "3px solid #5210c1 ",
               }}
             >
               <Avatar
