@@ -4,7 +4,6 @@ import myImage from "../assets/Images/aeps-guidelines-new.png";
 import myLogo from "../assets/Images/logo(1).png";
 import atmIcon from "../assets/Images/aeps_print.png";
 import Aeps1 from "./Aeps1";
-import Aeps2 from "./Aeps2";
 
 const style = {
   position: "absolute",
@@ -162,7 +161,13 @@ const Aeps = () => {
 
   // Step 4 → AEPS2 Component (abhi example ke liye simple text)
   if (step === 4) {
-    return <Aeps2 />;
+    return (
+      <Box sx={{ textAlign: "center", mt: 5 }}>
+        <Typography variant="h4" color="primary">
+          Complete Aeps2 Onboarding using mobile app
+        </Typography>
+      </Box>
+    );
   }
 
   return null;
