@@ -98,6 +98,7 @@ const ApiEndpoints = {
   GET_PURPOSES: "payout/getPurpose",
   CREATE_PURPOSE: "payout/createPurpose",
   AEPS2_SCHEMA: "aeps/aeps2Schema",
+  AEPS2_ONBOARDING: "aeps/onboardingAeps2",
 
   GET_NEWS: "news/getNews",
   CREATE_NEWS: "news/createNews",
