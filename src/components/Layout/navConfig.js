@@ -105,7 +105,7 @@ export const customer_nav = [
     to: "/customer/dashboard",
   },
   {
-    title: "Recharge and bill",
+    title: "Recharge",
     icon: serviceImage,
     icon2: "🛠️",
     to: "/customer/recharge-bill",
@@ -129,7 +129,7 @@ export const customer_nav = [
     title: "Bbps(Offline)",
     icon: aepsImage,
     icon2: "📒",
-    to: "/customer/bbps",
+    to: "/customer/bbpsoffline",
   },
 
   { title: "Cms", icon: transImage, icon2: "📒", to: "/customer/cms" },

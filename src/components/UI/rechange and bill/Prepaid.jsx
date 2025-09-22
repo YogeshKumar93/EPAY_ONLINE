@@ -24,7 +24,6 @@ import {
   Payments,
   SimCard,
   CheckCircle,
-  ArrowBack,
 } from "@mui/icons-material";
 import { apiCall } from "../../../api/apiClient";
 import ApiEndpoints from "../../../api/ApiEndpoints";
@@ -41,24 +40,35 @@ const Prepaid = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [mobileNumber, setMobileNumber] = useState("");
   const [manualAmount, setManualAmount] = useState("");
-  const [step, setStep] = useState(1); // 1: operator, 2: plans, 3: confirm, 4: success
+  const [step, setStep] = useState(2); // start directly at plans step
 
   const { location } = useContext(AuthContext);
 
-  // Fetch available operators
-  const fetchServices = async () => {
-    setLoading(true);
-    const { error, response } = await apiCall(
-      "post",
-      ApiEndpoints.GET_SERVICES,
-      { sub_type: "prepaid" }
-    );
-    setLoading(false);
+  // Fetch services and auto-select first operator
+  useEffect(() => {
+    const fetchInitial = async () => {
+      setLoading(true);
+      const { error, response } = await apiCall(
+        "post",
+        ApiEndpoints.GET_SERVICES,
+        { sub_type: "prepaid" }
+      );
+      setLoading(false);
 
-    if (error) return apiErrorToast(error);
+      if (error) return apiErrorToast(error);
 
-    setServices(response?.data || []);
-  };
+      const operators = response?.data || [];
+      setServices(operators);
+
+      if (operators.length > 0) {
+        const firstOperator = operators[0];
+        setSelectedService(firstOperator);
+        fetchPlans(firstOperator);
+      }
+    };
+
+    fetchInitial();
+  }, []);
 
   // Fetch plans for selected operator
   const fetchPlans = async (service) => {
@@ -112,13 +122,9 @@ const Prepaid = () => {
       setSelectedPlan(null);
       setMobileNumber("");
       setManualAmount("");
-      setStep(1);
+      setStep(2); // back to plans with first operator reset
     }, 3000);
   };
-
-  useEffect(() => {
-    fetchServices();
-  }, []);
 
   if (loading) {
     return (
@@ -140,121 +146,10 @@ const Prepaid = () => {
 
   return (
     <Container maxWidth="xl" sx={{ py: 2 }}>
-      {/* Step Indicator */}
-      <Box sx={{ display: "flex", justifyContent: "center", mb: 5 }}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            maxWidth: 1000,
-            width: "100%",
-          }}
-        >
-          {/* <Button
-        startIcon={<ArrowBack />}
-        onClick={() => setStep(1)}
-        sx={{  display:"flex", justifyContent:"flex-start",mr:5 }}
-      >
-        Back to Operators
-      </Button> */}
-
-          {[1, 2, 3, 4].map((s, i) => (
-            <Box
-              key={s}
-              sx={{ display: "flex", alignItems: "center", flex: 1 }}
-            >
-              <Box
-                sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: step >= s ? "#9D72F0" : "grey.300",
-                  color: step >= s ? "white" : "grey.600",
-                  fontWeight: "bold",
-                  zIndex: 2,
-                  position: "relative",
-                }}
-              >
-                {s}
-              </Box>
-              {i < 3 && (
-                <Box
-                  sx={{
-                    flex: 1,
-                    height: 3,
-                    backgroundColor: step > s ? "#9D72F0" : "grey.300",
-                    ml: -1,
-                    mr: -1,
-                    zIndex: 1,
-                  }}
-                />
-              )}
-            </Box>
-          ))}
-        </Box>
-      </Box>
-
-      {/* Step 1 */}
-      {step === 1 && (
-        <Slide direction="right" in mountOnEnter unmountOnExit>
-          <Box textAlign="center">
-            <Typography variant="h5" fontWeight="bold" gutterBottom>
-              Choose Your Operator
-            </Typography>
-            <Grid container spacing={4} justifyContent="center">
-              {services.map((service) => (
-                <Grid item xs={6} sm={4} md={3} key={service.id}>
-                  <Box
-                    onClick={() => fetchPlans(service)}
-                    sx={{
-                      textAlign: "center",
-                      cursor: "pointer",
-                      p: 2,
-                      borderRadius: 2,
-                      transition: "all 0.3s ease",
-                      "&:hover": { transform: "scale(1.05)" },
-                      border:
-                        selectedService?.id === service.id
-                          ? "2px solid #9D72F0"
-                          : "1px solid transparent",
-                      boxShadow:
-                        selectedService?.id === service.id
-                          ? 4
-                          : "0px 2px 4px rgba(0,0,0,0.1)",
-                    }}
-                  >
-                    <Avatar
-                      src={operatorImages[service.code]}
-                      alt={service.name}
-                      sx={{ width: 80, height: 80, mx: "auto", mb: 1 }}
-                    />
-                    <Typography
-                      variant="subtitle1"
-                      fontWeight={600}
-                      color={
-                        selectedService?.id === service.id
-                          ? "primary.main"
-                          : "text.primary"
-                      }
-                    >
-                      {service.name}
-                    </Typography>
-                  </Box>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-        </Slide>
-      )}
-
-      {/* Step 2 */}
+      {/* Step 2 - Operators & Plans */}
       {step === 2 && (
         <Slide direction="right" in mountOnEnter unmountOnExit>
           <Box>
-            {/* Flex layout for Left & Right */}
             <Box sx={{ display: "flex", gap: 3 }}>
               {/* Left side - Operators */}
               <Box sx={{ flex: "0 0 30%" }}>
@@ -277,23 +172,42 @@ const Prepaid = () => {
                           cursor: "pointer",
                           border:
                             selectedService?.id === service.id
-                              ? "2px solid"
-                              : "1px solid",
-                          borderColor:
-                            selectedService?.id === service.id
-                              ? "#9D72F0"
-                              : "divider",
+                              ? "2px solid #9D72F0"
+                              : "1px solid #e0e0e0",
                           backgroundColor:
                             selectedService?.id === service.id
-                              ? "#9D72F0"
+                              ? "#f3f0ff"
                               : "background.paper",
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            backgroundColor: "#f0ebff",
+                          },
                         }}
                       >
                         <Avatar
                           src={operatorImages[service.code]}
-                          sx={{ mr: 2 }}
+                          sx={{
+                            mr: 2,
+                            border:
+                              selectedService?.id === service.id
+                                ? "2px solid #9D72F0"
+                                : "none",
+                          }}
                         />
-                        <Typography>{service.name}</Typography>
+                        <Typography
+                          sx={{
+                            color:
+                              selectedService?.id === service.id
+                                ? "#6c4bc7"
+                                : "#333",
+                            fontWeight:
+                              selectedService?.id === service.id
+                                ? "600"
+                                : "500",
+                          }}
+                        >
+                          {service.name}
+                        </Typography>
                       </Box>
                     ))}
                   </Box>
@@ -308,7 +222,7 @@ const Prepaid = () => {
                     <Paper
                       sx={{
                         p: 2,
-                        mb: 1,
+                        mb: 2,
                         display: "flex",
                         alignItems: "center",
                       }}
@@ -321,9 +235,9 @@ const Prepaid = () => {
                         <Typography variant="h6" fontWeight="bold">
                           {selectedService?.name} Prepaid Plans
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
+                        {/* <Typography variant="body2" color="text.secondary">
                           Choose from available plans or enter custom amount
-                        </Typography>
+                        </Typography> */}
                       </Box>
                     </Paper>
 
@@ -405,6 +319,17 @@ const Prepaid = () => {
                         />
                         <Button
                           variant="contained"
+                          sx={{
+                            borderRadius: 2,
+                            fontWeight: "bold",
+                            fontSize: { xs: "0.9rem", sm: "1rem" },
+                            background: "#fff",
+                            color: "#6c4bc7",
+                            // boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
+                            "&:hover": {
+                              background: " #2563eb)",
+                            },
+                          }}
                           onClick={() => {
                             if (!manualAmount)
                               return apiErrorToast("Please enter amount");
@@ -446,7 +371,7 @@ const Prepaid = () => {
       {step === 3 && (
         <Fade in>
           <Box sx={{ display: "flex", gap: 2 }}>
-            {/* Left box */}
+            {/* Left box - operators */}
             <Box sx={{ flex: "0 0 30%" }}>
               <Paper sx={{ p: 2, borderRadius: 2, height: "100%" }}>
                 <Typography variant="h6" fontWeight="bold" mb={2}>
@@ -465,50 +390,63 @@ const Prepaid = () => {
                         cursor: "pointer",
                         border:
                           selectedService?.id === service.id
-                            ? "2px solid"
-                            : "1px solid",
-                        borderColor:
-                          selectedService?.id === service.id
-                            ? "#9D72F0"
-                            : "divider",
+                            ? "2px solid #9D72F0"
+                            : "1px solid #e0e0e0",
                         backgroundColor:
                           selectedService?.id === service.id
-                            ? "#9D72F0"
+                            ? "#f3f0ff"
                             : "background.paper",
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          backgroundColor: "#f0ebff",
+                        },
                       }}
                     >
                       <Avatar
                         src={operatorImages[service.code]}
-                        sx={{ mr: 2 }}
+                        sx={{
+                          mr: 2,
+                          border:
+                            selectedService?.id === service.id
+                              ? "2px solid #9D72F0"
+                              : "none",
+                        }}
                       />
-                      <Typography>{service.name}</Typography>
+                      <Typography
+                        sx={{
+                          color:
+                            selectedService?.id === service.id
+                              ? "#6c4bc7"
+                              : "#333",
+                          fontWeight:
+                            selectedService?.id === service.id ? "600" : "500",
+                        }}
+                      >
+                        {service.name}
+                      </Typography>
                     </Box>
                   ))}
                 </Box>
               </Paper>
             </Box>
 
-            {/* Right box */}
+            {/* Right box - confirm recharge */}
             <Box sx={{ flex: 1 }}>
-              <Typography
-                variant="h5"
-                fontWeight="bold"
-                textAlign="center"
-                mb={3}
-              >
-                Confirm Recharge
-              </Typography>
               <Paper sx={{ p: 2, borderRadius: 2 }}>
+                <Typography
+                  variant="h5"
+                  fontWeight="bold"
+                  textAlign="center"
+                  mb={1}
+                >
+                  Confirm Recharge
+                </Typography>
                 {/* Operator info */}
                 <Box
                   display="flex"
                   alignItems="center"
                   gap={2}
-                  sx={{
-                    p: 2,
-                    borderRadius: "8px",
-                    background: "#e6f0ff", // light blue background
-                  }}
+                  sx={{ p: 2, borderRadius: "8px", background: "#fff" }}
                 >
                   <Avatar
                     src={operatorImages[selectedService?.code]}
@@ -549,7 +487,12 @@ const Prepaid = () => {
                   fullWidth
                   label="Mobile Number"
                   value={mobileNumber}
-                  onChange={(e) => setMobileNumber(e.target.value)}
+                  onChange={(e) => {
+                    // Only allow digits 0-9
+                    const val = e.target.value.replace(/[^0-9]/g, "");
+                    setMobileNumber(val);
+                  }}
+                  inputProps={{ maxLength: 10 }} // optional: max 10 digits
                   sx={{ mb: 3 }}
                   InputProps={{
                     startAdornment: (
@@ -564,7 +507,18 @@ const Prepaid = () => {
                 <Box display="flex" gap={2}>
                   <Button
                     fullWidth
-                    variant="outlined"
+                    variant="contained"
+                    sx={{
+                      borderRadius: 2,
+                      fontWeight: "bold",
+                      fontSize: { xs: "0.9rem", sm: "1rem" },
+                      background: "#fff",
+                      color: "#6c4bc7",
+                      // boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
+                      "&:hover": {
+                        background: " #2563eb)",
+                      },
+                    }}
                     onClick={() => setStep(2)}
                   >
                     Back
@@ -573,6 +527,17 @@ const Prepaid = () => {
                     fullWidth
                     variant="contained"
                     onClick={handleRecharge}
+                    sx={{
+                      borderRadius: 2,
+                      fontWeight: "bold",
+                      fontSize: { xs: "0.9rem", sm: "1rem" },
+                      background: "#fff",
+                      color: "#6c4bc7",
+                      // boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
+                      "&:hover": {
+                        background: " #2563eb)",
+                      },
+                    }}
                   >
                     Pay ₹{selectedPlan?.price}
                   </Button>
@@ -606,7 +571,7 @@ const Prepaid = () => {
                 setSelectedPlan(null);
                 setMobileNumber("");
                 setManualAmount("");
-                setStep(1);
+                setStep(2); // back to plans
               }}
             >
               New Recharge

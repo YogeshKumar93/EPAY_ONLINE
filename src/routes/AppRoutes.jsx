@@ -75,6 +75,7 @@ import { WalletLedgers } from "../components/WalletLedgers";
 import MdDashboard from "../pages/MdDashboard";
 import Purposes from "../pages/Purposes";
 import News from "../pages/News";
+import { BbpsOffline } from "../pages/BbpsOffline";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading, user } = useContext(AuthContext);
@@ -112,24 +113,23 @@ export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-         <Route path="" element={<LandingPage />}/>
-          <Route path="navbar" element={<NavBar />} />
-          <Route path="footer" element={<Footer />} />
-          <Route path="landingservices" element={<LandingServices />} />
-          <Route path="landingaboutus" element={<LandingAboutUs />} />
-          <Route path="landingcontactus" element={<LandingContactUs />} />
-          <Route path="landingpageintro" element={<LandingPageIntro />} />
-          <Route path="landingpageintro1" element={<LandingPageIntro1 />} />
-          <Route path="landingpageintro2" element={<LandingPageIntro2 />} />
-          <Route path="landingpageintro3" element={<LandingPageIntro3 />} /> 
+        <Route path="" element={<LandingPage />} />
+        <Route path="navbar" element={<NavBar />} />
+        <Route path="footer" element={<Footer />} />
+        <Route path="landingservices" element={<LandingServices />} />
+        <Route path="landingaboutus" element={<LandingAboutUs />} />
+        <Route path="landingcontactus" element={<LandingContactUs />} />
+        <Route path="landingpageintro" element={<LandingPageIntro />} />
+        <Route path="landingpageintro1" element={<LandingPageIntro1 />} />
+        <Route path="landingpageintro2" element={<LandingPageIntro2 />} />
+        <Route path="landingpageintro3" element={<LandingPageIntro3 />} />
 
         {/* <Route path="/qrLogin" element={<QrLoginPage />} />
         <Route path="/login" element={<Login />} /> */}
         <Route path="/print-receipt" element={<DmtReceipt1 />} />
-         <Route path="/print-dmt" element={<PrintDmt />} />
-          <Route path="/print-dmt2" element={<PrintDmt2 />} />
-        
-      
+        <Route path="/print-dmt" element={<PrintDmt />} />
+        <Route path="/print-dmt2" element={<PrintDmt2 />} />
+
         <Route path="/adminagreement" element={<AdminAgreement />} />
         <Route
           path="/admindistributoragreement"
@@ -225,6 +225,7 @@ export default function AppRoutes() {
                 element={<AccountLadger />}
               />
               <Route path="customer/retailerlogs" element={<RetailerLogs />} />
+              <Route path="customer/bbpsoffline" element={<BbpsOffline />} />
               <Route
                 path="customer/money-transfer"
                 element={<MoneyTransfer />}

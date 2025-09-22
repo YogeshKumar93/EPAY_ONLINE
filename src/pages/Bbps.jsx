@@ -262,10 +262,14 @@ const Bbps = () => {
                           sx={{
                             borderRadius: 3,
                             boxShadow: 3,
-                            "&:hover": { boxShadow: 6 },
                             width: 212,
                             height: 120,
                             cursor: "pointer",
+                            transition: "all 0.3s ease", // smooth transition
+                            "&:hover": {
+                              boxShadow: 6,
+                              border: "2px solid #6c4bc7", // purple border on hover
+                            },
                           }}
                         >
                           <CardActionArea
@@ -293,7 +297,7 @@ const Bbps = () => {
                               <Typography
                                 variant="subtitle1"
                                 fontWeight="600"
-                                Wrap
+                                wrap
                               >
                                 {cat.category_name}
                               </Typography>

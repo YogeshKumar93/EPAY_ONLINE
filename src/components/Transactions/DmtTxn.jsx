@@ -14,7 +14,7 @@ import ComplaintForm from "../ComplaintForm";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CloseIcon from "@mui/icons-material/Close";
 import TransactionDetailsCard from "../common/TransactionDetailsCard";
-import companylogo from "../../assets/Images/logo(1).png";
+import companylogo from "../../assets/Images/PPALogor.png";
 import {
   android2,
   linux2,
@@ -171,7 +171,7 @@ const DmtTxn = ({ query }) => {
         name: "Service",
         selector: (row) => (
           <div
-            style={{ textAlign: "left", fontSize: "10px", fontWeight: "600" }}
+            style={{ textAlign: "left", fontSize: "14px", fontWeight: "600" }}
           >
             {row.operator}
           </div>
@@ -210,7 +210,7 @@ const DmtTxn = ({ query }) => {
                 <div
                   style={{
                     textAlign: "left",
-                    fontSize: "10px",
+                    fontSize: "12px",
                     fontWeight: "600",
                   }}
                 >
@@ -227,7 +227,7 @@ const DmtTxn = ({ query }) => {
         name: "Mobile",
         selector: (row) => (
           <div
-            style={{ textAlign: "left", fontSize: "10px", fontWeight: "600" }}
+            style={{ textAlign: "left", fontSize: "12px", fontWeight: "600" }}
           >
             {row.sender_mobile}
           </div>
@@ -248,7 +248,7 @@ const DmtTxn = ({ query }) => {
         ),
         wrap: true,
         center: true,
-        width: "150px",
+        width: "100px",
       },
       {
         name: "Amount",
@@ -345,10 +345,10 @@ const DmtTxn = ({ query }) => {
         center: true,
         width: "70px",
       },
-      ...(user?.role === "ret"
+      ...(user?.role === "ret" || user?.role === "dd"
         ? [
             {
-              name: "Actions",
+              name: "View",
               selector: (row) => (
                 <Box
                   sx={{
@@ -411,7 +411,6 @@ const DmtTxn = ({ query }) => {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        
       >
         <Box
           sx={{
@@ -419,7 +418,6 @@ const DmtTxn = ({ query }) => {
             display: "flex",
             flexDirection: "column",
             height: "100%",
-            
           }}
         >
           {selectedRow && (
@@ -437,8 +435,8 @@ const DmtTxn = ({ query }) => {
                 { label: "MOP", value: selectedRow.mop },
 
                 { label: "Customer Number", value: selectedRow.sender_mobile },
-               { label: "CCF", value: selectedRow.ccf },
-                { label: "Charge", value: selectedRow.charges},
+                { label: "CCF", value: selectedRow.ccf },
+                { label: "Charge", value: selectedRow.charges },
                 { label: "GST", value: selectedRow.gst },
 
                 { label: "TDS", value: selectedRow.tds },

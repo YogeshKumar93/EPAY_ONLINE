@@ -154,7 +154,7 @@ const PayoutTxn = ({ query }) => {
         name: "Service",
         selector: (row) => (
           <div
-            style={{ textAlign: "left", fontSize: "10px", fontWeight: "600" }}
+            style={{ textAlign: "left", fontSize: "14px", fontWeight: "600" }}
           >
             {row.operator}
           </div>

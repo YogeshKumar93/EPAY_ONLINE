@@ -233,12 +233,12 @@ const Wallet2WalletTransfer = ({ filters = [] }) => {
         center: true,
         width: "60px",
       },
-      {
-        name: "Status",
-        selector: (row) => <CommonStatus value={row.status} />,
-        center: true,
-        width: "90px",
-      },
+      // {
+      //   name: "Status",
+      //   selector: (row) => <CommonStatus value={row.status} />,
+      //   center: true,
+      //   width: "90px",
+      // },
     ],
     []
   );

@@ -15,6 +15,7 @@ import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { apiErrorToast } from "../utils/ToastUtil";
 import AuthContext from "../contexts/AuthContext";
+import Loader from "../components/common/Loader";
 
 const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
   const [detailsLoading, setDetailsLoading] = useState(false);
@@ -94,71 +95,70 @@ const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
     }
   };
 
-console.log("The biller id ins",billerId)
-const handlePayBill = (event) => {
-  event.preventDefault();
+  console.log("The biller id ins", billerId);
+  const handlePayBill = (event) => {
+    event.preventDefault();
 
-  const data = {
-    billerId: billerId,
-    biller_name: biller_name,
-    amount: billValue,
-    pan: pan || undefined,
-    pf: "web",
-    cat: categoryName?.categoryKey,
-    mpin: mpinVal,
-    latitude: location.lat,
-    longitude: location.long,
-    enquiryReferenceId: billData?.enquiryReferenceId || "15486sfdgyf",
+    const data = {
+      billerId: billerId,
+      biller_name: biller_name,
+      amount: billValue,
+      pan: pan || undefined,
+      pf: "web",
+      cat: categoryName?.categoryKey,
+      mpin: mpinVal,
+      latitude: location.lat,
+      longitude: location.long,
+      enquiryReferenceId: billData?.enquiryReferenceId || "15486sfdgyf",
+    };
+
+    // ✅ Map all dynamic params from API
+    if (params && params.length > 0) {
+      params.forEach((item) => {
+        const propertyName = item.name; // example: param1, param2, etc
+        let value = document.getElementById(propertyName)?.value;
+
+        // Convert numeric params to Number
+        if (item.inputType === "NUMERIC" && value) {
+          value = Number(value);
+        }
+
+        data[propertyName] = value;
+      });
+    }
+
+    // ✅ Special case: always add param2 as amount (if required)
+    if (!data.param2 && billValue) {
+      data.param2 = Number(billValue);
+    }
+
+    console.log("Pay Bill Data Payload 👉", data);
+
+    if (validateApiCall()) {
+      postJsonData(
+        ApiEndpoints.BBPS_PAY_BILL,
+        data,
+        setPayRequest,
+        (res) => {
+          okSuccessToast(res.data.message);
+          getRecentData();
+          setBillDetails(false);
+          setMpinVal(false);
+          setErr("");
+          refreshUser();
+        },
+        (error) => {
+          setMpinVal(false);
+          apiErrorToast(error);
+          getRecentData();
+          setErr("");
+          refreshUser();
+        }
+      );
+    } else {
+      setErr({ message: "Kindly wait some time before another request" });
+    }
   };
-
-  // ✅ Map all dynamic params from API
-  if (params && params.length > 0) {
-    params.forEach((item) => {
-      const propertyName = item.name; // example: param1, param2, etc
-      let value = document.getElementById(propertyName)?.value;
-
-      // Convert numeric params to Number
-      if (item.inputType === "NUMERIC" && value) {
-        value = Number(value);
-      }
-
-      data[propertyName] = value;
-    });
-  }
-
-  // ✅ Special case: always add param2 as amount (if required)
-  if (!data.param2 && billValue) {
-    data.param2 = Number(billValue);
-  }
-
-  console.log("Pay Bill Data Payload 👉", data);
-
-  if (validateApiCall()) {
-    postJsonData(
-      ApiEndpoints.BBPS_PAY_BILL,
-      data,
-      setPayRequest,
-      (res) => {
-        okSuccessToast(res.data.message);
-        getRecentData();
-        setBillDetails(false);
-        setMpinVal(false);
-        setErr("");
-        refreshUser();
-      },
-      (error) => {
-        setMpinVal(false);
-        apiErrorToast(error);
-        getRecentData();
-        setErr("");
-        refreshUser();
-      }
-    );
-  } else {
-    setErr({ message: "Kindly wait some time before another request" });
-  }
-};
-
 
   if (detailsLoading)
     return (
@@ -180,24 +180,25 @@ const handlePayBill = (event) => {
   const { parameters } = billerDetails;
 
   return (
-    <Box
-      maxWidth="1200px"
-      mx="auto"
-      px={{ xs: 1.5, sm: 3, md: 1.5 }}
-      py={{ xs: 2, sm: 4, md: 0 }}
-    >
-      {/* Back Button + Header */}
-      <Box display="flex" alignItems="center" mb={1} gap={2}>
-        <IconButton
-          onClick={onBack}
-          sx={{
-            bgcolor: "#f3f4f6",
-            "&:hover": { bgcolor: "#e5e7eb" },
-          }}
-        >
-          <ArrowBackIcon />
-        </IconButton>
-
+    <Loader loading={fetchingBill}>
+      <Box
+        maxWidth="1200px"
+        mx="auto"
+        px={{ xs: 1.5, sm: 3, md: 1.5 }}
+        py={{ xs: 2, sm: 4, md: 0 }}
+      >
+        {/* Back Button + Header */}
+        <Box display="flex" alignItems="center" mb={1} gap={2}>
+          <IconButton
+            onClick={onBack}
+            sx={{
+              bgcolor: "#f3f4f6",
+              "&:hover": { bgcolor: "#e5e7eb" },
+            }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          {/* 
         {selectedBillerIdImage && (
           <Box
             component="img"
@@ -210,9 +211,9 @@ const handlePayBill = (event) => {
               borderRadius: "8px",
             }}
           />
-        )}
+        )} */}
 
-        <Typography
+          {/* <Typography
           variant="h6"
           fontWeight="bold"
           sx={{
@@ -223,125 +224,125 @@ const handlePayBill = (event) => {
           }}
         >
           {billerDetails?.billerInfo?.name || "Biller"}
-        </Typography>
-      </Box>
+        </Typography> */}
+        </Box>
 
-      {/* Cards Layout */}
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: billData ? "row" : "column" },
-          justifyContent: billData ? "flex-start" : "center", // <-- Center before fetch
-          alignItems: billData ? "flex-start" : "center", // <-- center horizontally
-          gap: { xs: 2, md: 3 },
-        }}
-      >
-        {/* BILLER INPUT CARD */}
-        <Card
+        {/* Cards Layout */}
+        <Box
           sx={{
-            width: billData ? "40%" : { xs: "100%", sm: "500px" },
-            borderRadius: 3,
-            boxShadow: "0 4px 16px rgba(178, 176, 176, 0.08)",
-            background: "linear-gradient(135deg, #fefefe 0%, #f4f8f8 100%)",
-            border: "1px solid #e2e8f0",
-            flexShrink: 0,
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" }, // stack on mobile, row on md+
+            gap: { xs: 2, md: 3 },
+            justifyContent: "flex-start",
+            alignItems: "flex-start",
           }}
         >
-          <CardContent sx={{ p: { xs: 2, sm: 2 }, height: "300px" }}>
-            <Box
-              display="flex"
-              alignItems="center"
-              gap={2}
-              sx={{
-                p: 2,
-                borderRadius: "8px",
-                background: "#e6f0ff", // light blue background
-              }}
-            >
-              {selectedBillerIdImage && (
-                <Box
-                  component="img"
-                  src={selectedBillerIdImage}
-                  alt={billerDetails?.billerInfo?.name || "Biller"}
-                  sx={{
-                    width: 55,
-                    height: 55,
-                    objectFit: "contain",
-                    borderRadius: "8px",
-                  }}
-                />
-              )}
-
-              <Typography
-                variant="h5"
-                fontWeight="bold"
-                color="#000"
-                sx={{ fontSize: { xs: "1.1rem", sm: "1.5rem" } }}
-              >
-                {billerDetails?.billerInfo?.name || "Biller"}
-              </Typography>
-            </Box>
-
-            <Divider sx={{ mb: 4 }} />
-
-            <Box display="flex" flexDirection="column" gap={2}>
-              {parameters?.map((param, idx) => (
-                <TextField
-                  key={idx}
-                  fullWidth
-                  label={param.desc}
-                  variant="outlined"
-                  size="medium"
-                  value={inputValues[param.name] || ""}
-                  onChange={(e) => handleChange(param.name, e.target.value)}
-                  inputProps={{
-                    minLength: param.minLength,
-                    maxLength: param.maxLength,
-                    pattern: param.regex,
-                    required: param.mandatory === 1,
-                  }}
-                />
-              ))}
-            </Box>
-
-            <Button
-              fullWidth
-              variant="contained"
-              sx={{
-                mt: 4,
-                borderRadius: 2,
-                py: { xs: 1, sm: 1.4 },
-                fontWeight: "bold",
-                fontSize: { xs: "0.9rem", sm: "1rem" },
-                background: " #3b82f6)",
-                boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
-                "&:hover": {
-                  background: "#2563eb)",
-                },
-              }}
-              onClick={handleFetchBill}
-              disabled={fetchingBill}
-            >
-              {fetchingBill ? "Fetching Bill..." : "Fetch Bill"}
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* BILL DETAILS CARD */}
-        {billData && (
+          {/* BILLER INPUT CARD */}
           <Card
             sx={{
-              width: "60%",
+              flex: { xs: "1 1 auto", md: "0 0 40%" },
+              minWidth: { xs: "100%", sm: 300 },
               borderRadius: 3,
-              boxShadow: "0 4px 16px rgba(170, 169, 169, 0.08)",
-              background: "#ffffff",
+              boxShadow: "0 4px 16px rgba(178,176,176,0.08)",
+              background: "linear-gradient(135deg, #fefefe 0%, #f4f8f8 100%)",
               border: "1px solid #e2e8f0",
-              flexShrink: 0,
             }}
           >
-            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
-              <Box display="flex" alignItems="center" gap={1.5} mb={1}>
+            <CardContent sx={{ p: { xs: 2, sm: 3 }, height: "100%" }}>
+              <Box
+                display="flex"
+                alignItems="center"
+                gap={2}
+                sx={{
+                  p: 2,
+                  borderRadius: "8px",
+                  background: "#f2efff", // light blue background
+                }}
+              >
                 {selectedBillerIdImage && (
+                  <Box
+                    component="img"
+                    src={selectedBillerIdImage}
+                    alt={billerDetails?.billerInfo?.name || "Biller"}
+                    sx={{
+                      width: 55,
+                      height: 55,
+                      objectFit: "contain",
+                      borderRadius: "8px",
+                    }}
+                  />
+                )}
+
+                <Typography
+                  variant="h5"
+                  fontWeight="bold"
+                  color="#000"
+                  sx={{ fontSize: { xs: "1.1rem", sm: "1.3rem" } }}
+                >
+                  {billerDetails?.billerInfo?.name || "Biller"}
+                </Typography>
+              </Box>
+
+              <Divider sx={{ mb: 4 }} />
+
+              <Box display="flex" flexDirection="column" gap={2}>
+                {parameters?.map((param, idx) => (
+                  <TextField
+                    key={idx}
+                    fullWidth
+                    label={param.desc}
+                    variant="outlined"
+                    size="medium"
+                    value={inputValues[param.name] || ""}
+                    onChange={(e) => handleChange(param.name, e.target.value)}
+                    inputProps={{
+                      minLength: param.minLength,
+                      maxLength: param.maxLength,
+                      pattern: param.regex,
+                      required: param.mandatory === 1,
+                    }}
+                  />
+                ))}
+              </Box>
+
+              <Button
+                fullWidth
+                variant="contained"
+                sx={{
+                  mt: 4,
+                  borderRadius: 2,
+                  py: { xs: 1, sm: 1.4 },
+                  fontWeight: "bold",
+                  fontSize: { xs: "0.9rem", sm: "1rem" },
+                  background: " #fff",
+                  color: "#6c4bc7",
+                  boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
+                  "&:hover": {
+                    background: "#2563eb)",
+                  },
+                }}
+                onClick={handleFetchBill}
+                disabled={fetchingBill}
+              >
+                {fetchingBill ? "Fetching Bill..." : "Fetch Bill"}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* BILL DETAILS CARD */}
+          <Card
+            sx={{
+              flex: { xs: "1 1 auto", md: "0 0 60%" }, // fill remaining space
+              minWidth: { xs: "100%", sm: 300 },
+              borderRadius: 3,
+              boxShadow: "0 4px 16px rgba(170,169,169,0.08)",
+              background: "#ffffff",
+              border: "1px solid #e2e8f0",
+            }}
+          >
+            <CardContent sx={{ p: { xs: 2, sm: 3 }, height: "100%" }}>
+              <Box display="flex" alignItems="center" gap={1.5} mb={1}>
+                {/* {selectedBillerIdImage && (
                   <Box
                     component="img"
                     src={selectedBillerIdImage}
@@ -355,7 +356,7 @@ const handlePayBill = (event) => {
                       p: 0.5,
                     }}
                   />
-                )}
+                )} */}
                 <Typography
                   variant="h6"
                   fontWeight="bold"
@@ -366,7 +367,8 @@ const handlePayBill = (event) => {
                     textOverflow: "ellipsis",
                   }}
                 >
-                  {billerDetails?.billerInfo?.name || "Biller"}
+                  {/* {billerDetails?.billerInfo?.name || "Biller"} */}
+                  Bill Details
                 </Typography>
               </Box>
 
@@ -374,11 +376,11 @@ const handlePayBill = (event) => {
 
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
                 {[
-                  { label: "Customer Name", value: billData.CustomerName },
-                  { label: "Bill Number", value: billData.BillNumber },
-                  { label: "Bill Period", value: billData.BillPeriod },
-                  { label: "Bill Date", value: billData.BillDate },
-                  { label: "Due Date", value: billData.BillDueDate },
+                  { label: "Customer Name", value: billData?.CustomerName },
+                  { label: "Bill Number", value: billData?.BillNumber },
+                  { label: "Bill Period", value: billData?.BillPeriod },
+                  { label: "Bill Date", value: billData?.BillDate },
+                  { label: "Due Date", value: billData?.BillDueDate },
                 ].map((item, index) => (
                   <Box
                     key={index}
@@ -424,7 +426,7 @@ const handlePayBill = (event) => {
                   <TextField
                     size="small"
                     variant="outlined"
-                    value={billData.BillAmount || ""}
+                    value={billData?.BillAmount || ""}
                     onChange={(e) =>
                       setBillData((prev) => ({
                         ...prev,
@@ -456,7 +458,8 @@ const handlePayBill = (event) => {
                   py: { xs: 1, sm: 1.4 },
                   fontWeight: "bold",
                   fontSize: { xs: "0.9rem", sm: "1rem" },
-                  background: "#3b82f6",
+                  background: "#fff",
+                  color: "#6c4bc7",
                   boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
                   "&:hover": {
                     background: " #2563eb)",
@@ -469,9 +472,9 @@ const handlePayBill = (event) => {
               </Button>
             </CardContent>
           </Card>
-        )}
+        </Box>
       </Box>
-    </Box>
+    </Loader>
   );
 };
 

@@ -112,65 +112,69 @@ const FundRequest = () => {
         selector: (row) => <CommonStatus value={row.status} />,
         center: true,
       },
-      {
-        name: "Actions",
-        selector: (row, { hoveredRow, enableActionsHover }) => {
-          if (user?.role !== "adm") return null;
+      ...(user?.role === "ret" || user?.role === "dd"
+        ? []
+        : [
+            {
+              name: "Actions",
+              selector: (row, { hoveredRow, enableActionsHover }) => {
+                if (user?.role !== "adm") return null;
 
-          const isHovered = enableActionsHover && hoveredRow === row.id;
-          return (
-            <MuiBox
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              gap={1}
-              width="120px"
-            >
-              {isHovered &&
-                row.status !== "approved" &&
-                row.status !== "rejected" && (
-                  <MuiBox display="flex" gap={1}>
-                    <Tooltip title="Approve">
-                      <Button
-                        size="small"
-                        color="success"
-                        onClick={() => handleOpen(row, "approved")}
-                      >
-                        <CheckCircleIcon fontSize="small" />
-                      </Button>
-                    </Tooltip>
-                    <Tooltip title="Reject">
-                      <Button
-                        size="small"
-                        color="error"
-                        onClick={() => handleOpen(row, "rejected")}
-                      >
-                        <CancelIcon fontSize="small" />
-                      </Button>
-                    </Tooltip>
-                  </MuiBox>
-                )}
-              {isHovered && row.status === "rejected" && (
-                <Tooltip title="Reopen">
-                  <Button
-                    size="small"
-                    color="warning"
-                    onClick={() => handleOpen(row, "reopen")}
+                const isHovered = enableActionsHover && hoveredRow === row.id;
+                return (
+                  <MuiBox
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    gap={1}
+                    width="120px"
                   >
-                    <OpenInFullIcon fontSize="small" />
-                  </Button>
-                </Tooltip>
-              )}
-              {!isHovered && (
-                <Typography variant="body2" sx={{ color: "#999" }}>
-                  -
-                </Typography>
-              )}
-            </MuiBox>
-          );
-        },
-        width: "120px",
-      },
+                    {isHovered &&
+                      row.status !== "approved" &&
+                      row.status !== "rejected" && (
+                        <MuiBox display="flex" gap={1}>
+                          <Tooltip title="Approve">
+                            <Button
+                              size="small"
+                              color="success"
+                              onClick={() => handleOpen(row, "approved")}
+                            >
+                              <CheckCircleIcon fontSize="small" />
+                            </Button>
+                          </Tooltip>
+                          <Tooltip title="Reject">
+                            <Button
+                              size="small"
+                              color="error"
+                              onClick={() => handleOpen(row, "rejected")}
+                            >
+                              <CancelIcon fontSize="small" />
+                            </Button>
+                          </Tooltip>
+                        </MuiBox>
+                      )}
+                    {isHovered && row.status === "rejected" && (
+                      <Tooltip title="Reopen">
+                        <Button
+                          size="small"
+                          color="warning"
+                          onClick={() => handleOpen(row, "reopen")}
+                        >
+                          <OpenInFullIcon fontSize="small" />
+                        </Button>
+                      </Tooltip>
+                    )}
+                    {!isHovered && (
+                      <Typography variant="body2" sx={{ color: "#999" }}>
+                        -
+                      </Typography>
+                    )}
+                  </MuiBox>
+                );
+              },
+              width: "120px",
+            },
+          ]),
     ],
     [user]
   );

@@ -45,8 +45,8 @@ const titleMap = {
     "/customer/account-ledger": "Account Ledger",
     "/customer/sale": "Sales",
     "/customer/transfer": "Transfer",
-    "/customer/recharge-bill": "Recharge and Bill",
-     "/customer/wallet-ledger": "Wallet Ledger",
+    "/customer/recharge-bill": "Recharge",
+    "/customer/wallet-ledger": "Wallet Ledger",
     "/customer/purchase": "Purchase",
     "/customer/money-transfer": "Money Transfer",
     "/customer/express-transfer": "Express Transfer",
@@ -54,12 +54,13 @@ const titleMap = {
     "/customer/settlements": "Settlements",
     "/customer/nepal-transfer": "Nepal Transfer",
     "/customer/upi-transfer": "UPI Transfer",
-    "/customer/bbps": "BBPS Services",
+    "/customer/bbps": "BBPS (Online)",
+    "/customer/bbpsoffline": "BBPS (Offline)",
     "/customer/aeps": "AEPS Services",
     "/customer/wallet-transfer": "Wallet Transfer",
     "/customer/payment_transfer": "Payments",
     "/customer/cms": "Cash Management System",
-    "/customer/complaints": "My Complaints",
+    "/customer/complaint": "Complaints",
     "/customer/khata-book": "Khata Book",
     "/customer/my-profile": "My Profile",
     "/customer/services": "Services",
@@ -134,9 +135,7 @@ export const setTitleFunc = (path, states = {}) => {
 
   const roleMap = titleMap[role] || {};
 
-
   let title = roleMap[path] || "";
-
 
   if (path === "/admin/accountStatement") {
     return `Account Statement ${states.acc_name} (${states.mobile})`;

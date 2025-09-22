@@ -53,6 +53,7 @@ const ProfilePage = () => {
   const [resetMpinModalOpen, setResetMpinModalOpen] = useState(false);
   const [changePasswordModal, setChangePasswordModal] = useState(false);
   const [changeMpinModal, setChangeMpinModal] = useState(false);
+  const [chagnePasswordModal, setChagnePasswordModal] = useState(false);
   const [newNumberModal, setNewNumberModal] = useState(false);
   const [changeLayout, setChangeLayout] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -79,7 +80,7 @@ const ProfilePage = () => {
   };
 
   const handleChangePassword = () => {
-    setChangePasswordModal(true);
+    setChagnePasswordModal(true);
   };
 
   const handleChangeMpin = () => setChangeMpinModal(true);
@@ -115,7 +116,7 @@ const ProfilePage = () => {
       label: "Reset MPIN",
       icon: <LockReset sx={{ fontSize: { xs: 18, sm: 20 } }} />,
       onClick: handleResetMpin,
-      gradient: "#000",
+      gradient: "#fff",
       hoverGradient: "linear-gradient(135deg, #36d1dc, #5b86e5)",
     },
     {
@@ -123,7 +124,7 @@ const ProfilePage = () => {
       label: "Change Password",
       icon: <VpnKey sx={{ fontSize: { xs: 18, sm: 20 } }} />,
       onClick: handleChangePassword,
-      gradient: "#000",
+      gradient: "#fff",
       hoverGradient: "linear-gradient(135deg, #ff8e8e, #d35400)",
     },
     {
@@ -131,7 +132,7 @@ const ProfilePage = () => {
       label: "New Number",
       icon: <Phone sx={{ fontSize: { xs: 18, sm: 20 } }} />,
       onClick: handleNewNumber,
-      gradient: "#000",
+      gradient: "#fff",
       hoverGradient: "linear-gradient(135deg, #43e97b, #38f9d7)",
     },
     {
@@ -139,7 +140,7 @@ const ProfilePage = () => {
       label: "Change MPIN",
       icon: <VerifiedUser sx={{ fontSize: { xs: 18, sm: 20 } }} />,
       onClick: handleChangeMpin,
-      gradient: "#000",
+      gradient: "#fff",
       hoverGradient: "linear-gradient(135deg, #ff758c, #ff7eb3)",
     },
     {
@@ -147,7 +148,7 @@ const ProfilePage = () => {
       label: "Change Layout",
       icon: <Dashboard sx={{ fontSize: { xs: 18, sm: 20 } }} />,
       onClick: handleChangeLayout,
-      gradient: "#000",
+      gradient: "#fff",
       hoverGradient: "linear-gradient(135deg, #c9ffbf, #7bed9f)",
     },
     {
@@ -155,7 +156,7 @@ const ProfilePage = () => {
       label: "Business Information",
       icon: <Dashboard sx={{ fontSize: { xs: 18, sm: 20 } }} />,
       onClick: handleBusinessInfo,
-      gradient: "#000",
+      gradient: "#fff",
       hoverGradient: "linear-gradient(135deg, #c9ffbf, #7bed9f)",
     },
   ];
@@ -173,22 +174,23 @@ const ProfilePage = () => {
           sx={{
             borderRadius: { xs: 2, sm: 4 },
             overflow: "hidden",
-            background: "linear-gradient(90deg, #FFD700, #FFA500, #FFD700)",
-            boxShadow: "0 8px 25px rgba(0,0,0,0.08)",
+            background: "linear-gradient(135deg, #f9f5ff 0%, #f0e8ff 100%)",
+            boxShadow: "0 10px 30px rgba(157, 114, 240, 0.15)",
             transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease",
             "&:hover": {
               transform: "translateY(-5px)",
-              boxShadow: "0 12px 35px rgba(0,0,0,0.15)",
+              boxShadow: "0 15px 40px rgba(157, 114, 240, 0.25)",
             },
+            fontFamily: '"DM Sans", sans-serif',
           }}
         >
-          {/* Profile Header */}
+          {/* Header Section */}
           <Box
             sx={{
               p: { xs: 2, sm: 3, md: 4 },
               borderRadius: "12px 12px 0 0",
               mb: { xs: 2, sm: 3, md: 4 },
-              background: "#9D72F0",
+              background: "linear-gradient(135deg, #9D72F0 0%, #7B4DE0 100%)",
               color: "white",
               position: "relative",
               overflow: "hidden",
@@ -199,11 +201,12 @@ const ProfilePage = () => {
                 left: 0,
                 right: 0,
                 height: "4px",
-                background: "linear-gradient(90deg, #FFD700, #FFA500, #FFD700)",
+                background: "#9D72F0",
                 zIndex: 1,
               },
             }}
           >
+            {/* Decorative elements */}
             <Box
               sx={{
                 position: "absolute",
@@ -212,7 +215,7 @@ const ProfilePage = () => {
                 width: 150,
                 height: 150,
                 borderRadius: "50%",
-                background: "rgba(255,255,255,0.05)",
+                background: "rgba(255,255,255,0.08)",
               }}
             />
             <Box
@@ -223,7 +226,7 @@ const ProfilePage = () => {
                 width: 100,
                 height: 100,
                 borderRadius: "50%",
-                background: "rgba(255,255,255,0.03)",
+                background: "rgba(255,255,255,0.05)",
               }}
             />
 
@@ -236,46 +239,51 @@ const ProfilePage = () => {
             >
               {/* Avatar */}
               <Grid item xs={12} sm="auto" sx={{ position: "relative" }}>
-                <Avatar
-                  sx={{
-                    width: { xs: 100, sm: 120, md: 140 },
-                    height: { xs: 100, sm: 120, md: 140 },
-                    border: "4px solid rgba(255, 215, 0, 0.6)",
-                    bgcolor: "rgba(255,255,255,0.15)",
-                    mx: "auto",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      transform: "scale(1.05)",
-                      border: "4px solid rgba(255, 215, 0, 0.8)",
-                      boxShadow: "0 0 20px rgba(255, 215, 0, 0.4)",
-                    },
-                  }}
-                >
-                  <Person
+                <Box sx={{ position: "relative", display: "inline-block" }}>
+                  <Avatar
                     sx={{
-                      fontSize: { xs: 40, sm: 50, md: 60 },
-                      color: "rgba(255, 255, 255, 0.9)",
+                      width: { xs: 100, sm: 120, md: 140 },
+                      height: { xs: 100, sm: 120, md: 140 },
+                      border: "4px solid rgba(255, 255, 255, 0.3)",
+                      bgcolor: "rgba(255,255,255,0.15)",
+                      mx: "auto",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        transform: "scale(1.05)",
+                        border: "4px solid rgba(255, 215, 0, 0.8)",
+                        boxShadow: "0 0 25px rgba(255, 215, 0, 0.5)",
+                      },
                     }}
-                  />
-                </Avatar>
+                  >
+                    <Person
+                      sx={{
+                        fontSize: { xs: 40, sm: 50, md: 60 },
+                        color: "white",
+                      }}
+                    />
+                  </Avatar>
 
-                <IconButton
-                  sx={{
-                    position: "absolute",
-                    bottom: 5,
-                    right: 5,
-                    backgroundColor: "rgba(255, 215, 0, 0.9)",
-                    "&:hover": {
-                      backgroundColor: "#FFD700",
-                    },
-                  }}
-                  onClick={handleEditToggle}
-                >
-                  <Edit sx={{ fontSize: 16, color: "#1E3A8A" }} />
-                </IconButton>
+                  <IconButton
+                    sx={{
+                      position: "absolute",
+                      bottom: 5,
+                      right: 5,
+                      backgroundColor: "rgba(255, 215, 0, 0.95)",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                      "&:hover": {
+                        backgroundColor: "#FFD700",
+                        transform: "scale(1.1)",
+                      },
+                      transition: "all 0.2s ease",
+                    }}
+                    onClick={handleEditToggle}
+                  >
+                    <Edit sx={{ fontSize: 16, color: "#1E3A8A" }} />
+                  </IconButton>
+                </Box>
               </Grid>
 
               {/* User Info */}
@@ -299,37 +307,46 @@ const ProfilePage = () => {
                         handleInputChange("name", e.target.value)
                       }
                       style={{
-                        background: "rgba(255,255,255,0.2)",
-                        border: "1px solid rgba(255,255,255,0.3)",
-                        borderRadius: "4px",
-                        padding: "8px 12px",
+                        background: "rgba(255,255,255,0.25)",
+                        border: "1px solid rgba(255,255,255,0.4)",
+                        borderRadius: "8px",
+                        padding: "10px 14px",
                         color: "white",
                         fontSize: isMobile ? "1.5rem" : "1.75rem",
                         fontWeight: "bold",
                         width: "100%",
                         maxWidth: "300px",
+                        fontFamily: '"DM Sans", sans-serif',
+                        outline: "none",
                       }}
+                      placeholder="Full Name"
                     />
                   ) : (
                     <Typography
                       variant={isSmallMobile ? "h4" : isMobile ? "h3" : "h3"}
                       fontWeight="bold"
                       sx={{
+                        color: "#000",
                         letterSpacing: "0.5px",
+                        color: "white",
                         textAlign: { xs: "center", sm: "left" },
+                        fontFamily: '"DM Sans", sans-serif',
+                        textShadow: "0 1px 2px rgba(0,0,0,0.1)",
                       }}
                     >
                       {user?.name}
                     </Typography>
                   )}
                   <Chip
-                    icon={<AccountCircle />}
+                    icon={<AccountCircle sx={{ color: "#7B4DE0" }} />}
                     label="Active User"
                     size="small"
                     sx={{
-                      background: "rgba(255, 215, 0, 0.9)",
-                      color: "#1E3A8A",
+                      background: "rgba(255, 255, 255, 0.9)",
+                      color: "#7B4DE0",
                       fontWeight: "bold",
+                      fontFamily: '"DM Sans", sans-serif',
+                      ml: 1,
                     }}
                   />
                 </Box>
@@ -343,7 +360,7 @@ const ProfilePage = () => {
                     justifyContent: { xs: "center", sm: "flex-start" },
                   }}
                 >
-                  <Email sx={{ fontSize: 20, mr: 1, opacity: 0.9 }} />
+                  <Email sx={{ fontSize: 20, mr: 1.5, opacity: 0.9 }} />
                   {isEditing ? (
                     <input
                       type="email"
@@ -352,17 +369,28 @@ const ProfilePage = () => {
                         handleInputChange("email", e.target.value)
                       }
                       style={{
-                        background: "rgba(255,255,255,0.2)",
-                        border: "1px solid rgba(255,255,255,0.3)",
-                        borderRadius: "4px",
-                        padding: "6px 10px",
+                        background: "rgba(255,255,255,0.25)",
+                        border: "1px solid rgba(255,255,255,0.4)",
+                        borderRadius: "6px",
+                        padding: "8px 12px",
                         color: "white",
                         width: "100%",
                         maxWidth: "250px",
+                        fontFamily: '"DM Sans", sans-serif',
+                        outline: "none",
                       }}
+                      placeholder="Email Address"
                     />
                   ) : (
-                    <Typography variant="body1" sx={{ opacity: 0.9 }}>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        opacity: 0.9,
+                        color: "white",
+                        fontFamily: '"DM Sans", sans-serif',
+                        fontWeight: 500,
+                      }}
+                    >
                       {user?.email}
                     </Typography>
                   )}
@@ -373,11 +401,11 @@ const ProfilePage = () => {
                   sx={{
                     display: "flex",
                     alignItems: "center",
-                    mt: 1,
+                    mt: 1.5,
                     justifyContent: { xs: "center", sm: "flex-start" },
                   }}
                 >
-                  <Smartphone sx={{ fontSize: 20, mr: 1, opacity: 0.8 }} />
+                  <Smartphone sx={{ fontSize: 20, mr: 1.5, opacity: 0.9 }} />
                   {isEditing ? (
                     <input
                       type="tel"
@@ -386,17 +414,28 @@ const ProfilePage = () => {
                         handleInputChange("mobile", e.target.value)
                       }
                       style={{
-                        background: "rgba(255,255,255,0.2)",
-                        border: "1px solid rgba(255,255,255,0.3)",
-                        borderRadius: "4px",
-                        padding: "6px 10px",
+                        background: "rgba(255,255,255,0.25)",
+                        border: "1px solid rgba(255,255,255,0.4)",
+                        borderRadius: "6px",
+                        padding: "8px 12px",
                         color: "white",
                         width: "100%",
                         maxWidth: "200px",
+                        fontFamily: '"DM Sans", sans-serif',
+                        outline: "none",
                       }}
+                      placeholder="Mobile Number"
                     />
                   ) : (
-                    <Typography variant="body1" sx={{ opacity: 0.8 }}>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        opacity: 0.9,
+                        color: "white",
+                        fontFamily: '"DM Sans", sans-serif',
+                        fontWeight: 500,
+                      }}
+                    >
                       {user?.mobile}
                     </Typography>
                   )}
@@ -407,61 +446,95 @@ const ProfilePage = () => {
                   sx={{
                     display: "flex",
                     alignItems: "center",
-                    mt: 1,
+                    mt: 1.5,
                     justifyContent: { xs: "center", sm: "flex-start" },
+                    background: "rgba(255,255,255,0.15)",
+                    p: 1,
+                    borderRadius: 1,
+                    maxWidth: "fit-content",
                   }}
                 >
-                  <Typography variant="body2" sx={{ opacity: 0.7, mr: 1 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      opacity: 0.9,
+                      mr: 1,
+                      color: "white",
+                      fontFamily: '"DM Sans", sans-serif',
+                    }}
+                  >
                     Username:
                   </Typography>
-                  <Typography variant="body2" fontWeight="bold">
+                  <Typography
+                    variant="body2"
+                    fontWeight="bold"
+                    sx={{
+                      color: "white",
+                      fontFamily: '"DM Sans", sans-serif',
+                    }}
+                  >
                     {username}
                   </Typography>
                 </Box>
               </Grid>
             </Grid>
+          </Box>
 
-            <Box
+          {/* Action Buttons Section */}
+          <Box
+            sx={{
+              p: { xs: 2, sm: 3 },
+              mt: 1,
+              borderRadius: 2,
+            }}
+          >
+            <Typography
+              variant="h6"
               sx={{
-                p: { xs: 2, sm: 3 },
-                mt: 3,
-
-                borderRadius: 2,
+                mb: 2,
+                color: "#7B4DE0",
+                fontFamily: '"DM Sans", sans-serif',
+                fontWeight: 600,
+                textAlign: "center",
               }}
             >
-              <Grid container spacing={2}>
-                {actionButtons.map((button) => (
-                  <Grid item xs={12} sm={6} md={4} key={button.id}>
-                    <Button
-                      fullWidth
-                      variant="contained"
-                      onClick={button.onClick}
-                      startIcon={button.icon}
-                      sx={{
-                        height: 50,
-                        minWidth: "100%",
-                        borderRadius: 2,
-                        textTransform: "none",
-                        fontWeight: "bold",
-                        fontSize: { xs: "0.9rem", sm: "1rem" },
-                        justifyContent: "flex-start",
-                        pl: 2,
-                        background: "#fff",
-                        boxShadow: "0 3px 6px rgba(0,0,0,0.15)",
-                        "&:hover": {
-                          background: button.hoverGradient,
-                          transform: "translateY(-3px)",
-                          boxShadow: "0 6px 12px rgba(0,0,0,0.25)",
-                        },
-                        transition: "all 0.25s ease",
-                      }}
-                    >
-                      {button.label}
-                    </Button>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
+              Account Actions
+            </Typography>
+
+            <Grid container spacing={2}>
+              {actionButtons.map((button) => (
+                <Grid item xs={12} sm={6} md={4} key={button.id}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    onClick={button.onClick}
+                    startIcon={button.icon}
+                    sx={{
+                      height: 50,
+                      minWidth: "100%",
+                      borderRadius: 2,
+                      textTransform: "none",
+                      fontWeight: "bold",
+                      fontSize: { xs: "0.9rem", sm: "1rem" },
+                      justifyContent: "flex-start",
+                      pl: 2,
+                      color: "#000",
+                      background: button.gradient,
+                      boxShadow: "0 4px 10px rgba(157, 114, 240, 0.2)",
+                      "&:hover": {
+                        // background: button.hoverGradient,
+                        transform: "translateY(-3px)",
+                        boxShadow: "0 8px 15px rgba(157, 114, 240, 0.3)",
+                      },
+                      transition: "all 0.25s ease",
+                      fontFamily: '"DM Sans", sans-serif',
+                    }}
+                  >
+                    {button.label}
+                  </Button>
+                </Grid>
+              ))}
+            </Grid>
           </Box>
 
           {/* Success Message */}
@@ -481,15 +554,16 @@ const ProfilePage = () => {
                   boxShadow: "0px 4px 12px rgba(76, 175, 80, 0.4)",
                   textAlign: "center",
                   animation: "pulse 2s infinite",
+                  fontFamily: '"DM Sans", sans-serif',
                 }}
               >
                 <CheckCircle sx={{ mr: 1 }} />
-                <Typography fontWeight="500">{successMessage}</Typography>
+                <Typography fontWeight="500" fontFamily='"DM Sans", sans-serif'>
+                  {successMessage}
+                </Typography>
               </Box>
             </Fade>
           )}
-
-          {/* Actions Section */}
         </Paper>
       </Slide>
       {/* Modals */}
@@ -500,10 +574,10 @@ const ProfilePage = () => {
           username={username}
         />
       )}
-      {changePasswordModal && (
+      {chagnePasswordModal && (
         <ChangePassword
-          open={chagnePasswordModal}
-          onClose={() => setChagnePasswordModal(false)}
+          open={changePasswordModal}
+          onClose={() => setChangePasswordModal(false)}
           username={username}
         />
       )}
