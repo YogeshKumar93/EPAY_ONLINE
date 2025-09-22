@@ -19,8 +19,8 @@ const LandingPage = () => {
     <div>
       <Helmet>
         <meta charSet="utf-8" />
-        <title>IMPS GURU</title>
-        <meta name="description" content="IMPS GURU - Secure Payment Platform" />
+        <title>P2PAE</title>
+        <meta name="description" content="P2PAE - Secure Payment Platform" />
         <meta name="keywords" content="TrustPayIndia, Payments, Finance" />
       </Helmet>
 

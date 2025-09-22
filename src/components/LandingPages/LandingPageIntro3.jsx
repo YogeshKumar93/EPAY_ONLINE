@@ -123,7 +123,7 @@ const LandingPageIntro3 = () => {
                     display: "inline-block",
                   }}
                 >
-                  IMPS GURU
+                  P2PAE
                   <Box 
                     sx={{
                       position: "absolute",

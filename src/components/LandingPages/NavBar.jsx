@@ -26,7 +26,7 @@ const NavBar = () => {
       >
         {/* Logo */}
         <div style={{ fontSize: "2rem", fontWeight: "bold", color: "white" }}>
-          IMPS GURU
+          P2PAE
         </div>
 
         {/* Links + Login Button */}
