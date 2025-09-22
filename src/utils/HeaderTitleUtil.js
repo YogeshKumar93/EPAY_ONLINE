@@ -56,7 +56,7 @@ const titleMap = {
     "/customer/upi-transfer": "UPI Transfer",
     "/customer/bbps": "BBPS (Online)",
     "/customer/bbpsoffline": "BBPS (Offline)",
-    "/customer/aeps": "AEPS Services",
+    "/customer/aeps": "AEPS",
     "/customer/wallet-transfer": "Wallet Transfer",
     "/customer/payment_transfer": "Payments",
     "/customer/cms": "Cash Management System",
