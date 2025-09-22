@@ -13,7 +13,6 @@ import {
   apiErrorToast,
   okSuccessToastAlt,
 } from "../utils/ToastUtil";
-import BeneficiaryList from "./BeneficiaryList";
 import SenderDetails from "./SenderDetails";
 import SenderRegisterModal from "./SenderRegisterModal";
 import VerifySenderModal from "./VerifySenderModal";
@@ -92,53 +91,52 @@ const UpiTransfer = () => {
   };
 
   return (
- <Box p={0}>
-  {/* Always show mobile input */}
-  <Box position="relative">
-    <TextField
-      label="Mobile Number"
-      variant="outlined"
-      fullWidth
-      value={mobile}
-      autoComplete="on"
-      onChange={handleChange}
-      inputProps={{ maxLength: 10 }}
-      sx={{ mb: 1 }}
-    />
-    {loading && (
-      <CommonLoader
-        loading={loading}
-        size={24}
-        sx={{
-          position: "absolute",
-          top: "50%",
-          right: 16,
-          transform: "translateY(-50%)",
-        }}
-      />
-    )}
-  </Box>
+    <Box p={0}>
+      {/* Always show mobile input */}
+      <Box position="relative">
+        <TextField
+          label="Mobile Number"
+          variant="outlined"
+          fullWidth
+          value={mobile}
+          onChange={handleChange}
+          inputProps={{ maxLength: 10 }}
+          sx={{ mb: 1 }}
+          autoComplete="tel" // ✅ enables browser autocomplete
+        />
+        {loading && (
+          <CommonLoader
+            loading={loading}
+            size={24}
+            sx={{
+              position: "absolute",
+              top: "50%",
+              right: 16,
+              transform: "translateY(-50%)",
+            }}
+          />
+        )}
+      </Box>
 
-  {/* Sender Details - Full width */}
-  <Box mb={1}>
-    <SenderDetails sender={sender} />
-  </Box>
+      {/* Sender Details - Full width */}
+      <Box mb={1}>
+        <SenderDetails sender={sender} />
+      </Box>
 
-  {/* Beneficiaries - 70/30 split */}
-  <Box display="flex" flexDirection={isMobile ? "column" : "row"} gap={1}>
-    {/* Left: Beneficiary List - 70% */}
-   {/* Beneficiary List - Full width */}
-<Box width="100%">
-  <UpiBeneficiaryList
-    sender={sender}
-    onSuccess={() => handleFetchSender()}
-    onSelect={(b) => setSelectedBeneficiary(b)}
-  />
-</Box>
+      {/* Beneficiaries - 70/30 split */}
+      <Box display="flex" flexDirection={isMobile ? "column" : "row"} gap={1}>
+        {/* Left: Beneficiary List - 70% */}
+        {/* Beneficiary List - Full width */}
+        <Box width="100%">
+          <UpiBeneficiaryList
+            sender={sender}
+            onSuccess={() => handleFetchSender()}
+            onSelect={(b) => setSelectedBeneficiary(b)}
+          />
+        </Box>
 
-
-    {/* Right: Beneficiary Details - 30% */}
-    {/* {selectedBeneficiary && (
+        {/* Right: Beneficiary Details - 30% */}
+        {/* {selectedBeneficiary && (
       <Box flex={isMobile ? "1 1 100%" : "0 0 30%"}>
         <UpiBeneficiaryDetails
           beneficiary={selectedBeneficiary}
@@ -146,30 +144,29 @@ const UpiTransfer = () => {
         />
       </Box>
     )} */}
-  </Box>
+      </Box>
 
-  {/* Register Modal */}
-  {openRegisterModal && (
-    <SenderRegisterModal
-      open={openRegisterModal}
-      onClose={() => setOpenRegisterModal(false)}
-      mobile={mobile}
-      onRegistered={handleSenderRegistered}
-    />
-  )}
+      {/* Register Modal */}
+      {openRegisterModal && (
+        <SenderRegisterModal
+          open={openRegisterModal}
+          onClose={() => setOpenRegisterModal(false)}
+          mobile={mobile}
+          onRegistered={handleSenderRegistered}
+        />
+      )}
 
-  {/* Verify Modal */}
-  {openVerifyModal && otpData && (
-    <VerifySenderModal
-      open={openVerifyModal}
-      onClose={() => setOpenVerifyModal(false)}
-      mobile={otpData.mobile_number}
-      otpRef={otpData.otp_ref}
-      otpData={otpData}
-    />
-  )}
-</Box>
-
+      {/* Verify Modal */}
+      {openVerifyModal && otpData && (
+        <VerifySenderModal
+          open={openVerifyModal}
+          onClose={() => setOpenVerifyModal(false)}
+          mobile={otpData.mobile_number}
+          otpRef={otpData.otp_ref}
+          otpData={otpData}
+        />
+      )}
+    </Box>
   );
 };
 

@@ -1,29 +1,27 @@
 import { useState, useContext } from "react";
 import {
-  Paper,
   Box,
   Typography,
   Radio,
   RadioGroup,
   FormControlLabel,
   TextField,
-  Button,
   InputAdornment,
+  Button,
 } from "@mui/material";
 import OTPInput from "react-otp-input";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
-import {
-  okSuccessToast,
-  apiErrorToast,
-  okSuccessToastAlt,
-} from "../utils/ToastUtil";
+import { apiErrorToast } from "../utils/ToastUtil";
 import AuthContext from "../contexts/AuthContext";
 import { useToast } from "../utils/ToastContext";
 import ResetMpin from "../components/common/ResetMpin";
 import { showSuccessToast } from "../components/common/ShowSuccessToast";
+import CommonModal from "../components/common/CommonModal";
 
 const Dmt2SelectedBene = ({
+  open,
+  onClose,
   beneficiary,
   senderId,
   senderMobile,
@@ -33,32 +31,30 @@ const Dmt2SelectedBene = ({
   const { location } = useContext(AuthContext);
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
+  const { showToast } = useToast();
+
   const [transferMode, setTransferMode] = useState("IMPS");
   const [amount, setAmount] = useState("");
   const [otpRef, setOtpRef] = useState(null);
   const [otp, setOtp] = useState("");
   const [mpin, setMpin] = useState("");
   const [loading, setLoading] = useState(false);
-  const { showToast } = useToast();
   const [resendLoading, setResendLoading] = useState(false);
-  console.log("sender linit ", sender.limitAvailable);
   const [openResetModal, setOpenResetModal] = useState(false);
-
-  const username = `GURU1${user?.id}`;
 
   if (!beneficiary) return null;
 
+  const username = `GURU1${user?.id}`;
+
+  // --- API Handlers ---
   const handleGetOtp = async () => {
-    if (!amount || parseFloat(amount) <= 0) {
-      apiErrorToast("Enter a valid amount");
-      return;
-    }
-    console.log("referenceKey", referenceKey);
+    if (!amount || parseFloat(amount) <= 0)
+      return apiErrorToast("Enter a valid amount");
 
     setLoading(true);
     try {
       const payload = {
-        referenceKey: referenceKey,
+        referenceKey,
         beneficiary_id: beneficiary.id,
         amount,
         latitude: location?.lat || "",
@@ -83,11 +79,12 @@ const Dmt2SelectedBene = ({
       setLoading(false);
     }
   };
+
   const handleResendOtp = async () => {
     setResendLoading(true);
     try {
       const payload = {
-        referenceKey: referenceKey,
+        referenceKey,
         beneficiary_id: beneficiary.id,
         amount,
         latitude: location?.lat || "",
@@ -104,8 +101,8 @@ const Dmt2SelectedBene = ({
       if (error) apiErrorToast(error);
       else {
         showToast("OTP resent successfully!", "success");
-        setOtpRef(response?.data || null); // 🔑 Save NEW referenceKey
-        setOtp(""); // clear old OTP
+        setOtpRef(response?.data || null);
+        setOtp("");
       }
     } catch (err) {
       apiErrorToast(err);
@@ -113,15 +110,11 @@ const Dmt2SelectedBene = ({
       setResendLoading(false);
     }
   };
+
   const handleProceed = async () => {
-    if (!otp || otp.length !== 4) {
-      apiErrorToast("Enter the 4-digit OTP");
-      return;
-    }
-    if (!mpin || mpin.length !== 6) {
-      apiErrorToast("Enter the 6-digit M-PIN");
-      return;
-    }
+    if (!otp || otp.length !== 4) return apiErrorToast("Enter the 4-digit OTP");
+    if (!mpin || mpin.length !== 6)
+      return apiErrorToast("Enter the 6-digit M-PIN");
 
     setLoading(true);
     try {
@@ -165,55 +158,32 @@ const Dmt2SelectedBene = ({
           date: new Date().toLocaleString(),
         };
 
-        // okSuccessToastAlt(txnDetails); // pass full details
         showSuccessToast({
           txnID: response?.data,
           message: response?.message,
-          redirectUrl: "/print-dmt", // can be anything
+          redirectUrl: "/print-dmt",
         });
         sessionStorage.setItem("txnData", JSON.stringify(txnDetails));
-
-        // Open PrintDmt in a new tab
-        // window.open("/print-dmt", "_blank");
         setAmount("");
         setOtp("");
         setMpin("");
         setOtpRef(null);
+        onClose();
       } else {
-        okSuccessToastAlt(error?.message);
+        showToast(error?.message, "error");
       }
-    } catch (error) {
+    } catch (err) {
       apiErrorToast(err?.message);
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <Paper sx={{ p: 0, mt: 2, borderRadius: 2, overflow: "hidden" }}>
-      {/* Header */}
-      <Box
-        sx={{
-          bgcolor: "#9d72ff",
-          color: "#fff",
-          textAlign: "center",
-          py: 1,
-          px: 2,
-        }}
-      >
-        {" "}
-        <Typography
-          variant="subtitle1"
-          fontWeight="bold"
-          color="#fff"
-          sx={{ textAlign: "left" }}
-        >
-          Selected Beneficiary
-        </Typography>
-      </Box>
-
-      {/* Beneficiary Details */}
-      <Box sx={{ mx: 2, my: 2, p: 1, bgcolor: "#f0f8ff", borderRadius: 2 }}>
+  // --- Custom Content ---
+  const customContent = (
+    <Box display="flex" flexDirection="column" gap={2}>
+      {/* Beneficiary Info */}
+      <Box sx={{ bgcolor: "#f0f8ff", p: 2, borderRadius: 2 }}>
         {[
           { label: "Name", value: beneficiary.beneficiary_name },
           { label: "Account Number", value: beneficiary.account_number },
@@ -232,8 +202,8 @@ const Dmt2SelectedBene = ({
       </Box>
 
       {/* Transfer Mode */}
-      <Box textAlign="center" mb={0}>
-        <Typography variant="body2" fontWeight="bold" mb={0}>
+      <Box textAlign="center">
+        <Typography variant="body2" fontWeight="bold" mb={0.5}>
           Transfer Mode
         </Typography>
         <RadioGroup
@@ -253,19 +223,15 @@ const Dmt2SelectedBene = ({
           label="Amount"
           type="number"
           fullWidth
-          variant="outlined"
           size="small"
           value={amount}
           onChange={(e) => {
             const value = e.target.value;
             const limit = parseFloat(sender?.limit || 0);
-
-            // ✅ Block invalid or over-limit values
             if (parseFloat(value) > limit) {
               apiErrorToast(`Amount cannot exceed available limit: ${limit}`);
               return;
             }
-
             setAmount(value);
           }}
           InputProps={{
@@ -278,11 +244,9 @@ const Dmt2SelectedBene = ({
                   disabled={loading}
                   sx={{
                     backgroundColor: "#5c3ac8",
-                    minWidth: "60px",
+                    minWidth: 60,
                     px: 1,
                     py: 0.5,
-                    fontSize: "0.75rem",
-                    borderRadius: 1,
                   }}
                 >
                   {loading ? "..." : "Get OTP"}
@@ -293,7 +257,7 @@ const Dmt2SelectedBene = ({
         />
       ) : (
         <Box display="flex" flexDirection="column" gap={2}>
-          {/* OTP */}
+          {/* OTP Input */}
           <Box>
             <Typography variant="body2" mb={0.5} sx={{ px: 2 }}>
               Enter OTP
@@ -325,7 +289,7 @@ const Dmt2SelectedBene = ({
             </Button>
           </Box>
 
-          {/* M-PIN */}
+          {/* M-PIN Input */}
           <Box>
             <Typography variant="body2" mb={0.5} sx={{ px: 2 }}>
               Enter M-PIN
@@ -350,29 +314,49 @@ const Dmt2SelectedBene = ({
               variant="text"
               size="small"
               sx={{ mt: 1 }}
-              onClick={() => setOpenResetModal(true)} // ✅ open modal
+              onClick={() => setOpenResetModal(true)}
             >
-              Reset Mpin
+              Reset M-PIN
             </Button>
           </Box>
-
-          <Button
-            variant="contained"
-            color="success"
-            onClick={handleProceed}
-            disabled={loading}
-          >
-            {loading ? "Processing..." : "Proceed"}
-          </Button>
         </Box>
       )}
+    </Box>
+  );
+
+  return (
+    <>
+      <CommonModal
+        open={open}
+        onClose={onClose}
+        title="Selected Beneficiary"
+        size="small"
+        iconType="info"
+        customContent={customContent}
+        footerButtons={[
+          {
+            text: "Cancel",
+            variant: "outlined",
+            onClick: onClose,
+            disabled: loading,
+          },
+          {
+            text: loading ? "Processing..." : "Proceed",
+            variant: "contained",
+            color: "success",
+            onClick: handleProceed,
+            disabled: loading || !otpRef,
+          },
+        ]}
+      />
+
       {/* ✅ Reset MPIN Modal */}
       <ResetMpin
         open={openResetModal}
         onClose={() => setOpenResetModal(false)}
         username={username}
       />
-    </Paper>
+    </>
   );
 };
 

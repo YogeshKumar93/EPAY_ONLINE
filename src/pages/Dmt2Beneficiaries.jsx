@@ -57,6 +57,7 @@ import { apiErrorToast, okSuccessToast } from "../utils/ToastUtil";
 import DeleteBeneficiaryModal from "./DeleteBeneficiaryModal";
 import AuthContext from "../contexts/AuthContext";
 import DeleteBeneDmt2 from "./DeleteBeneDmt2";
+import Dmt2SelectedBene from "./Dmt2SelectedBene";
 
 const Dmt2Beneficiaries = ({
   beneficiaries,
@@ -74,6 +75,8 @@ const Dmt2Beneficiaries = ({
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
   const [verifyOpen, setVerifyOpen] = useState(false); // 🔑 verify modal state
   const [mpinDigits, setMpinDigits] = useState(Array(6).fill(""));
+  const [sendMoneyOpen, setSendMoneyOpen] = useState(false);
+  const [searchText, setSearchText] = useState("");
 
   const { location } = useContext(AuthContext);
   const { schema, formData, handleChange, errors, setErrors, loading } =
@@ -188,6 +191,9 @@ const Dmt2Beneficiaries = ({
             bank_name: null,
           },
         ];
+  const filteredBeneficiaries = normalized.filter((b) =>
+    b.beneficiary_name.toLowerCase().includes(searchText.toLowerCase())
+  );
 
   const bankImageMapping = {
     SBIN: sbi2,
@@ -212,6 +218,11 @@ const Dmt2Beneficiaries = ({
     IDIB: idib2,
     SCBL: stand2,
     JAKA: jk2,
+  };
+  // when user clicks send money
+  const handleSendMoney = (b) => {
+    setSelectedBeneficiary(b);
+    setSendMoneyOpen(true);
   };
 
   return (
@@ -276,8 +287,19 @@ const Dmt2Beneficiaries = ({
       {/* Collapse wrapper */}
       <Collapse in={open} timeout="auto" unmountOnExit>
         <CardContent sx={{ p: 2 }}>
+          {normalized.length > 1 && (
+            <Box mb={2}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="Search beneficiary by name"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+              />
+            </Box>
+          )}
           <List dense sx={{ py: 0 }}>
-            {normalized.map((b) => (
+            {filteredBeneficiaries.map((b) => (
               <ListItem
                 key={b.id}
                 sx={{
@@ -338,7 +360,7 @@ const Dmt2Beneficiaries = ({
                         size="small"
                         variant="contained"
                         color="primary"
-                        onClick={() => onSelect?.(b)}
+                        onClick={() => handleSendMoney(b)} // 🔑 open modal
                         sx={{
                           backgroundColor: "#5c3ac8",
                           borderRadius: 1,
@@ -449,6 +471,15 @@ const Dmt2Beneficiaries = ({
                 </Box>
               </ListItem>
             ))}
+            {filteredBeneficiaries.length === 0 && (
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 1 }}
+              >
+                No beneficiaries found
+              </Typography>
+            )}
           </List>
         </CardContent>
       </Collapse>
@@ -546,6 +577,17 @@ const Dmt2Beneficiaries = ({
           onSuccess?.(sender.mobileNumber);
         }}
       />
+      {sendMoneyOpen && selectedBeneficiary && (
+        <Dmt2SelectedBene
+          open={sendMoneyOpen}
+          onClose={() => setSendMoneyOpen(false)}
+          beneficiary={selectedBeneficiary}
+          senderId={sender.id}
+          sender={sender}
+          senderMobile={sender.mobile}
+          referenceKey={sender.referenceKey}
+        />
+      )}
     </Card>
   );
 };

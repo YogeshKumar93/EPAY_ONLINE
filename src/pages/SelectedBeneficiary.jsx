@@ -1,6 +1,5 @@
 import { useState, useContext } from "react";
 import {
-  Paper,
   Box,
   Typography,
   Radio,
@@ -13,18 +12,17 @@ import {
 import OTPInput from "react-otp-input";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
-import {
-  okSuccessToast,
-  apiErrorToast,
-  okSuccessToastAlt,
-} from "../utils/ToastUtil";
+import { apiErrorToast } from "../utils/ToastUtil";
 import AuthContext from "../contexts/AuthContext";
 import { useToast } from "../utils/ToastContext";
 import ResetMpin from "../components/common/ResetMpin";
 import { showSuccessToast } from "../components/common/ShowSuccessToast";
 import { useNavigate } from "react-router-dom";
+import CommonModal from "../components/common/CommonModal";
 
 const SelectedBeneficiary = ({
+  open,
+  onClose,
   beneficiary,
   senderId,
   senderMobile,
@@ -42,7 +40,6 @@ const SelectedBeneficiary = ({
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
   const [resendLoading, setResendLoading] = useState(false);
-  console.log("sender linit ", sender.limitAvailable);
   const [openResetModal, setOpenResetModal] = useState(false);
 
   const username = `GURU1${user?.id}`;
@@ -55,8 +52,6 @@ const SelectedBeneficiary = ({
       apiErrorToast("Enter a valid amount");
       return;
     }
-    console.log("referenceKey", referenceKey);
-
     setLoading(true);
     try {
       const payload = {
@@ -81,11 +76,12 @@ const SelectedBeneficiary = ({
       setLoading(false);
     }
   };
+
   const handleResendOtp = async () => {
     setResendLoading(true);
     try {
       const payload = {
-        referenceKey: referenceKey, // still pass original referenceKey
+        referenceKey,
         number: senderMobile,
         beneficiary_id: beneficiary.id,
         amount,
@@ -98,8 +94,8 @@ const SelectedBeneficiary = ({
       if (error) apiErrorToast(error);
       else {
         showToast("OTP resent successfully!", "success");
-        setOtpRef(response?.data?.referenceKey || null); // 🔑 Save NEW referenceKey
-        setOtp(""); // clear old OTP
+        setOtpRef(response?.data?.referenceKey || null);
+        setOtp("");
       }
     } catch (err) {
       apiErrorToast(err);
@@ -107,6 +103,7 @@ const SelectedBeneficiary = ({
       setResendLoading(false);
     }
   };
+
   const handleProceed = async () => {
     if (!otp || otp.length !== 6) {
       apiErrorToast("Enter the 6-digit OTP");
@@ -118,129 +115,69 @@ const SelectedBeneficiary = ({
     }
 
     setLoading(true);
-    try {
-      const payload = {
-        sender_id: senderId,
-        ben_id: beneficiary.bene_id,
-        ben_name: beneficiary.beneficiary_name,
-        ben_acc: beneficiary.account_number,
-        ifsc: beneficiary.ifsc_code,
-        bank_name: beneficiary.bank_name,
-        mobile_number: beneficiary.mobile_number,
-        operator: 13,
-        latitude: location?.lat || "",
-        longitude: location?.long || "",
-        amount,
-        otp,
-        referenceKey: otpRef,
-        type: transferMode,
-        mpin,
-        pf: "web",
-      };
 
-      const { error, response } = await apiCall(
-        "post",
-        ApiEndpoints.DMT1_TXN,
-        payload
-      );
-      if (response) {
-        const txnDetails = {
-          txnID: response?.data?.rrn,
-          amount,
-          transferMode,
-          senderMobile,
-          beneficiary: {
-            name: beneficiary.beneficiary_name,
-            account: beneficiary.account_number,
-            bank: beneficiary.bank_name,
-            ifsc: beneficiary.ifsc_code,
-            mobile: beneficiary.mobile_number,
-          },
-          date: new Date().toLocaleString(),
-        };
+    const payload = {
+      sender_id: senderId,
+      ben_id: beneficiary.bene_id,
+      ben_name: beneficiary.beneficiary_name,
+      ben_acc: beneficiary.account_number,
+      ifsc: beneficiary.ifsc_code,
+      bank_name: beneficiary.bank_name,
+      mobile_number: beneficiary.mobile_number,
+      operator: 13,
+      latitude: location?.lat || "",
+      longitude: location?.long || "",
+      amount,
+      otp,
+      referenceKey: otpRef,
+      type: transferMode,
+      mpin,
+      pf: "web",
+    };
 
-        // okSuccessToastAlt(txnDetails); // pass full details
-        showSuccessToast({
-          txnID: response?.data?.rrn,
-          message: response?.message,
-          redirectUrl: "/print-dmt",
-        });
-        sessionStorage.setItem("txnData", JSON.stringify(txnDetails));
-
-        // Open PrintDmt in a new tab
-        // window.open("/print-dmt", "_blank");
-
-        setAmount("");
-        setOtp("");
-        setMpin("");
-        setOtpRef(null);
-      } else {
-        const txnDetails = {
-          txnID: response?.message,
-          amount,
-          transferMode,
-          beneficiary: {
-            name: beneficiary.beneficiary_name,
-            account: beneficiary.account_number,
-            bank: beneficiary.bank_name,
-            ifsc: beneficiary.ifsc_code,
-          },
-          date: new Date().toLocaleString(),
-        };
-        okSuccessToastAlt(txnDetails);
-      }
-    } catch (err) {
-      apiErrorToast(err);
-    } finally {
-      setLoading(false);
+    const { error, response } = await apiCall(
+      "post",
+      ApiEndpoints.DMT1_TXN,
+      payload
+    );
+    if (response) {
+      showSuccessToast({
+        txnID: response?.data?.rrn,
+        message: response?.message,
+        redirectUrl: "/print-dmt",
+      });
+      setAmount("");
+      setOtp("");
+      setMpin("");
+      setOtpRef(null);
+      onClose();
+    } else {
+      showToast(error?.message, "error");
     }
   };
 
-  return (
-    <Paper sx={{ p: 0, mt: 2, borderRadius: 2, overflow: "hidden" }}>
-      {/* Header */}
-      <Box
-        sx={{
-          bgcolor: "#9d72ff",
-          color: "#fff",
-          textAlign: "center",
-          py: 1,
-          px: 2,
-        }}
-      >
-        {" "}
-        <Typography
-          variant="subtitle1"
-          fontWeight="bold"
-          color="#fff"
-          sx={{ textAlign: "left" }}
-        >
-          Selected Beneficiary
-        </Typography>
-      </Box>
-
+  const customContent = (
+    <Box display="flex" flexDirection="column" gap={2}>
       {/* Beneficiary Details */}
-      <Box sx={{ mx: 2, my: 2, p: 1, bgcolor: "#f0f8ff", borderRadius: 2 }}>
+      <Box sx={{ bgcolor: "#f0f8ff", p: 2, borderRadius: 2 }}>
         {[
           { label: "Name", value: beneficiary.beneficiary_name },
           { label: "Account Number", value: beneficiary.account_number },
-          { label: "Bank", value: beneficiary.bank_name },
+          { label: "Bank", value: beneficiary.ifsc_code },
           { label: "IFSC", value: beneficiary.ifsc_code },
         ].map((item, idx) => (
           <Box key={idx} display="flex" mb={1}>
-            <Typography
-              sx={{ width: "150px", fontWeight: 500, fontSize: "14px" }}
-            >
+            <Typography sx={{ width: "150px", fontWeight: 500 }}>
               {item.label}:
             </Typography>
-            <Typography sx={{ fontSize: "12px" }}>{item.value}</Typography>
+            <Typography>{item.value}</Typography>
           </Box>
         ))}
       </Box>
 
       {/* Transfer Mode */}
-      <Box textAlign="center" mb={0}>
-        <Typography variant="body2" fontWeight="bold" mb={0}>
+      <Box textAlign="center">
+        <Typography variant="body2" fontWeight="bold">
           Transfer Mode
         </Typography>
         <RadioGroup
@@ -260,19 +197,15 @@ const SelectedBeneficiary = ({
           label="Amount"
           type="number"
           fullWidth
-          variant="outlined"
           size="small"
           value={amount}
           onChange={(e) => {
             const value = e.target.value;
             const limit = parseFloat(sender?.limitAvailable || 0);
-
-            // ✅ Block invalid or over-limit values
             if (parseFloat(value) > limit) {
               apiErrorToast(`Amount cannot exceed available limit: ${limit}`);
               return;
             }
-
             setAmount(value);
           }}
           InputProps={{
@@ -283,14 +216,7 @@ const SelectedBeneficiary = ({
                   size="small"
                   onClick={handleGetOtp}
                   disabled={loading}
-                  sx={{
-                    backgroundColor: "#5c3ac8",
-                    minWidth: "60px",
-                    px: 1,
-                    py: 0.5,
-                    fontSize: "0.75rem",
-                    borderRadius: 1,
-                  }}
+                  sx={{ backgroundColor: "#5c3ac8" }}
                 >
                   {loading ? "..." : "Get OTP"}
                 </Button>
@@ -300,9 +226,8 @@ const SelectedBeneficiary = ({
         />
       ) : (
         <Box display="flex" flexDirection="column" gap={2}>
-          {/* OTP */}
           <Box>
-            <Typography variant="body2" mb={0.5} sx={{ px: 2 }}>
+            <Typography variant="body2" mb={0.5}>
               Enter OTP
             </Typography>
             <OTPInput
@@ -324,7 +249,6 @@ const SelectedBeneficiary = ({
             <Button
               variant="text"
               size="small"
-              sx={{ mt: 1 }}
               onClick={handleResendOtp}
               disabled={resendLoading}
             >
@@ -332,9 +256,8 @@ const SelectedBeneficiary = ({
             </Button>
           </Box>
 
-          {/* M-PIN */}
           <Box>
-            <Typography variant="body2" mb={0.5} sx={{ px: 2 }}>
+            <Typography variant="body2" mb={0.5}>
               Enter M-PIN
             </Typography>
             <OTPInput
@@ -356,30 +279,48 @@ const SelectedBeneficiary = ({
             <Button
               variant="text"
               size="small"
-              sx={{ mt: 1 }}
-              onClick={() => setOpenResetModal(true)} // ✅ open modal
+              onClick={() => setOpenResetModal(true)}
             >
-              Reset Mpin
+              Reset M-PIN
             </Button>
           </Box>
-
-          <Button
-            variant="contained"
-            color="success"
-            onClick={handleProceed}
-            disabled={loading}
-          >
-            {loading ? "Processing..." : "Proceed"}
-          </Button>
         </Box>
       )}
-      {/* ✅ Reset MPIN Modal */}
+    </Box>
+  );
+
+  return (
+    <>
+      <CommonModal
+        open={open}
+        onClose={onClose}
+        title="Selected Beneficiary"
+        iconType="info"
+        size="small"
+        customContent={customContent}
+        footerButtons={[
+          {
+            text: "Cancel",
+            variant: "outlined",
+            onClick: onClose,
+            disabled: loading,
+          },
+          {
+            text: loading ? "Processing..." : "Proceed",
+            variant: "contained",
+            color: "success",
+            onClick: handleProceed,
+            disabled: loading,
+          },
+        ]}
+      />
+
       <ResetMpin
         open={openResetModal}
         onClose={() => setOpenResetModal(false)}
         username={username}
       />
-    </Paper>
+    </>
   );
 };
 

@@ -166,6 +166,7 @@ const Dmt = () => {
               inputProps={{ maxLength: 10 }}
               sx={{ flex: 1 }}
               fullWidth
+              autoComplete="tel" // ✅ enables browser autocomplete
             />
 
             <Box
@@ -205,15 +206,15 @@ const Dmt = () => {
             />
           )}
 
-          <Box
-            display="flex"
-            flexDirection={{ xs: "column", md: "row" }}
-            gap={0.5}
-          >
-            <Box flex="0 0 30%" display="flex" flexDirection="column">
+          <Box display="flex" flexDirection="column" gap={2} width="100%">
+            {/* Remitter Details */}
+            <Box width="100%">
               <RemitterDetails sender={sender} />
+            </Box>
 
-              {selectedBeneficiary && (
+            {/* Selected Beneficiary */}
+            {/* {selectedBeneficiary && (
+              <Box width="100%">
                 <SelectedBeneficiary
                   beneficiary={selectedBeneficiary}
                   senderId={sender.id}
@@ -221,10 +222,11 @@ const Dmt = () => {
                   senderMobile={sender.mobileNumber}
                   referenceKey={sender.referenceKey}
                 />
-              )}
-            </Box>
+              </Box>
+            )} */}
 
-            <Box flex="0 0 70%">
+            {/* Beneficiaries List */}
+            <Box width="100%">
               <Beneficiaries
                 sender={sender}
                 onSuccess={handleFetchSender}

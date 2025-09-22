@@ -128,30 +128,29 @@ const SuperTransfer = () => {
           />
         )}
       </Box>
-  <Box display="flex" flexDirection="column" gap={2}>
-  {/* Sender Details */}
-  <Box width="100%">
-    <SenderDetails sender={sender} />
+      <Box display="flex" flexDirection="column" gap={2}>
+        {/* Sender Details */}
+        <Box width="100%">
+          <SenderDetails sender={sender} />
 
-    {/* {selectedBeneficiary && (
+          {/* {selectedBeneficiary && (
       <BeneficiaryDetails
         beneficiary={selectedBeneficiary}
         senderMobile={mobile}
         sender={sender}
       />
     )} */}
-  </Box>
+        </Box>
 
-  {/* Beneficiary List */}
-  <Box width="100%">
-    <BeneficiaryList
-      sender={sender}
-      onSuccess={() => handleFetchSender()}
-      onSelect={(b) => setSelectedBeneficiary(b)}
-    />
-  </Box>
-</Box>
-
+        {/* Beneficiary List */}
+        <Box width="100%">
+          <BeneficiaryList
+            sender={sender}
+            onSuccess={() => handleFetchSender()}
+            onSelect={(b) => setSelectedBeneficiary(b)}
+          />
+        </Box>
+      </Box>
 
       {/* Register Modal */}
       {openRegisterModal && (

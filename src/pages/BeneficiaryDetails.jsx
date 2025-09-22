@@ -2,11 +2,10 @@ import { useContext, useEffect, useState } from "react";
 import {
   Box,
   Typography,
-  Paper,
+  TextField,
   Radio,
   RadioGroup,
   FormControlLabel,
-  TextField,
   Button,
   InputAdornment,
 } from "@mui/material";
@@ -16,8 +15,11 @@ import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
 import AuthContext from "../contexts/AuthContext";
 import OTPInput from "react-otp-input";
 import { useToast } from "../utils/ToastContext";
+import CommonModal from "../components/common/CommonModal";
 
 const BeneficiaryDetails = ({
+  open,
+  onClose,
   beneficiary,
   senderMobile,
   senderId,
@@ -36,76 +38,43 @@ const BeneficiaryDetails = ({
   const [selectedPurpose, setSelectedPurpose] = useState("");
   const [loadingPurposes, setLoadingPurposes] = useState(false);
 
-  // console.log("sender rem_limit",sender.rem_limit);
-
   if (!beneficiary) return null;
 
-  const handleGetOtp = async () => {
-    if (!amount || parseFloat(amount) <= 0) {
-      apiErrorToast("Please enter a valid amount");
-      return;
-    }
-    setLoading(true);
-    try {
-      const payload = {
-        mobile_number: senderMobile,
-        beneficiary_id: beneficiary.id,
-        amount,
-      };
-      const { error, response } = await apiCall(
-        "post",
-        ApiEndpoints.PAYOUT_OTP,
-        payload
-      );
-      if (error) {
-        apiErrorToast(error);
-      } else {
-        showToast("OTP sent successfully!", "success");
-        setOtpRef(response?.data?.otp_ref || null);
-      }
-    } catch (err) {
-      apiErrorToast(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-  const handleResendOtp = async () => {
-    setResendLoading(true);
-    try {
-      const payload = {
-        mobile_number: senderMobile,
-        beneficiary_id: beneficiary.id,
-        amount,
-      };
-      const { error, response } = await apiCall(
-        "post",
-        ApiEndpoints.PAYOUT_OTP,
-        payload
-      );
-
-      if (error) {
-        apiErrorToast(error);
-      } else {
-        showToast("OTP resent successfully!", "success");
-        setOtpRef(response?.data?.otp_ref || null); // 🔑 update new reference
-        setOtp(""); // clear old OTP input
-      }
-    } catch (err) {
-      apiErrorToast(err);
-    } finally {
-      setResendLoading(false);
-    }
-  };
+  // --- API Calls ---
+  // const handleGetOtp = async () => {
+  //   if (!amount || parseFloat(amount) <= 0) {
+  //     apiErrorToast("Please enter a valid amount");
+  //     return;
+  //   }
+  //   setLoading(true);
+  //   try {
+  //     const payload = {
+  //       mobile_number: senderMobile,
+  //       beneficiary_id: beneficiary.id,
+  //       amount,
+  //     };
+  //     const { error, response } = await apiCall(
+  //       "post",
+  //       ApiEndpoints.PAYOUT_OTP,
+  //       payload
+  //     );
+  //     if (error) apiErrorToast(error);
+  //     else {
+  //       showToast("OTP sent successfully!", "success");
+  //       setOtpRef(response?.data?.otp_ref || null);
+  //     }
+  //   } catch (err) {
+  //     apiErrorToast(err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleProceed = async () => {
-    if (!otp || otp.length !== 6) {
-      apiErrorToast("Please enter the 6-digit OTP");
-      return;
-    }
-    if (!mpin || mpin.length !== 6) {
-      apiErrorToast("Please enter the 6-digit M-PIN");
-      return;
-    }
+    // if (!otp || otp.length !== 6)
+    //   return apiErrorToast("Please enter the 6-digit OTP");
+    if (!mpin || mpin.length !== 6)
+      return apiErrorToast("Please enter the 6-digit M-PIN");
 
     setLoading(true);
     try {
@@ -121,11 +90,11 @@ const BeneficiaryDetails = ({
         latitude: location?.lat || "",
         longitude: location?.long || "",
         amount,
-        otp,
-        otp_ref: otpRef,
+        // otp,
+        // otp_ref: otpRef,
         mop: transferMode,
         mpin,
-        purpose_id: selectedPurpose, // <-- send selected purpose id
+        purpose_id: selectedPurpose,
       };
 
       const { error, response } = await apiCall(
@@ -139,6 +108,7 @@ const BeneficiaryDetails = ({
         setOtp("");
         setMpin("");
         setOtpRef(null);
+        onClose();
       } else {
         apiErrorToast(error?.message);
       }
@@ -148,6 +118,7 @@ const BeneficiaryDetails = ({
       setLoading(false);
     }
   };
+
   useEffect(() => {
     const fetchPurposes = async () => {
       setLoadingPurposes(true);
@@ -160,37 +131,21 @@ const BeneficiaryDetails = ({
           const purposesData = response?.data || [];
           setPurposes(purposesData);
           if (purposesData.length > 0) setSelectedPurpose(purposesData[0].id);
-        } else {
-          apiErrorToast(error);
-        }
+        } else apiErrorToast(error);
       } catch (err) {
         apiErrorToast(err);
       } finally {
         setLoadingPurposes(false);
       }
     };
-
     fetchPurposes();
   }, []);
 
-  // --- UI Section ---
-  return (
-    <Paper sx={{ p: 0, mt: 2, borderRadius: 2, overflow: "hidden" }}>
-      {/* Header */}
-      <Box
-        sx={{
-          bgcolor: "#9d72ff",
-          color: "#fff",
-          textAlign: "center",
-          py: 1,
-        }}
-      >
-        <Typography variant="subtitle1" fontWeight="bold">
-          Selected Beneficiary
-        </Typography>
-      </Box>
-      {/* Beneficiary Details */}
-      <Box sx={{ mx: 2, my: 2, p: 2, bgcolor: "#f0f8ff", borderRadius: 2 }}>
+  // --- Custom Content ---
+  const customContent = (
+    <Box display="flex" flexDirection="column" gap={2}>
+      {/* Beneficiary Info */}
+      <Box sx={{ bgcolor: "#f0f8ff", p: 2, borderRadius: 2 }}>
         {[
           { label: "Name", value: beneficiary.beneficiary_name },
           { label: "Account Number", value: beneficiary.account_number },
@@ -198,60 +153,36 @@ const BeneficiaryDetails = ({
           { label: "IFSC", value: beneficiary.ifsc_code },
         ].map((item, index) => (
           <Box key={index} display="flex" mb={1}>
-            {/* Label column with fixed width */}
             <Typography
               variant="body2"
-              fontWeight="500"
-              color="#4B5563"
-              sx={{ width: "190px", flexShrink: 0 }}
+              fontWeight={500}
+              sx={{ width: "160px" }}
             >
               {item.label}
             </Typography>
-
-            {/* Value always starts aligned */}
-            <Typography variant="body2" color="#111827">
-              {item.value}
-            </Typography>
+            <Typography variant="body2">{item.value}</Typography>
           </Box>
         ))}
       </Box>
 
-      <Box
-        mt={2}
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        gap={2}
-      >
-        {/* Transfer Mode Radios */}
+      {/* Transfer Mode + Purpose */}
+      <Box display="flex" justifyContent="space-between" gap={2}>
         <Box>
-          <Typography
-            variant="body2"
-            fontWeight="bold"
-            mb={0.5}
-            color="#4B5563"
-          >
+          <Typography variant="body2" fontWeight="bold" mb={0.5}>
             Transfer Mode
           </Typography>
           <RadioGroup
             row
             value={transferMode}
             onChange={(e) => setTransferMode(e.target.value)}
-            sx={{ justifyContent: "center" }}
           >
             <FormControlLabel value="IMPS" control={<Radio />} label="IMPS" />
             <FormControlLabel value="NEFT" control={<Radio />} label="NEFT" />
           </RadioGroup>
         </Box>
 
-        {/* Purpose Dropdown */}
         <Box>
-          <Typography
-            variant="body2"
-            fontWeight="bold"
-            mb={0.5}
-            color="#4B5563"
-          >
+          <Typography variant="body2" fontWeight="bold" mb={0.5}>
             Purpose
           </Typography>
           <TextField
@@ -275,113 +206,88 @@ const BeneficiaryDetails = ({
         </Box>
       </Box>
 
-      {/* Amount + OTP / M-PIN */}
-      {!otpRef ? (
-        <Box mt={2} px={2} pb={2}>
-          <TextField
-            label="Amount"
-            type="number"
-            variant="outlined"
-            size="small"
-            fullWidth
-            value={amount}
-            onChange={(e) => {
-              const value = e.target.value;
-              // ✅ prevent exceeding rem_limit
-              if (parseFloat(value) > parseFloat(sender?.rem_limit || 0)) {
-                apiErrorToast(`Exceeds Rem Limit`);
-                return;
-              }
-              setAmount(value);
-            }}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <Button
-                    variant="contained"
-                    size="small"
-                    onClick={handleGetOtp}
-                    disabled={loading}
-                    sx={{
-                      backgroundColor: "#5c3ac8",
-                    }}
-                  >
-                    {loading ? "Sending..." : "Get OTP"}
-                  </Button>
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Box>
-      ) : (
-        <Box mt={2} px={2} pb={2} display="flex" flexDirection="column" gap={2}>
-          {/* OTP Input */}
-          <Box>
-            <Typography variant="body2" mb={0.5}>
-              Enter OTP
-            </Typography>
-            <OTPInput
-              value={otp}
-              onChange={setOtp}
-              numInputs={6}
-              inputType="tel"
-              renderInput={(props) => <input {...props} />}
-              inputStyle={{
-                width: "40px",
-                height: "40px",
-                margin: "0 5px",
-                fontSize: "18px",
-                border: "1px solid #D0D5DD", // ✅ uniform border
-                borderRadius: "6px", // optional for rounded look
-                outline: "none",
-                textAlign: "center",
-              }}
-            />
-            <Button
-              variant="text"
-              size="small"
-              sx={{ mt: 1 }}
-              onClick={handleResendOtp}
-              disabled={resendLoading}
-            >
-              {resendLoading ? "Resending..." : "Resend OTP"}
-            </Button>
-          </Box>
-          {/* M-PIN Input */}
-          <Box>
-            <Typography variant="body2" mb={0.5}>
-              Enter M-PIN
-            </Typography>
-            <OTPInput
-              value={mpin}
-              onChange={setMpin}
-              numInputs={6}
-              inputType="password"
-              renderInput={(props) => <input {...props} />}
-              inputStyle={{
-                width: "40px",
-                height: "40px",
-                margin: "0 5px",
-                fontSize: "18px",
-                border: "1px solid #D0D5DD", // ✅ uniform border
-                outline: "none",
-                borderRadius: "6px",
-                textAlign: "center",
-              }}
-            />
-          </Box>
+      {/* Amount with OTP button */}
+      <TextField
+        label="Amount"
+        type="number"
+        size="small"
+        fullWidth
+        value={amount}
+        onChange={(e) => {
+          const value = e.target.value;
+          if (parseFloat(value) > parseFloat(sender?.rem_limit || 0)) {
+            apiErrorToast("Exceeds Rem Limit");
+            return;
+          }
+          setAmount(value);
+        }}
+        InputProps={
+          {
+            // endAdornment: (
+            //   <InputAdornment position="end">
+            //     <Button
+            //       variant="contained"
+            //       size="small"
+            //       onClick={handleGetOtp}
+            //       disabled={loading}
+            //       sx={{ backgroundColor: "#5c3ac8" }}
+            //     >
+            //       {loading ? "Sending..." : "Get OTP"}
+            //     </Button>
+            //   </InputAdornment>
+            // ),
+          }
+        }
+      />
 
-          <Button
-            variant="contained"
-            color="success"
-            onClick={handleProceed}
-            disabled={loading}
-          >
-            {loading ? "Processing..." : "Proceed"}
-          </Button>
-        </Box>
-      )}
-    </Paper>
+      <Box>
+        <Typography variant="body2" mb={0.5}>
+          Enter M-PIN
+        </Typography>
+        <OTPInput
+          value={mpin}
+          onChange={setMpin}
+          numInputs={6}
+          inputType="password"
+          renderInput={(props) => <input {...props} />}
+          inputStyle={{
+            width: "40px",
+            height: "40px",
+            margin: "0 5px",
+            fontSize: "18px",
+            border: "1px solid #D0D5DD",
+            borderRadius: "6px",
+            textAlign: "center",
+          }}
+        />
+      </Box>
+    </Box>
+  );
+
+  return (
+    <CommonModal
+      open={open}
+      onClose={onClose}
+      title="Send Money"
+      iconType="info"
+      size="small"
+      customContent={customContent}
+      footerButtons={[
+        {
+          text: "Cancel",
+          variant: "outlined",
+          onClick: onClose,
+          disabled: loading,
+        },
+        {
+          text: loading ? "Processing..." : "Proceed",
+          variant: "contained",
+          color: "success",
+          onClick: handleProceed,
+          disabled: loading,
+        },
+      ]}
+    />
   );
 };
 

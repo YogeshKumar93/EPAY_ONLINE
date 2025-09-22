@@ -56,6 +56,7 @@ import { apiCall } from "../api/apiClient";
 import { apiErrorToast, okSuccessToast } from "../utils/ToastUtil";
 import DeleteBeneficiaryModal from "./DeleteBeneficiaryModal";
 import AuthContext from "../contexts/AuthContext";
+import SelectedBeneficiary from "./SelectedBeneficiary";
 
 const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
   const theme = useTheme();
@@ -67,8 +68,12 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
   const [verifyOpen, setVerifyOpen] = useState(false); // 🔑 verify modal state
   const [mpinDigits, setMpinDigits] = useState(Array(6).fill(""));
+  const [searchText, setSearchText] = useState("");
 
   const { location } = useContext(AuthContext);
+  const [sendMoneyOpen, setSendMoneyOpen] = useState(false);
+  const [selectedForSend, setSelectedForSend] = useState(null);
+
   const { schema, formData, handleChange, errors, setErrors, loading } =
     useSchemaForm(ApiEndpoints.ADD_DMT1_SCHEMA, openModal, {
       sender_id: sender?.id,
@@ -207,6 +212,9 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
     SCBL: stand2,
     JAKA: jk2,
   };
+  const filteredBeneficiaries = normalized.filter((b) =>
+    b.beneficiary_name.toLowerCase().includes(searchText.toLowerCase())
+  );
 
   return (
     <Card
@@ -269,8 +277,19 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
       {/* Collapse wrapper */}
       <Collapse in={open} timeout="auto" unmountOnExit>
         <CardContent sx={{ p: 2 }}>
+          {normalized.length > 1 && (
+            <Box mb={2}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="Search beneficiary by name"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+              />
+            </Box>
+          )}
           <List dense sx={{ py: 0 }}>
-            {normalized.map((b) => (
+            {filteredBeneficiaries.map((b) => (
               <ListItem
                 key={b.id}
                 sx={{
@@ -330,7 +349,10 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
                         size="small"
                         variant="contained"
                         color="primary"
-                        onClick={() => onSelect?.(b)}
+                        onClick={() => {
+                          setSelectedForSend(b); // set selected beneficiary
+                          setSendMoneyOpen(true); // open modal
+                        }}
                         sx={{
                           backgroundColor: "#5c3ac8",
                           borderRadius: 1,
@@ -441,6 +463,15 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
                 </Box>
               </ListItem>
             ))}
+            {filteredBeneficiaries.length === 0 && (
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 1 }}
+              >
+                No beneficiaries found
+              </Typography>
+            )}
           </List>
         </CardContent>
       </Collapse>
@@ -538,6 +569,20 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
           onSuccess?.(sender.mobileNumber);
         }}
       />
+      {sendMoneyOpen && selectedForSend && (
+        <SelectedBeneficiary
+          open={sendMoneyOpen}
+          onClose={() => {
+            setSendMoneyOpen(false);
+            setSelectedForSend(null);
+          }}
+          beneficiary={selectedForSend}
+          senderId={sender?.id}
+          senderMobile={sender?.mobileNumber}
+          referenceKey={sender?.referenceKey || ""} // or generate if needed
+          sender={sender}
+        />
+      )}
     </Card>
   );
 };

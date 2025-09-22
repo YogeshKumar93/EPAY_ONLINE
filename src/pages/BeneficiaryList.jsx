@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Box,
   Card,
@@ -16,6 +16,7 @@ import {
   Avatar,
   Stack,
   Tooltip,
+  TextField,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
@@ -52,6 +53,7 @@ import {
   yes2,
 } from "../utils/iconsImports";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import BeneficiaryDetails from "./BeneficiaryDetails";
 
 const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
   const theme = useTheme();
@@ -60,6 +62,19 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
   const [openModal, setOpenModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [openList, setOpenList] = useState(true);
+  const [openPayModal, setOpenPayModal] = useState(false);
+  const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
+  const [searchText, setSearchText] = useState("");
+
+  const handleOpenPay = (beneficiary) => {
+    setSelectedBeneficiary(beneficiary);
+    setOpenPayModal(true);
+  };
+
+  const handleClosePay = () => {
+    setOpenPayModal(false);
+    setSelectedBeneficiary(null);
+  };
 
   // load schema
   const { schema, formData, handleChange, errors, setErrors, loading } =
@@ -150,6 +165,12 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
             bank_name: null,
           },
         ];
+  const filteredBeneficiaries = useMemo(() => {
+    if (!searchText) return beneficiaries;
+    return beneficiaries.filter((b) =>
+      b.beneficiary_name.toLowerCase().includes(searchText.toLowerCase())
+    );
+  }, [searchText, beneficiaries]);
 
   return (
     <Card
@@ -224,8 +245,19 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
 
       <Collapse in={openList}>
         <CardContent sx={{ p: 2 }}>
+          {beneficiaries.length > 1 && (
+            <Box mb={2}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="Search beneficiary by name"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+              />
+            </Box>
+          )}
           <List dense sx={{ py: 0, maxHeight: 300, overflowY: "auto" }}>
-            {beneficiaries.map((b) => (
+            {filteredBeneficiaries.map((b) => (
               <ListItem
                 key={b.id}
                 sx={{
@@ -266,7 +298,7 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
                         size="small"
                         variant="contained"
                         // color="primary"
-                        onClick={() => onSelect?.(b)}
+                        onClick={() => handleOpenPay(b)} // ✅ open modal with this beneficiary
                         sx={{
                           backgroundColor: "#5c3ac8",
                           borderRadius: 1,
@@ -388,6 +420,15 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
                 </Box>
               </ListItem>
             ))}
+            {filteredBeneficiaries.length === 0 && (
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 1 }}
+              >
+                No beneficiaries found
+              </Typography>
+            )}
           </List>
         </CardContent>
       </Collapse>
@@ -415,6 +456,16 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
               sx: { borderRadius: 1 },
             },
           ]}
+        />
+      )}
+      {openPayModal && (
+        <BeneficiaryDetails
+          open={openPayModal}
+          onClose={() => setOpenPayModal(false)}
+          beneficiary={selectedBeneficiary}
+          sender={sender}
+          senderId={sender?.id}
+          senderMobile={sender?.mobile_number}
         />
       )}
     </Card>
