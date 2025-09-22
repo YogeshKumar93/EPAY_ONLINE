@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Button, Modal, Typography } from "@mui/material";
 import myImage from "../assets/Images/aeps-guidelines-new.png";
-import myLogo from "../assets/Images/logo(1).png";
+import myLogo from "../assets/Images/PPALogo.jpeg";
 import atmIcon from "../assets/Images/aeps_print.png";
 import Aeps1 from "./Aeps1";
 
@@ -28,9 +28,11 @@ const Aeps = () => {
           alt="Guidelines"
           sx={{
             width: "100%",
-            maxWidth: 600,
+            maxWidth: 700,
+            height:400,
             borderRadius: 2,
             mb: 2,
+            pt:8
           }}
         />
         <Box
@@ -55,23 +57,38 @@ const Aeps = () => {
     );
   }
 
+  
   // Step 2 → AEPS Selection
-  if (step === 2) {
-    return (
+if (step === 2) {
+  return (
+    <Box
+      sx={{
+        p: 5, // padding around the whole section
+        bgcolor: "#f5f5f5", // light background color
+        borderRadius: 4, // rounded corners
+        boxShadow: 3, // slight shadow
+        border: "1px solid #3d3df0ff",
+        maxWidth: 700,
+        height: 400,
+        mx: "auto", // center horizontally
+       mt:8
+      }}
+    >
       <Box sx={{ textAlign: "center", mt: 5 }}>
         <Typography
           variant="h5"
           sx={{ mb: 3, fontWeight: "bold", color: "#9d72f0" }}
         >
-          Choose Your AEPS Service
+          Select AEPS Type
         </Typography>
 
         <Box
           sx={{
             display: "flex",
             justifyContent: "center",
-            gap: 4,
+            gap: 14,
             flexWrap: "wrap",
+            mt: 7,
           }}
         >
           {/* AEPS1 */}
@@ -151,8 +168,10 @@ const Aeps = () => {
           </Button>
         </Box>
       </Box>
-    );
-  }
+    </Box>
+  );
+}
+
 
   // Step 3 → AEPS1 Component
   if (step === 3) {

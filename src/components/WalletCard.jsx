@@ -7,32 +7,57 @@ import { Avatar, Box, Tooltip, Typography } from "@mui/material";
 
 const WalletCard = ({ label = "", amount = "" }) => {
   return (
+ <Box
+  sx={{
+    px: 2,
+    py: 1,
+    borderRadius: "16px",
+    background: "#dbe8e3ff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 2,
+    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+    border: "1px solid rgba(255,255,255,0.2)",
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+    "&:hover": {
+      transform: "translateY(-3px)",
+      boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+    },
+  }}
+>
+  {/* Left: Label + optional icon */}
+  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+    {/* Optional icon placeholder */}
     <Box
       sx={{
-        px: 1.5,
-        py: 0.5,
-        borderRadius: "12px",
-        background: "#9d72f0",
-        color: "white",
+        width: 24,
+        height: 24,
+        borderRadius: "50%",
+        background: "#451b9bff",
         display: "flex",
         alignItems: "center",
-        gap: 1,
-        boxShadow: "0 3px 6px rgba(124,77,255,0.3)",
-        cursor: "pointer",
-        transition: "0.3s",
-        "&:hover": {
-          transform: "translateY(-2px)",
-          boxShadow: "0 6px 12px rgba(124,77,255,0.45)",
-        },
+        justifyContent: "center",
+        fontSize: "0.8rem",
       }}
     >
-      <Typography sx={{ fontSize: "0.75rem", fontWeight: 600 }}>
-        {label}
-      </Typography>
-      <Typography sx={{ fontSize: "0.9rem", fontWeight: 700 }}>
-        {amount}
-      </Typography>
+      💰
     </Box>
+    <Typography sx={{ fontSize: "0.8rem", fontWeight: 600, letterSpacing: 0.5, color: "#000" }}>
+      {label}
+    </Typography>
+  </Box>
+
+  {/* Right: Amount */}
+  <Typography sx={{ fontSize: "1rem", fontWeight: 700, letterSpacing: 0.5, color: "#000" }}>
+    {amount}
+  </Typography>
+</Box>
+
+
+
+
   );
 };
 
