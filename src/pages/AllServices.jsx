@@ -70,6 +70,11 @@ import { Recharge } from "./Recharge";
 import UpiTransfer from "./UpiTransfer";
 import Bbps from "./Bbps";
 import Dmt from "./Dmt";
+import Dmt2 from "./Dmt2";
+import Aeps from "./Aeps";
+import Cms from "./Cms";
+import Prepaid from "../components/UI/rechange and bill/Prepaid";
+import Dth from "../components/UI/rechange and bill/Dth";
 
 const MenuCard = ({ icon, label, onClick, isActive, user }) => {
   return (
@@ -243,24 +248,55 @@ const SubMenuCard = ({ icon, label, onClick, isActive, user }) => {
   );
 };
 export default function AllServices() {
-  const [activeMenu, setActiveMenu] = useState("qrUpi");
+  const [activeMenu, setActiveMenu] = useState(null);
   const [activeSubMenu, setActiveSubMenu] = useState(null);
 
   const authCtx = useContext(AuthContext);
-  const user = authCtx.user;
+  const user = authCtx.user || {};
   const theme = useTheme();
-  const setCurrentView = authCtx.setCurrentView;
-  const currentView = authCtx.currentView;
+  const [currentView, setCurrentView] = useState("");
+
+  const hasPermission = (permissionKey) => {
+    if (!user) return false;
+    return user[permissionKey] !== 1; // Show menu if permission is NOT 1
+  };
+
+  const hasNonZeroPermission = (permissionKey) => {
+    if (!user) return false;
+    return user[permissionKey] !== 0; // Show menu if permission is NOT 0
+  };
 
   const menuData = [
-    (user?.dmt1 !== 1 || user?.dmt2 !== 1) && {
-      key: "moneyTransfer",
+    // (hasPermission("dmt1") || hasPermission("dmt2")) && {
+    //   key: "moneyTransfer",
+    //   label: "Money Transfer",
+    //   icon: mt,
+    //   component: Dmt,
+    // },
+    hasPermission("monettransfer") && {
+      key: "monettransfer",
       label: "Money Transfer",
       icon: mt,
-      component: Dmt,
+      subMenu: [
+        {
+          key: "dmt1",
+          label: "Dmt1",
+          icon: mt,
+          component: Dmt,
+          type: "mobile",
+          title: "Dmt1",
+        },
+        {
+          key: "dmt2",
+          label: "Dmt2",
+          icon: mt,
+          component: Dmt2,
+          type: "mobile",
+          title: "Dmt2",
+        },
+      ],
     },
-
-    user?.dmt4 !== 0 && {
+    hasNonZeroPermission("dmt4") && {
       key: "ppiWallet",
       label: "Fund Transfer",
       icon: vapy_1,
@@ -274,7 +310,7 @@ export default function AllServices() {
         },
       ],
     },
-    user?.upi_transfer !== 1 && {
+    hasPermission("upi") && {
       key: "qrUpi",
       label: "UPI Transfer",
       icon: upi_1,
@@ -288,27 +324,69 @@ export default function AllServices() {
         },
       ],
     },
-    user?.aeps !== 1 && {
+    hasPermission("aeps") && {
       key: "aeps",
       label: "AEPS",
       icon: aeps1,
+      component: Aeps,
+    },
+    hasPermission("billpay") && {
+      key: "billPayments",
+      label: "BBPS(OFFLINE)",
+      icon: BBPS,
       subMenu: [
         {
-          key: "aepsTxn",
-          label: "AEPS 1",
-          icon: LocalAtmIcon,
+          key: "electricity",
+          label: "Electricity",
+          icon: electricity1,
+          component: BBPS,
+          type: "C04",
+        },
+        {
+          key: "broadband",
+          label: "Broadband",
+          icon: broadband_1,
+          component: BBPS,
+          type: "C05",
+        },
+        {
+          key: "gas",
+          label: "Gas Bill",
+          icon: gas_1,
+          component: BBPS,
+          type: "C07",
+        },
+        {
+          key: "water",
+          label: "Water Bill",
+          icon: water_1,
+          component: BBPS,
+          type: "C08",
+        },
+        {
+          key: "insurance",
+          label: "Insurance",
+          icon: insurance_1,
+          component: BBPS,
+          type: "C11",
+        },
+        {
+          key: "landline",
+          label: "Landline Bill",
+          icon: landline_1,
+          component: BBPS,
+          type: "C02",
         },
       ],
     },
-
-    user?.bbps !== 1 && {
+    hasPermission("bbps") && {
       key: "bbps",
       label: "BBPS ",
       icon: BBPS,
       component: Bbps,
     },
 
-    user?.recharge !== 1 && {
+    hasPermission("mt") && {
       key: "recharge",
       label: "Recharge",
       icon: recharge,
@@ -317,7 +395,7 @@ export default function AllServices() {
           key: "prepaid",
           label: "Prepaid",
           icon: recharge,
-          component: Recharge,
+          component: Prepaid,
           type: "mobile",
           title: "Prepaid",
         },
@@ -325,7 +403,7 @@ export default function AllServices() {
           key: "postpaid",
           label: "Postpaid",
           icon: postpaid_1,
-          component: Recharge,
+          component: Prepaid,
           type: "mobile",
           title: "Postpaid",
         },
@@ -333,7 +411,7 @@ export default function AllServices() {
           key: "dth",
           label: "DTH",
           icon: dth_1,
-          component: Recharge,
+          component: Dth,
           type: "dth",
         },
       ],
@@ -365,6 +443,7 @@ export default function AllServices() {
           key: "cms",
           label: "Cms",
           icon: DashboardIcon,
+          component: Cms,
           type: "C04",
         },
       ],
@@ -397,7 +476,18 @@ export default function AllServices() {
   const handleMenuClick = (menu) => {
     setActiveMenu(menu.key);
     setActiveSubMenu(null);
-    setCurrentView(null); // reset hamesha
+
+    if (!menu.subMenu) {
+      setCurrentView({
+        component: menu.component,
+        menuLabel: menu.label,
+        subMenuLabel: null,
+        type: null,
+        title: null,
+      });
+    } else {
+      setCurrentView(null);
+    }
   };
 
   const handleSubMenuClick = (sub, parentMenu) => {
@@ -414,19 +504,17 @@ export default function AllServices() {
   const resetView = () => {
     setCurrentView(null);
     setActiveSubMenu(null);
+    setActiveMenu(null); // 👈 forcefully null
   };
-
-  const activeMenuData = menuData.find((m) => m.key === activeMenu);
+  const activeMenuData = menuData.find((m) => m.key === activeMenu) || null;
 
   return (
     <Box
       sx={{
         p: { xs: 1, md: 2 },
         backgroundColor: "#F5F4FA",
-        //  minHeight: "100vh",
       }}
     >
-      {/* ✅ Main Menu - hamesha dikhega */}
       <Grid container spacing={2} sx={{ mb: 2 }}>
         {menuData.map((menu) => (
           <Grid
@@ -485,11 +573,9 @@ export default function AllServices() {
               },
             }}
           >
-            {activeMenuData.label}
-            {currentView?.subMenuLabel && ` / ${currentView.subMenuLabel}`}
+            {currentView?.subMenuLabel || activeMenuData.label}
           </Typography>
 
-          {/* 👇 Agar submenu hai aur abhi koi component select nahi hua */}
           {activeMenuData.subMenu && !currentView && (
             <Grid container spacing={2}>
               {activeMenuData.subMenu.map((sub) => (
@@ -515,7 +601,7 @@ export default function AllServices() {
           )}
 
           {/* 👇 Agar submenu me se koi component select ho gaya */}
-          {currentView && (
+          {currentView && currentView.component && (
             <Box sx={{ mt: 1 }}>
               <currentView.component
                 type={currentView.type}
@@ -525,10 +611,20 @@ export default function AllServices() {
             </Box>
           )}
 
-          {/* 👇 Agar submenu hi nahi tha (direct component menu tha) */}
-          {!activeMenuData.subMenu && activeMenuData.component && (
-            <Box sx={{ mt: 1 }}>
-              <activeMenuData.component />
+          {!activeMenuData.subMenu &&
+            activeMenuData.component &&
+            !currentView && (
+              <Box sx={{ mt: 1 }}>
+                <activeMenuData.component />
+              </Box>
+            )}
+
+          {/* 👇 Fallback for menus without components */}
+          {!activeMenuData.subMenu && !activeMenuData.component && (
+            <Box
+              sx={{ mt: 2, p: 2, textAlign: "center", color: "text.secondary" }}
+            >
+              <Typography>No content available for this menu</Typography>
             </Box>
           )}
         </Box>

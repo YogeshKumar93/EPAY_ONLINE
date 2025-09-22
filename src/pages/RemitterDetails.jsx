@@ -3,12 +3,12 @@ import {
   Box,
   Typography,
   Card,
-  IconButton,
   Collapse,
   useTheme,
   useMediaQuery,
   Grid,
   Avatar,
+  IconButton,
 } from "@mui/material";
 import {
   ExpandMore,
@@ -36,40 +36,39 @@ const RemitterDetails = ({ sender }) => {
         overflow: "hidden",
       }}
     >
-      {/* Header */}
-      {/* <Box
-        sx={{
-          bgcolor: "#9d72ff",
-          color: "#fff",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          py: 1,
-          px: 2,
-          cursor: isMobile ? "pointer" : "default",
-        }}
-        onClick={isMobile ? handleToggle : undefined}
-      >
-        <Typography variant="subtitle1" fontWeight="bold">
-          Sender Details
-        </Typography> */}
+      {/* Mobile Toggle */}
       {isMobile && (
-        <IconButton size="small" sx={{ color: "white" }}>
-          {open ? <ExpandLess /> : <ExpandMore />}
-        </IconButton>
+        <Box
+          sx={{
+            bgcolor: "#9d72ff",
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            py: 1,
+            px: 2,
+            cursor: "pointer",
+          }}
+          onClick={handleToggle}
+        >
+          <Typography variant="subtitle1" fontWeight="bold">
+            Sender Details
+          </Typography>
+          <IconButton size="small" sx={{ color: "white" }}>
+            {open ? <ExpandLess /> : <ExpandMore />}
+          </IconButton>
+        </Box>
       )}
-      {/* </Box> */}
 
-      {/* Content with collapse on mobile */}
       <Collapse in={open || !isMobile} timeout="auto" unmountOnExit>
         {sender ? (
           <Box sx={{ p: 2 }}>
-            <Grid container>
-              {/* Top Row */}
+            <Grid container spacing={2}>
+              {/* Name */}
               <Grid
                 item
                 xs={12}
-                sm={6}
+                sm={3}
                 sx={{ display: "flex", alignItems: "center" }}
               >
                 <Avatar
@@ -93,15 +92,12 @@ const RemitterDetails = ({ sender }) => {
                 </Box>
               </Grid>
 
+              {/* Number */}
               <Grid
                 item
                 xs={12}
-                sm={6}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "flex-end",
-                }}
+                sm={3}
+                sx={{ display: "flex", alignItems: "center" }}
               >
                 <Avatar
                   sx={{
@@ -113,7 +109,7 @@ const RemitterDetails = ({ sender }) => {
                 >
                   <Phone fontSize="small" />
                 </Avatar>
-                <Box ml={1.5} textAlign="left">
+                <Box ml={1.5}>
                   <Typography variant="body2" color="text.secondary">
                     Number
                   </Typography>
@@ -123,12 +119,12 @@ const RemitterDetails = ({ sender }) => {
                 </Box>
               </Grid>
 
-              {/* Bottom Row */}
+              {/* Limit per txn */}
               <Grid
                 item
                 xs={12}
-                sm={6}
-                sx={{ display: "flex", alignItems: "center", mt: 2 }}
+                sm={3}
+                sx={{ display: "flex", alignItems: "center" }}
               >
                 <Avatar
                   sx={{
@@ -148,16 +144,12 @@ const RemitterDetails = ({ sender }) => {
                 </Box>
               </Grid>
 
+              {/* Limit Available */}
               <Grid
                 item
                 xs={12}
-                sm={6}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "flex-end",
-                  mt: 2,
-                }}
+                sm={3}
+                sx={{ display: "flex", alignItems: "center" }}
               >
                 <Avatar
                   sx={{
@@ -169,7 +161,7 @@ const RemitterDetails = ({ sender }) => {
                 >
                   <AccountBalance fontSize="small" />
                 </Avatar>
-                <Box ml={1.5} textAlign="left">
+                <Box ml={1.5}>
                   <Typography variant="body2" color="text.secondary">
                     Limit Available
                   </Typography>
