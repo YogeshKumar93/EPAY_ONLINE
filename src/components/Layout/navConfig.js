@@ -76,7 +76,7 @@ export const Admin_nav = [
   // },
   {
     title: "Wallet Ledger",
-    icon: walletLdgerImage,
+    icon: walletLedgerImg,
     icon2: "🛠️",
     to: "/admin/wallet-ledger",
   },

@@ -35,6 +35,7 @@ const titleMap = {
     "/admin/pg-orders": "PG Orders",
     "/admin/virtual_accounts": "Virtual Accounts",
     "/admin/invoice": "Invoices",
+   
   },
 
   customer: {

@@ -7,6 +7,9 @@ import Logs from "./Logs";
 import WebHooks from "./WebHooks";
 import Plans from "./Plans";
 import Notification from "../components/Notification/Notification";
+import EventNoteIcon from '@mui/icons-material/EventNote';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import EmojiObjectsIcon from '@mui/icons-material/EmojiObjects';
 
 // Icons
 import DescriptionIcon from "@mui/icons-material/Description"; // Template
@@ -19,15 +22,16 @@ import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import News from "./News";
 import Purposes from "./Purposes";
 
+
 export const Settings = () => {
   const tabItems = [
     { label: "Template", icon: <DescriptionIcon />, component: <Templates /> },
     { label: "Comm Rules", icon: <RuleIcon />, component: <CommissionRule /> },
     // { label: "WebHooks", icon: <HttpIcon />, component: <WebHooks /> },
     { label: "Logs", icon: <ListAltIcon />, component: <Logs /> },
-    { label: "Plans", icon: <AssignmentIcon />, component: <Plans /> },
-    { label: "News", icon: <AssignmentIcon />, component: <News /> },
-    { label: "Purposes", icon: <AssignmentIcon />, component: <Purposes /> },
+    { label: "Plans", icon: <EventNoteIcon/>, component: <Plans /> },
+    { label: "News", icon: <EmojiObjectsIcon />, component: <News /> },
+    { label: "Purposes", icon: <StarBorderIcon />, component: <Purposes /> },
     {
       label: "Notifications",
       icon: <NotificationsActiveIcon />,

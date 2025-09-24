@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import AuthContext from "../contexts/AuthContext";
-import { dateToTime, ddmmyy } from "../utils/DateUtils";
+import { dateToTime, ddmmyy, ddmmyyWithTime } from "../utils/DateUtils";
 import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CreateTemplateModal from "../components/CreateTemplateModal";
@@ -68,9 +68,14 @@ const columns = useMemo(
     {
       name: "Date/Time",
       selector: (row) => (
-        <Typography variant="body2" sx={{ textAlign: "left" }} noWrap>
-          {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
-        </Typography>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+                   <Tooltip title={`Created: ${ddmmyyWithTime(row.created_at)}`} arrow>
+                     <span>
+                       {ddmmyy(row.created_at)} 
+                     </span>
+                   </Tooltip> 
+                 
+                 </div>
       ),
       wrap: false,
       width: "150px",

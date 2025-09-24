@@ -196,7 +196,7 @@ import walletTransfer from "./assets/Images/Transfer.svg";
 import walletLdger from "./assets/Images/walletLedger.svg";
 import complnImg from "./assets/new_dashboardIcon/complaint.png";
 import setting from "./assets/ImageS/settings2.svg";
-import service from "./assets/new_dashboardIcon/fundTrnsfr.png";
+import service from "./assets/Images/Services.svg";
 import rechargeNewImg from "./assets/new_dashboardIcon/rechargeNew.png";
 import layout from "./assets/ImageS/layouts.svg";
 import aeps from "./assets/ImageS/AEPS.svg";

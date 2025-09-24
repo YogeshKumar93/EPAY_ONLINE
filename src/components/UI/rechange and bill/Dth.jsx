@@ -13,6 +13,7 @@ import {
   Slide,
 } from "@mui/material";
 import { CheckCircle } from "@mui/icons-material";
+import OTPInput from "react-otp-input"; // ✅ Import OTPInput
 import { apiCall } from "../../../api/apiClient";
 import ApiEndpoints from "../../../api/ApiEndpoints";
 import { apiErrorToast, okSuccessToast } from "../../../utils/ToastUtil";
@@ -222,35 +223,27 @@ const Dth = () => {
 
                 {/* MPIN boxes: show only if amount is filled */}
                 {manualAmount && (
-                  <Box sx={{ display: "flex", justifyContent: "center", gap: 1, mb: 3 }}>
-                    {Array.from({ length: 6 }).map((_, index) => (
-                      <TextField
-                        key={index}
-                        type="password"
-                        id={`mpin-${index}`}
-                        value={MpinCallBackVal[index] || ""}
-                        inputProps={{
-                          maxLength: 1,
-                          style: { textAlign: "center", fontSize: 24, width: 35, padding: 8 },
-                        }}
-                        onChange={(e) => {
-                          const val = e.target.value.replace(/[^0-9]/g, "");
-                          if (!val) return;
-
-                          let newMpin = MpinCallBackVal.split("");
-                          newMpin[index] = val;
-                          setMpinCallBackVal(newMpin.join(""));
-
-                          // focus next input
-                          const next = document.getElementById(`mpin-${index + 1}`);
-                          if (next) next.focus();
-                        }}
-                      />
-                    ))}
+                  <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
+                    <OTPInput
+                      value={MpinCallBackVal}
+                      onChange={setMpinCallBackVal}
+                      numInputs={6} // 6 digits for MPIN
+                      inputType="password"
+                      renderInput={(props) => <input {...props} />}
+                      inputStyle={{
+                        width: 40,
+                        height: 40,
+                        margin: "0 5px",
+                        fontSize: 20,
+                        border: "1px solid #D0D5DD",
+                        borderRadius: 6,
+                        textAlign: "center",
+                      }}
+                    />
                   </Box>
                 )}
 
-                {/* Pay button: show only if amount is filled, enable only if MPIN complete */}
+                {/* Pay button */}
                 {manualAmount && (
                   <Button
                     fullWidth

@@ -33,11 +33,13 @@ const NewsSection = () => {
           // key={index}
           style={{
             // color: colors[index % colors.length],
-            color: "#000",
+            color: "#060a5cff",
             margin: "0 8px",
+            backgroundColor:"#e3f2f2ff"
           }}
         >
-          hello welcome to my website
+          🚀 We have new Plans for You! | UPI Service is working Fine | New updates available | Keep
+          track of your transactions here..
           {/* {item.news} */}
           {/* {index < data.length - 1 && " | "} */}
         </span>

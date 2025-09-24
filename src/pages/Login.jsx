@@ -23,7 +23,7 @@ import AuthContext from "../contexts/AuthContext";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { apiCall } from "../api/apiClient";
 import { ReTextField } from "../components/common/ReTextField";
-import backImg from "../assets/Images/LoginPge.png";
+import backImg from "../assets/Images/LoginNew.svg";
 import VerifyMpinLogin from "../components/UI/VerifyMpinLogin";
 import { getGeoLocation } from "../utils/GeoLocationUtil";
 import { okErrorToast } from "../utils/ToastUtil";
@@ -178,19 +178,26 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
   xs={false}
   md={7}
   sx={{
-    backgroundImage: `url(${backImg})`,
-    backgroundRepeat: "no-repeat",
-    backgroundSize: "auto 88%", // <-- height is 50% of container
-    backgroundPosition: "center",
-    display: { xs: "none", md: "block" },
+    display: { xs: "none", md: "flex" },
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "#5224a3ff",
     width: "55%",
     border: "3px solid #4adc51ff",
-  boxShadow: "#3d27a1ff"
-
   }}
-/>
-
+>
+  <Box
+    component="img"
+    src={backImg}
+    alt="Background"
+    sx={{
+      height: "80%",
+      objectFit: "contain",
+      boxShadow: "0px 4px 20px rgba(0,0,0,0.5)", // 👈 shadow only on image
+      borderRadius: 2, // optional if you want rounded corners
+    }}
+  />
+</Grid>
 
 
       {/* Right Side - Login Form */}
@@ -347,6 +354,7 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
             position: "absolute",
             top: "50%",
             left: "50%",
+            type: "password",
             transform: "translate(-50%, -50%)",
             width: { xs: "90%", sm: 500, md: 600 },
             // boxShadow: 24,

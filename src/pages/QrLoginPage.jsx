@@ -35,7 +35,7 @@ import VerifyMpinLogin from "../components/UI/VerifyMpinLogin";
 import { getGeoLocation } from "../utils/GeoLocationUtil";
 import { okErrorToast } from "../utils/ToastUtil";
 import ForgotPassword from "../components/common/ForgotPassword";
-import biggpayLogo from "../assets/logo(1).png";
+import biggpayLogo from "../assets/Images/PPALogor.png";
 import QRCode from "react-qr-code";
 
 const QrLoginPage = () => {

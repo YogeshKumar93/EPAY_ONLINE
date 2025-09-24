@@ -45,7 +45,9 @@ const ChangeLayoutModal = ({ open, onClose, onSuccess, username }) => {
   const [mpinModalOpen, setMpinModalOpen] = useState(false);
   const [MpinCallBackVal, setMpinCallBackVal] = useState(false);
   const [selectedLayout, setSelectedLayout] = useState(null);
-
+  const [otpRef, setOtpRef] = useState(null);
+  const [otp, setOtp] = useState("");
+  const [mpin, setMpin] = useState("");
   const authCtx = useContext(AuthContext);
   const user = authCtx.user;
   const loadUserProfile = authCtx?.loadUserProfile;
