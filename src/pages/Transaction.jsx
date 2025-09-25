@@ -20,6 +20,7 @@ import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
 import TrainIcon from "@mui/icons-material/Train";
 import { Wallet } from "@mui/icons-material";
 import Wallet2WalletTransfer from "./Wallet2WalletTransfer";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 
 export const Transaction = () => {
   const tabItems = [
@@ -154,7 +155,7 @@ export const Transaction = () => {
           justifyContent: "flex-start",
         }}
       >
-        <Wallet fontSize="small" />
+      <AccountBalanceWalletIcon fontSize="small" />
         <span>W2W</span>
       </div>
     ),
