@@ -270,6 +270,7 @@ export default function AppRoutes() {
 
               <Route path="di/wallet-ledger" element={<AccountLadger />} />
               <Route path="di/transactions" element={<Transaction />} />
+                           <Route path="di/wallet-ledgers" element={<WalletLedgers />} />
               <Route
                 path="di/wallet-transfer"
                 element={<Wallet2WalletTransfer />}

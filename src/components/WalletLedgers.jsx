@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import CommonTabs from "../components/common/CommonTabs";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import ReceiptIcon from "@mui/icons-material/Receipt";
@@ -9,6 +10,12 @@ import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 
 
 export const WalletLedgers = () => {
+  const [tab, setTab] = useState(0);
+
+  const handleChange = (event, newValue) => {
+    setTab(newValue);
+  };
+
   const tabItems = [
       {
     label: (
@@ -66,5 +73,5 @@ export const WalletLedgers = () => {
     
   ];
 
-  return <CommonTabs tabs={tabItems} defaultTab={0} />;
+  return <CommonTabs tabs={tabItems} value={tab} onChange={handleChange} />;
 };

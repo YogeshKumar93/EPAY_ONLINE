@@ -13,6 +13,8 @@ import ReButton from "../components/common/ReButton";
 import CreateUser from "../components/User/createUser";
 import EditIcon from "@mui/icons-material/Edit";
 import { apiCall } from "../api/apiClient";
+import AdWalletTransfer from "./AdWalletTransfer";
+import CommonStatus from "../components/common/CommonStatus";
 const roleLabels = {
   ret: "Retailer",
   adm: "Admin",
@@ -106,8 +108,8 @@ const Users = ({ query }) => {
     []
   );
 
-  const columns = useMemo(
-    () => [
+  const columns = useMemo(() => {
+    const baseColumns = [
       {
         name: "Date/Time",
         selector: (row) => (
@@ -120,7 +122,9 @@ const Users = ({ query }) => {
         name: "Id",
         selector: (row) => (
           <Tooltip title={row?.id}>
-            <div style={{ textAlign: "left" }}>Trans_{row?.id}</div>
+            <div style={{ textAlign: "left", fontWeight: "bold" }}>
+              TRANS{row?.id}
+            </div>
           </Tooltip>
         ),
       },
@@ -132,7 +136,7 @@ const Users = ({ query }) => {
           </Tooltip>
         ),
       },
-         {
+      {
         name: "Establishment",
         selector: (row) => (
           <Tooltip title={row?.establishment}>
@@ -141,16 +145,20 @@ const Users = ({ query }) => {
         ),
         width: "100px",
       },
-          {
-        name: "Role",
-        selector: (row) => (
-          <Tooltip title={roleLabels[row?.role] || row?.role}>
-            <div style={{ textAlign: "left" }}>
-              {roleLabels[row?.role] || row?.role}
-            </div>
-          </Tooltip>
-        ),
-      },
+      ...(userRole.role !== "di"
+        ? [
+            {
+              name: "Role",
+              selector: (row) => (
+                <Tooltip title={roleLabels[row?.role] || row?.role}>
+                  <div style={{ textAlign: "left" }}>
+                    {roleLabels[row?.role] || row?.role}
+                  </div>
+                </Tooltip>
+              ),
+            },
+          ]
+        : []),
       {
         name: "Mobile",
         selector: (row) => (
@@ -160,24 +168,122 @@ const Users = ({ query }) => {
         ),
         width: "100px",
       },
+      ...(userRole.role !== "di"
+        ? [
+            {
+              name: "Parent",
+              selector: (row) => {
+                const parentName = userMap[row.parent] || "-";
+                return (
+                  <Tooltip title={parentName}>
+                    <div style={{ textAlign: "left", cursor: "pointer" }}>
+                      {row.parent}
+                    </div>
+                  </Tooltip>
+                );
+              },
+            },
+          ]
+        : []),
       {
-        name: "Parent",
-        selector: (row) => {
-          const parentName = userMap[row.parent] || "-"; // Lookup parent name from userMap
-          return (
-            <Tooltip title={parentName}>
-              <div style={{ textAlign: "left", cursor: "pointer" }}>
-                {row.parent}
-              </div>
-            </Tooltip>
-          );
-        },
+        name: "Wallet 1",
+        selector: (row) => (
+          <div style={{ textAlign: "left", cursor: "pointer" }}>
+            ₹ {(row.w1 / 100).toFixed(2)}
+          </div>
+        ),
       },
       {
-        name: "Status",
-        selector: (row, { hoveredRow, enableActionsHover }) => {
-          
+        name: "Wallet 2",
+        selector: (row) => (
+          <div style={{ textAlign: "left", cursor: "pointer" }}>
+            ₹ {(row.w2 / 100).toFixed(2)}
+          </div>
+        ),
+      },
+      ...(userRole.role !== "di"
+        ? [
+            {
+              name: "Wallet 3",
+              selector: (row) => (
+                <div style={{ textAlign: "left", cursor: "pointer" }}>
+                  ₹ {row.w3}
+                </div>
+              ),
+            },
+          ]
+        : []),
+      ...(userRole.role !== "di"
+        ? [
+            {
+              name: "Lien",
+              selector: (row) => (
+                <Tooltip title={row.lien}>
+                  <div style={{ textAlign: "left", cursor: "pointer" }}>
+                    {row.lien}
+                  </div>
+                </Tooltip>
+              ),
+            },
+          ]
+        : []),
+    ];
 
+    // Conditionally add Actions column for admins and distributors
+    if (userRole.role === "adm" || userRole.role === "di") {
+      baseColumns.push({
+        name: "Actions",
+        selector: (row) => (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "left",
+              justifyContent: "left",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                opacity: 1,
+                pointerEvents: "auto",
+                transition: "opacity 0.2s ease-in-out",
+              }}
+            >
+              {userRole.role === "adm" && (
+                <>
+                  <Tooltip title="Edit User">
+                    <IconButton
+                      size="small"
+                      color="secondary"
+                      onClick={() => handleEdit(row)}
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Edit Permissions">
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={() => handleOpenPermissions(row)}
+                    >
+                      <SettingsIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </>
+              )}
+              {userRole.role === "di" && <AdWalletTransfer row={row} />}
+            </Box>
+          </Box>
+        ),
+      });
+    }
+
+    // Move Status column to last
+    baseColumns.push({
+      name: "Status",
+      selector: (row) => {
+        if (userRole.role === "adm" || userRole.role === "sadm") {
           return (
             <Box
               sx={{
@@ -187,26 +293,15 @@ const Users = ({ query }) => {
                 minWidth: "120px",
               }}
             >
-              {/* Status text */}
-              <Typography
-                sx={{
-                  color: row.is_active === 1 ? "green" : "red",
-                  minWidth: "60px", // Reserve space
-                }}
-              >
-                {row.is_active === 1 ? "Active" : "Inactive"}
-              </Typography>
-
-              {/* Lock icon container */}
               <Box
                 sx={{
                   display: "flex",
                   alignItems: "center",
                   gap: 0.5,
-                  opacity:  1 , // fade effect
-                  pointerEvents:  "auto" ,  
+                  opacity: 1,
+                  pointerEvents: "auto",
                   transition: "opacity 0.2s ease-in-out",
-                  minWidth: "40px", // reserve space
+                  minWidth: "40px",
                 }}
               >
                 {row.is_active === 1 ? (
@@ -231,119 +326,29 @@ const Users = ({ query }) => {
                   </Tooltip>
                 )}
               </Box>
-
-            
             </Box>
           );
-        },
-      },
-{
-        name: "Wallet 1",
-        selector: (row) => {
-          const parentName = userMap[row.parent] || "-"; // Lookup parent name from userMap
+        } else if (userRole.role === "di") {
           return (
-            <Tooltip title={parentName}>
-              <div style={{ textAlign: "left", cursor: "pointer" }}>
-                {row.w1}
-              </div>
-            </Tooltip>
+            <CommonStatus value={row.is_active} />
+            // <Box
+            //   sx={{
+            //     textAlign: "left",
+            //     minWidth: "120px",
+            //     color: row.is_active === 1 ? "success.main" : "error.main",
+            //     fontWeight: 500,
+            //   }}
+            // >
+            //   {row.is_active === 1 ? "Active" : "Inactive"}
+            // </Box>
           );
-        },
+        }
+        return null;
       },
-      {
-        name: "Wallet 2",
-        selector: (row) => {
-          const parentName = userMap[row.parent] || "-"; // Lookup parent name from userMap
-          return (
-            <Tooltip title={parentName}>
-              <div style={{ textAlign: "left", cursor: "pointer" }}>
-                {row.w2}
-              </div>
-            </Tooltip>
-          );
-        },
-      },
-      {
-        name: "Wallet 3",
-        selector: (row) => {
-          const parentName = userMap[row.parent] || "-"; // Lookup parent name from userMap
-          return (
-            <Tooltip title={row.w3}>
-              <div style={{ textAlign: "left", cursor: "pointer" }}>
-                {row.w3}
-              </div>
-            </Tooltip>
-          );
-        },
-      },
-      {
-        name: "Lien",
-        selector: (row) => {
-          const parentName = userMap[row.lien] || "-"; // Lookup parent name from userMap
-          return (
-            <Tooltip title={row.lien}>
-              <div style={{ textAlign: "left", cursor: "pointer" }}>
-                {row.lien}
-              </div>
-            </Tooltip>
-          );
-        },
-      },
-      {
-        name: "Actions",
-        selector: (row, { hoveredRow, enableActionsHover }) => {
-          
+    });
 
-          return (
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                minWidth: "100px", // Fixed width to prevent table shift
-              }}
-            >
-              {/* Buttons always take space; just change opacity */}
-
-              {userRole.role == "adm" && (
-                <Box
-                  sx={{
-                    display: "flex",
-                    gap: 1,
-                    opacity:   1 ,
-                    pointerEvents:   "auto"  ,
-                    transition: "opacity 0.2s ease-in-out",
-                  }}
-                >
-                  <Tooltip title="Edit User">
-                    <IconButton
-                      size="small"
-                      color="secondary"
-                      onClick={() => handleEdit(row)}
-                    >
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Edit Permissions">
-                    <IconButton
-                      size="small"
-                      color="primary"
-                      onClick={() => handleOpenPermissions(row)}
-                    >
-                      <SettingsIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-              )}
-
-           
-            </Box>
-          );
-        },
-      },
-    ],
-    [userMap]
-  );
+    return baseColumns;
+  }, [userMap, userRole]);
 
   return (
     <Box>

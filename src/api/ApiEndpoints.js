@@ -2,7 +2,9 @@
 // export const BASE_URL = "https://uat.impsguru.com/";
 // export const BASE_URL = "https://api.dillipay.com/";
 // export const BASE_URL = "http://192.168.1.14/impsguru-php/";
-export const BASE_URL = "https://newapi.impsguru.com/";
+// export const BASE_URL = "https://newapi.impsguru.com/";
+
+export const BASE_URL = "https://api.transup.in/";
 
 const ApiEndpoints = {
   COOKIE: "sanctum/csrf-cookie",
@@ -234,10 +236,14 @@ const ApiEndpoints = {
   KYC_SCHEMA: "business/kycSchema",
   STATUS_SCHEMA: "business/statusSchema",
 
+ WALLET_LEDGER_TXNDATA: "walletledger/getTxnData",
+
   WALLET_LIST: "wallet/getW2WTransactions",
   WALLET_GET_RECEIVER: "wallet/getReceiver",
   WALLET_GET_W2W_TRANSACTION: "wallet/getW2WTransaction",
   WALLET_CREATE: "wallet/createW2W",
+   WALLET2_WALLET1: "/wallet/createW2W1",
+  WALLET3_WALLET1: "/wallet/createW3W1",
   CREATE_ORDER_CMS_NEW: "cms/createOrderCms",
   VERIFY_UPI_BENEFICIARY: "payout/upiVerifiaction",
   DMT1_OUTLET_INITIATE: "aeps/initiateSignupAeps",

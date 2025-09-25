@@ -415,6 +415,20 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
         >
           <LogoutIcon fontSize="small" /> Logout
         </MenuItem>
+
+          {/* App Version text */}
+        <Typography
+          variant="body2"
+          sx={{
+            textAlign: "center",
+            mt: 1.5,
+            mb: 1,
+            fontSize: "14px",
+            color: "#000",
+          }}
+        >
+          App Version 2.0.0
+        </Typography>
       </List>
     </Box>
   );
