@@ -111,6 +111,7 @@ const Login = () => {
         if (user?.role === "adm") navigate("/admin/dashboard");
         else if (user?.role === "ret") navigate("/customer/dashboard");
         else if (user?.role === "user") navigate("/user/home");
+        else if (user?.role === "md") navigate("/md/dashboard");
         else navigate("/");
       } else {
         setLoginError("Unexpected response from server");

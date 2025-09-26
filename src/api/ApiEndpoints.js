@@ -2,9 +2,9 @@
 // export const BASE_URL = "https://uat.impsguru.com/";
 // export const BASE_URL = "https://api.dillipay.com/";
 // export const BASE_URL = "http://192.168.1.14/impsguru-php/";
-export const BASE_URL = "https://newapi.impsguru.com/";
+// export const BASE_URL = "https://newapi.impsguru.com/";
 
-// export const BASE_URL = "https://api.transup.in/";
+export const BASE_URL = "https://api.transup.in/";
 
 const ApiEndpoints = {
   COOKIE: "sanctum/csrf-cookie",
