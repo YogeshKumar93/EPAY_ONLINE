@@ -221,7 +221,7 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
         }}
       >
         <Box sx={{ width: "100%", maxWidth: 500 }}>
-          <a href="https://app.p2pae.com">
+          <a href="https://app.p2pae.com/qrLogin">
             <Box
               component="img"
               src={biggpayLogo}
