@@ -111,7 +111,7 @@ const QrLoginPage = () => {
           if (authCtx.location) {
             localStorage.setItem("location", JSON.stringify(authCtx.location));
           }
-          switch (userData.role) {
+              switch (userData.role) {
             case "adm":
             case "sadm":
               navigate("/admin/dashboard");
@@ -119,12 +119,18 @@ const QrLoginPage = () => {
             case "asm":
               navigate("/asm/dashboard");
               break;
+            case "zsm":
+              navigate("/zsm/dashboard");
+              break;
             case "di":
               navigate("/di/dashboard");
               break;
             case "ret":
             case "dd":
               navigate("/customer/dashboard");
+              break;
+            case "md":
+              navigate("/md/dashboard");
               break;
             default:
               navigate("/other/dashboard");
