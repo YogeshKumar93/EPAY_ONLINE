@@ -153,14 +153,14 @@ const FundRequest = () => {
         center: true,
       },
 
-    {
+      {
         name: "Actions",
         selector: (row) => (
           <MuiBox
             display="flex"
             alignItems="center"
             justifyContent="center"
-            gap={1}
+            gap={2}
             width="150px"
           >
             {/* ✅ Edit - only if pending */}
@@ -189,40 +189,37 @@ const FundRequest = () => {
             {user?.role === "adm" && (
               <>
                 {row.status !== "approved" && row.status !== "rejected" && (
-                  <MuiBox display="flex" gap={1}>
+                  <MuiBox display="flex" gap={2}>
                     <Tooltip title="Approve">
-                      <Button
-                        size="small"
+                      <CheckCircleIcon
+                        fontSize="small"
                         color="success"
                         onClick={() =>
                           handleOpenModal("status", row, "approved")
                         }
-                      >
-                        <CheckCircleIcon fontSize="small" />
-                      </Button>
+                        style={{ cursor: "pointer" }}
+                      />
                     </Tooltip>
                     <Tooltip title="Reject">
-                      <Button
-                        size="small"
+                      <CancelIcon
+                        fontSize="small"
                         color="error"
                         onClick={() =>
                           handleOpenModal("status", row, "rejected")
                         }
-                      >
-                        <CancelIcon fontSize="small" />
-                      </Button>
+                        style={{ cursor: "pointer" }}
+                      />
                     </Tooltip>
                   </MuiBox>
                 )}
                 {row.status === "rejected" && (
                   <Tooltip title="Reopen">
-                    <Button
-                      size="small"
+                    <OpenInFullIcon
+                      fontSize="small"
                       color="warning"
                       onClick={() => handleOpenModal("status", row, "reopen")}
-                    >
-                      <OpenInFullIcon fontSize="small" />
-                    </Button>
+                      style={{ cursor: "pointer" }}
+                    />
                   </Tooltip>
                 )}
               </>
@@ -230,6 +227,7 @@ const FundRequest = () => {
           </MuiBox>
         ),
         width: "150px",
+       
       },
     ],
     [user]
