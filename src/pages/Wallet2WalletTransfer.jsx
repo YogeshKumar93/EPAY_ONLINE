@@ -384,9 +384,9 @@ const Wallet2WalletTransfer = ({}) => {
             onFetchRef={handleFetchRef}
             columns={columns}
             endpoint={tableEndpoint}
-         
+            queryParam="service=W2W transfer"
             filters={filters}
-            queryParam=""
+       
             refresh={true}
             includeClientRef={false}
           />

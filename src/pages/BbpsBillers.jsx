@@ -22,12 +22,15 @@ import { apiErrorToast } from "../utils/ToastUtil";
 import BbpsBillerDetails from "./BbpsBillerDetails";
 import AuthContext from "../contexts/AuthContext";
 
+
 const BbpsBillers = ({ category, onBack }) => {
   const [billers, setBillers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [selectedBillerId, setSelectedBillerId] = useState(null);
   const [selectedBillerIdImage, setSelectedBillerIdImage] = useState(null);
+  const [selectedBiller, setSelectedBiller] = useState(null);
+
   const authCtx = useContext(AuthContext);
   const user = authCtx.user;
   const is_layout = user?.is_layout;
@@ -127,6 +130,8 @@ const BbpsBillers = ({ category, onBack }) => {
           billerId={selectedBillerId}
           selectedBillerIdImage={selectedBillerIdImage}
           onBack={() => setSelectedBillerId(null)}
+          category={category}
+          biller={selectedBiller}
         />
       ) : null}
 
@@ -171,6 +176,7 @@ const BbpsBillers = ({ category, onBack }) => {
                   onClick={() => {
                     if (!isBillerDisabled(biller)) {
                       setSelectedBillerId(biller.billerId);
+                      setSelectedBiller(biller);
                       setSelectedBillerIdImage(biller.iconUrl);
                     }
                   }}

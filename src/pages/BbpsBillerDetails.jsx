@@ -16,14 +16,27 @@ import ApiEndpoints from "../api/ApiEndpoints";
 import { apiErrorToast } from "../utils/ToastUtil";
 import AuthContext from "../contexts/AuthContext";
 import Loader from "../components/common/Loader";
+import CommonMpinModal from "../components/common/CommonMpinModal";
 
-const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
+const BbpsBillerDetails = ({
+  billerId,
+  onBack,
+  selectedBillerIdImage,
+  category,
+  biller,
+}) => {
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [billerDetails, setBillerDetails] = useState(null);
   const [inputValues, setInputValues] = useState({});
   const [fetchingBill, setFetchingBill] = useState(false);
   const [billData, setBillData] = useState(null);
   const [payingBill, setPayingBill] = useState(false);
+  const [mpinModalOpen, setMpinModalOpen] = useState(false);
+  const handleSendClick = () => {
+    setMpinModalOpen(true);
+  };
+
+  const { location } = useContext(AuthContext);
 
   const authCtx = useContext(AuthContext);
   const ip = authCtx?.ip;
@@ -39,7 +52,9 @@ const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
       );
 
       if (response) {
-        const details = response?.data || null;
+        const details =
+          // response?.data?.response?.data?.parameters[0] ||
+          response?.data?.response?.data;
         setBillerDetails(details);
 
         const params = details?.parameters || [];
@@ -74,6 +89,8 @@ const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
         biller_id: billerId,
         ...inputValues,
         ip: ip || "0.0.0.0",
+        latitude: location?.lat || "",
+        longitude: location?.long || "",
       };
 
       const { error, response } = await apiCall(
@@ -95,68 +112,44 @@ const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
     }
   };
 
-  console.log("The biller id ins", billerId);
-  const handlePayBill = (event) => {
-    event.preventDefault();
-
-    const data = {
+  const handlePayBill = async (mpin) => {
+      const payload = {
       billerId: billerId,
-      biller_name: biller_name,
-      amount: billValue,
-      pan: pan || undefined,
+      biller_name: billerDetails?.billerInfo?.name,
+      cat: billerDetails?.category?.key,
       pf: "web",
-      cat: categoryName?.categoryKey,
-      mpin: mpinVal,
-      latitude: location.lat,
-      longitude: location.long,
-      enquiryReferenceId: billData?.enquiryReferenceId || "15486sfdgyf",
+      latitude: location?.lat,
+      longitude: location?.long,
+      enquiryReferenceId: billData?.enquiryReferenceId || "",
+      amount: billData?.BillAmount || inputValues?.amount,
+      mpin,
     };
-
-    // ✅ Map all dynamic params from API
-    if (params && params.length > 0) {
-      params.forEach((item) => {
-        const propertyName = item.name; // example: param1, param2, etc
-        let value = document.getElementById(propertyName)?.value;
-
-        // Convert numeric params to Number
-        if (item.inputType === "NUMERIC" && value) {
-          value = Number(value);
-        }
-
-        data[propertyName] = value;
+    // dynamic params (param1, param2, etc.)
+    if (billerDetails?.parameters?.length > 0) {
+      billerDetails.parameters.forEach((param) => {
+        payload[param.name] = inputValues[param.name];
       });
     }
-
-    // ✅ Special case: always add param2 as amount (if required)
-    if (!data.param2 && billValue) {
-      data.param2 = Number(billValue);
-    }
-
-    console.log("Pay Bill Data Payload 👉", data);
-
-    if (validateApiCall()) {
-      postJsonData(
+  
+    setPayingBill(true);
+    try {
+      const { response, error } = await apiCall(
+        "post",
         ApiEndpoints.BBPS_PAY_BILL,
-        data,
-        setPayRequest,
-        (res) => {
-          okSuccessToast(res.data.message);
-          getRecentData();
-          setBillDetails(false);
-          setMpinVal(false);
-          setErr("");
-          refreshUser();
-        },
-        (error) => {
-          setMpinVal(false);
-          apiErrorToast(error);
-          getRecentData();
-          setErr("");
-          refreshUser();
-        }
+        payload
       );
-    } else {
-      setErr({ message: "Kindly wait some time before another request" });
+      if (response) {
+        okSuccessToast(response.data.message);
+        getRecentData();
+        refreshUser();
+      } else {
+        apiErrorToast(error?.message || "Payment failed");
+      }
+    } catch (err) {
+      apiErrorToast(err.message || "Payment failed");
+    } finally {
+      setPayingBill(false);
+      setMpinModalOpen(false);
     }
   };
 
@@ -180,7 +173,8 @@ const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
   const { parameters } = billerDetails;
 
   return (
-    <Loader loading={fetchingBill}>
+    <>
+      <Loader loading={payingBill} />
       <Box
         maxWidth="1200px"
         mx="auto"
@@ -315,10 +309,11 @@ const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
                   fontWeight: "bold",
                   fontSize: { xs: "0.9rem", sm: "1rem" },
                   background: " #fff",
-                  color: "#6c4bc7",
+                  color: "#2275b7",
                   boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
                   "&:hover": {
-                    background: "#2563eb)",
+                    background: "#2275b7",
+                    color: "#fff",
                   },
                 }}
                 onClick={handleFetchBill}
@@ -459,13 +454,14 @@ const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
                   fontWeight: "bold",
                   fontSize: { xs: "0.9rem", sm: "1rem" },
                   background: "#fff",
-                  color: "#6c4bc7",
+                  color: "#2275b7",
                   boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
                   "&:hover": {
-                    background: " #2563eb)",
+                    background: " #2275b7",
+                    color: "#fff",
                   },
                 }}
-                onClick={handlePayBill}
+                onClick={handleSendClick}
                 disabled={payingBill}
               >
                 {payingBill ? "Processing Payment..." : "Pay Bill"}
@@ -474,7 +470,13 @@ const BbpsBillerDetails = ({ billerId, onBack, selectedBillerIdImage }) => {
           </Card>
         </Box>
       </Box>
-    </Loader>
+      <CommonMpinModal
+        open={mpinModalOpen}
+        setOpen={setMpinModalOpen}
+        title="Enter MPIN to Confirm Delete"
+        mPinCallBack={handlePayBill}
+      />
+    </>
   );
 };
 
