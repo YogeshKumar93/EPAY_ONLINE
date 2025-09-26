@@ -169,7 +169,7 @@ const FundRequest = () => {
                 {row.status !== "approved" && row.status !== "rejected" && (
                   <>
                     <Tooltip title="Approve">
-                      <Button
+                      {/* <Button
                         size="small"
                         color="success"
                         onClick={() =>
@@ -177,7 +177,12 @@ const FundRequest = () => {
                         }
                       >
                         <CheckCircleIcon fontSize="small" />
-                      </Button>
+                      </Button> */}
+                      <CheckCircleIcon
+                        fontSize="small"
+                        sx={{ color: "blue", cursor: "pointer" }}
+                        onClick={() => handleOpenModal("edit", row)}
+                      />
                     </Tooltip>
                     <Tooltip title="Reject">
                       <Button
