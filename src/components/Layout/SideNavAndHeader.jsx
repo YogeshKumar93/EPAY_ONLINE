@@ -760,55 +760,57 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
           },
           position: "fixed",
           top: 0,
+          pb: 0.3,
           right: 0,
           height: "100vh",
           overflowY: "auto",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between", // ensures footer stays at bottom
         }}
         className="content"
       >
-        <Toolbar sx={{ minHeight: "60px !important" }} />
-        <Outlet />
-     
+        <Box>
+          <Toolbar sx={{ minHeight: "60px !important" }} />
+          <Outlet />
+        </Box>
 
-    {/* Footer */}
-    <Box
-   component="footer"
-      sx={{
-        textAlign: "center",
-        py: { xs: 2, sm: 1.5 },
-        px: { xs: 1, sm: 2 },
-        mt: 4,
-        mb: -2,
-        backgroundColor: "#d4e8e8ff",
-        color: "#000",
-        boxShadow: "0 -2px 8px rgba(0,0,0,0.1)",
-        flexShrink: 0,
-        borderRadius:"10px",
-      }}
-    >
-      <Typography
-        sx={{
-          fontSize: { xs: "13px", sm: "15px", md: "17px" },
-          fontWeight: "bold",
-        }}
-      >
-        © 2025 <Box component="span" sx={{ fontWeight: 700 }}>P2PAE Solutions Pvt. Ltd.</Box> All Rights Reserved.
-      </Typography>
-      <Typography
-        sx={{
-          fontSize: { xs: "11.5px", sm: "13px", md: "14.5px" },
-          mt: 1,
-          color: "#000",
-        
-        }}
-      >
-        Disclaimer: Disputes shall be subject to the jurisdiction of the courts of Delhi.
-      </Typography>
-    </Box>
-
-
+        <Box
+          sx={{
+            textAlign: "center",
+            py: { xs: 2, sm: 1.5 },
+            px: { xs: 1, sm: 2 },
+            backgroundColor: "#d4e8e8ff",
+            color: "#6c4bc7",
+            borderRadius: "10px",
+            mt: 4,
+            flexShrink: 0,
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: { xs: "13px", sm: "15px", md: "17px" },
+              fontWeight: "bold",
+            }}
+          >
+            © 2025{" "}
+            <Box component="span" sx={{ fontWeight: 700 }}>
+              P2PA SOLUTIONS PVT LTD.
+            </Box>{" "}
+            All Rights Reserved.
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: { xs: "11.5px", sm: "13px", md: "14.5px" },
+              mt: 1,
+              color: "#6c4bc7",
+            }}
+          >
+            Disclaimer: Disputes shall be subject to the jurisdiction of the
+            courts of Delhi.
+          </Typography>
+        </Box>
       </MainContent>
-
     </Box>
   );
 };

@@ -77,6 +77,7 @@ import Purposes from "../pages/Purposes";
 import News from "../pages/News";
 import { BbpsOffline } from "../pages/BbpsOffline";
 import RetDdDashboard from "../pages/RetDdDashboard";
+import { WalletTransfer } from "../pages/WalletTransfer";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading, user } = useContext(AuthContext);
@@ -109,7 +110,7 @@ export default function AppRoutes() {
   const isAsm = role === "asm";
   const isZsm = role === "zsm";
   const isApi = role === "api";
-  const isMd = role === "api";
+  const isMd = role === "md";
 
   return (
     <BrowserRouter>
@@ -234,7 +235,7 @@ export default function AppRoutes() {
 
               <Route
                 path="customer/wallet-transfer"
-                element={<Wallet2WalletTransfer />}
+                element={<WalletTransfer />}
               />
               <Route
                 path="customer/wallet-ledger"
@@ -270,7 +271,7 @@ export default function AppRoutes() {
 
               <Route path="di/wallet-ledger" element={<AccountLadger />} />
               <Route path="di/transactions" element={<Transaction />} />
-                           <Route path="di/wallet-ledgers" element={<WalletLedgers />} />
+              <Route path="di/wallet-ledgers" element={<WalletLedgers />} />
               <Route
                 path="di/wallet-transfer"
                 element={<Wallet2WalletTransfer />}

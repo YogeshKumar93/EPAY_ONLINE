@@ -2,15 +2,14 @@ import React, { useContext, useState } from "react";
 import CommonTabs from "../components/common/CommonTabs";
 
 // Wallet components
- 
-
+import Wallet2WalletTransfer from "./Wallet2WalletTransfer";
+import Wallet2Wallet1 from "./Wallet2Wallet1";
+import Wallet3ToWallet1 from "./Wallet3ToWallet1";
+import WalletIcon from "@mui/icons-material/Wallet";
 // Icons
 import { CurrencyRupee } from "@mui/icons-material";
 
 import AuthContext from "../contexts/AuthContext";
-import Wallet2WalletTransfer from "./Wallet2WalletTransfer";
-import Wallet2Wallet1 from "./Wallet2Wallet1";
-import Wallet3ToWallet1 from "./Wallet3Wallet1";
 
 export const WalletTransfer = () => {
   const authCtx = useContext(AuthContext);
@@ -30,8 +29,8 @@ export const WalletTransfer = () => {
       {
         label: (
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <CurrencyRupee fontSize="small" />
-            WALLETtoWallet
+            <WalletIcon fontSize="small" />
+            W1 TO W1 Transfer
           </div>
         ),
         content: <Wallet2WalletTransfer />,
@@ -52,8 +51,8 @@ export const WalletTransfer = () => {
       {
         label: (
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <CurrencyRupee fontSize="small" />
-            WALLETtoWallet
+            <WalletIcon fontSize="small" />
+            W1 TO W1 Transfer
           </div>
         ),
         content: <Wallet2WalletTransfer />,
@@ -61,8 +60,8 @@ export const WalletTransfer = () => {
       {
         label: (
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <CurrencyRupee fontSize="small" />
-            WALLET3TOWALLET1
+            <WalletIcon fontSize="small" />
+            W3 TO W1 Transfer
           </div>
         ),
         content: <Wallet3ToWallet1 />,

@@ -1,18 +1,5 @@
 import React, { useState, useContext, useRef, useMemo } from "react";
-import {
-  Box,
-  Typography,
-  Tooltip,
-  Button,
-  Modal,
-  IconButton,
-  Tabs,
-  Tab,
-} from "@mui/material";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
-import OpenInFullIcon from "@mui/icons-material/OpenInFull";
+import { Box, Typography } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import CreateFundRequest from "../../pages/CreateFundRequest";
@@ -22,6 +9,17 @@ import ReButton from "../common/ReButton";
 import CommonStatus from "../common/CommonStatus";
 import { ddmmyy, ddmmyyWithTime, dateToTime1 } from "../../utils/DateUtils";
 import { currencySetter } from "../../utils/Currencyutil";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
+import OpenInFullIcon from "@mui/icons-material/OpenInFull";
+import { Tooltip, Button, Box as MuiBox } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit"; // ✅ import icon from MUI
+import { Delete } from "@mui/icons-material";
+import { IconButton } from "rsuite";
+import DeleteFundRequestModal from "./DelelteFundReques";
+import DeleteFundRequest from "./DelelteFundReques";
+import ReceiptButton from "../ReceiptButton";
+import EditFundRequest from "./EditFundRequest";
 
 const FundRequest = () => {
   const authCtx = useContext(AuthContext);
@@ -29,20 +27,8 @@ const FundRequest = () => {
 
   const fetchUsersRef = useRef(null);
 
-  const [openCreate, setOpenCreate] = useState(false);
-  const [openModal, setOpenModal] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
-  const [status, setStatus] = useState("");
-  const [openImage, setOpenImage] = useState(false);
-  const [imageSrc, setImageSrc] = useState(null);
-  const [tabValue, setTabValue] = useState("pending");
-
-  const handleImageOpen = (receiptUrl) => {
-    if (!receiptUrl) return;
-    const fixedUrl = receiptUrl.replace(/\\\//g, "/");
-    setImageSrc(fixedUrl);
-    setOpenImage(true);
-  };
+  // ✅ Single modal state
+  const [modal, setModal] = useState({ type: null, row: null, status: null });
 
   const handleFetchRef = (fetchFn) => {
     fetchUsersRef.current = fetchFn;
@@ -52,19 +38,12 @@ const FundRequest = () => {
     if (fetchUsersRef.current) fetchUsersRef.current();
   };
 
-  const handleOpen = (row, statusType) => {
-    setSelectedRow(row);
-    setStatus(statusType);
-    setOpenModal(true);
+  const handleOpenModal = (type, row = null, status = null) => {
+    setModal({ type, row, status });
   };
 
-  const handleSaveCreate = () => {
-    setOpenCreate(false);
-    refreshUsers();
-  };
-
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
+  const handleCloseModal = () => {
+    setModal({ type: null, row: null, status: null });
   };
 
   const columns = useMemo(
@@ -72,28 +51,56 @@ const FundRequest = () => {
       {
         name: "Date",
         selector: (row) => (
-          <Box display="flex" flexDirection="column">
+          <MuiBox display="flex" flexDirection="column">
             <Tooltip title={`Created: ${ddmmyyWithTime(row.created_at)}`} arrow>
               <span>
-                {ddmmyy(row.created_at)}  
-              </span>
-            </Tooltip><br/>
-            <Tooltip title={`Updated: ${ddmmyyWithTime(row.updated_at)}`} arrow>
-              <span>
-                {ddmmyy(row.updated_at)}  
+                {ddmmyy(row.created_at)} {dateToTime1(row.created_at)}
               </span>
             </Tooltip>
-          </Box>
+            <Tooltip title={`Updated: ${ddmmyyWithTime(row.updated_at)}`} arrow>
+              <span>
+                {ddmmyy(row.updated_at)} {dateToTime1(row.updated_at)}
+              </span>
+            </Tooltip>
+          </MuiBox>
         ),
         width: "140px",
         wrap: true,
       },
-      { name: "ID", selector: (row) => row?.id, width: "70px" },
-      {
-        name: "Name",
-        selector: (row) => <Typography>{row?.name}</Typography>,
-        wrap: true,
-      },
+      ...(user?.role !== "md" && user?.role !== "di"
+        ? [
+            {
+              name: "ID",
+              selector: (row) => row?.id,
+              width: "70px",
+            },
+          ]
+        : []),
+      ...(user?.role === "adm" || user?.role === "sadm"
+        ? [
+            {
+              name: "Role",
+              selector: (row) => (
+                <Typography sx={{ fontSize: "10px", fontWeight: 600 }}>
+                  {row.role}
+                </Typography>
+              ),
+              width: "100px",
+              wrap: true,
+            },
+          ]
+        : []),
+
+      ...(user?.role === "adm" || user?.role === "sadm"
+        ? [
+            {
+              name: "Name",
+              selector: (row) => <Typography>{row?.name}</Typography>,
+              wrap: true,
+            },
+          ]
+        : []),
+
       {
         name: "Bank",
         selector: (row) => <Typography>{row?.bank_name}</Typography>,
@@ -117,38 +124,20 @@ const FundRequest = () => {
           </Typography>
         ),
       },
-      // {
-      //   name: "Receipt",
-      //   selector: (row) =>
-      //     row?.receipt ? (
-      //       <Tooltip title="View Receipt">
-      //         <Button size="small" onClick={() => handleImageOpen(row.receipt)}>
-      //           <VisibilityIcon fontSize="small" />
-      //         </Button>
-      //       </Tooltip>
-      //     ) : (
-      //       <Typography variant="body2" sx={{ color: "#999" }}>
-      //         -
-      //       </Typography>
-      //     ),
-      //   width: "100px",
-      //   center: true,
-      // },
-      {
-        name: "Receipt",
-        selector: (row) => (
-          <>
-            <img src={row?.receipt} alt="dbibifb" />
-          </>
-        ),
-        width: "100px",
-        center: true,
-      },
       {
         name: "Remark",
         selector: (row) => (
           <Tooltip title={row?.remark}>
             <Typography noWrap>{row?.remark}</Typography>
+          </Tooltip>
+        ),
+        width: "100px",
+      },
+      {
+        name: "Admin Remark",
+        selector: (row) => (
+          <Tooltip title={row?.admin_remark}>
+            <Typography noWrap>{row?.admin_remark || "N/A"}</Typography>
           </Tooltip>
         ),
         grow: 2,
@@ -159,166 +148,162 @@ const FundRequest = () => {
         center: true,
       },
       {
+        name: "Reciept",
+        selector: (row) => <ReceiptButton row={row} />,
+        center: true,
+      },
+
+      {
         name: "Actions",
-        selector: (row, { hoveredRow, enableActionsHover }) => {
-          if (user?.role !== "adm") return null;
-          const isHovered = enableActionsHover && hoveredRow === row.id;
-          return (
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              gap={1}
-              width="120px"
-            >
-              {isHovered &&
-                row.status !== "approved" &&
-                row.status !== "rejected" && (
-                  <Box display="flex" gap={1}>
+        selector: (row) => (
+          <MuiBox
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            gap={2}
+            width="150px"
+          >
+            {/* Admin actions */}
+            {user?.role === "adm" && (
+              <>
+                {row.status !== "approved" && row.status !== "rejected" && (
+                  <>
                     <Tooltip title="Approve">
-                      <Button
-                        size="small"
-                        color="success"
-                        onClick={() => handleOpen(row, "approved")}
-                      >
-                        <CheckCircleIcon fontSize="small" />
-                      </Button>
+                      <CheckCircleIcon
+                        fontSize="small"
+                        sx={{ color: "green", cursor: "pointer" }}
+                        onClick={() =>
+                          handleOpenModal("status", row, "approved")
+                        }
+                      />
                     </Tooltip>
                     <Tooltip title="Reject">
-                      <Button
-                        size="small"
-                        color="error"
-                        onClick={() => handleOpen(row, "rejected")}
-                      >
-                        <CancelIcon fontSize="small" />
-                      </Button>
+                      <CancelIcon
+                        fontSize="small"
+                        sx={{ color: "red", cursor: "pointer" }}
+                        onClick={() =>
+                          handleOpenModal("status", row, "rejected")
+                        }
+                      />
                     </Tooltip>
-                  </Box>
+                  </>
                 )}
-              {isHovered && row.status === "rejected" && (
-                <Tooltip title="Reopen">
-                  <Button
-                    size="small"
-                    color="warning"
-                    onClick={() => handleOpen(row, "reopen")}
-                  >
-                    <OpenInFullIcon fontSize="small" />
-                  </Button>
-                </Tooltip>
-              )}
-              {!isHovered && (
-                <Typography variant="body2" sx={{ color: "#999" }}>
-                  -
-                </Typography>
-              )}
-            </Box>
-          );
-        },
-        width: "120px",
+                {row.status === "rejected" && (
+                  <Tooltip title="Reopen">
+                    <Button
+                      size="small"
+                      color="warning"
+                      onClick={() => handleOpenModal("status", row, "reopen")}
+                    >
+                      <OpenInFullIcon fontSize="small" />
+                    </Button>
+                  </Tooltip>
+                )}
+              </>
+            )}
+            {/* ✅ Edit - only if pending */}
+            {row.status === "pending" && (
+              <Tooltip title="Edit">
+                <EditIcon
+                  fontSize="small"
+                  sx={{ color: "blue", cursor: "pointer" }}
+                  onClick={() => handleOpenModal("edit", row)}
+                />
+              </Tooltip>
+            )}
+
+            {/* ✅ Delete - only if pending */}
+            {row.status === "pending" && (
+              <Tooltip title="Delete">
+                <Delete
+                  fontSize="small"
+                  sx={{ color: "red", cursor: "pointer" }}
+                  onClick={() => handleOpenModal("delete", row)}
+                />
+              </Tooltip>
+            )}
+          </MuiBox>
+        ),
+        width: "150px",
       },
     ],
     [user]
   );
 
-  // const filters = useMemo(
-  //   () => [
-  //     {
-  //       id: "status",
-  //       label: "Status",
-  //       type: "dropdown",
-  //       options: [
-  //         { value: "success", label: "Success" },
-  //         { value: "refund", label: "Refund" },
-  //         { value: "pending", label: "Pending" },
-  //         { value: "approved", label: "Approved" },
-  //         { value: "rejected", label: "Rejected" },
-  //       ],
-  //       defaultValue: "pending",
-  //     },
-  //   ],
-  //   []
-  // );
+  // Filters
+  const filters = useMemo(
+    () => [
+      {
+        id: "status",
+        label: "Status",
+        type: "dropdown",
+        options: [
+          { value: "success", label: "Success" },
+          { value: "refund", label: "Refund" },
+          { value: "pending", label: "Pending" },
+          { value: "approved", label: "Approved" },
+          { value: "rejected", label: "Rejected" },
+        ],
+        defaultValue: "pending",
+      },
+      { id: "date_range", type: "daterange" },
+    ],
+    []
+  );
 
   return (
     <Box>
-      <Tabs
-        value={tabValue}
-        onChange={handleTabChange}
-        sx={{ mb: 2 }}
-        textColor="primary"
-        indicatorColor="primary"
-      >
-        <Tab label="All" value="all" />
-        <Tab label="Pending" value="pending" />
-        <Tab label="Approved" value="approved" />
-        <Tab label="Rejected" value="rejected" />
-      </Tabs>
-
       <CommonTable
         columns={columns}
         endpoint={ApiEndpoints.GET_FUND_REQUESTS}
+        filters={filters}
         onFetchRef={handleFetchRef}
-        enableActionsHover={true}
-        // ✅ only pass status if not "all"
-        queryParam={tabValue === "all" ? {} : { status: tabValue }}
+        enableActionsHover
         customHeader={
           user?.role !== "sadm" &&
           user?.role !== "adm" && (
             <ReButton
               variant="contained"
               label="Request"
-              onClick={() => setOpenCreate(true)}
+              onClick={() => handleOpenModal("create")}
             />
           )
         }
       />
 
-      {openImage && (
-        <Modal open={openImage} onClose={() => setOpenImage(false)}>
-          <Box
-            sx={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              bgcolor: "background.paper",
-              p: 2,
-              borderRadius: 2,
-              maxWidth: "90%",
-              maxHeight: "90%",
-            }}
-          >
-            <Typography variant="h6" mb={2}>
-              Receipt
-            </Typography>
-            <img
-              src={imageSrc}
-              alt="Receipt"
-              style={{ width: "100%", borderRadius: 8, maxHeight: "80vh" }}
-              onError={(e) => {
-                console.error("Failed to load image:", imageSrc);
-                e.target.src = ""; // fallback
-              }}
-            />
-          </Box>
-        </Modal>
+      {/* ✅ Centralised modal rendering */}
+      {modal.type === "create" && (
+        <CreateFundRequest
+          open
+          handleClose={handleCloseModal}
+          handleSave={refreshUsers}
+        />
       )}
 
-      {/* Create Fund Request */}
-      <CreateFundRequest
-        open={openCreate}
-        handleClose={() => setOpenCreate(false)}
-        handleSave={handleSaveCreate}
-        onFetchRef={refreshUsers}
-      />
+      {modal.type === "edit" && (
+        <EditFundRequest
+          open
+          handleClose={handleCloseModal}
+          row={modal.row}
+          onFetchRef={refreshUsers}
+        />
+      )}
 
-      {/* Approve / Reject / Reopen modal */}
-      {openModal && (
+      {modal.type === "delete" && (
+        <DeleteFundRequest
+          open
+          handleClose={handleCloseModal}
+          row={modal.row}
+          onFetchRef={refreshUsers}
+        />
+      )}
+
+      {modal.type === "status" && (
         <FundRequestModal
-          open={openModal}
-          handleClose={() => setOpenModal(false)}
-          row={selectedRow}
-          status={status}
+          open
+          handleClose={handleCloseModal}
+          row={modal.row}
+          status={modal.status}
           onFetchRef={refreshUsers}
         />
       )}

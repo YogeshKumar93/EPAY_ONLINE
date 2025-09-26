@@ -1,15 +1,15 @@
 import { useMemo, useContext, useState, useEffect, useRef } from "react";
 import {
+  Box,
+  TextField,
+  Button,
+  Typography,
   Tooltip,
   IconButton,
-  Box,
-  Grid,
-  Typography,
-  Paper,
 } from "@mui/material";
 import { Edit } from "@mui/icons-material";
 import CommonTable from "../components/common/CommonTable";
-import ApiEndpoints from "../api/ApiEndpoints";
+
 import AuthContext from "../contexts/AuthContext";
 import {
   dateToTime,
@@ -17,18 +17,23 @@ import {
   ddmmyy,
   ddmmyyWithTime,
 } from "../utils/DateUtils";
-
 import CommonStatus from "../components/common/CommonStatus";
 import CommonLoader from "../components/common/CommonLoader";
+import LaptopIcon from "@mui/icons-material/Laptop";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PrintIcon from "@mui/icons-material/Print";
-import LaptopIcon from "@mui/icons-material/Laptop";
-import DescriptionIcon from "@mui/icons-material/Description";
+
 import { useNavigate } from "react-router-dom";
 import W2wTransfer from "./w2wTransfer";
 import { android2, linux2, macintosh2, windows2 } from "../iconsImports";
+import { okhttp } from "../utils/iconsImports";
 
-const Wallet2WalletTransfer = ({}) => {
+import { useToast } from "../utils/ToastContext";
+import CommonMpinModal from "../components/common/CommonMpinModal";
+import { apiCall } from "../api/apiClient";
+import ApiEndpoints from "../api/ApiEndpoints";
+import W3W1Transfer from "../components/WalletTransfer/W3W1Transfer";
+const Wallet3ToWallet1 = ({}) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const navigate = useNavigate();
@@ -211,10 +216,7 @@ const Wallet2WalletTransfer = ({}) => {
         wrap: true,
         width: "80px",
       },
-      ...(user?.role === "ret" ||
-      user?.role === "dd" ||
-      user?.role === "di" ||
-      user?.role === "md"
+      ...(user?.role === "ret" || user?.role === "dd" || user?.role === "di"
         ? [] // ❌ hide for ret and dd
         : [
             {
@@ -372,7 +374,7 @@ const Wallet2WalletTransfer = ({}) => {
         }}
       >
         {user.role !== "adm" && (
-          <W2wTransfer type="w2w" handleFetchRef={refreshTransfer} />
+          <W3W1Transfer type="w2w" handleFetchRef={refreshTransfer} />
         )}
       </Box>
 
@@ -385,7 +387,7 @@ const Wallet2WalletTransfer = ({}) => {
             columns={columns}
             endpoint={tableEndpoint}
             filters={filters}
-            queryParam="service=W2W transfer"
+            queryParam="service=W3W1 Transfer"
             refresh={true}
             includeClientRef={false}
           />
@@ -395,4 +397,4 @@ const Wallet2WalletTransfer = ({}) => {
   );
 };
 
-export default Wallet2WalletTransfer;
+export default Wallet3ToWallet1;
