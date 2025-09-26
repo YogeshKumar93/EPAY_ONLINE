@@ -312,10 +312,11 @@ export default function AppRoutes() {
               <Route path="md/dashboard" element={<MdDashboard />} />
               <Route path="md/users" element={<Users />} />
               <Route path="md/transcations" element={<Transaction />} />
-              <Route path="md/profile" element={<ProfilePage />} />
+             <Route path="md/profile" element={<ProfilePage />} />
                <Route path="md/fund-request" element={<FundRequest />} />
               <Route path="md/wallet-transfer" element={<WalletTransfer />} />
               <Route path="md/wallet-ledger" element={<AccountLadger />} />
+                <Route path="md/logs" element={<Logs />} />
             </>
           )}
 
