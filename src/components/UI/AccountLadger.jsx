@@ -9,6 +9,7 @@ import AuthContext from "../../contexts/AuthContext";
 import CommonStatus from "../common/CommonStatus";
 import CommonLoader from "../common/CommonLoader";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { RemoveRedEye } from "@mui/icons-material";
 
 const AccountLadger = ({ query }) => {
   const authCtx = useContext(AuthContext);
@@ -132,30 +133,51 @@ const AccountLadger = ({ query }) => {
         ),
       },
 
- {
-        name: "View",
-        selector: (row) => (
-          <Tooltip title="View wallet ledger">
-            <IconButton
-              color="info"
-              // onClick={() => {
-              //   setSelectedRow(row);
-              //   setDrawerOpen(true);
-              // }}
-              size="small"
-              sx={{ backgroundColor: "transparent" }}
-            >
-              <VisibilityIcon />
-            </IconButton>
-          </Tooltip>
-        ),
-      },
+//  {
+//         name: "View",
+//         selector: (row) => (
+//           <Tooltip title="View wallet ledger">
+//             <IconButton
+//               color="info"
+//               // onClick={() => {
+//               //   setSelectedRow(row);
+//               //   setDrawerOpen(true);
+//               // }}
+//               size="small"
+//               sx={{ backgroundColor: "transparent" }}
+//             >
+//               <VisibilityIcon />
+//             </IconButton>
+//           </Tooltip>
+//         ),
+//       },
 
       // {
       //   name: "Status",
       //   selector: (row) => <CommonStatus value={row.status} />,
       //   center: true,
       // },
+         {
+        name: "Action",
+        selector: (row) => (
+          <button
+            onClick={() => {
+              setSelectedRowId(row.txn_id);
+              setDetailOpen(true);
+            }}
+            style={{
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              color: "#007bff",
+              fontSize: "16px",
+            }}
+          >
+            <RemoveRedEye />
+          </button>
+        ),
+        center: true,
+      },
     ],
     [user]
   );

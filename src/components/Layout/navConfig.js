@@ -340,11 +340,30 @@ export const md_nav = [
     icon2: "📊",
     to: "/md/dashboard",
   },
-  { title: "Users", icon: "📊", icon2: "📊", to: "/md/users" },
+  { title: "Users", icon: usersImage, icon2: "📊", to: "/md/users" },
+ 
+   {
+    title: "Fund Request",
+    icon: bankImage,
+    icon2: "🛠️",
+    to: "/md/fund-request",
+  },
   {
     title: "Transcations",
     icon: transImage,
     icon2: "📊",
     to: "/md/transcations",
+  },
+    {
+    title: "Wallet Transfer",
+    icon: walletTransferImage,
+    icon2: "🛠️",
+    to: "/md/wallet-transfer",
+  },
+    {
+    title: "Wallet Ledger",
+    icon: walletLedgerImg,
+    icon2: "🛠️",
+    to: "/md/wallet-ledger",
   },
 ];

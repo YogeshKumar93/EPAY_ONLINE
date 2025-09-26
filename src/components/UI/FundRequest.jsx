@@ -153,54 +153,16 @@ const FundRequest = () => {
         center: true,
       },
 
-      {
+    {
         name: "Actions",
         selector: (row) => (
           <MuiBox
             display="flex"
             alignItems="center"
             justifyContent="center"
-            gap={2}
+            gap={1}
             width="150px"
           >
-            {/* Admin actions */}
-            {user?.role === "adm" && (
-              <>
-                {row.status !== "approved" && row.status !== "rejected" && (
-                  <>
-                    <Tooltip title="Approve">
-                      <CheckCircleIcon
-                        fontSize="small"
-                        sx={{ color: "green", cursor: "pointer" }}
-                        onClick={() =>
-                          handleOpenModal("status", row, "approved")
-                        }
-                      />
-                    </Tooltip>
-                    <Tooltip title="Reject">
-                      <CancelIcon
-                        fontSize="small"
-                        sx={{ color: "red", cursor: "pointer" }}
-                        onClick={() =>
-                          handleOpenModal("status", row, "rejected")
-                        }
-                      />
-                    </Tooltip>
-                  </>
-                )}
-                {row.status === "rejected" && (
-                  <Tooltip title="Reopen">
-                    <Button
-                      size="small"
-                      color="warning"
-                      onClick={() => handleOpenModal("status", row, "reopen")}
-                    >
-                      <OpenInFullIcon fontSize="small" />
-                    </Button>
-                  </Tooltip>
-                )}
-              </>
-            )}
             {/* ✅ Edit - only if pending */}
             {row.status === "pending" && (
               <Tooltip title="Edit">
@@ -221,6 +183,49 @@ const FundRequest = () => {
                   onClick={() => handleOpenModal("delete", row)}
                 />
               </Tooltip>
+            )}
+
+            {/* Admin actions */}
+            {user?.role === "adm" && (
+              <>
+                {row.status !== "approved" && row.status !== "rejected" && (
+                  <MuiBox display="flex" gap={1}>
+                    <Tooltip title="Approve">
+                      <Button
+                        size="small"
+                        color="success"
+                        onClick={() =>
+                          handleOpenModal("status", row, "approved")
+                        }
+                      >
+                        <CheckCircleIcon fontSize="small" />
+                      </Button>
+                    </Tooltip>
+                    <Tooltip title="Reject">
+                      <Button
+                        size="small"
+                        color="error"
+                        onClick={() =>
+                          handleOpenModal("status", row, "rejected")
+                        }
+                      >
+                        <CancelIcon fontSize="small" />
+                      </Button>
+                    </Tooltip>
+                  </MuiBox>
+                )}
+                {row.status === "rejected" && (
+                  <Tooltip title="Reopen">
+                    <Button
+                      size="small"
+                      color="warning"
+                      onClick={() => handleOpenModal("status", row, "reopen")}
+                    >
+                      <OpenInFullIcon fontSize="small" />
+                    </Button>
+                  </Tooltip>
+                )}
+              </>
             )}
           </MuiBox>
         ),
