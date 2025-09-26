@@ -285,7 +285,8 @@ export default function AppRoutes() {
               <Route path="asm/dashboard" element={<Dashboard />} />
               <Route path="asm/users" element={<Users />} />
               <Route path="asm/transcations" element={<Transaction />} />
-              <Route path="di/profile" element={<ProfilePage />} />
+              <Route path="asm/profile" element={<ProfilePage />} />
+              <Route path="asm/wallet-ledger" element={<AccountLadger />} />
             </>
           )}
 
@@ -295,6 +296,7 @@ export default function AppRoutes() {
               <Route path="zsm/users" element={<Users />} />
               <Route path="zsm/transcations" element={<Transaction />} />
               <Route path="zsm/profile" element={<ProfilePage />} />
+            <Route path="zsm/wallet-ledger" element={<AccountLadger />} />
             </>
           )}
 
@@ -304,6 +306,9 @@ export default function AppRoutes() {
               <Route path="api/users" element={<Users />} />
               <Route path="api/transcations" element={<Transaction />} />
               <Route path="api/profile" element={<ProfilePage />} />
+             <Route path="api/complaint" element={<Complaint />} />
+              <Route path="api/fund-request" element={<FundRequest />} />
+              <Route path="api/wallet-ledger" element={<AccountLadger />} />
             </>
           )}
 
