@@ -14,12 +14,12 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import { Tooltip, Button, Box as MuiBox } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit"; // ✅ import icon from MUI
-// import EditFundRequest from "./EditFundRequest";
 import { Delete } from "@mui/icons-material";
 import { IconButton } from "rsuite";
 import DeleteFundRequestModal from "./DelelteFundReques";
 import DeleteFundRequest from "./DelelteFundReques";
 import ReceiptButton from "../ReceiptButton";
+import EditFundRequest from "./EditFundRequest";
 
 const FundRequest = () => {
   const authCtx = useContext(AuthContext);
@@ -160,7 +160,7 @@ const FundRequest = () => {
             display="flex"
             alignItems="center"
             justifyContent="center"
-            gap={1}
+            gap={2}
             width="150px"
           >
             {/* Admin actions */}
@@ -169,31 +169,22 @@ const FundRequest = () => {
                 {row.status !== "approved" && row.status !== "rejected" && (
                   <>
                     <Tooltip title="Approve">
-                      {/* <Button
-                        size="small"
-                        color="success"
+                      <CheckCircleIcon
+                        fontSize="small"
+                        sx={{ color: "green", cursor: "pointer" }}
                         onClick={() =>
                           handleOpenModal("status", row, "approved")
                         }
-                      >
-                        <CheckCircleIcon fontSize="small" />
-                      </Button> */}
-                      <CheckCircleIcon
-                        fontSize="small"
-                        sx={{ color: "blue", cursor: "pointer" }}
-                        onClick={() => handleOpenModal("edit", row)}
                       />
                     </Tooltip>
                     <Tooltip title="Reject">
-                      <Button
-                        size="small"
-                        color="error"
+                      <CancelIcon
+                        fontSize="small"
+                        sx={{ color: "red", cursor: "pointer" }}
                         onClick={() =>
                           handleOpenModal("status", row, "rejected")
                         }
-                      >
-                        <CancelIcon fontSize="small" />
-                      </Button>
+                      />
                     </Tooltip>
                   </>
                 )}
@@ -289,14 +280,14 @@ const FundRequest = () => {
         />
       )}
 
-      {/* {modal.type === "edit" && (
+      {modal.type === "edit" && (
         <EditFundRequest
           open
           handleClose={handleCloseModal}
           row={modal.row}
           onFetchRef={refreshUsers}
         />
-      )} */}
+      )}
 
       {modal.type === "delete" && (
         <DeleteFundRequest
