@@ -208,7 +208,8 @@ import aepsAeps from "./assets/sidenav/aeps1.svg";
 import sendmoney_1 from "./assets/new_dashboardIcon/rupee.png";
 import sendmoney_2 from "./assets/new_dashboardIcon/moneyTrnsfr.png";
 import thumbPrint_1 from "./assets/svg/aeps.svg";
-import mobileRech_1 from "./assets/new_dashboardIcon/moneyTrnsfr.png";
+import mobileRech_1 from "./assets/new_dashboardIcon/moneyTrnsfr.png";         
+import profile_New from "./assets/new_dashboardIcon/profileNew.png";         
 
 // side nav images
 
@@ -584,4 +585,5 @@ export const sendmoney   = sendmoney_1;
 export const sendmoney2 = sendmoney_2;
 export const thumbPrint   = thumbPrint_1;
 export const mobileRechargeNew = mobileRech_1;
+export const profileNewImage    = profile_New;
 

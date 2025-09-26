@@ -111,6 +111,7 @@ const Login = () => {
         if (user?.role === "adm") navigate("/admin/dashboard");
         else if (user?.role === "ret") navigate("/customer/dashboard");
         else if (user?.role === "user") navigate("/user/home");
+        else if (user?.role === "md") navigate("/md/dashboard");
         else navigate("/");
       } else {
         setLoginError("Unexpected response from server");
@@ -191,10 +192,12 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
     src={backImg}
     alt="Background"
     sx={{
-      height: "80%",
+      height: "100%",
+      padding:10,
       objectFit: "contain",
       boxShadow: "0px 4px 20px rgba(0,0,0,0.5)", // 👈 shadow only on image
       borderRadius: 2, // optional if you want rounded corners
+  
     }}
   />
 </Grid>

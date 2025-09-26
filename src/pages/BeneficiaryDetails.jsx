@@ -16,6 +16,7 @@ import AuthContext from "../contexts/AuthContext";
 import OTPInput from "react-otp-input";
 import { useToast } from "../utils/ToastContext";
 import CommonModal from "../components/common/CommonModal";
+import ResetMpin from "../components/common/ResetMpin";
 
 const BeneficiaryDetails = ({
   open,
@@ -37,6 +38,7 @@ const BeneficiaryDetails = ({
   const [purposes, setPurposes] = useState([]);
   const [selectedPurpose, setSelectedPurpose] = useState("");
   const [loadingPurposes, setLoadingPurposes] = useState(false);
+  const [resetMpinModalOpen, setResetMpinModalOpen] = useState(false);
 
   if (!beneficiary) return null;
 
@@ -261,6 +263,23 @@ const BeneficiaryDetails = ({
           }}
         />
       </Box>
+        <Box sx={{ display: "flex", justifyContent: "center", ml: 32 }}>
+          <Button
+            variant="contained"
+            size="small"
+            sx={{ fontSize: "11px" }}
+            onClick={() => setResetMpinModalOpen(true)}
+          >
+            Reset MPIN
+          </Button>
+        </Box>
+        {resetMpinModalOpen && (
+          <ResetMpin
+            open={resetMpinModalOpen}
+            onClose={() => setResetMpinModalOpen(false)}
+            username={username}
+          />
+        )}
     </Box>
   );
 

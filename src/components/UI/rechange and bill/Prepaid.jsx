@@ -30,7 +30,10 @@ import ApiEndpoints from "../../../api/ApiEndpoints";
 import { apiErrorToast, okSuccessToast } from "../../../utils/ToastUtil";
 import AuthContext from "../../../contexts/AuthContext";
 import operatorImages from "../../../assets/operators";
-import OTPInput from "react-otp-input";
+import CommonLoader from "../../common/CommonLoader";
+import { useToast } from "../../../utils/ToastContext";
+import ResetMpin from "../../common/ResetMpin";
+// import { useToast } from "../utils/ToastContext";
 
 const Prepaid = () => {
   const [services, setServices] = useState([]);
@@ -44,6 +47,10 @@ const Prepaid = () => {
   const [step, setStep] = useState(2); // start directly at plans step
   const [MpinCallBackVal, setMpinCallBackVal] = useState("");
   const { location } = useContext(AuthContext);
+  const { showToast } = useToast();
+ const [resetMpinModalOpen, setResetMpinModalOpen] = useState(false);
+   const authCtx = useContext(AuthContext);
+  const username = `TRANS${authCtx?.user?.id}`;
 
   // Fetch services and auto-select first operator
   useEffect(() => {
@@ -93,6 +100,7 @@ const Prepaid = () => {
 
   // Handle recharge action
   const handleRecharge = async () => {
+    setLoading(true);
     if (!selectedPlan || !mobileNumber)
       return apiErrorToast("Please select a plan and enter mobile number");
     if (mobileNumber.length !== 10)
@@ -108,13 +116,17 @@ const Prepaid = () => {
       amount: selectedPlan.price,
       latitude: location?.lat || "",
       longitude: location?.long || "",
-      mpin: MpinCallBackVal, // include MPIN in payload
+      mpin: Number(MpinCallBackVal),
     };
 
-    const { error, response } = await apiCall("post", ApiEndpoints.RECHARGE, payload);
-    if (error) return apiErrorToast(error?.message);
+    const { error, response } = await apiCall(
+      "post",
+      ApiEndpoints.RECHARGE,
+      payload
+    );
+    if (error) return showToast(error?.message, "error");
 
-    okSuccessToast(`Recharge successful for ${mobileNumber}`);
+    okSuccessToast(response?.message);
     setStep(4); // Success step
 
     setTimeout(() => {
@@ -128,22 +140,28 @@ const Prepaid = () => {
     }, 3000);
   };
 
-  if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
-        <Box textAlign="center">
-          <CircularProgress size={60} thickness={4} />
-          <Typography variant="h6" sx={{ mt: 2 }}>
-            Loading Operators...
-          </Typography>
-        </Box>
-      </Box>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <Box
+  //       display="flex"
+  //       justifyContent="center"
+  //       alignItems="center"
+  //       minHeight="60vh"
+  //     >
+  //       {/* <Box textAlign="center">
+  //         <CircularProgress size={60} thickness={4} />
+  //         <Typography variant="h6" sx={{ mt: 2 }}>
+  //           Loading Operators...
+  //         </Typography>
+  //       </Box> */}
+  //     </Box>
+  //   );
+  // }
 
   return (
     <Container maxWidth="xl" sx={{ py: 2 }}>
       {/* Step 2 - Operators & Plans */}
+      <CommonLoader loading={loading} />
       {step === 2 && (
         <Slide direction="right" in mountOnEnter unmountOnExit>
           <Box sx={{ display: "flex", gap: 3 }}>
@@ -166,7 +184,7 @@ const Prepaid = () => {
                         cursor: "pointer",
                         border:
                           selectedService?.id === service.id
-                            ? "2px solid #9D72F0"
+                            ? "2px solid #2275b7"
                             : "1px solid #e0e0e0",
                         backgroundColor:
                           selectedService?.id === service.id
@@ -184,14 +202,16 @@ const Prepaid = () => {
                           mr: 2,
                           border:
                             selectedService?.id === service.id
-                              ? "2px solid #9D72F0"
+                              ? "2px solid #2275b7"
                               : "none",
                         }}
                       />
                       <Typography
                         sx={{
                           color:
-                            selectedService?.id === service.id ? "#6c4bc7" : "#333",
+                            selectedService?.id === service.id
+                              ? "#2275b7"
+                              : "#333",
                           fontWeight:
                             selectedService?.id === service.id ? "600" : "500",
                         }}
@@ -209,78 +229,45 @@ const Prepaid = () => {
               {selectedService ? (
                 <Box>
                   {/* Operator header */}
-                  <Paper sx={{ p: 2, mb: 2, display: "flex", alignItems: "center" }}>
+                  <Paper
+                    sx={{ p: 2, mb: 2, display: "flex", alignItems: "center" }}
+                  >
                     <Avatar
                       src={operatorImages[selectedService?.code]}
                       sx={{ width: 50, height: 50, mr: 2 }}
                     />
                     <Box sx={{ height: 22 }}>
                       <Typography variant="h6" fontWeight="bold">
-                        {selectedService?.name} Prepaid Plans
+                        {selectedService?.name}
                       </Typography>
                     </Box>
                   </Paper>
 
-                  {/* Plans grid */}
-   <Grid container spacing={2} justifyContent="center">
-  {plans.map((plan) => (
-    <Grid
-      item
-      key={plan.id}
-      sx={{ display: "flex", justifyContent: "center" }}
-    >
-      <Card
-        onClick={() => {
-          setSelectedPlan(plan);
-          setStep(3);
-        }}
-        sx={{
-          p: 2,
-          borderRadius: 2,
-          cursor: "pointer",
-          width: 250, // fixed width for all cards
-          border: selectedPlan?.id === plan.id ? "2px solid" : "1px solid",
-          borderColor: selectedPlan?.id === plan.id ? "#9D72F0" : "divider",
-          textAlign: "center",
-        }}
-      >
-        <Typography variant="h5" fontWeight="700">
-          ₹{plan.price}
-        </Typography>
-        <Typography variant="body2" sx={{ mb: 1 }}>
-          {plan.name}
-        </Typography>
-        {plan.validity && <Chip label={`Validity: ${plan.validity}`} size="small" />}
-      </Card>
-    </Grid>
-  ))}
-</Grid>
-
-
-
-                  {/* Custom Amount */}
-                  <Divider sx={{ my: 4 }}>
-                    <Chip label="OR" />
-                  </Divider>
+                  {/* Custom Amount (moved above plans) */}
                   <Paper
                     sx={{
                       p: 3,
                       textAlign: "center",
                       border: "1px dashed",
                       borderColor: "divider",
+                      mb: 4, // spacing below
                     }}
                   >
                     <Typography variant="h6" gutterBottom>
                       Enter Custom Amount
                     </Typography>
-                    <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
+                    <Box
+                      sx={{ display: "flex", justifyContent: "center", gap: 2 }}
+                    >
                       <TextField
                         label="Amount"
                         type="number"
                         value={manualAmount}
                         onChange={(e) => setManualAmount(e.target.value)}
                         InputProps={{
-                          startAdornment: <InputAdornment position="start">₹</InputAdornment>,
+                          startAdornment: (
+                            <InputAdornment position="start">₹</InputAdornment>
+                          ),
                         }}
                         sx={{ width: 160 }}
                       />
@@ -291,10 +278,7 @@ const Prepaid = () => {
                           fontWeight: "bold",
                           fontSize: { xs: "0.9rem", sm: "1rem" },
                           background: "#fff",
-                          color: "#6c4bc7",
-                          "&:hover": {
-                            background: "#2563eb",
-                          },
+                          color: "#2275b7",
                         }}
                         onClick={() => {
                           if (!manualAmount)
@@ -312,6 +296,59 @@ const Prepaid = () => {
                       </Button>
                     </Box>
                   </Paper>
+
+                  {/* Plans grid */}
+                  <Grid container spacing={1} justifyContent="center">
+                    {plans.map((plan) => (
+                      <Grid
+                        item
+                        key={plan.id}
+                        xs={3} 
+                        sm={3}
+                        md={3}
+                        sx={{ display: "flex", justifyContent: "center" }}
+                      >
+                        <Card
+                          onClick={() => {
+                            setSelectedPlan(plan);
+                            setStep(3);
+                          }}
+                          sx={{
+                            p: 1, // smaller padding
+                            borderRadius: 2,
+                            cursor: "pointer",
+                            width: "120px", // fill the grid item
+                            // maxWidth: 200, // optional max width
+                            border:
+                              selectedPlan?.id === plan.id
+                                ? "2px solid"
+                                : "1px solid",
+                            borderColor:
+                              selectedPlan?.id === plan.id
+                                ? "#2275b7"
+                                : "divider",
+                            textAlign: "center",
+                          }}
+                        >
+                          <Typography variant="h6" fontWeight="700">
+                            ₹{plan.price}
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ mb: 1, fontSize: "0.85rem" }}
+                          >
+                            {plan.name}
+                          </Typography>
+                          {plan.validity && (
+                            <Chip
+                              label={`Validity: ${plan.validity}`}
+                              size="small"
+                            />
+                          )}
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Grid>
                 </Box>
               ) : (
                 <Paper
@@ -355,7 +392,7 @@ const Prepaid = () => {
                         cursor: "pointer",
                         border:
                           selectedService?.id === service.id
-                            ? "2px solid #9D72F0"
+                            ? "2px solid #2275b7"
                             : "1px solid #e0e0e0",
                         backgroundColor:
                           selectedService?.id === service.id
@@ -373,14 +410,16 @@ const Prepaid = () => {
                           mr: 2,
                           border:
                             selectedService?.id === service.id
-                              ? "2px solid #9D72F0"
+                              ? "2px solid #2275b7"
                               : "none",
                         }}
                       />
                       <Typography
                         sx={{
                           color:
-                            selectedService?.id === service.id ? "#6c4bc7" : "#333",
+                            selectedService?.id === service.id
+                              ? "#2275b7"
+                              : "#333",
                           fontWeight:
                             selectedService?.id === service.id ? "600" : "500",
                         }}
@@ -406,10 +445,20 @@ const Prepaid = () => {
                 </Typography>
 
                 {/* Operator info */}
-                <Box display="flex" alignItems="center" gap={2} sx={{ p: 2, borderRadius: "8px", background: "#fff" }}>
-                  <Avatar src={operatorImages[selectedService?.code]} sx={{ width: 50, height: 50, mr: 2 }} />
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  gap={2}
+                  sx={{ p: 2, borderRadius: "8px", background: "#fff" }}
+                >
+                  <Avatar
+                    src={operatorImages[selectedService?.code]}
+                    sx={{ width: 50, height: 50, mr: 2 }}
+                  />
                   <Box>
-                    <Typography variant="h6">{selectedService?.name}</Typography>
+                    <Typography variant="h6">
+                      {selectedService?.name}
+                    </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Prepaid Mobile
                     </Typography>
@@ -425,7 +474,7 @@ const Prepaid = () => {
                   </Typography>
                   <Box display="flex" justifyContent="space-between">
                     <Typography variant="h6">{selectedPlan?.name}</Typography>
-                    <Typography variant="h6" color="#9D72F0">
+                    <Typography variant="h6" color="#2275b7">
                       ₹{selectedPlan?.price}
                     </Typography>
                   </Box>
@@ -456,77 +505,139 @@ const Prepaid = () => {
                   }}
                 />
 
-
                 {/* MPIN Field */}
-    
-{mobileNumber.length === 10 && (
-  <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
-    <OTPInput
-      value={MpinCallBackVal}
-      onChange={setMpinCallBackVal}
-      numInputs={6} // 6 digits for MPIN
-      inputType="password"
-      renderInput={(props) => <input {...props} />}
-      inputStyle={{
-        width: 40,
-        height: 40,
-        margin: "0 5px",
-        fontSize: 20,
-        border: "1px solid #D0D5DD",
-        borderRadius: 6,
-        textAlign: "center",
-      }}
-    />
-  </Box>
-)}
+                {mobileNumber.length === 10 && (
+                  <Box sx={{ textAlign: "center", mb: 2 }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ mb: 1, fontWeight: 500, color: "gray" }}
+                    >
+                      Enter 6-digit MPIN
+                    </Typography>
 
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        gap: 1,
+                        mb: 1.5,
+                      }}
+                    >
+                      {Array.from({ length: 6 }).map((_, index) => (
+                        <TextField
+                          key={index}
+                          type="password"
+                          inputProps={{
+                            maxLength: 1,
+                            style: {
+                              textAlign: "center",
+                              fontSize: 24,
+                              width: 35,
+                              padding: 8,
+                            },
+                          }}
+                          value={MpinCallBackVal[index] || ""}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/[^0-9]/g, "");
 
+                            let newMpin = MpinCallBackVal.split("");
+                            newMpin[index] = val; // can be "" too
+                            setMpinCallBackVal(newMpin.join(""));
 
-                
-{/* Buttons - always visible, disabled until mobile is 10 digits and MPIN is complete */}
-<Box display="flex" gap={2}>
-  <Button
-    fullWidth
-    variant="contained"
-    sx={{
-      borderRadius: 2,
-      fontWeight: "bold",
-      fontSize: { xs: "0.9rem", sm: "1rem" },
-      background: "#fff",
-      color: "#6c4bc7",
-      "&:hover": {
-        background: "#2563eb",
-      },
-    }}
-    onClick={() => setStep(2)}
-    disabled={!(mobileNumber.length === 10 && MpinCallBackVal.length === 6)}
-    
-  >
-    
-    Back
-  </Button>
-  <Button
-    fullWidth
-    variant="contained"
-    onClick={handleRecharge}
-    sx={{
-      borderRadius: 2,
-      fontWeight: "bold",
-      fontSize: { xs: "0.9rem", sm: "1rem" },
-      background: "#fff",
-      color: "#6c4bc7",
-      "&:hover": {
-        background: "#2563eb",
-      },
-    }}
-    disabled={!(mobileNumber.length === 10 && MpinCallBackVal.length === 6)}
-  >
-     
-    Pay ₹{selectedPlan?.price}
-  </Button>
-</Box>
+                            if (val && index < 5) {
+                              // move to next input if digit entered
+                              const next = document.getElementById(
+                                `mpin-${index + 1}`
+                              );
+                              if (next) next.focus();
+                            } else if (!val && index > 0) {
+                              // move back if deleted
+                              const prev = document.getElementById(
+                                `mpin-${index - 1}`
+                              );
+                              if (prev) prev.focus();
+                            }
+                          }}
+                          id={`mpin-${index}`}
+                        />
+                      ))}
+                     
+                    </Box>
+                      <Box
+                                   
+                                    sx={{ display: "flex", justifyContent: "center", ml: 32 }}
+                                  >
+                                    <Button
+                                      variant="contained"
+                                      size="small"
+                                      sx={{ fontSize: "11px" }}
+                                      onClick={() => setResetMpinModalOpen(true)}
+                                    >
+                                      Reset MPIN
+                                    </Button>
+                                  </Box>
+                     {resetMpinModalOpen && (
+                            <ResetMpin
+                              open={resetMpinModalOpen}
+                              onClose={() => setResetMpinModalOpen(false)}
+                              username={username}
+                            />
+                          )}
 
+                  </Box>
+                )}
 
+                {/* Buttons - always visible, disabled until mobile is 10 digits and MPIN is complete */}
+                <Box display="flex" gap={2}>
+                  {/* <Button
+                    fullWidth
+                    variant="contained"
+                    sx={{
+                      borderRadius: 2,
+                      fontWeight: "bold",
+                      fontSize: { xs: "0.9rem", sm: "1rem" },
+                      background: "#fff",
+                      color: "#2275b7",
+                      "&:hover": {
+                        background: "#1e3c72",
+                        color: "#fff",
+                      },
+                    }}
+                    onClick={() => setStep(2)}
+                    disabled={
+                      !(
+                        mobileNumber.length === 10 &&
+                        MpinCallBackVal.length === 6
+                      )
+                    }
+                  >
+                    Back
+                  </Button> */}
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    onClick={handleRecharge}
+                    sx={{
+                      borderRadius: 2,
+                      fontWeight: "bold",
+                      fontSize: { xs: "0.9rem", sm: "1rem" },
+                      background: "#fff",
+                      color: "#2275b7",
+                      "&:hover": {
+                        background: "#1e3c72",
+                        color: "#fff",
+                      },
+                    }}
+                    disabled={
+                      !(
+                        mobileNumber.length === 10 &&
+                        MpinCallBackVal.length === 6
+                      )
+                    }
+                  >
+                    Pay ₹{selectedPlan?.price}
+                  </Button>
+                </Box>
               </Paper>
             </Box>
           </Box>
@@ -565,9 +676,9 @@ const Prepaid = () => {
           </Box>
         </Fade>
       )}
-      
     </Container>
   );
 };
 
 export default Prepaid;
+// sx={{ backgroundColor: "#2275b7" }}

@@ -11,6 +11,7 @@ import {
   dashboardImage,
   fundReqImage,
   loginHistoryImage,
+  profileNewImage,
   rechargeNew,
   riskImage,
   sendmoney,
@@ -320,12 +321,19 @@ export const zsm_nav = [
     icon2: "📊",
     to: "/zsm/dashboard",
   },
-  { title: "Users", icon: "📊", icon2: "📊", to: "/zsm/users" },
+  { title: "Users", icon: usersImage, icon2: "📊", to: "/zsm/users" },
   {
     title: "Transcations",
     icon: transImage,
     icon2: "📊",
     to: "/zsm/transcations",
+  },
+  { title: "Profile", icon: profileNewImage, icon2: "📊", to: "/zsm/profile" },
+  {
+    title: "Wallet Ledger",
+    icon: walletLdgerImage,
+    icon2: "📊",
+    to: "/zsm/wallet-ledger",
   },
 ];
 
@@ -336,12 +344,25 @@ export const api_nav = [
     icon2: "📊",
     to: "/api/dashboard",
   },
-  { title: "Users", icon: "📊", icon2: "📊", to: "/api/users" },
+  { title: "Users", icon: usersImage, icon2: "📊", to: "/api/users" },
   {
     title: "Transcations",
     icon: transImage,
     icon2: "📊",
     to: "/api/transcations",
+  },
+  { title: "Profile", icon: profileNewImage, icon2: "📊", to: "/api/profile" },
+  {
+    title: "Complaint",
+    icon: complainImageNew,
+    icon2: "📊",
+    to: "/api/complaint",
+  },
+  {
+    title: "Fund Request",
+    icon: bankImage,
+    icon2: "📊",
+    to: "/api/fund-request",
   },
 ];
 
@@ -352,11 +373,30 @@ export const md_nav = [
     icon2: "📊",
     to: "/md/dashboard",
   },
-  { title: "Users", icon: "📊", icon2: "📊", to: "/md/users" },
+  { title: "Users", icon: usersImage, icon2: "📊", to: "/md/users" },
+
+  {
+    title: "Fund Request",
+    icon: bankImage,
+    icon2: "🛠️",
+    to: "/md/fund-request",
+  },
   {
     title: "Transcations",
     icon: transImage,
     icon2: "📊",
     to: "/md/transcations",
+  },
+  {
+    title: "Wallet Transfer",
+    icon: walletTransferImage,
+    icon2: "🛠️",
+    to: "/md/wallet-transfer",
+  },
+  {
+    title: "Wallet Ledger",
+    icon: walletLedgerImg,
+    icon2: "🛠️",
+    to: "/md/wallet-ledger",
   },
 ];

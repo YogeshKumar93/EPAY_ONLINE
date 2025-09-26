@@ -101,7 +101,7 @@ const ResetMpin = ({ open, onClose, username }) => {
           onClick={handleMpin}
           sx={{
             py: 1.5,
-            backgroundColor: "#FF6B6B",
+            backgroundColor: "#6c4bc7",
             color: "#fff",
             fontWeight: 600,
             borderRadius: "10px",

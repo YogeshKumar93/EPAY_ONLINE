@@ -163,44 +163,6 @@ const FundRequest = () => {
             gap={2}
             width="150px"
           >
-            {/* Admin actions */}
-            {user?.role === "adm" && (
-              <>
-                {row.status !== "approved" && row.status !== "rejected" && (
-                  <>
-                    <Tooltip title="Approve">
-                      <CheckCircleIcon
-                        fontSize="small"
-                        sx={{ color: "green", cursor: "pointer" }}
-                        onClick={() =>
-                          handleOpenModal("status", row, "approved")
-                        }
-                      />
-                    </Tooltip>
-                    <Tooltip title="Reject">
-                      <CancelIcon
-                        fontSize="small"
-                        sx={{ color: "red", cursor: "pointer" }}
-                        onClick={() =>
-                          handleOpenModal("status", row, "rejected")
-                        }
-                      />
-                    </Tooltip>
-                  </>
-                )}
-                {row.status === "rejected" && (
-                  <Tooltip title="Reopen">
-                    <Button
-                      size="small"
-                      color="warning"
-                      onClick={() => handleOpenModal("status", row, "reopen")}
-                    >
-                      <OpenInFullIcon fontSize="small" />
-                    </Button>
-                  </Tooltip>
-                )}
-              </>
-            )}
             {/* ✅ Edit - only if pending */}
             {row.status === "pending" && (
               <Tooltip title="Edit">
@@ -222,9 +184,50 @@ const FundRequest = () => {
                 />
               </Tooltip>
             )}
+
+            {/* Admin actions */}
+            {user?.role === "adm" && (
+              <>
+                {row.status !== "approved" && row.status !== "rejected" && (
+                  <MuiBox display="flex" gap={2}>
+                    <Tooltip title="Approve">
+                      <CheckCircleIcon
+                        fontSize="small"
+                        color="success"
+                        onClick={() =>
+                          handleOpenModal("status", row, "approved")
+                        }
+                        style={{ cursor: "pointer" }}
+                      />
+                    </Tooltip>
+                    <Tooltip title="Reject">
+                      <CancelIcon
+                        fontSize="small"
+                        color="error"
+                        onClick={() =>
+                          handleOpenModal("status", row, "rejected")
+                        }
+                        style={{ cursor: "pointer" }}
+                      />
+                    </Tooltip>
+                  </MuiBox>
+                )}
+                {row.status === "rejected" && (
+                  <Tooltip title="Reopen">
+                    <OpenInFullIcon
+                      fontSize="small"
+                      color="warning"
+                      onClick={() => handleOpenModal("status", row, "reopen")}
+                      style={{ cursor: "pointer" }}
+                    />
+                  </Tooltip>
+                )}
+              </>
+            )}
           </MuiBox>
         ),
         width: "150px",
+       
       },
     ],
     [user]

@@ -13,12 +13,12 @@ import {
   Slide,
 } from "@mui/material";
 import { CheckCircle } from "@mui/icons-material";
-import OTPInput from "react-otp-input"; // ✅ Import OTPInput
 import { apiCall } from "../../../api/apiClient";
 import ApiEndpoints from "../../../api/ApiEndpoints";
 import { apiErrorToast, okSuccessToast } from "../../../utils/ToastUtil";
 import AuthContext from "../../../contexts/AuthContext";
 import operatorImages from "../../../assets/operators";
+import ResetMpin from "../../common/ResetMpin";
 
 const Dth = () => {
   const [services, setServices] = useState([]);
@@ -28,21 +28,29 @@ const Dth = () => {
   const [manualAmount, setManualAmount] = useState("");
   const [step, setStep] = useState(2);
   const [MpinCallBackVal, setMpinCallBackVal] = useState("");
-
+  const [mobileNumber, setMobileNumber] = useState("");
   const { location } = useContext(AuthContext);
+   const [resetMpinModalOpen, setResetMpinModalOpen] = useState(false);
+     const authCtx = useContext(AuthContext);
+    const username = `TRANS${authCtx?.user?.id}`;
 
   // Fetch DTH services
   const fetchServices = async () => {
     setLoading(true);
-    const { error, response } = await apiCall("post", ApiEndpoints.GET_SERVICES, {
-      sub_type: "dth",
-    });
+    const { error, response } = await apiCall(
+      "post",
+      ApiEndpoints.GET_SERVICES,
+      {
+        sub_type: "dth",
+      }
+    );
     setLoading(false);
     if (error) return apiErrorToast(error);
 
     const fetchedServices = response?.data || [];
     setServices(fetchedServices);
 
+    // Set first service as default
     if (fetchedServices.length > 0) {
       setSelectedService(fetchedServices[0]);
     }
@@ -56,25 +64,27 @@ const Dth = () => {
     setSelectedService(service);
     setCustomerId("");
     setManualAmount("");
-    setMpinCallBackVal("");
   };
 
   const handleRecharge = async () => {
     if (!customerId) return apiErrorToast("Please enter Customer ID");
+    if (!mobileNumber || mobileNumber.length !== 10)
+      return apiErrorToast("Please enter valid 10-digit Mobile Number");
     if (!manualAmount || parseFloat(manualAmount) <= 0)
       return apiErrorToast("Please enter a valid amount");
-    if (MpinCallBackVal.length < 6)
-      return apiErrorToast("Please enter a valid 6-digit MPIN");
+    if (!MpinCallBackVal || MpinCallBackVal.length !== 6)
+      return apiErrorToast("Please enter your 6-digit MPIN");
     if (!location?.lat || !location?.long)
       return apiErrorToast("Location not available, please enable GPS.");
 
     const payload = {
       customer_id: customerId,
+      mobile_number: mobileNumber,
       operator: selectedService?.id,
       amount: parseFloat(manualAmount),
-      mpin: MpinCallBackVal, // send MPIN in payload
       latitude: location?.lat,
       longitude: location?.long,
+      mpin: Number(MpinCallBackVal),
     };
 
     const { error } = await apiCall("post", ApiEndpoints.RECHARGE, payload);
@@ -82,10 +92,10 @@ const Dth = () => {
 
     okSuccessToast(`Recharge successful for ${customerId}`);
     setStep(4);
-
     setTimeout(() => {
       setSelectedService(services[0] || null);
       setCustomerId("");
+      setMobileNumber("");
       setManualAmount("");
       setMpinCallBackVal("");
       setStep(2);
@@ -94,7 +104,12 @@ const Dth = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="60vh"
+      >
         <Box textAlign="center">
           <CircularProgress size={60} thickness={4} />
           <Typography variant="h6" sx={{ mt: 2 }}>
@@ -104,9 +119,6 @@ const Dth = () => {
       </Box>
     );
   }
-
-  // Check if MPIN is fully entered
-  const isMpinComplete = MpinCallBackVal.length === 6;
 
   return (
     <Container maxWidth="xl" sx={{ py: 1 }}>
@@ -133,11 +145,18 @@ const Dth = () => {
                         position: "relative",
                         mb: 1.2,
                         backgroundColor:
-                          selectedService?.id === service.id ? "#ebeef2" : "background.paper",
-                        color: selectedService?.id === service.id ? "#2275b7" : "text.secondary",
+                          selectedService?.id === service.id
+                            ? "#ebeef2"
+                            : "background.paper",
+                        color:
+                          selectedService?.id === service.id
+                            ? "#2275b7"
+                            : "text.secondary",
                         border: "1px solid",
                         borderColor:
-                          selectedService?.id === service.id ? "#2275b7" : "divider",
+                          selectedService?.id === service.id
+                            ? "#2275b7"
+                            : "divider",
                         "&:hover": {
                           backgroundColor: "#ebeef2",
                           color: "#2275b7",
@@ -166,7 +185,10 @@ const Dth = () => {
                           fontFamily: "DM Sans, sans-serif",
                           fontWeight: 550,
                           fontSize: "15px",
-                          color: selectedService?.id === service.id ? "#2275b7" : "#6e82a5",
+                          color:
+                            selectedService?.id === service.id
+                              ? "#2275b7"
+                              : "#6e82a5",
                         }}
                       >
                         {service.name}
@@ -180,7 +202,12 @@ const Dth = () => {
             {/* Right: Confirm Recharge */}
             <Box sx={{ flex: 1 }}>
               <Paper sx={{ p: 3, borderRadius: 2 }}>
-                <Typography variant="h5" textAlign="center" fontWeight="bold" mb={2}>
+                <Typography
+                  variant="h5"
+                  textAlign="center"
+                  fontWeight="bold"
+                  mb={2}
+                >
                   Confirm Recharge
                 </Typography>
                 <Paper
@@ -207,6 +234,22 @@ const Dth = () => {
                 />
                 <TextField
                   fullWidth
+                  label="Mobile Number"
+                  value={mobileNumber}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^0-9]/g, "");
+                    setMobileNumber(val);
+                  }}
+                  inputProps={{ maxLength: 10 }}
+                  sx={{ mb: 2 }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">📱</InputAdornment>
+                    ),
+                  }}
+                />
+                <TextField
+                  fullWidth
                   label="Amount"
                   type="number"
                   value={manualAmount}
@@ -215,46 +258,114 @@ const Dth = () => {
                     if (/^\d*\.?\d*$/.test(val)) setManualAmount(val);
                   }}
                   InputProps={{
-                    startAdornment: <InputAdornment position="start">₹</InputAdornment>,
+                    startAdornment: (
+                      <InputAdornment position="start">₹</InputAdornment>
+                    ),
                     inputProps: { min: 1 },
                   }}
-                  sx={{ mb: 2 }}
+                  sx={{ mb: 3 }}
                 />
+                {mobileNumber.length === 10 && (
+                  <Box sx={{ textAlign: "center", mb: 2 }}>
+                    {/* Instruction text */}
+                    <Typography
+                      variant="body2"
+                      sx={{ mb: 1, fontWeight: 500, color: "gray" }}
+                    >
+                      Enter 6-digit MPIN
+                    </Typography>
 
-                {/* MPIN boxes: show only if amount is filled */}
-                {manualAmount && (
-                  <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
-                    <OTPInput
-                      value={MpinCallBackVal}
-                      onChange={setMpinCallBackVal}
-                      numInputs={6} // 6 digits for MPIN
-                      inputType="password"
-                      renderInput={(props) => <input {...props} />}
-                      inputStyle={{
-                        width: 40,
-                        height: 40,
-                        margin: "0 5px",
-                        fontSize: 20,
-                        border: "1px solid #D0D5DD",
-                        borderRadius: 6,
-                        textAlign: "center",
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        gap: 1,
+                        mb: 1.5,
                       }}
-                    />
+                    >
+                      {Array.from({ length: 6 }).map((_, index) => (
+                        <TextField
+                          key={index}
+                          type="password"
+                          inputProps={{
+                            maxLength: 1,
+                            style: {
+                              textAlign: "center",
+                              fontSize: 24,
+                              width: 35,
+                              padding: 8,
+                            },
+                          }}
+                          value={MpinCallBackVal[index] || ""}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/[^0-9]/g, "");
+
+                            let newMpin = MpinCallBackVal.split("");
+                            newMpin[index] = val; // allow "" too
+                            setMpinCallBackVal(newMpin.join(""));
+
+                            if (val && index < 5) {
+                              // move to next if digit entered
+                              const next = document.getElementById(
+                                `mpin-${index + 1}`
+                              );
+                              if (next) next.focus();
+                            } else if (!val && index > 0) {
+                              // move back if deleted
+                              const prev = document.getElementById(
+                                `mpin-${index - 1}`
+                              );
+                              if (prev) prev.focus();
+                            }
+                          }}
+                          onKeyDown={(e) => {
+                            if (
+                              e.key === "Backspace" &&
+                              !MpinCallBackVal[index] &&
+                              index > 0
+                            ) {
+                              // move back if empty and backspace pressed
+                              const prev = document.getElementById(
+                                `mpin-${index - 1}`
+                              );
+                              if (prev) prev.focus();
+                            }
+                          }}
+                          id={`mpin-${index}`}
+                        />
+                      ))}
+                    </Box>
+                        <Box
+                                                       
+                                                        sx={{ display: "flex", justifyContent: "center", ml: 32 }}
+                                                      >
+                                                        <Button
+                                                          variant="contained"
+                                                          size="small"
+                                                          sx={{ fontSize: "11px" }}
+                                                          onClick={() => setResetMpinModalOpen(true)}
+                                                        >
+                                                          Reset MPIN
+                                                        </Button>
+                                                      </Box>
+                                         {resetMpinModalOpen && (
+                                                <ResetMpin
+                                                  open={resetMpinModalOpen}
+                                                  onClose={() => setResetMpinModalOpen(false)}
+                                                  username={username}
+                                                />
+                                              )}
                   </Box>
                 )}
 
-                {/* Pay button */}
-                {manualAmount && (
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    sx={{ backgroundColor: "#2275b7" }}
-                    onClick={handleRecharge}
-                    disabled={!isMpinComplete}
-                  >
-                    Pay ₹{manualAmount || 0}
-                  </Button>
-                )}
+                <Button
+                  fullWidth
+                  variant="contained"
+                  sx={{ backgroundColor: "#2275b7" }}
+                  onClick={handleRecharge}
+                >
+                  Pay ₹{manualAmount || 0}
+                </Button>
               </Paper>
             </Box>
           </Box>
@@ -276,10 +387,9 @@ const Dth = () => {
               variant="contained"
               sx={{ backgroundColor: "#2275b7" }}
               onClick={() => {
-                setSelectedService(services[0] || null);
+                setSelectedService(services[0] || null); // default first service
                 setCustomerId("");
                 setManualAmount("");
-                setMpinCallBackVal("");
                 setStep(2);
               }}
             >

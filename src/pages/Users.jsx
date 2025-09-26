@@ -168,7 +168,7 @@ const Users = ({ query }) => {
         ),
         width: "100px",
       },
-      ...(userRole.role !== "di"
+      ...(userRole.role !== "di" && userRole.role !== "md"
         ? [
             {
               name: "Parent",
@@ -193,7 +193,9 @@ const Users = ({ query }) => {
           </div>
         ),
       },
-      {
+      ...(userRole.role !== "md"
+      ? [
+        {
         name: "Wallet 2",
         selector: (row) => (
           <div style={{ textAlign: "left", cursor: "pointer" }}>
@@ -201,7 +203,9 @@ const Users = ({ query }) => {
           </div>
         ),
       },
-      ...(userRole.role !== "di"
+    ]
+    :[]),
+      ...(userRole.role !== "di" && userRole.role !== "md"
         ? [
             {
               name: "Wallet 3",
@@ -213,7 +217,7 @@ const Users = ({ query }) => {
             },
           ]
         : []),
-      ...(userRole.role !== "di"
+      ...(userRole.role !== "di" && userRole.role !== "md"
         ? [
             {
               name: "Lien",
@@ -230,7 +234,7 @@ const Users = ({ query }) => {
     ];
 
     // Conditionally add Actions column for admins and distributors
-    if (userRole.role === "adm" || userRole.role === "di") {
+    if (userRole.role === "adm" || userRole.role === "di" || userRole.role === "md") {
       baseColumns.push({
         name: "Actions",
         selector: (row) => (
@@ -272,7 +276,8 @@ const Users = ({ query }) => {
                   </Tooltip>
                 </>
               )}
-              {userRole.role === "di" && <AdWalletTransfer row={row} />}
+            {userRole.role === "di" ||
+                (userRole.role === "md" && <AdWalletTransfer row={row} />)}
             </Box>
           </Box>
         ),
@@ -328,7 +333,7 @@ const Users = ({ query }) => {
               </Box>
             </Box>
           );
-        } else if (userRole.role === "di") {
+        } else if (userRole.role === "di" || userRole.role === "md") {
           return (
             <CommonStatus value={row.is_active} />
             // <Box
