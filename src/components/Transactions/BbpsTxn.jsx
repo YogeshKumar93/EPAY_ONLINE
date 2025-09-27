@@ -10,7 +10,12 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import CloseIcon from "@mui/icons-material/Close";
 import PrintIcon from "@mui/icons-material/Print";
 import TransactionDetailsCard from "../common/TransactionDetailsCard";
+import ReplayIcon from "@mui/icons-material/Replay";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import DoneIcon from "@mui/icons-material/Done";
+
 import { useNavigate } from "react-router-dom";
+
 import {
   android2,
   linux2,
@@ -20,16 +25,52 @@ import {
 } from "../../utils/iconsImports";
 import LaptopIcon from "@mui/icons-material/Laptop";
 import { Logo } from "../../iconsImports";
+import CommonModal from "../common/CommonModal";
 
 const BbpxTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const [openCreate, setOpenCreate] = useState(false);
   const [selectedTxn, setSelectedTxn] = useState(null);
-
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [selectedForRefund, setSelectedForRefund] = useState(null);
+  const [refundLoading, setRefundLoading] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
+  const [responseModalOpen, setResponseModalOpen] = useState(false);
+  const [selectedApiResponse, setSelectedApiResponse] = useState("");
+
   const navigate = useNavigate();
+  const handleRefundClick = (row) => {
+    setSelectedForRefund(row);
+    setConfirmModalOpen(true);
+  };
+  const handleConfirmRefund = async () => {
+    if (!selectedForRefund) return;
+    setRefundLoading(true);
+
+    const { error, response } = await apiCall("post", ApiEndpoints.REFUND_TXN, {
+      txn_id: selectedForRefund.txn_id,
+    });
+
+    if (response) {
+      showToast(
+        response?.message || "Refund processed successfully",
+        "success"
+      );
+
+      // Close modal and reset selected row
+      setConfirmModalOpen(false);
+      setSelectedForRefund(null);
+
+      // Refresh table
+      refreshPlans();
+    } else {
+      showToast(error?.message || "Failed to process refund", "error");
+    }
+
+    setRefundLoading(false);
+  };
   const filters = useMemo(
     () => [
       {
@@ -285,18 +326,65 @@ const BbpxTxn = ({ query }) => {
         ),
         center: true,
       },
-      {
-        name: "Action",
-        selector: (row) => (
-          <div
-            style={{ textAlign: "right", fontSize: "10px", fontWeight: 600 }}
-          >
-            {row?.action || "N/A"}
-          </div>
-        ),
-        right: true,
-        width: "60px",
-      },
+      ...(user?.role === "adm" || user?.role === "sadm"
+        ? [
+            {
+              name: "Action",
+              selector: (row) => (
+                <div
+                  style={{
+                    fontSize: "10px",
+                    fontWeight: "600",
+                    display: "flex",
+                    gap: "4px",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {/* SUCCESS: only Replay */}
+                  {row?.status === "SUCCESS" && (
+                    <Tooltip title="Click To Refund">
+                      <ReplayIcon
+                        sx={{ color: "red", fontSize: 25, cursor: "pointer" }}
+                        onClick={() => handleRefundClick(row)}
+                      />
+                    </Tooltip>
+                  )}
+
+                  {/* PENDING: CheckCircle + Replay */}
+                  {row?.status === "PENDING" && (
+                    <>
+                      <Tooltip title="Click To Success">
+                        <DoneIcon sx={{ color: "green", fontSize: 25 }} />
+                      </Tooltip>
+                      <Tooltip title="Click To Refund">
+                        <ReplayIcon
+                          sx={{ color: "red", fontSize: 25, cursor: "pointer" }}
+                          onClick={() => handleRefundClick(row)}
+                        />
+                      </Tooltip>
+                    </>
+                  )}
+
+                  {/* FAILED or REFUND: Refresh */}
+                  {(row?.status === "FAILED" || row?.status === "REFUND") && (
+                    <Tooltip title="Click To Rollback">
+                      <RefreshIcon
+                        sx={{
+                          color: "orange",
+                          fontSize: 25,
+                          cursor: "pointer",
+                        }}
+                      />
+                    </Tooltip>
+                  )}
+                </div>
+              ),
+              center: true,
+              width: "70px",
+            },
+          ]
+        : []),
       {
         name: "View",
         selector: (row) => (
@@ -361,7 +449,57 @@ const BbpxTxn = ({ query }) => {
         enableActionsHover={true}
       />
 
+      <CommonModal
+        open={responseModalOpen}
+        onClose={() => setResponseModalOpen(false)}
+        title="API Response"
+        iconType="info"
+        footerButtons={[
+          {
+            text: "Close",
+            variant: "contained",
+            onClick: () => setResponseModalOpen(false),
+          },
+        ]}
+      >
+        <Typography
+          sx={{
+            whiteSpace: "pre-wrap",
+            fontSize: "14px",
+            color: "#333",
+            wordBreak: "break-word",
+          }}
+        >
+          {selectedApiResponse}
+        </Typography>
+      </CommonModal>
+
+      <CommonModal
+        open={confirmModalOpen}
+        onClose={() => setConfirmModalOpen(false)}
+        title="Confirm Refund"
+        footerButtons={[
+          {
+            text: "Cancel",
+            variant: "outlined",
+            onClick: () => setConfirmModalOpen(false),
+          },
+          {
+            text: "Confirm",
+            variant: "contained",
+            onClick: handleConfirmRefund,
+            disabled: refundLoading,
+          },
+        ]}
+      >
+        <Typography sx={{ fontSize: 14 }}>
+          Are you sure you want to refund transaction ID:{" "}
+          {selectedForRefund?.txn_id}?
+        </Typography>
+      </CommonModal>
+
       {/* BBPS Details Drawer */}
+
       <Drawer
         anchor="right"
         open={drawerOpen}
