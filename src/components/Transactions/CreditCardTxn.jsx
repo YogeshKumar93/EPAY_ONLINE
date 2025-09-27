@@ -14,6 +14,7 @@ import ComplaintForm from "../ComplaintForm";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CloseIcon from "@mui/icons-material/Close";
 import TransactionDetailsCard from "../common/TransactionDetailsCard";
+import biggpayLogo from "../../assets/Images/PPALogor.png";
 import companylogo from "../../assets/Images/logo(1).png";
 import {
   android2,
@@ -27,13 +28,19 @@ import LaptopIcon from "@mui/icons-material/Laptop";
 import PrintIcon from "@mui/icons-material/Print";
 import { useNavigate } from "react-router-dom";
 import { Logo } from "../../iconsImports";
-
+import CommonModal from "../common/CommonModal";
+import ReplayIcon from "@mui/icons-material/Replay";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import DoneIcon from "@mui/icons-material/Done";
 const CreditCardTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
 
   const [openCreate, setOpenCreate] = useState(false);
   const [selectedTxn, setSelectedTxn] = useState(null);
+  const [responseModalOpen, setResponseModalOpen] = useState(false);
+  const [selectedApiResponse, setSelectedApiResponse] = useState("");
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
@@ -164,7 +171,30 @@ const CreditCardTxn = ({ query }) => {
         name: "Service",
         selector: (row) => (
           <div style={{ textAlign: "left", fontWeight: "600" }}>
-            {row.operator}
+            {row.operator} <br />
+            <span
+              style={{ fontWeight: "normal", fontSize: "8px", color: "blue" }}
+            >
+              STATUS
+            </span>
+            <span
+              style={{
+                fontWeight: "normal",
+                fontSize: "8px",
+                color: "blue",
+                cursor: "pointer",
+                textDecoration: "underline",
+                marginLeft: "6px", // gap between status and response
+              }}
+              onClick={() => {
+                setSelectedApiResponse(
+                  row.api_response || "No response available"
+                );
+                setResponseModalOpen(true);
+              }}
+            >
+              RESPONSE
+            </span>
           </div>
         ),
         wrap: true,
@@ -190,7 +220,7 @@ const CreditCardTxn = ({ query }) => {
         wrap: true,
         width: "80px",
       },
- 
+
       {
         name: "Amount",
         selector: (row) => (
@@ -207,22 +237,22 @@ const CreditCardTxn = ({ query }) => {
         right: true,
         width: "80px",
       },
-    //   {
-    //     name: "CCF",
-    //     selector: (row) => (
-    //       <div
-    //         style={{
-    //           color: "red",
-    //           fontWeight: "600",
-    //           textAlign: "right",
-    //         }}
-    //       >
-    //         {parseFloat(row.ccf).toFixed(2)}
-    //       </div>
-    //     ),
-    //     right: true,
-    //     width: "60px",
-    //   },
+      //   {
+      //     name: "CCF",
+      //     selector: (row) => (
+      //       <div
+      //         style={{
+      //           color: "red",
+      //           fontWeight: "600",
+      //           textAlign: "right",
+      //         }}
+      //       >
+      //         {parseFloat(row.ccf).toFixed(2)}
+      //       </div>
+      //     ),
+      //     right: true,
+      //     width: "60px",
+      //   },
     ];
 
     // --- Insert Route and GST after CCF for admin ---
@@ -338,17 +368,56 @@ const CreditCardTxn = ({ query }) => {
       //   center: true,
       //   width: "70px",
       // },
-      ...(user?.role !== "ret" &&
-      user?.role !== "dd" &&
-      user?.role !== "di" &&
-      user?.role === "api" &&
-      user?.role === "md"
+      ...(user?.role === "adm" || user?.role === "sadm"
         ? [
             {
               name: "Action",
               selector: (row) => (
-                <div style={{ fontSize: "10px", fontWeight: "600" }}>
-                  {row.action || "N/A"}
+                <div
+                  style={{
+                    fontSize: "10px",
+                    fontWeight: "600",
+                    display: "flex",
+                    gap: "4px",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {/* SUCCESS: only Replay */}
+                  {row?.status === "SUCCESS" && (
+                    <Tooltip title="Click To Refund">
+                      <ReplayIcon
+                        sx={{ color: "red", fontSize: 25, cursor: "pointer" }}
+                      />
+                    </Tooltip>
+                  )}
+
+                  {/* PENDING: CheckCircle + Replay */}
+                  {row?.status === "PENDING" && (
+                    <>
+                      <Tooltip title="Click To Success">
+                        <DoneIcon sx={{ color: "green", fontSize: 25 }} />
+                      </Tooltip>
+                      <Tooltip title="Click To Refund">
+                        <ReplayIcon
+                          sx={{ color: "red", fontSize: 25, cursor: "pointer" }}
+                        />
+                      </Tooltip>
+                    </>
+                  )}
+
+                  {/* FAILED or REFUND: Refresh */}
+                  {(row?.status === "FAILED" || row?.status === "REFUND") && (
+                    <Tooltip title="Click To Rollback">
+                      <RefreshIcon
+                        sx={{
+                          color: "orange",
+                          fontSize: 25,
+                          cursor: "pointer",
+                        }}
+                      />
+                    </Tooltip>
+                  )}
                 </div>
               ),
               center: true,
@@ -356,6 +425,7 @@ const CreditCardTxn = ({ query }) => {
             },
           ]
         : []),
+
       {
         name: "View",
         selector: (row) => (
@@ -452,7 +522,7 @@ const CreditCardTxn = ({ query }) => {
               amount={selectedRow.amount}
               status={selectedRow.status}
               onClose={() => setDrawerOpen(false)} // ✅ Close drawer
-              companyLogoUrl={Logo}
+              companyLogoUrl={biggpayLogo}
               dateTime={ddmmyyWithTime(selectedRow.created_at)}
               message={selectedRow.message || "No message"}
               details={[
@@ -476,6 +546,30 @@ const CreditCardTxn = ({ query }) => {
           )}
         </Box>
       </Drawer>
+      <CommonModal
+        open={responseModalOpen}
+        onClose={() => setResponseModalOpen(false)}
+        title="API Response"
+        iconType="info"
+        footerButtons={[
+          {
+            text: "Close",
+            variant: "contained",
+            onClick: () => setResponseModalOpen(false),
+          },
+        ]}
+      >
+        <Typography
+          sx={{
+            whiteSpace: "pre-wrap",
+            fontSize: "14px",
+            color: "#333",
+            wordBreak: "break-word",
+          }}
+        >
+          {selectedApiResponse}
+        </Typography>
+      </CommonModal>
     </>
   );
 };

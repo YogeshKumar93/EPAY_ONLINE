@@ -18,9 +18,11 @@ const CreditCardBillPayment = ({
   handleClose,
   data = {},
   refreshData,
+  view,
 }) => {
-  const { location } = useContext(AuthContext);
+  console.log("THe view is ", view);
 
+  const { location } = useContext(AuthContext);
   const [submitting, setSubmitting] = useState(false);
   const [mpinModalOpen, setMpinModalOpen] = useState(false);
 
@@ -58,7 +60,7 @@ const CreditCardBillPayment = ({
 
     setFormErrors(errors);
 
-    return Object.keys(errors).length === 0;
+    return Object.views(errors).length === 0;
   };
 
   const handleConfirmPayment = async (mpin) => {
@@ -90,23 +92,10 @@ const CreditCardBillPayment = ({
 
   return (
     <>
-      <Box
-        sx={{
-          position: "fixed",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: { xs: "90%", sm: 400 },
-          bgcolor: "background.paper",
-          borderRadius: 2,
-          boxShadow: 24,
-          p: 4,
-          zIndex: 1100,
-        }}
-      >
-        <Typography variant="h6" gutterBottom fontWeight="bold" color="primary">
+      <Box sx={{}}>
+        {/* <Typography variant="h6" gutterBottom fontWeight="bold" color="primary">
           Credit Card Bill Payment
-        </Typography>
+        </Typography> */}
 
         <Box display="flex" flexDirection="column" gap={2} mb={3}>
           <TextField

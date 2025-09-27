@@ -269,6 +269,7 @@ const ApiEndpoints = {
   GET_PENDING_ACCOUNT_TRANSACTION: "admin/getPendingBankTxn",
   GET_STATUS: "admin/checkTxnStatus",
   CHANGE_STATUS: "admin/changeTxnStatus",
+   REFUND_TXN: "refund/refundTxn",
 
   BLOCK_UNBLOCK_PLANS: "",
   ADD_PLAN: "admin/createPlan",
@@ -355,6 +356,8 @@ const ApiEndpoints = {
   RECH_PAY_BILL: "prepaid/payBill",
   GET_UNCLAIMED_ENTERIES: "bankStatement/getUnclaimedEntries",
 
+  CREDIT_CARD_BILL_PAYMENT: "creditcard/payCreditCard",
+  GET_CREDIT_CARD: "/creditcard/getCreditCard",
   // user
   GET_ROLL: "",
   RAISE_ISSUE_USER: "user/raiseIssue",
