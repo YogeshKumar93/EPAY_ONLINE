@@ -113,7 +113,7 @@ const BbpsBillerDetails = ({
   };
 
   const handlePayBill = async (mpin) => {
-      const payload = {
+    const payload = {
       billerId: billerId,
       biller_name: billerDetails?.billerInfo?.name,
       cat: billerDetails?.category?.key,
@@ -130,7 +130,7 @@ const BbpsBillerDetails = ({
         payload[param.name] = inputValues[param.name];
       });
     }
-  
+
     setPayingBill(true);
     try {
       const { response, error } = await apiCall(
