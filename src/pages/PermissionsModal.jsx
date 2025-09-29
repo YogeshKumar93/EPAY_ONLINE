@@ -1,21 +1,19 @@
 import {
-  Drawer,
   Box,
   Typography,
-  IconButton,
   Switch,
   FormControlLabel,
-  Button,
   Divider,
+  Grid,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import { apiErrorToast } from "../utils/ToastUtil";
-import ApiEndpoints from "../api/ApiEndpoints";
 import { apiCall } from "../api/apiClient";
+import ApiEndpoints from "../api/ApiEndpoints";
 import { useState } from "react";
 import { useToast } from "../utils/ToastContext";
+import CommonModal from "../components/common/CommonModal";
+import { apiErrorToast } from "../utils/ToastUtil";
 
-const PermissionsDrawer = ({ open, handleClose, user, onFetchRef }) => {
+const PermissionsModal = ({ open, handleClose, user, onFetchRef }) => {
   const [permissions, setPermissions] = useState(user?.permissions || {});
   const { showToast } = useToast();
 
@@ -42,6 +40,7 @@ const PermissionsDrawer = ({ open, handleClose, user, onFetchRef }) => {
       onFetchRef();
     } else {
       apiErrorToast(response?.message || "Something went wrong");
+      // revert change on error
       setPermissions((prev) => ({
         ...prev,
         [permKey]: prev[permKey] === 1 ? 0 : 1,
@@ -51,59 +50,45 @@ const PermissionsDrawer = ({ open, handleClose, user, onFetchRef }) => {
 
   if (!user) return null;
 
+  const permKeys = Object.keys(permissions).filter(
+    (key) => !["id", "user_id", "created_at", "updated_at"].includes(key)
+  );
+
   return (
-    <Drawer
-      anchor="right"
+    <CommonModal
       open={open}
-      onClose={() => handleClose(false)}
-      sx={{
-        "& .MuiDrawer-paper": {
-          width: 400,
-          p: 2,
-          top: "64px", // push below navbar
-          height: "calc(100% - 64px)", // take remaining height
+      onClose={handleClose}
+      title={`Permissions for ${user.name}`}
+      maxWidth="sm"
+      footerButtons={[
+        {
+          text: "Close",
+          variant: "outlined",
+          onClick: handleClose,
         },
-      }}
+      ]}
     >
-      {/* Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h6">Permissions for {user.name}</Typography>
-        <IconButton onClick={() => handleClose(false)}>
-          <CloseIcon />
-        </IconButton>
-      </Box>
-      <Divider />
-
-      {/* Permissions List */}
-      <Box display="flex" flexDirection="column" gap={1} mt={2}>
-        {Object.keys(permissions)
-          .filter(
-            (key) =>
-              !["id", "user_id", "created_at", "updated_at"].includes(key)
-          )
-          .map((permKey) => (
-            <FormControlLabel
-              key={permKey}
-              control={
-                <Switch
-                  checked={permissions[permKey] === 1}
-                  onChange={() => handleToggle(permKey)}
-                  color="primary"
-                />
-              }
-              label={permKey.toUpperCase()}
-            />
+      <Box>
+        <Divider sx={{ mb: 2 }} />
+        <Grid container spacing={2}>
+          {permKeys.map((permKey) => (
+            <Grid item xs={12} sm={6} key={permKey}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={permissions[permKey] === 1}
+                    onChange={() => handleToggle(permKey)}
+                    color="primary"
+                  />
+                }
+                label={permKey.toUpperCase()}
+              />
+            </Grid>
           ))}
+        </Grid>
       </Box>
-
-      {/* Footer */}
-      <Box mt={3}>
-        {/* <Button variant="outlined" fullWidth onClick={() => handleClose(false)}>
-          Close
-        </Button> */}
-      </Box>
-    </Drawer>
+    </CommonModal>
   );
 };
 
-export default PermissionsDrawer;
+export default PermissionsModal;

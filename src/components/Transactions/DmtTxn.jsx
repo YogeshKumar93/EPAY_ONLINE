@@ -1,33 +1,102 @@
-import { useMemo, useContext, useState } from "react";
-import { Box, Tooltip, IconButton, Drawer } from "@mui/material";
+import { useMemo, useContext, useState, useRef } from "react";
+import {
+  Box,
+  Tooltip,
+  IconButton,
+  Drawer,
+  Typography,
+  Modal,
+} from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import AuthContext from "../../contexts/AuthContext";
-import { dateToTime1, ddmmyy, ddmmyyWithTime } from "../../utils/DateUtils";
+import {
+  dateToTime,
+  dateToTime1,
+  ddmmyy,
+  ddmmyyWithTime,
+} from "../../utils/DateUtils";
 import CommonStatus from "../common/CommonStatus";
 import ComplaintForm from "../ComplaintForm";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import PrintIcon from "@mui/icons-material/Print";
+import CloseIcon from "@mui/icons-material/Close";
 import TransactionDetailsCard from "../common/TransactionDetailsCard";
-import companylogo from "../../assets/Images/PPALogor.png";
+import companylogo from "../../assets/Images/logo(1).png";
+import biggpayLogo from "../../assets/Images/PPALogor.png";
 import {
   android2,
   linux2,
   macintosh2,
   okhttp,
+  postman,
   windows2,
 } from "../../utils/iconsImports";
 import LaptopIcon from "@mui/icons-material/Laptop";
-
+import PrintIcon from "@mui/icons-material/Print";
+import { useNavigate } from "react-router-dom";
+import { Logo } from "../../iconsImports";
+import CommonModal from "../common/CommonModal";
+import ReplayIcon from "@mui/icons-material/Replay";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import DoneIcon from "@mui/icons-material/Done";
+import { apiCall } from "../../api/apiClient";
+import { useToast } from "../../utils/ToastContext";
 const DmtTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
 
   const [openCreate, setOpenCreate] = useState(false);
   const [selectedTxn, setSelectedTxn] = useState(null);
-
+  const [responseModalOpen, setResponseModalOpen] = useState(false);
+  const [selectedApiResponse, setSelectedApiResponse] = useState("");
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [selectedForRefund, setSelectedForRefund] = useState(null);
+  const [refundLoading, setRefundLoading] = useState(false);
+  const { showToast } = useToast();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
+  const navigate = useNavigate();
+  const handleRefundClick = (row) => {
+    setSelectedForRefund(row);
+    setConfirmModalOpen(true);
+  };
+  const fetchUsersRef = useRef(null);
+
+  const handleFetchRef = (fetchFn) => {
+    fetchUsersRef.current = fetchFn;
+  };
+  const refreshPlans = () => {
+    if (fetchUsersRef.current) {
+      fetchUsersRef.current();
+    }
+  };
+  const handleConfirmRefund = async () => {
+    if (!selectedForRefund) return;
+    setRefundLoading(true);
+
+    const { error, response } = await apiCall("post", ApiEndpoints.REFUND_TXN, {
+      txn_id: selectedForRefund.txn_id,
+    });
+
+    if (response) {
+      showToast(
+        response?.message || "Refund processed successfully",
+        "success"
+      );
+
+      // Close modal and reset selected row
+      setConfirmModalOpen(false);
+      setSelectedForRefund(null);
+
+      // Refresh table
+      refreshPlans();
+    } else {
+      showToast(error?.message || "Failed to process refund", "error");
+    }
+
+    setRefundLoading(false);
+  };
 
   const filters = useMemo(
     () => [
@@ -45,41 +114,50 @@ const DmtTxn = ({ query }) => {
       },
       { id: "sender_mobile", label: "Sender Mobile", type: "textfield" },
       { id: "txn_id", label: "Txn ID", type: "textfield" },
+      { id: "route", label: "Route", type: "textfield", roles: ["adm"] },
+      {
+        id: "client_ref",
+        label: "Client Ref",
+        type: "textfield",
+        roles: ["adm"],
+      },
     ],
     []
   );
 
   const columns = useMemo(() => {
     const baseColumns = [
-     {
-          name: "Date",
-          selector: (row) => (
-            <div style={{ display: "flex", flexDirection: "column", fontSize:"10px", fontWeight:"bold" }}>
-              <Tooltip
-                title={`Created: ${ddmmyyWithTime(row?.created_at)}`}
-                arrow
-              >
-                <span>
-                  {ddmmyy(row?.created_at)} {dateToTime1(row?.created_at)}
+      {
+        name: "Date",
+        selector: (row) => (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              // fontSize: "",
+              fontWeight: "600",
+            }}
+          >
+            <Tooltip title={`Created: ${ddmmyyWithTime(row.created_at)}`} arrow>
+              <span>
+                {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
+              </span>
+            </Tooltip>
+            {!(user?.role === "ret" || user?.role === "dd") && (
+              <Tooltip title={`Updated: ${dateToTime(row.updated_at)}`} arrow>
+                <span style={{ marginTop: "8px" }}>
+                  {ddmmyy(row.updated_at)}
+                  {dateToTime(row.updated_at)}
                 </span>
               </Tooltip>
-  
-              <Tooltip
-                title={`Updated: ${ddmmyyWithTime(row?.updated_at)}`}
-                arrow
-              >
-                <span>
-                  {ddmmyy(row?.updated_at)} {dateToTime1(row?.updated_at)}
-                </span>
-              </Tooltip>
-            </div>
-          ),
-          wrap: true,
-          width: "140px",
-        },
-      ...(user?.role === "ret" || user?.role === "dd"
-        ? []
-        : [
+            )}
+          </div>
+        ),
+        wrap: true,
+        width: "80px",
+      },
+      ...(user?.role === "adm" || user?.role === "sadm"
+        ? [
             {
               name: "Route",
               selector: (row) => (
@@ -90,7 +168,9 @@ const DmtTxn = ({ query }) => {
               center: true,
               width: "70px",
             },
-          ]),
+          ]
+        : []),
+
       {
         name: "Pf",
         selector: (row) => {
@@ -103,6 +183,8 @@ const DmtTxn = ({ query }) => {
             icon = <img src={macintosh2} style={{ width: "22px" }} alt="" />;
           else if (row.pf.toLowerCase().includes("linux"))
             icon = <img src={linux2} style={{ width: "22px" }} alt="" />;
+          else if (row.pf.toLowerCase().includes("postman"))
+            icon = <img src={postman} style={{ width: "22px" }} alt="" />;
           else if (row.pf.toLowerCase().includes("okhttp"))
             icon = <img src={okhttp} style={{ width: "22px" }} alt="" />;
           else icon = <LaptopIcon sx={{ color: "blue", width: "22px" }} />;
@@ -124,14 +206,14 @@ const DmtTxn = ({ query }) => {
         wrap: true,
         left: true,
       },
-      ...(user?.role === "ret" || user?.role === "dd"
+      ...(user?.role === "ret" || user?.role === "dd" || user?.role === "api"
         ? []
         : [
             {
               name: "Est.",
               selector: (row) => (
                 <div style={{ fontSize: "10px", fontWeight: "600" }}>
-                  {row.establishment || "N/A"}
+                  {row.establishment}
                 </div>
               ),
               center: true,
@@ -141,39 +223,64 @@ const DmtTxn = ({ query }) => {
       {
         name: "Service",
         selector: (row) => (
-          <div
-            style={{ textAlign: "left", fontSize: "14px", fontWeight: "600" }}
-          >
-            {row.operator}
+          <div style={{ textAlign: "left", fontWeight: "600" }}>
+            {row.operator} <br />
+            <span
+              style={{ fontWeight: "normal", fontSize: "8px", color: "blue" }}
+            >
+              STATUS
+            </span>
+            <span
+              style={{
+                fontWeight: "normal",
+                fontSize: "8px",
+                color: "blue",
+                cursor: "pointer",
+                textDecoration: "underline",
+                marginLeft: "6px", // gap between status and response
+              }}
+              onClick={() => {
+                setSelectedApiResponse(
+                  row.api_response || "No response available"
+                );
+                setResponseModalOpen(true);
+              }}
+            >
+              RESPONSE
+            </span>
           </div>
         ),
         wrap: true,
-        width: "80px",
+        width: "160px",
       },
       {
         name: "TxnId",
         selector: (row) => (
-          <div
-            style={{
-              textAlign: "left",
-              fontSize: "10px",
-              fontWeight: "600",
-            }}
-          >
-            {row.txn_id}
-            <br />
-            {row.client_ref}
+          <div style={{ textAlign: "left", fontWeight: "600" }}>
+            {row.txn_id} <br />
           </div>
         ),
         wrap: true,
         width: "100px",
       },
+      ...(user.role === "api"
+        ? [
+            {
+              name: "client ref",
+              selector: (row) => (
+                <div style={{ textAlign: "left", fontWeight: "600" }}>
+                  {row.client_ref} <br />
+                </div>
+              ),
+              wrap: true,
+              width: "100px",
+            },
+          ]
+        : []),
       {
         name: "Mobile",
         selector: (row) => (
-          <div
-            style={{ textAlign: "left", fontSize: "12px", fontWeight: "600" }}
-          >
+          <div style={{ textAlign: "left", fontWeight: "600" }}>
             {row.sender_mobile}
           </div>
         ),
@@ -193,7 +300,7 @@ const DmtTxn = ({ query }) => {
         ),
         wrap: true,
         center: true,
-        width: "100px",
+        width: "150px",
       },
       {
         name: "Amount",
@@ -203,10 +310,9 @@ const DmtTxn = ({ query }) => {
               color: "red",
               fontWeight: "600",
               textAlign: "right",
-              fontSize: "10px",
             }}
           >
-            ₹{parseFloat(row.amount).toFixed(2)}
+            {parseFloat(row.amount).toFixed(2)}
           </div>
         ),
         right: true,
@@ -219,7 +325,6 @@ const DmtTxn = ({ query }) => {
             style={{
               color: "red",
               fontWeight: "600",
-              fontSize: "10px",
               textAlign: "right",
             }}
           >
@@ -231,6 +336,7 @@ const DmtTxn = ({ query }) => {
       },
     ];
 
+    // --- Insert Route and GST after CCF for admin ---
     if (user?.role === "adm") {
       baseColumns.push({
         name: "GST",
@@ -251,12 +357,13 @@ const DmtTxn = ({ query }) => {
       });
     }
 
+    // Add remaining columns (Comm/TDS, di Comm/tds, Md Comm/tds, Status, View)
     const remainingColumns = [
       {
-        name: "Comm / Tds",
+        name: "Ret Comm",
         selector: (row) => (
           <div
-            style={{ textAlign: "right", fontSize: "10px", fontWeight: 600 }}
+            style={{ textAlign: "right", fontSize: "14px", fontWeight: 600 }}
           >
             <div style={{ color: "green" }}>
               {parseFloat(row.comm).toFixed(2)}
@@ -269,10 +376,14 @@ const DmtTxn = ({ query }) => {
         right: true,
         width: "60px",
       },
-      ...(user?.role === "adm"
+      ...(user?.role === "adm" ||
+      user?.role === "di" ||
+      user?.role === "md" ||
+      user?.role === "asm" ||
+      user?.role === "zsm"
         ? [
             {
-              name: "di Comm/ tds",
+              name: "Di Comm",
               selector: (row) => (
                 <div
                   style={{
@@ -292,8 +403,15 @@ const DmtTxn = ({ query }) => {
               right: true,
               width: "60px",
             },
+          ]
+        : []),
+      ...(user?.role === "adm" ||
+      user?.role === "md" ||
+      user?.role === "asm" ||
+      user?.role === "zsm"
+        ? [
             {
-              name: "Md Comm/ tds",
+              name: "Md Comm",
               selector: (row) => (
                 <div
                   style={{
@@ -321,22 +439,83 @@ const DmtTxn = ({ query }) => {
         center: true,
         width: "70px",
       },
-      {
-        name: "Action",
-        selector: (row) => (
-          <div
-            style={{
-              fontWeight: "600",
-              fontSize: "10px",
-              textAlign: "right",
-            }}
-          >
-            {row.action || "N/A"}
-          </div>
-        ),
-        center: true,
-        width: "70px",
-      },
+      // {
+      //   name: "Action",
+      //   selector: (row) => (
+      //     <div
+      //       style={{
+      //         // color: "red",
+      //         fontWeight: "600",
+      //         fontSize: "10px",
+      //         textAlign: "right",
+      //       }}
+      //     >
+      //       {row.action || "N/A"}
+      //     </div>
+      //   ),
+      //   center: true,
+      //   width: "70px",
+      // },
+      ...(user?.role === "adm" || user?.role === "sadm"
+        ? [
+            {
+              name: "Action",
+              selector: (row) => (
+                <div
+                  style={{
+                    fontSize: "10px",
+                    fontWeight: "600",
+                    display: "flex",
+                    gap: "4px",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {/* SUCCESS: only Replay */}
+                  {row?.status === "SUCCESS" && (
+                    <Tooltip title="Click To Refund">
+                      <ReplayIcon
+                        sx={{ color: "red", fontSize: 25, cursor: "pointer" }}
+                        onClick={() => handleRefundClick(row)}
+                      />
+                    </Tooltip>
+                  )}
+
+                  {/* PENDING: CheckCircle + Replay */}
+                  {row?.status === "PENDING" && (
+                    <>
+                      <Tooltip title="Click To Success">
+                        <DoneIcon sx={{ color: "green", fontSize: 25 }} />
+                      </Tooltip>
+                      <Tooltip title="Click To Refund">
+                        <ReplayIcon
+                          sx={{ color: "red", fontSize: 25, cursor: "pointer" }}
+                          onClick={() => handleRefundClick(row)}
+                        />
+                      </Tooltip>
+                    </>
+                  )}
+
+                  {/* FAILED or REFUND: Refresh */}
+                  {(row?.status === "FAILED" || row?.status === "REFUND") && (
+                    <Tooltip title="Click To Rollback">
+                      <RefreshIcon
+                        sx={{
+                          color: "orange",
+                          fontSize: 25,
+                          cursor: "pointer",
+                        }}
+                      />
+                    </Tooltip>
+                  )}
+                </div>
+              ),
+              center: true,
+              width: "70px",
+            },
+          ]
+        : []),
+
       {
         name: "View",
         selector: (row) => (
@@ -346,7 +525,7 @@ const DmtTxn = ({ query }) => {
               alignItems: "center",
               justifyContent: "center",
               minWidth: "80px",
-              gap: 1,
+              gap: 1, // spacing between icons
             }}
           >
             {/* View Transaction visible to all */}
@@ -366,12 +545,12 @@ const DmtTxn = ({ query }) => {
 
             {/* Print payout visible only to ret and dd */}
             {(user?.role === "ret" || user?.role === "dd") && (
-              <Tooltip title="Print payout">
+              <Tooltip title="Print DMT">
                 <IconButton
                   color="secondary"
                   size="small"
                   onClick={() =>
-                    navigate("/print-payout", { state: { txnData: row } })
+                    navigate("/print-dmt2",  { state: { txnData: row } })
                   }
                   sx={{ backgroundColor: "transparent" }}
                 >
@@ -393,8 +572,9 @@ const DmtTxn = ({ query }) => {
 
   return (
     <>
-      <Box sx={{ mx: -4 }}>
+      <Box sx={{}}>
         <CommonTable
+          onFetchRef={handleFetchRef}
           columns={columns}
           endpoint={ApiEndpoints.GET_DMT_TXN}
           filters={filters}
@@ -432,8 +612,8 @@ const DmtTxn = ({ query }) => {
             <TransactionDetailsCard
               amount={selectedRow.amount}
               status={selectedRow.status}
-              onClose={() => setDrawerOpen(false)}
-              companyLogoUrl={companylogo}
+              onClose={() => setDrawerOpen(false)} // ✅ Close drawer
+              companyLogoUrl={biggpayLogo}
               dateTime={ddmmyyWithTime(selectedRow.created_at)}
               message={selectedRow.message || "No message"}
               details={[
@@ -441,10 +621,12 @@ const DmtTxn = ({ query }) => {
                 { label: "Operator Id", value: selectedRow.operator_id },
                 { label: "Order Id", value: selectedRow.order_id },
                 { label: "MOP", value: selectedRow.mop },
+
                 { label: "Customer Number", value: selectedRow.sender_mobile },
                 { label: "CCF", value: selectedRow.ccf },
                 { label: "Charge", value: selectedRow.charges },
                 { label: "GST", value: selectedRow.gst },
+
                 { label: "TDS", value: selectedRow.tds },
               ]}
               onRaiseIssue={() => {
@@ -455,6 +637,53 @@ const DmtTxn = ({ query }) => {
           )}
         </Box>
       </Drawer>
+      <CommonModal
+        open={responseModalOpen}
+        onClose={() => setResponseModalOpen(false)}
+        title="API Response"
+        iconType="info"
+        footerButtons={[
+          {
+            text: "Close",
+            variant: "contained",
+            onClick: () => setResponseModalOpen(false),
+          },
+        ]}
+      >
+        <Typography
+          sx={{
+            whiteSpace: "pre-wrap",
+            fontSize: "14px",
+            color: "#333",
+            wordBreak: "break-word",
+          }}
+        >
+          {selectedApiResponse}
+        </Typography>
+      </CommonModal>
+      <CommonModal
+        open={confirmModalOpen}
+        onClose={() => setConfirmModalOpen(false)}
+        title="Confirm Refund"
+        footerButtons={[
+          {
+            text: "Cancel",
+            variant: "outlined",
+            onClick: () => setConfirmModalOpen(false),
+          },
+          {
+            text: "Confirm",
+            variant: "contained",
+            onClick: handleConfirmRefund,
+            disabled: refundLoading,
+          },
+        ]}
+      >
+        <Typography sx={{ fontSize: 14 }}>
+          Are you sure you want to refund transaction ID:{" "}
+          {selectedForRefund?.txn_id}?
+        </Typography>
+      </CommonModal>
     </>
   );
 };

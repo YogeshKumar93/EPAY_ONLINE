@@ -115,8 +115,9 @@ export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="" element={<LandingPage />} />
-        <Route path="navbar" element={<NavBar />} />
+         <Route path="" element={<QrLoginPage />} />
+        {/* <Route path="" element={<LandingPage />} /> */}
+        {/* <Route path="navbar" element={<NavBar />} />
         <Route path="footer" element={<Footer />} />
         <Route path="landingservices" element={<LandingServices />} />
         <Route path="landingaboutus" element={<LandingAboutUs />} />
@@ -124,7 +125,7 @@ export default function AppRoutes() {
         <Route path="landingpageintro" element={<LandingPageIntro />} />
         <Route path="landingpageintro1" element={<LandingPageIntro1 />} />
         <Route path="landingpageintro2" element={<LandingPageIntro2 />} />
-        <Route path="landingpageintro3" element={<LandingPageIntro3 />} />
+        <Route path="landingpageintro3" element={<LandingPageIntro3 />} /> */}
 
         <Route path="/qrLogin" element={<QrLoginPage />} />
         <Route path="/login" element={<Login />} />

@@ -104,7 +104,10 @@ const ApiEndpoints = {
   CREATE_PURPOSE: "payout/createPurpose",
   AEPS2_SCHEMA: "aeps/aeps2Schema",
   AEPS2_ONBOARDING: "aeps/onboardingAeps2",
-
+  GET_BY_TYPE: "business/getByType",
+  UPDATE_BY_TYPE: "business/updateByType",
+  GET_ALL_BY_USER: "business/getAllByUser",
+  APPROVE_REJECT_DOCS: "business/approveReject",
   GET_NEWS: "news/getNews",
   CREATE_NEWS: "news/createNews",
   DELETE_NEWS: "news/deleteNews",
@@ -251,6 +254,10 @@ const ApiEndpoints = {
   DMT1_OUTLET_INITIATE: "aeps/initiateSignupAeps",
   DMT1_OUTLET_INITIATE_SCHEMA: "aeps/getInitiateSchema",
   VALIDATE_DMT1_OUTLET: "aeps/validateSignupAeps",
+ ADD_LEIN: "lien/addLien",
+  REMOVE_LEIN: "lien/removeLien",
+  GET_LEIN: "lien/getLien",
+
   // WALLET_UPDATE: "wallet/update",
   // WALLET_DELETE: "wallet/delete",
 
@@ -273,6 +280,7 @@ const ApiEndpoints = {
   GET_PENDING_ACCOUNT_TRANSACTION: "admin/getPendingBankTxn",
   GET_STATUS: "admin/checkTxnStatus",
   CHANGE_STATUS: "admin/changeTxnStatus",
+   REFUND_TXN: "refund/refundTxn",
 
   BLOCK_UNBLOCK_PLANS: "",
   ADD_PLAN: "admin/createPlan",
@@ -359,6 +367,8 @@ const ApiEndpoints = {
   RECH_PAY_BILL: "prepaid/payBill",
   GET_UNCLAIMED_ENTERIES: "bankStatement/getUnclaimedEntries",
 
+  CREDIT_CARD_BILL_PAYMENT: "creditcard/payCreditCard",
+  GET_CREDIT_CARD: "/creditcard/getCreditCard",
   // user
   GET_ROLL: "",
   RAISE_ISSUE_USER: "user/raiseIssue",

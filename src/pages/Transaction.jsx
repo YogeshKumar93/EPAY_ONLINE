@@ -20,7 +20,7 @@ import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
 import TrainIcon from "@mui/icons-material/Train";
 import { Wallet } from "@mui/icons-material";
 import Wallet2WalletTransfer from "./Wallet2WalletTransfer";
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import CreditCardTxn from "../components/Transactions/CreditCardTxn";
 
 export const Transaction = () => {
   const tabItems = [
@@ -161,6 +161,15 @@ export const Transaction = () => {
     ),
     component: <Wallet2WalletTransfer />,
   },
+   {
+      label: (
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <Wallet fontSize="small" />
+          Credit Card
+        </div>
+      ),
+      content: <CreditCardTxn />,
+    },
   ];
 
   return <CommonTabs tabs={tabItems} defaultTab={0} />;

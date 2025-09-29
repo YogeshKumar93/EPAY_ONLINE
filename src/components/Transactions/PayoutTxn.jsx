@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useContext, useState } from "react";
+import { useMemo, useCallback, useContext, useState, useRef } from "react";
 import {
   Box,
   Tooltip,
@@ -19,7 +19,7 @@ import {
 import CommonStatus from "../common/CommonStatus";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CloseIcon from "@mui/icons-material/Close";
-
+import biggpayLogo from "../../assets/Images/PPALogor.png";
 import companylogo from "../../assets/Images/logo(1).png";
 import TransactionDetailsCard from "../common/TransactionDetailsCard";
 import {
@@ -27,22 +27,74 @@ import {
   linux2,
   macintosh2,
   okhttp,
+  postman,
   windows2,
 } from "../../utils/iconsImports";
 import LaptopIcon from "@mui/icons-material/Laptop";
 import PrintIcon from "@mui/icons-material/Print";
 import { useNavigate } from "react-router-dom";
 import { Logo } from "../../iconsImports";
-
+import CommonModal from "../common/CommonModal";
+import ReplayIcon from "@mui/icons-material/Replay";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import DoneIcon from "@mui/icons-material/Done";
+import { apiCall } from "../../api/apiClient";
+import { useToast } from "../../utils/ToastContext";
 const PayoutTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const [openCreate, setOpenCreate] = useState(false);
   const [selectedTxn, setSelectedTxn] = useState(null);
   const navigate = useNavigate();
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [selectedForRefund, setSelectedForRefund] = useState(null);
+  const [refundLoading, setRefundLoading] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
+  const [responseModalOpen, setResponseModalOpen] = useState(false);
+  const [selectedApiResponse, setSelectedApiResponse] = useState("");
+  const { showToast } = useToast();
+  const handleRefundClick = (row) => {
+    setSelectedForRefund(row);
+    setConfirmModalOpen(true);
+  };
+  const fetchUsersRef = useRef(null);
 
+  const handleFetchRef = (fetchFn) => {
+    fetchUsersRef.current = fetchFn;
+  };
+  const refreshPlans = () => {
+    if (fetchUsersRef.current) {
+      fetchUsersRef.current();
+    }
+  };
+  const handleConfirmRefund = async () => {
+    if (!selectedForRefund) return;
+    setRefundLoading(true);
+
+    const { error, response } = await apiCall("post", ApiEndpoints.REFUND_TXN, {
+      txn_id: selectedForRefund.txn_id,
+    });
+
+    if (response) {
+      showToast(
+        response?.message || "Refund processed successfully",
+        "success"
+      );
+
+      // Close modal and reset selected row
+      setConfirmModalOpen(false);
+      setSelectedForRefund(null);
+
+      // Refresh table
+      refreshPlans();
+    } else {
+      showToast(error?.message || "Failed to process refund", "error");
+    }
+
+    setRefundLoading(false);
+  };
   const filters = useMemo(
     () => [
       {
@@ -89,9 +141,8 @@ const PayoutTxn = ({ query }) => {
           </div>
         ),
       },
-      ...(user?.role === "ret" || user?.role === "dd"
-        ? []
-        : [
+      ...(user?.role === "adm" || user?.role === "sadm"
+        ? [
             {
               name: "Route",
               selector: (row) => (
@@ -102,7 +153,8 @@ const PayoutTxn = ({ query }) => {
               center: true,
               width: "70px",
             },
-          ]),
+          ]
+        : []),
       {
         name: "Pf",
         selector: (row) => {
@@ -136,6 +188,14 @@ const PayoutTxn = ({ query }) => {
             icon = (
               <img
                 src={linux2}
+                style={{ width: "22px" }}
+                alt="description of image"
+              />
+            );
+          } else if (row.pf.toLowerCase().includes("postman")) {
+            icon = (
+              <img
+                src={postman}
                 style={{ width: "22px" }}
                 alt="description of image"
               />
@@ -187,10 +247,31 @@ const PayoutTxn = ({ query }) => {
       {
         name: "Service",
         selector: (row) => (
-          <div
-            style={{ textAlign: "left", fontSize: "10px", fontWeight: "600" }}
-          >
-            {row.operator}
+          <div style={{ textAlign: "left", fontWeight: "600" }}>
+            {row.operator} <br />
+            <span
+              style={{ fontWeight: "normal", fontSize: "8px", color: "blue" }}
+            >
+              STATUS
+            </span>
+            <span
+              style={{
+                fontWeight: "normal",
+                fontSize: "8px",
+                color: "blue",
+                cursor: "pointer",
+                textDecoration: "underline",
+                marginLeft: "6px", // gap between status and response
+              }}
+              onClick={() => {
+                setSelectedApiResponse(
+                  row.api_response || "No response available"
+                );
+                setResponseModalOpen(true);
+              }}
+            >
+              RESPONSE
+            </span>
           </div>
         ),
         wrap: true,
@@ -215,19 +296,9 @@ const PayoutTxn = ({ query }) => {
               width: "100px",
             },
           ]),
+
       {
-        name: "Operator Id",
-        selector: (row) => (
-          <>
-            <div style={{ textAlign: "left", fontSize: "13px" }}>
-              {row?.operator}
-            </div>
-          </>
-        ),
-        wrap: true,
-      },
-      {
-        name: "Mobile Number",
+        name: "Number",
         selector: (row) => (
           <div
             style={{
@@ -251,7 +322,7 @@ const PayoutTxn = ({ query }) => {
       //   wrap: true,
       // },
       {
-        name: "Beneficiary Details",
+        name: "Beneficiary",
         selector: (row) => (
           <div style={{ textAlign: "left", fontSize: "12px" }}>
             {row.beneficiary_name?.toUpperCase()} <br />
@@ -272,10 +343,25 @@ const PayoutTxn = ({ query }) => {
         wrap: true,
         right: true,
       },
-      ...(user?.role === "adm"
+
+      {
+        name: "Charges",
+        selector: (row) => (
+          <div style={{ color: "red", fontWeight: "600", textAlign: "right" }}>
+            ₹{parseFloat(row.charges).toFixed(2)}
+          </div>
+        ),
+        wrap: true,
+        right: true,
+      },
+      ...(user?.role === "adm" ||
+      user?.role === "di" ||
+      user?.role === "md" ||
+      user?.role === "asm" ||
+      user?.role === "zsm"
         ? [
             {
-              name: "Di Comm/ tds",
+              name: "Di Comm",
               selector: (row) => (
                 <div
                   style={{
@@ -295,8 +381,15 @@ const PayoutTxn = ({ query }) => {
               right: true,
               width: "60px",
             },
+          ]
+        : []),
+      ...(user?.role === "adm" ||
+      user?.role === "md" ||
+      user?.role === "asm" ||
+      user?.role === "zsm"
+        ? [
             {
-              name: "Md Comm/ tds",
+              name: "Md Comm",
               selector: (row) => (
                 <div
                   style={{
@@ -318,18 +411,10 @@ const PayoutTxn = ({ query }) => {
             },
           ]
         : []),
-
-      {
-        name: "Charges",
-        selector: (row) => (
-          <div style={{ color: "red", fontWeight: "600", textAlign: "right" }}>
-            ₹{parseFloat(row.charges).toFixed(2)}
-          </div>
-        ),
-        wrap: true,
-        right: true,
-      },
-      ...(user?.role === "ret" || user?.role === "dd"
+      ...(user?.role === "ret" ||
+      user?.role === "dd" ||
+      user?.role === "di" ||
+      user?.role === "md"
         ? [] // ❌ hide for ret and dd
         : [
             {
@@ -352,27 +437,76 @@ const PayoutTxn = ({ query }) => {
 
       {
         name: "Status",
-        selector: (row) => <CommonStatus value={row.status} />,
-
-        center: true,
-      },
-      {
-        name: "Action",
         selector: (row) => (
-          <div
-            style={{
-              // color: "red",
-              fontWeight: "600",
-              fontSize: "10px",
-              textAlign: "right",
-            }}
-          >
-            {row.action || "N/A"}
+          <div style={{ textAlign: "center" }}>
+            <CommonStatus value={row.status} />
+            <div style={{ fontSize: "10px", marginTop: "4px" }}>
+              {row?.operator_id || "N/A"}
+            </div>
           </div>
         ),
         center: true,
-        width: "70px",
       },
+      ...(user?.role === "adm" || user?.role === "sadm"
+        ? [
+            {
+              name: "Action",
+              selector: (row) => (
+                <div
+                  style={{
+                    fontSize: "10px",
+                    fontWeight: "600",
+                    display: "flex",
+                    gap: "4px",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {/* SUCCESS: only Replay */}
+                  {row?.status === "SUCCESS" && (
+                    <Tooltip title="Click To Refund">
+                      <ReplayIcon
+                        sx={{ color: "red", fontSize: 25, cursor: "pointer" }}
+                        onClick={() => handleRefundClick(row)}
+                      />
+                    </Tooltip>
+                  )}
+
+                  {/* PENDING: CheckCircle + Replay */}
+                  {row?.status === "PENDING" && (
+                    <>
+                      <Tooltip title="Click To Success">
+                        <DoneIcon sx={{ color: "green", fontSize: 25 }} />
+                      </Tooltip>
+                      <Tooltip title="Click To Refund">
+                        <ReplayIcon
+                          sx={{ color: "red", fontSize: 25, cursor: "pointer" }}
+                          onClick={() => handleRefundClick(row)}
+                        />
+                      </Tooltip>
+                    </>
+                  )}
+
+                  {/* FAILED or REFUND: Refresh */}
+                  {(row?.status === "FAILED" || row?.status === "REFUND") && (
+                    <Tooltip title="Click To Rollback">
+                      <RefreshIcon
+                        sx={{
+                          color: "orange",
+                          fontSize: 25,
+                          cursor: "pointer",
+                        }}
+                      />
+                    </Tooltip>
+                  )}
+                </div>
+              ),
+              center: true,
+              width: "70px",
+            },
+          ]
+        : []),
+
       {
         name: "View",
         selector: (row) => (
@@ -429,6 +563,7 @@ const PayoutTxn = ({ query }) => {
   return (
     <>
       <CommonTable
+        onFetchRef={handleFetchRef}
         columns={columns}
         endpoint={ApiEndpoints.GET_PAYOUT_TXN}
         filters={filters}
@@ -455,7 +590,7 @@ const PayoutTxn = ({ query }) => {
               amount={selectedRow.amount}
               status={selectedRow.status}
               onClose={() => setDrawerOpen(false)} // ✅ Close drawer
-              companyLogoUrl={Logo}
+              companyLogoUrl={biggpayLogo}
               dateTime={ddmmyyWithTime(selectedRow.created_at)}
               message={selectedRow.message || "No message"}
               details={[
@@ -484,6 +619,53 @@ const PayoutTxn = ({ query }) => {
           )}
         </Box>
       </Drawer>
+      <CommonModal
+        open={responseModalOpen}
+        onClose={() => setResponseModalOpen(false)}
+        title="API Response"
+        iconType="info"
+        footerButtons={[
+          {
+            text: "Close",
+            variant: "contained",
+            onClick: () => setResponseModalOpen(false),
+          },
+        ]}
+      >
+        <Typography
+          sx={{
+            whiteSpace: "pre-wrap",
+            fontSize: "14px",
+            color: "#333",
+            wordBreak: "break-word",
+          }}
+        >
+          {selectedApiResponse}
+        </Typography>
+      </CommonModal>
+      <CommonModal
+        open={confirmModalOpen}
+        onClose={() => setConfirmModalOpen(false)}
+        title="Confirm Refund"
+        footerButtons={[
+          {
+            text: "Cancel",
+            variant: "outlined",
+            onClick: () => setConfirmModalOpen(false),
+          },
+          {
+            text: "Confirm",
+            variant: "contained",
+            onClick: handleConfirmRefund,
+            disabled: refundLoading,
+          },
+        ]}
+      >
+        <Typography sx={{ fontSize: 14 }}>
+          Are you sure you want to refund transaction ID:{" "}
+          {selectedForRefund?.txn_id}?
+        </Typography>
+      </CommonModal>
     </>
   );
 };

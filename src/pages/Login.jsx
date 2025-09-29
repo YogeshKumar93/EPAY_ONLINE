@@ -32,6 +32,7 @@ import biggpayLogo from "../assets/Images/PPALogo.jpeg";
 import lockicon from "../assets/lock.png";
 import mobilelogin from "../assets/mobile.png";
 import ReCAPTCHA from "react-google-recaptcha";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const validationSchema = Yup.object({
   mobile: Yup.string()
@@ -149,7 +150,7 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
   style: { padding: 0, borderRadius: "10px" },
   endAdornment: (
     <InputAdornment position="end">
-      <IconButton onClick={() => setShowPassword(!showPassword)}>
+      <IconButton onClick={() => setShowPassword(!showPassword)} >
         {showPassword ? <Visibility /> : <VisibilityOff />}
       </IconButton>
       <img
@@ -221,7 +222,7 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
         }}
       >
         <Box sx={{ width: "100%", maxWidth: 500 }}>
-          {/* <a href="https://impsguru.com"> */}
+          {/* <a href="https://app.p2pae.com"> */}
             <Box
               component="img"
               src={biggpayLogo}
@@ -235,7 +236,6 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
                 display: "block",
                 mx: "auto",
               }}
-              onClick={() => navigate("/login")} 
             />
           {/* </a> */}
 
@@ -300,7 +300,7 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
             <Button
               variant="text"
               size="small"
-              sx={{ textTransform: "none", fontWeight: 500, color: "#0052CC", "&:hover": { textDecoration: "underline" } }}
+              sx={{ textTransform: "none", fontWeight: 500, color: "#5210c1", "&:hover": { textDecoration: "underline" } }}
               onClick={handleForgotPassword}
             >
               Forgot Password?
@@ -334,6 +334,7 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
             }
             sx={{ width: "100%", textAlign: "center", marginBottom: 0 }}
           />
+    
 
           {/* Submit */}
           <Button
@@ -341,11 +342,38 @@ const passwordInputProps = (showPassword, setShowPassword) => ({
             fullWidth
             variant="contained"
             size="large"
-            sx={{ mt: 2, py: 1.5, borderRadius: 2, fontWeight: 600, background: "linear-gradient(90deg,#0052CC,#007BFF)" }}
+            sx={{ mt: 2, py: 1.5, borderRadius: 2, fontWeight: 600, background: "linear-gradient(90deg,#5210c1,#5210c1)", 
+     
+     }}
             disabled={loading}
           >
             {loading ? <CircularProgress size={24} /> : "Login"}
           </Button>
+           <Box sx={{ display: "flex", justifyContent: "flex-end",mt:1.5 }}>
+     <Button
+  variant="outlined"
+  size="small"
+  startIcon={<ArrowBackIcon />}
+  sx={{
+    py: 0.5,
+    borderRadius: 2,
+    fontWeight: 600,
+    minWidth: 80,
+    color: "#5210c1",
+    borderColor: "#5210c1",
+    transition: "all 0.3s ease",
+    "&:hover": {
+      backgroundColor: "#5210c1",
+      color: "#fff",
+      borderColor: "#5210c1",
+    },
+  }}
+  onClick={() => navigate("/qrLogin")}
+>
+  Back to QR
+</Button>
+
+    </Box>
         </Box>
         </Box>
       </Grid>

@@ -15,6 +15,13 @@ import EditIcon from "@mui/icons-material/Edit";
 import { apiCall } from "../api/apiClient";
 import AdWalletTransfer from "./AdWalletTransfer";
 import CommonStatus from "../components/common/CommonStatus";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import ViewDocuments from "./ViewDocuments";
+import AddLein from "../components/LienAmount/AddLein";
+import EditUser from "./EditUser";
+
+
 const roleLabels = {
   ret: "Retailer",
   adm: "Admin",
@@ -29,13 +36,33 @@ const Users = ({ query }) => {
   const fetchUsersRef = useRef(null);
   const userRole = authCtx?.user;
   const [selectedUser, setSelectedUser] = useState(null);
+  const [openEditUser, setOpenEditUser] = useState(false);
   const [openPermissions, setOpenPermissions] = useState(false);
+
   const [userMap, setUserMap] = useState({}); // id → name map
+  const [searchTerm, setSearchTerm] = useState("");
+  const [openViewDocuments, setOpenViewDocuments] = useState(false);
 
   // 🔐 Lock/Unlock Modal
   const [lockModalOpen, setLockModalOpen] = useState(false);
   const [userToToggle, setUserToToggle] = useState(null);
   const [openCreateUser, setOpenCreateUser] = useState(false);
+  const [openLeinModal, setOpenLeinModal] = useState(false);
+
+  const handleOpenLein = (row) => {
+    setOpenLeinModal(true);
+    setSelectedUser(row);
+  };
+  const handleCloseLein = () => setOpenLeinModal(false);
+  const handleOpenEditUser = (user) => {
+    setSelectedUser(user);
+    setOpenEditUser(true);
+  };
+
+  const handleCloseEditUser = () => {
+    setOpenEditUser(false);
+    setSelectedUser(null);
+  };
 
   const handleOpenPermissions = (user) => {
     setSelectedUser(user);
@@ -43,8 +70,8 @@ const Users = ({ query }) => {
   };
 
   const handleClosePermissions = () => {
-    setSelectedUser(null);
     setOpenPermissions(false);
+    setSelectedUser(null);
   };
 
   const handleFetchRef = (fetchFn) => {
@@ -70,6 +97,25 @@ const Users = ({ query }) => {
   const handleEdit = (user) => {
     // Implement edit functionality here
     console.log("Edit user:", user);
+  };
+  const filterRows = (rows) => {
+    if (!searchTerm) return rows;
+    const lowerSearch = searchTerm.toLowerCase();
+
+    return rows.filter((row) =>
+      Object.values(row).some((val) =>
+        String(val).toLowerCase().includes(lowerSearch)
+      )
+    );
+  };
+  const handleOpenViewDocuments = (user) => {
+    setSelectedUser(user);
+    setOpenViewDocuments(true);
+  };
+
+  const handleCloseViewDocuments = () => {
+    setSelectedUser(null);
+    setOpenViewDocuments(false);
   };
 
   useEffect(() => {
@@ -101,9 +147,13 @@ const Users = ({ query }) => {
 
   const filters = useMemo(
     () => [
-      { id: "mobile", label: "Mobile Number", type: "textfield" },
+      {
+        id: "mobile",
+        label: "Mobile Number",
+        type: "textfield",
+      },
       { id: "id", label: "User Id", type: "textfield" },
-      { id: "Parent", label: "Parent", type: "textfield" },
+      { id: "Parent", label: "Parent", type: "textfield", roles: ["adm"] },
     ],
     []
   );
@@ -123,7 +173,7 @@ const Users = ({ query }) => {
         selector: (row) => (
           <Tooltip title={row?.id}>
             <div style={{ textAlign: "left", fontWeight: "bold" }}>
-              TRANS{row?.id}
+              P2PAE{row?.id}
             </div>
           </Tooltip>
         ),
@@ -177,7 +227,7 @@ const Users = ({ query }) => {
                 return (
                   <Tooltip title={parentName}>
                     <div style={{ textAlign: "left", cursor: "pointer" }}>
-                      {row.parent}
+                      {parentName}
                     </div>
                   </Tooltip>
                 );
@@ -252,23 +302,25 @@ const Users = ({ query }) => {
             <Box
               sx={{
                 display: "flex",
-                gap: 1,
+                gap: 2,
                 opacity: 1,
                 pointerEvents: "auto",
                 transition: "opacity 0.2s ease-in-out",
               }}
             >
+              {/* Admin Actions */}
               {userRole.role === "adm" && (
                 <>
                   <Tooltip title="Edit User">
                     <IconButton
                       size="small"
                       color="secondary"
-                      onClick={() => handleEdit(row)}
+                      onClick={() => handleOpenEditUser(row)}
                     >
                       <EditIcon fontSize="small" />
                     </IconButton>
                   </Tooltip>
+
                   <Tooltip title="Edit Permissions">
                     <IconButton
                       size="small"
@@ -278,10 +330,32 @@ const Users = ({ query }) => {
                       <SettingsIcon fontSize="small" />
                     </IconButton>
                   </Tooltip>
+                  <Tooltip title="View Documents">
+                    <IconButton
+                      size="small"
+                      color="info"
+                      onClick={() => handleOpenViewDocuments(row)}
+                    >
+                      <VisibilityIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
                 </>
               )}
-              {userRole.role === "di" ||
-                (userRole.role === "md" && <AdWalletTransfer row={row} />)}
+
+              {/* DI or MD Actions */}
+              {(userRole.role === "di" || userRole.role === "md") && (
+                <AdWalletTransfer row={row} />
+              )}
+
+              <Tooltip title="Lein Amount">
+                <IconButton
+                  size="small"
+                  color="success"
+                  onClick={() => handleOpenLein(row)}
+                >
+                  <MonetizationOnIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
             </Box>
           </Box>
         ),
@@ -340,7 +414,9 @@ const Users = ({ query }) => {
         } else if (
           userRole.role === "di" ||
           userRole.role === "md" ||
-          userRole.role === "asm"
+          userRole.role === "asm" ||
+          userRole?.role === "zsm" ||
+          userRole?.role === "api"
         ) {
           return (
             <CommonStatus value={row.is_active} />
@@ -370,10 +446,32 @@ const Users = ({ query }) => {
         endpoint={ApiEndpoints.GET_USERS}
         filters={filters}
         queryParam={query}
+        transformData={filterRows} // 🔑 Filter applied here
         onFetchRef={handleFetchRef}
         enableActionsHover={true}
         customHeader={
-          <ReButton label="Add User" onClick={() => setOpenCreateUser(true)} />
+          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+            {userRole.role !== "asm" && userRole.role !== "zsm" && (
+              <ReButton
+                label="Add User"
+                onClick={() => setOpenCreateUser(true)}
+              />
+            )}
+
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                padding: "6px 10px",
+                borderRadius: "6px",
+                border: "1px solid #ccc",
+                fontSize: "14px",
+                flex: 1,
+              }}
+            />
+          </Box>
         }
       />
 
@@ -385,8 +483,18 @@ const Users = ({ query }) => {
         />
       )}
 
+      {/* Edit User Modal */}
+      {openEditUser && selectedUser && (
+        <EditUser
+          open={openEditUser}
+          onClose={handleCloseEditUser}
+          user={selectedUser}
+          onFetchRef={refreshUsers}
+        />
+      )}
+
       {/* Permissions Modal */}
-      {selectedUser && (
+      {openPermissions && selectedUser && (
         <PermissionsModal
           open={openPermissions}
           handleClose={handleClosePermissions}
@@ -402,6 +510,22 @@ const Users = ({ query }) => {
           handleClose={handleCloseLockModal}
           user={userToToggle}
           onSuccess={refreshUsers}
+        />
+      )}
+
+      {openLeinModal && (
+        <AddLein
+          open={openLeinModal}
+          handleClose={handleCloseLein}
+          onFetchRef={() => {}}
+          user={selectedUser}
+        />
+      )}
+      {openViewDocuments && selectedUser && (
+        <ViewDocuments
+          open={openViewDocuments}
+          onClose={handleCloseViewDocuments}
+          user={selectedUser}
         />
       )}
     </Box>
