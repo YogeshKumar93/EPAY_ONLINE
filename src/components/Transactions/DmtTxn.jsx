@@ -51,32 +51,39 @@ const DmtTxn = ({ query }) => {
 
   const columns = useMemo(() => {
     const baseColumns = [
-     {
-          name: "Date",
-          selector: (row) => (
-            <div style={{ display: "flex", flexDirection: "column", fontSize:"10px", fontWeight:"bold" }}>
-              <Tooltip
-                title={`Created: ${ddmmyyWithTime(row?.created_at)}`}
-                arrow
-              >
-                <span>
-                  {ddmmyy(row?.created_at)} {dateToTime1(row?.created_at)}
-                </span>
-              </Tooltip>
-  
-              <Tooltip
-                title={`Updated: ${ddmmyyWithTime(row?.updated_at)}`}
-                arrow
-              >
-                <span>
-                  {ddmmyy(row?.updated_at)} {dateToTime1(row?.updated_at)}
-                </span>
-              </Tooltip>
-            </div>
-          ),
-          wrap: true,
-          width: "140px",
-        },
+      {
+        name: "Date",
+        selector: (row) => (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              fontSize: "10px",
+              fontWeight: "bold",
+            }}
+          >
+            <Tooltip
+              title={`Created: ${ddmmyyWithTime(row?.created_at)}`}
+              arrow
+            >
+              <span>
+                {ddmmyy(row?.created_at)} {dateToTime1(row?.created_at)}
+              </span>
+            </Tooltip>
+
+            <Tooltip
+              title={`Updated: ${ddmmyyWithTime(row?.updated_at)}`}
+              arrow
+            >
+              <span>
+                {ddmmyy(row?.updated_at)} {dateToTime1(row?.updated_at)}
+              </span>
+            </Tooltip>
+          </div>
+        ),
+        wrap: true,
+        width: "140px",
+      },
       ...(user?.role === "ret" || user?.role === "dd"
         ? []
         : [
