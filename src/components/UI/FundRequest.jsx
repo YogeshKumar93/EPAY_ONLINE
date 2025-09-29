@@ -14,12 +14,12 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import { Tooltip, Button, Box as MuiBox } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit"; // ✅ import icon from MUI
+import EditFundRequest from "./EditFundRequest";
 import { Delete } from "@mui/icons-material";
 import { IconButton } from "rsuite";
+import ReceiptButton from "../ReceiptButton";
 import DeleteFundRequestModal from "./DelelteFundReques";
 import DeleteFundRequest from "./DelelteFundReques";
-import ReceiptButton from "../ReceiptButton";
-import EditFundRequest from "./EditFundRequest";
 
 const FundRequest = () => {
   const authCtx = useContext(AuthContext);
@@ -131,7 +131,7 @@ const FundRequest = () => {
             <Typography noWrap>{row?.remark}</Typography>
           </Tooltip>
         ),
-        width: "100px",
+        grow: 2,
       },
       {
         name: "Admin Remark",
@@ -227,7 +227,6 @@ const FundRequest = () => {
           </MuiBox>
         ),
         width: "150px",
-       
       },
     ],
     [user]
