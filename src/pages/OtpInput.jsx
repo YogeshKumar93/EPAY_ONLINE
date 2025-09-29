@@ -14,7 +14,7 @@ const OtpInput = ({ otp, setOtp }) => {
       {/* Hidden real input */}
       <input
         ref={inputRef}
-        type="text"
+        type="password"
         value={otp}
         maxLength={6}
         onChange={(e) => {
