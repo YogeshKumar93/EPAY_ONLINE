@@ -51,6 +51,7 @@ const Prepaid = () => {
  const [resetMpinModalOpen, setResetMpinModalOpen] = useState(false);
    const authCtx = useContext(AuthContext);
   const username = `TRANS${authCtx?.user?.id}`;
+    const loadUserProfile = authCtx.loadUserProfile;
 
   // Fetch services and auto-select first operator
   useEffect(() => {
@@ -109,6 +110,7 @@ const Prepaid = () => {
     if (!location?.lat || !location?.long) {
       return apiErrorToast("Location not available, please enable GPS.");
     }
+      setLoading(true);
 
     const payload = {
       mobile_number: mobileNumber,
@@ -124,20 +126,13 @@ const Prepaid = () => {
       ApiEndpoints.RECHARGE,
       payload
     );
+      setLoading(false); 
     if (error) return showToast(error?.message, "error");
-
+loadUserProfile()
     okSuccessToast(response?.message);
     setStep(4); // Success step
 
-    setTimeout(() => {
-      setSelectedService(null);
-      setPlans([]);
-      setSelectedPlan(null);
-      setMobileNumber("");
-      setManualAmount("");
-      setMpinCallBackVal("");
-      setStep(2); // back to plans
-    }, 3000);
+   
   };
 
   // if (loading) {

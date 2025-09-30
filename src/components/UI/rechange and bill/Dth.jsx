@@ -19,6 +19,8 @@ import { apiErrorToast, okSuccessToast } from "../../../utils/ToastUtil";
 import AuthContext from "../../../contexts/AuthContext";
 import operatorImages from "../../../assets/operators";
 import ResetMpin from "../../common/ResetMpin";
+import { useToast } from "../../../utils/ToastContext";
+import CommonLoader from "../../common/CommonLoader";
 
 const Dth = () => {
   const [services, setServices] = useState([]);
@@ -27,13 +29,14 @@ const Dth = () => {
   const [customerId, setCustomerId] = useState("");
   const [manualAmount, setManualAmount] = useState("");
   const [step, setStep] = useState(2);
+  const { showToast } = useToast();
   const [MpinCallBackVal, setMpinCallBackVal] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
   const { location } = useContext(AuthContext);
-   const [resetMpinModalOpen, setResetMpinModalOpen] = useState(false);
-     const authCtx = useContext(AuthContext);
-    const username = `TRANS${authCtx?.user?.id}`;
-
+  const [resetMpinModalOpen, setResetMpinModalOpen] = useState(false);
+  const authCtx = useContext(AuthContext);
+  const username = `TRANS${authCtx?.user?.id}`;
+  const loadUserProfile = authCtx.loadUserProfile;
   // Fetch DTH services
   const fetchServices = async () => {
     setLoading(true);
@@ -76,7 +79,7 @@ const Dth = () => {
       return apiErrorToast("Please enter your 6-digit MPIN");
     if (!location?.lat || !location?.long)
       return apiErrorToast("Location not available, please enable GPS.");
-
+  setLoading(true);
     const payload = {
       customer_id: customerId,
       mobile_number: mobileNumber,
@@ -88,40 +91,35 @@ const Dth = () => {
     };
 
     const { error } = await apiCall("post", ApiEndpoints.RECHARGE, payload);
-    if (error) return apiErrorToast(error.message);
+ setLoading(false); 
 
+    if (error) return showToast(error?.message, "error");
+    loadUserProfile();
     okSuccessToast(`Recharge successful for ${customerId}`);
     setStep(4);
-    setTimeout(() => {
-      setSelectedService(services[0] || null);
-      setCustomerId("");
-      setMobileNumber("");
-      setManualAmount("");
-      setMpinCallBackVal("");
-      setStep(2);
-    }, 3000);
   };
 
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="60vh"
-      >
-        <Box textAlign="center">
-          <CircularProgress size={60} thickness={4} />
-          <Typography variant="h6" sx={{ mt: 2 }}>
-            Loading DTH Services...
-          </Typography>
-        </Box>
-      </Box>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <Box
+  //       display="flex"
+  //       justifyContent="center"
+  //       alignItems="center"
+  //       minHeight="60vh"
+  //     >
+  //       <Box textAlign="center">
+  //         <CircularProgress size={60} thickness={4} />
+  //         <Typography variant="h6" sx={{ mt: 2 }}>
+  //           Loading DTH Services...
+  //         </Typography>
+  //       </Box>
+  //     </Box>
+  //   );
+  // }
 
   return (
     <Container maxWidth="xl" sx={{ py: 1 }}>
+        <CommonLoader loading={loading} />
       {step === 2 && (
         <Slide direction="right" in mountOnEnter unmountOnExit>
           <Box sx={{ display: "flex", gap: 3 }}>
@@ -335,26 +333,25 @@ const Dth = () => {
                         />
                       ))}
                     </Box>
-                        <Box
-                                                       
-                                                        sx={{ display: "flex", justifyContent: "center", ml: 32 }}
-                                                      >
-                                                        <Button
-                                                          variant="contained"
-                                                          size="small"
-                                                          sx={{ fontSize: "11px" }}
-                                                          onClick={() => setResetMpinModalOpen(true)}
-                                                        >
-                                                          Reset MPIN
-                                                        </Button>
-                                                      </Box>
-                                         {resetMpinModalOpen && (
-                                                <ResetMpin
-                                                  open={resetMpinModalOpen}
-                                                  onClose={() => setResetMpinModalOpen(false)}
-                                                  username={username}
-                                                />
-                                              )}
+                    <Box
+                      sx={{ display: "flex", justifyContent: "center", ml: 32 }}
+                    >
+                      <Button
+                        variant="contained"
+                        size="small"
+                        sx={{ fontSize: "11px" }}
+                        onClick={() => setResetMpinModalOpen(true)}
+                      >
+                        Reset MPIN
+                      </Button>
+                    </Box>
+                    {resetMpinModalOpen && (
+                      <ResetMpin
+                        open={resetMpinModalOpen}
+                        onClose={() => setResetMpinModalOpen(false)}
+                        username={username}
+                      />
+                    )}
                   </Box>
                 )}
 
