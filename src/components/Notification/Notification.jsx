@@ -134,11 +134,11 @@ const Notification = ({ filters = [], query }) => {
       },
       {
         name: "Actions",
-        selector: (row, { hoveredRow, enableActionsHover }) => {
-          const isHovered = hoveredRow === row.id || !enableActionsHover;
+        selector: (row) => {
+           
 
           return (
-            <Fade in={isHovered}>
+            <>
               <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
                 <Tooltip title="Edit">
                   <IconButton
@@ -159,7 +159,7 @@ const Notification = ({ filters = [], query }) => {
                   </IconButton>
                 </Tooltip>
               </Box>
-            </Fade>
+            </>
           );
         },
         width: "120px",

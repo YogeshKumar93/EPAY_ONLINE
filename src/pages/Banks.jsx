@@ -124,8 +124,8 @@ const Banks = ({ filters = [] }) => {
       },
 {
   name: "Actions",
-  selector: (row, { hoveredRow, enableActionsHover }) => {
-    const isHovered = enableActionsHover && hoveredRow === row.id;
+  selector: (row) => {
+    
 
     return (
       <Box
@@ -142,7 +142,7 @@ const Banks = ({ filters = [] }) => {
           sx={{
             display: "flex",
             gap: 1,
-            visibility: isHovered ? "visible" : "hidden", // keeps layout stable
+            visibility:  "visible", // keeps layout stable
           }}
         >
           <Tooltip title="Statement">
@@ -173,22 +173,8 @@ const Banks = ({ filters = [] }) => {
           )}
         </Box>
 
-        {/* Overlay dash only when icons are hidden */}
-        {!isHovered && (
-          <Typography
-            variant="body2"
-            sx={{
-              color: "#999",
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              pointerEvents: "none",
-            }}
-          >
-            -
-          </Typography>
-        )}
+         
+       
       </Box>
     );
   },
