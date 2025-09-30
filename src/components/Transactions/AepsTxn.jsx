@@ -552,7 +552,7 @@ const AepsTxn = ({ query }) => {
                 { label: "IFSC Code", value: selectedRow.ifsc_code },
                 { label: "Bank Name", value: selectedRow.bank_name },
                 { label: "Route", value: selectedRow.route },
-                { label: "Charge", value: selectedRow.ccf },
+                { label: "Charge", value: selectedRow.charges },
                 { label: "GST", value: selectedRow.gst },
                 { label: "Commission", value: selectedRow.comm },
                 { label: "TDS", value: selectedRow.tds },
