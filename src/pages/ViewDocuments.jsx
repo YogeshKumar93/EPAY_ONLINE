@@ -104,18 +104,34 @@ const ViewDocuments = ({ open, onClose, user }) => {
     );
   };
 
-  const renderSection = (sectionData) => {
+  const renderSection = (sectionData = {}) => {
+    if (!sectionData || Object.keys(sectionData).length === 0) {
+      return (
+        <Typography sx={{ fontStyle: "italic", color: "#777", fontSize: 14 }}>
+          No data available for this section.
+        </Typography>
+      );
+    }
+
     const textKeys = Object.keys(sectionData).filter(
       (key) => !EXCLUDE_KEYS.includes(key) && !DOCUMENT_KEYS.includes(key)
     );
+
     const docKeys = Object.keys(sectionData).filter((key) =>
       DOCUMENT_KEYS.includes(key)
     );
 
     return (
       <>
-        {textKeys.map((key) => renderField(key, sectionData[key]))}
-        {docKeys.length > 0 && (
+        {textKeys.length > 0 ? (
+          textKeys.map((key) => renderField(key, sectionData[key]))
+        ) : (
+          <Typography sx={{ fontStyle: "italic", color: "#777", fontSize: 14 }}>
+            No text data available.
+          </Typography>
+        )}
+
+        {docKeys.length > 0 ? (
           <>
             <Divider sx={{ my: 1 }} />
             <Grid container spacing={1}>
@@ -126,6 +142,12 @@ const ViewDocuments = ({ open, onClose, user }) => {
               ))}
             </Grid>
           </>
+        ) : (
+          <Typography
+            sx={{ fontStyle: "italic", color: "#777", fontSize: 14, mt: 1 }}
+          >
+            No documents uploaded.
+          </Typography>
         )}
       </>
     );

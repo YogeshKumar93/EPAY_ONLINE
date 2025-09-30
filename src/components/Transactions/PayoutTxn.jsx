@@ -141,20 +141,20 @@ const PayoutTxn = ({ query }) => {
           </div>
         ),
       },
-      ...(user?.role === "adm" || user?.role === "sadm"
-        ? [
-            {
-              name: "Route",
-              selector: (row) => (
-                <div style={{ fontSize: "10px", fontWeight: "600" }}>
-                  {row.route}
-                </div>
-              ),
-              center: true,
-              width: "70px",
-            },
-          ]
-        : []),
+      // ...(user?.role === "adm" || user?.role === "sadm"
+      //   ? [
+      //       {
+      //         name: "Route",
+      //         selector: (row) => (
+      //           <div style={{ fontSize: "10px", fontWeight: "600" }}>
+      //             {row.route}
+      //           </div>
+      //         ),
+      //         center: true,
+      //         width: "70px",
+      //       },
+      //     ]
+      //   : []),
       {
         name: "Pf",
         selector: (row) => {
@@ -216,13 +216,19 @@ const PayoutTxn = ({ query }) => {
             <Box
               sx={{
                 display: "flex",
+                flexDirection: "column", // stack vertically
                 alignItems: "center",
                 fontSize: "13px",
-                textAlign: "justify",
-                gap: 2,
+                textAlign: "center",
+                gap: 0.5,
               }}
             >
               {icon}
+              {(user?.role === "adm" || user?.role === "sadm") && (
+                <Typography variant="caption" sx={{ fontSize: 10 }}>
+                  {row.route || "-"}
+                </Typography>
+              )}
             </Box>
           );
         },

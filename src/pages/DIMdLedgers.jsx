@@ -3,13 +3,10 @@ import CommonTabs from "../components/common/CommonTabs";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 
-import AccountLadger from "./UI/AccountLadger";
-import WalletLedger2 from "./UI/WalletLedger2";
- 
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import WalletLedger3 from "./WalletLedger3";
+import AccountLadger from "../components/UI/AccountLadger";
 
-
-export const WalletLedgers = () => {
+export const DiMdLedgers = () => {
   const [tab, setTab] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -24,16 +21,16 @@ export const WalletLedgers = () => {
           Wallet Ledger 1
         </div>
       ),
-      component: <AccountLadger />,
+      content: <AccountLadger />,
     },
     {
       label: (
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <ReceiptIcon fontSize="small" />
-          Wallet Ledger 2
+          Wallet Ledger 3
         </div>
       ),
-      component: <WalletLedger2 />,
+      content: <WalletLedger3 />,
     },
   ];
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   IconButton,
   TextField,
@@ -19,9 +19,9 @@ import debounce from "lodash.debounce";
   /* Wallet Icon */
 }
 import { CurrencyRupee } from "@mui/icons-material";
+import CommonLoader from "../components/common/CommonLoader";
 
-const AdWalletTransfer = ({ row }) => {
-  const [modalOpen, setModalOpen] = useState(false);
+const AdWalletTransfer = ({ row, open, onClose }) => {
   const [mpinModalOpen, setMpinModalOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [receiver, setReceiver] = useState(null);
@@ -41,13 +41,12 @@ const AdWalletTransfer = ({ row }) => {
         "post",
         ApiEndpoints.WALLET_GET_RECEIVER,
         {
-          mobile_number: row.mobile, // use mobile from row
+          mobile_number: row.mobile,
         }
       );
 
       if (response && response.data) {
         setReceiver(response.data);
-        setModalOpen(true); // open modal after fetch
       } else {
         setError("Receiver not found");
       }
@@ -57,14 +56,11 @@ const AdWalletTransfer = ({ row }) => {
       setLoading(false);
     }
   };
-
-  const handleClose = () => {
-    setModalOpen(false);
-    setAmount("");
-    setRemark("");
-    setError("");
-    setSuccess("");
-  };
+  useEffect(() => {
+    if (open) {
+      fetchReceiver();
+    }
+  }, []);
 
   const handleSendClick = () => {
     if (!amount || parseFloat(amount) <= 0) {
@@ -98,7 +94,6 @@ const AdWalletTransfer = ({ row }) => {
         setSuccess(response?.message || "Transfer successful");
         setAmount("");
         setRemark("");
-        setModalOpen(false);
       } else {
         setError(response?.data?.message || "Transfer failed");
       }
@@ -133,17 +128,16 @@ const AdWalletTransfer = ({ row }) => {
         </IconButton>
       </Box>
 
-      {/* Loading */}
-      {loading && <CircularProgress size={24} />}
-
-      {/* Transfer Modal */}
+      {/* {loading && <CircularProgress size={24} />} */}
       <CommonModal
-        open={modalOpen}
-        onClose={handleClose}
+        open={open}
+        onClose={onClose}
         title="Wallet Transfer"
         footerButtons={[]}
       >
-        {receiver && (
+        {loading ? (
+          <CommonLoader loading={loading} />
+        ) : receiver ? (
           <>
             {/* Receiver Details */}
             <Card
@@ -268,10 +262,13 @@ const AdWalletTransfer = ({ row }) => {
               )}
             </Button>
           </>
+        ) : (
+          <Typography textAlign="center" sx={{ mt: 2 }}>
+            Receiver not found
+          </Typography>
         )}
       </CommonModal>
 
-      {/* MPIN Modal */}
       <CommonMpinModal
         open={mpinModalOpen}
         setOpen={setMpinModalOpen}

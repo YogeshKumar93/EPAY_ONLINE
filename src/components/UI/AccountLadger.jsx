@@ -50,23 +50,33 @@ const AccountLadger = ({ query }) => {
       {
         name: "Date/Time",
         selector: (row) => (
-          
           <div className="mb-1" style={{ textAlign: "left" }}>
             {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
           </div>
         ),
         wrap: true,
       },
+
       {
         name: "Service",
         selector: (row) => (
-          <div  style={{ fontWeight:500 ,color:"#000"}}>
-            {" "}
-            {row.service}
-          </div>
+          <div style={{ fontWeight: 500, color: "#000" }}> {row.service}</div>
         ),
         center: true,
       },
+      ...(user?.role === "adm" || user?.role === "sadm"
+        ? [
+            {
+              name: "Est.",
+              selector: (row) => (
+                <div style={{ fontWeight: 500, color: "#000" }}>
+                  {row.establishment}
+                </div>
+              ),
+              center: true,
+            },
+          ]
+        : []),
       {
         name: "Narration",
         selector: (row) => (
@@ -133,31 +143,31 @@ const AccountLadger = ({ query }) => {
         ),
       },
 
-//  {
-//         name: "View",
-//         selector: (row) => (
-//           <Tooltip title="View wallet ledger">
-//             <IconButton
-//               color="info"
-//               // onClick={() => {
-//               //   setSelectedRow(row);
-//               //   setDrawerOpen(true);
-//               // }}
-//               size="small"
-//               sx={{ backgroundColor: "transparent" }}
-//             >
-//               <VisibilityIcon />
-//             </IconButton>
-//           </Tooltip>
-//         ),
-//       },
+      //  {
+      //         name: "View",
+      //         selector: (row) => (
+      //           <Tooltip title="View wallet ledger">
+      //             <IconButton
+      //               color="info"
+      //               // onClick={() => {
+      //               //   setSelectedRow(row);
+      //               //   setDrawerOpen(true);
+      //               // }}
+      //               size="small"
+      //               sx={{ backgroundColor: "transparent" }}
+      //             >
+      //               <VisibilityIcon />
+      //             </IconButton>
+      //           </Tooltip>
+      //         ),
+      //       },
 
       // {
       //   name: "Status",
       //   selector: (row) => <CommonStatus value={row.status} />,
       //   center: true,
       // },
-         {
+      {
         name: "Action",
         selector: (row) => (
           <button

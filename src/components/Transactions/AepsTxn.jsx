@@ -22,16 +22,60 @@ import { okhttp } from "../../utils/iconsImports";
 import LaptopIcon from "@mui/icons-material/Laptop";
 import PrintIcon from "@mui/icons-material/Print";
 import { Navigate, useNavigate } from "react-router-dom";
+import CommonModal from "../common/CommonModal";
+import { useToast } from "../../utils/ToastContext";
+import { apiCall } from "../../api/apiClient";
 
 const AepsTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const [openCreate, setOpenCreate] = useState(false);
   const [selectedTxn, setSelectedTxn] = useState(null);
-
+  const [responseModalOpen, setResponseModalOpen] = useState(false);
+  const [selectedApiResponse, setSelectedApiResponse] = useState("");
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const { showToast } = useToast();
+  const [selectedForRefund, setSelectedForRefund] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const navigate = useNavigate();
+  const [selectedTransaction, setSelectedTrancation] = useState("");
+  const [openLeinModal, setOpenLeinModal] = useState(false);
+  const [refundLoading, setRefundLoading] = useState(false);
+
+  const handleOpenLein = (row) => {
+    setOpenLeinModal(true);
+    setSelectedTrancation(row);
+  };
+
+  const handleCloseLein = () => setOpenLeinModal(false);
+  const handleRefundClick = (row) => {
+    setSelectedForRefund(row);
+    setConfirmModalOpen(true);
+  };
+  const handleConfirmRefund = async () => {
+    if (!selectedForRefund) return;
+    setRefundLoading(true);
+
+    const { error, response } = await apiCall("post", ApiEndpoints.REFUND_TXN, {
+      txn_id: selectedForRefund.txn_id,
+    });
+
+    if (response) {
+      showToast(
+        response?.message || "Refund processed successfully",
+        "success"
+      );
+
+      // Close modal and reset selected row
+      setConfirmModalOpen(false);
+      setSelectedForRefund(null);
+    } else {
+      showToast(error?.message || "Failed to process refund", "error");
+    }
+
+    setRefundLoading(false);
+  };
   const filters = useMemo(
     () => [
       {
@@ -58,6 +102,51 @@ const AepsTxn = ({ query }) => {
     ],
     []
   );
+  const ActionColumn = ({ row }) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => setAnchorEl(event.currentTarget);
+    const handleClose = () => setAnchorEl(null);
+
+    return (
+      <div style={{ textAlign: "center" }}>
+        <IconButton size="small" onClick={handleClick}>
+          <MoreVertIcon />
+        </IconButton>
+        <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+          {row.status === "PENDING" && (
+            <>
+              <MenuItem
+                onClick={() => {
+                  // mark as success handler
+                  handleClose();
+                }}
+              >
+                Mark as Success
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  handleRefundClick(row);
+                  handleClose();
+                }}
+              >
+                Refund
+              </MenuItem>
+            </>
+          )}
+
+          <MenuItem
+            onClick={() => {
+              handleOpenLein(row);
+              handleClose();
+            }}
+          >
+            Mark Lein
+          </MenuItem>
+        </Menu>
+      </div>
+    );
+  };
   const columns = useMemo(
     () => [
       {
@@ -156,6 +245,20 @@ const AepsTxn = ({ query }) => {
         left: true,
       },
       ...(user?.role === "ret" || user?.role === "dd"
+        ? []
+        : [
+            {
+              name: "Est.",
+              selector: (row) => (
+                <div style={{ fontSize: "10px", fontWeight: "600" }}>
+                  {row.establishment}
+                </div>
+              ),
+              center: true,
+              width: "70px",
+            },
+          ]),
+      ...(user?.role === "ret" || user?.role === "dd"
         ? [] // ❌ hide for ret and dd
         : [
             {
@@ -175,20 +278,6 @@ const AepsTxn = ({ query }) => {
               ),
               wrap: true,
               width: "100px",
-            },
-          ]),
-      ...(user?.role === "ret" || user?.role === "dd"
-        ? []
-        : [
-            {
-              name: "Est.",
-              selector: (row) => (
-                <div style={{ fontSize: "10px", fontWeight: "600" }}>
-                  {row.establishment}
-                </div>
-              ),
-              center: true,
-              width: "70px",
             },
           ]),
 
@@ -226,7 +315,40 @@ const AepsTxn = ({ query }) => {
       {
         name: "Service",
         selector: (row) => (
-          <div style={{ textAlign: "left" }}>{row.operator}</div>
+          <div style={{ textAlign: "left", fontWeight: "600" }}>
+            {row.operator} <br />
+            {["adm", "sadm"].includes(user?.role) && (
+              <>
+                <span
+                  style={{
+                    fontWeight: "normal",
+                    fontSize: "8px",
+                    color: "blue",
+                  }}
+                >
+                  STATUS
+                </span>
+                <span
+                  style={{
+                    fontWeight: "normal",
+                    fontSize: "8px",
+                    color: "blue",
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                    marginLeft: "6px",
+                  }}
+                  onClick={() => {
+                    setSelectedApiResponse(
+                      row.api_response || "No response available"
+                    );
+                    setResponseModalOpen(true);
+                  }}
+                >
+                  RESPONSE
+                </span>
+              </>
+            )}
+          </div>
         ),
         wrap: true,
       },
@@ -239,15 +361,7 @@ const AepsTxn = ({ query }) => {
       //   ),
       //   wrap: true,
       // },
-      {
-        name: "Txn Type",
-        selector: (row) => (
-          <div style={{ fontWeight: 500, textAlign: "center" }}>
-            {row.txn_type}
-          </div>
-        ),
-        center: true,
-      },
+
       {
         name: "Amount",
         selector: (row) => (
@@ -258,7 +372,7 @@ const AepsTxn = ({ query }) => {
         right: true,
       },
       {
-        name: " RetComm / Tds",
+        name: " Ret Comm",
         selector: (row) => (
           <div
             style={{ textAlign: "right", fontSize: "10px", fontWeight: 600 }}
@@ -277,7 +391,7 @@ const AepsTxn = ({ query }) => {
       ...(user?.role === "adm"
         ? [
             {
-              name: "Di Comm/ tds",
+              name: "Di Comm",
               selector: (row) => (
                 <div
                   style={{
@@ -298,7 +412,7 @@ const AepsTxn = ({ query }) => {
               width: "60px",
             },
             {
-              name: "Md Comm/ tds",
+              name: "Md Comm",
               selector: (row) => (
                 <div
                   style={{
@@ -451,6 +565,62 @@ const AepsTxn = ({ query }) => {
           )}
         </Box>
       </Drawer>
+      <CommonModal
+        open={responseModalOpen}
+        onClose={() => setResponseModalOpen(false)}
+        title="API Response"
+        iconType="info"
+        footerButtons={[
+          {
+            text: "Close",
+            variant: "contained",
+            onClick: () => setResponseModalOpen(false),
+          },
+        ]}
+      >
+        <Typography
+          sx={{
+            whiteSpace: "pre-wrap",
+            fontSize: "14px",
+            color: "#333",
+            wordBreak: "break-word",
+          }}
+        >
+          {selectedApiResponse}
+        </Typography>
+      </CommonModal>
+      <CommonModal
+        open={confirmModalOpen}
+        onClose={() => setConfirmModalOpen(false)}
+        title="Confirm Refund"
+        footerButtons={[
+          {
+            text: "Cancel",
+            variant: "outlined",
+            onClick: () => setConfirmModalOpen(false),
+          },
+          {
+            text: "Confirm",
+            variant: "contained",
+            onClick: handleConfirmRefund,
+            disabled: refundLoading,
+          },
+        ]}
+      >
+        <Typography sx={{ fontSize: 14 }}>
+          Are you sure you want to refund transaction ID:{" "}
+          {selectedForRefund?.txn_id}?
+        </Typography>
+      </CommonModal>
+      {openLeinModal && (
+        <AddLein
+          open={openLeinModal}
+          handleClose={handleCloseLein}
+          onFetchRef={() => {}}
+          selectedRow={selectedTransaction}
+          type="transaction"
+        />
+      )}
     </>
   );
 };

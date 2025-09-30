@@ -4,7 +4,7 @@ import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CommonModal from "./common/CommonModal";
 
-const EditServiceModal = ({ open, onClose, service,onFetchRef }) => {
+const EditServiceModal = ({ open, onClose, service, onFetchRef }) => {
   const [form, setForm] = useState({
     id: "",
     name: "",
@@ -76,14 +76,15 @@ const EditServiceModal = ({ open, onClose, service,onFetchRef }) => {
           value={form.name}
           onChange={handleChange}
           fullWidth
+          disabled
         />
-        <TextField
+        {/* <TextField
           label="Code"
           name="code"
           value={form.code}
           onChange={handleChange}
           fullWidth
-        />
+        /> */}
         <TextField
           label="Route"
           name="route"
@@ -91,7 +92,7 @@ const EditServiceModal = ({ open, onClose, service,onFetchRef }) => {
           onChange={handleChange}
           fullWidth
         />
-        <TextField
+        {/* <TextField
           select
           label="Status"
           name="is_active"
@@ -101,7 +102,7 @@ const EditServiceModal = ({ open, onClose, service,onFetchRef }) => {
         >
           <MenuItem value={1}>Active</MenuItem>
           <MenuItem value={0}>Inactive</MenuItem>
-        </TextField>
+        </TextField> */}
       </Box>
     </CommonModal>
   );

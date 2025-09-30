@@ -41,19 +41,21 @@ import ChangeMpin from "../common/ChangeMpin";
 import NumberVerificationComponent from "../common/NumberVerificationComponent";
 import ChangeLayoutModal from "../Layout/ChangeLayoutModal";
 import { BusinessInformation } from "./BusinessInformation";
+import ProfileTabs from "./ProfileTabs";
+// import ProfileTabs from "./ProfileTabs";
 
 const ProfilePage = () => {
   const theme = useTheme();
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
-  const username = `GURU1${user?.id}`;
+  const username = `P2PAE${user?.id}`;
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isSmallMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [resetMpinModalOpen, setResetMpinModalOpen] = useState(false);
   const [changePasswordModal, setChangePasswordModal] = useState(false);
   const [changeMpinModal, setChangeMpinModal] = useState(false);
-  const [chagnePasswordModal, setChagnePasswordModal] = useState(false);
+
   const [newNumberModal, setNewNumberModal] = useState(false);
   const [changeLayout, setChangeLayout] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -80,7 +82,7 @@ const ProfilePage = () => {
   };
 
   const handleChangePassword = () => {
-    setChagnePasswordModal(true);
+    setChangePasswordModal(true);
   };
 
   const handleChangeMpin = () => setChangeMpinModal(true);
@@ -108,8 +110,9 @@ const ProfilePage = () => {
   const handleInputChange = (field, value) => {
     setEditedUser((prev) => ({ ...prev, [field]: value }));
   };
+  const allowedRolesForLayout = ["dd", "ret"];
+  const userRole = authCtx.user.role; // assuming you have access to user role
 
-  // Action buttons data for cleaner rendering
   const actionButtons = [
     {
       id: 1,
@@ -129,14 +132,6 @@ const ProfilePage = () => {
     },
     {
       id: 3,
-      label: "Change Number",
-      icon: <Phone sx={{ fontSize: { xs: 18, sm: 20 } }} />,
-      onClick: handleNewNumber,
-      gradient: "#fff",
-      hoverGradient: "linear-gradient(135deg, #43e97b, #38f9d7)",
-    },
-    {
-      id: 4,
       label: "Change MPIN",
       icon: <VerifiedUser sx={{ fontSize: { xs: 18, sm: 20 } }} />,
       onClick: handleChangeMpin,
@@ -144,7 +139,7 @@ const ProfilePage = () => {
       hoverGradient: "linear-gradient(135deg, #ff758c, #ff7eb3)",
     },
     {
-      id: 5,
+      id: 4,
       label: "Change Layout",
       icon: <Dashboard sx={{ fontSize: { xs: 18, sm: 20 } }} />,
       onClick: handleChangeLayout,
@@ -152,14 +147,17 @@ const ProfilePage = () => {
       hoverGradient: "linear-gradient(135deg, #c9ffbf, #7bed9f)",
     },
     {
-      id: 6,
+      id: 5,
       label: "Business Information",
       icon: <Dashboard sx={{ fontSize: { xs: 18, sm: 20 } }} />,
       onClick: handleBusinessInfo,
       gradient: "#fff",
       hoverGradient: "linear-gradient(135deg, #c9ffbf, #7bed9f)",
     },
-  ];
+  ].filter(
+    (btn) =>
+      btn.label !== "Change Layout" || allowedRolesForLayout.includes(userRole)
+  );
 
   return (
     <Box
@@ -169,7 +167,7 @@ const ProfilePage = () => {
       }}
     >
       <Slide in={true} direction="up" timeout={500}>
-        <Paper
+    <Paper
           elevation={isMobile ? 1 : 4}
           sx={{
             borderRadius: { xs: 2, sm: 4 },
@@ -184,8 +182,8 @@ const ProfilePage = () => {
             fontFamily: '"DM Sans", sans-serif',
           }}
         >
-          {/* Header Section */}
-          <Box
+    
+  <Box
             sx={{
               p: { xs: 2, sm: 3, md: 4 },
               borderRadius: "12px 12px 0 0",
@@ -204,10 +202,9 @@ const ProfilePage = () => {
                 background: "#9D72F0",
                 zIndex: 1,
               },
-            }}
-          >
+            }}>
             {/* Decorative elements */}
-            <Box
+              <Box
               sx={{
                 position: "absolute",
                 top: -20,
@@ -229,7 +226,6 @@ const ProfilePage = () => {
                 background: "rgba(255,255,255,0.05)",
               }}
             />
-
             {/* Profile Info */}
             <Grid
               container
@@ -328,7 +324,7 @@ const ProfilePage = () => {
                       sx={{
                         color: "#000",
                         letterSpacing: "0.5px",
-                        color: "white",
+
                         textAlign: { xs: "center", sm: "left" },
                         fontFamily: '"DM Sans", sans-serif',
                         textShadow: "0 1px 2px rgba(0,0,0,0.1)",
@@ -338,12 +334,12 @@ const ProfilePage = () => {
                     </Typography>
                   )}
                   <Chip
-                    icon={<AccountCircle sx={{ color: "#7B4DE0" }} />}
+                    icon={<AccountCircle sx={{ color: "#2275b7" }} />}
                     label="Active User"
                     size="small"
                     sx={{
                       background: "rgba(255, 255, 255, 0.9)",
-                      color: "#7B4DE0",
+                      color: "#2275b7",
                       fontWeight: "bold",
                       fontFamily: '"DM Sans", sans-serif',
                       ml: 1,
@@ -489,10 +485,10 @@ const ProfilePage = () => {
             }}
           >
             <Typography
-              variant="h6"
+              variant="h5"
               sx={{
                 mb: 2,
-                color: "#7B4DE0",
+                color: "#000",
                 fontFamily: '"DM Sans", sans-serif',
                 fontWeight: 600,
                 textAlign: "center",
@@ -501,7 +497,7 @@ const ProfilePage = () => {
               Account Actions
             </Typography>
 
-            <Grid container spacing={2}>
+            <Grid container spacing={2} justifyContent={"center"}>
               {actionButtons.map((button) => (
                 <Grid item xs={12} sm={6} md={4} key={button.id}>
                   <Button
@@ -520,11 +516,10 @@ const ProfilePage = () => {
                       pl: 2,
                       color: "#000",
                       background: button.gradient,
-                      boxShadow: "0 4px 10px rgba(157, 114, 240, 0.2)",
+
                       "&:hover": {
                         // background: button.hoverGradient,
                         transform: "translateY(-3px)",
-                        boxShadow: "0 8px 15px rgba(157, 114, 240, 0.3)",
                       },
                       transition: "all 0.25s ease",
                       fontFamily: '"DM Sans", sans-serif',
@@ -564,6 +559,7 @@ const ProfilePage = () => {
               </Box>
             </Fade>
           )}
+          {user?.status === 1 && <ProfileTabs />}
         </Paper>
       </Slide>
       {/* Modals */}
@@ -574,7 +570,7 @@ const ProfilePage = () => {
           username={username}
         />
       )}
-      {chagnePasswordModal && (
+      {changePasswordModal && (
         <ChangePassword
           open={changePasswordModal}
           onClose={() => setChangePasswordModal(false)}

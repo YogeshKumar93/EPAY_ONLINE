@@ -1,4 +1,4 @@
-import biggpayLogo from "./assets/logo.png";
+import biggpayLogo from "./assets/PPALogor.png";
 // import biggpayLogo from "./assets/festivalVideo.mp4";
 import biggpayLogo_sm from "./assets/p2pae.png";
 import airIndia from "./assets_travel/images/icons/AI.png";
@@ -208,8 +208,8 @@ import aepsAeps from "./assets/sidenav/aeps1.svg";
 import sendmoney_1 from "./assets/new_dashboardIcon/rupee.png";
 import sendmoney_2 from "./assets/new_dashboardIcon/moneyTrnsfr.png";
 import thumbPrint_1 from "./assets/svg/aeps.svg";
-import mobileRech_1 from "./assets/new_dashboardIcon/moneyTrnsfr.png";         
-import profile_New from "./assets/new_dashboardIcon/profileNew.png";         
+import mobileRech_1 from "./assets/new_dashboardIcon/moneyTrnsfr.png";
+import profile_New from "./assets/new_dashboardIcon/profileNew.png";
 
 // side nav images
 
@@ -580,10 +580,9 @@ export const riskImage = risk;
 export const virtuanAccountImage = virtualAccount;
 
 export const loginHistoryImage = loginHistory;
-export const aepsaeps   = aepsAeps;
-export const sendmoney   = sendmoney_1;
+export const aepsaeps = aepsAeps;
+export const sendmoney = sendmoney_1;
 export const sendmoney2 = sendmoney_2;
-export const thumbPrint   = thumbPrint_1;
+export const thumbPrint = thumbPrint_1;
 export const mobileRechargeNew = mobileRech_1;
-export const profileNewImage    = profile_New;
-
+export const profileNewImage = profile_New;

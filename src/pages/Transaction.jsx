@@ -24,151 +24,150 @@ import CreditCardTxn from "../components/Transactions/CreditCardTxn";
 
 export const Transaction = () => {
   const tabItems = [
-     
-     {
-    label: (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          minWidth: "80px",
-          justifyContent: "flex-start",
-        }}
-      >
-        <CurrencyRupeeIcon fontSize="small" />
-        <span>DMT</span>
-      </div>
-    ),
-    component: <DmtTxn />,
-  },
-  {
-    label: (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          minWidth: "80px",
-          justifyContent: "flex-start",
-        }}
-      >
-        <ReceiptIcon fontSize="small" />
-        <span>BBPS</span>
-      </div>
-    ),
-    component: <BbpxTxn />,
-  },
-  {
-    label: (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          minWidth: "80px",
-          justifyContent: "flex-start",
-        }}
-      >
-        <FingerprintIcon fontSize="small" />
-        <span>Aeps</span>
-      </div>
-    ),
-    component: <AepsTxn />,
-  },
-  {
-    label: (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          minWidth: "80px",
-          justifyContent: "flex-start",
-        }}
-      >
-        <CreditCardIcon fontSize="small" />
-        <span>Matm</span>
-      </div>
-    ),
-    component: <MatmTxn />,
-  },
-  {
-    label: (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          minWidth: "80px",
-          justifyContent: "flex-start",
-        }}
-      >
-        <SwapHorizIcon fontSize="small" />
-        <span>Fund Transfer</span>
-      </div>
-    ),
-    component: <PayoutTxn />,
-  },
-  {
-    label: (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          minWidth: "80px",
-          justifyContent: "flex-start",
-        }}
-      >
-        <PhoneIphoneIcon fontSize="small" />
-        <span>Recharge</span>
-      </div>
-    ),
-    component: <RechargeTxn />,
-  },
-  {
-    label: (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          minWidth: "80px",
-          justifyContent: "flex-start",
-        }}
-      >
-        <TrainIcon fontSize="small" />
-        <span>Irctc</span>
-      </div>
-    ),
-    component: <IrctcTxn />,
-  },
-  {
-    label: (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          minWidth: "80px",
-          justifyContent: "flex-start",
-        }}
-      >
-        <Wallet fontSize="small" />
-        <span>W2W</span>
-      </div>
-    ),
-    component: <Wallet2WalletTransfer />,
-  },
-   {
+    {
+      label: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            minWidth: "80px",
+            justifyContent: "flex-start",
+          }}
+        >
+          <CurrencyRupeeIcon fontSize="small" />
+          <span>DMT</span>
+        </div>
+      ),
+      component: <DmtTxn />,
+    },
+    {
+      label: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            minWidth: "80px",
+            justifyContent: "flex-start",
+          }}
+        >
+          <ReceiptIcon fontSize="small" />
+          <span>BBPS</span>
+        </div>
+      ),
+      component: <BbpxTxn />,
+    },
+    {
+      label: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            minWidth: "80px",
+            justifyContent: "flex-start",
+          }}
+        >
+          <FingerprintIcon fontSize="small" />
+          <span>Aeps</span>
+        </div>
+      ),
+      component: <AepsTxn />,
+    },
+    {
+      label: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            minWidth: "80px",
+            justifyContent: "flex-start",
+          }}
+        >
+          <CreditCardIcon fontSize="small" />
+          <span>Matm</span>
+        </div>
+      ),
+      component: <MatmTxn />,
+    },
+    {
+      label: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            minWidth: "80px",
+            justifyContent: "flex-start",
+          }}
+        >
+          <SwapHorizIcon fontSize="small" />
+          <span>Fund Transfer</span>
+        </div>
+      ),
+      component: <PayoutTxn />,
+    },
+    {
+      label: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            minWidth: "80px",
+            justifyContent: "flex-start",
+          }}
+        >
+          <PhoneIphoneIcon fontSize="small" />
+          <span>Recharge</span>
+        </div>
+      ),
+      component: <RechargeTxn />,
+    },
+    {
+      label: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            minWidth: "80px",
+            justifyContent: "flex-start",
+          }}
+        >
+          <TrainIcon fontSize="small" />
+          <span>Irctc</span>
+        </div>
+      ),
+      component: <IrctcTxn />,
+    },
+    {
+      label: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            minWidth: "80px",
+            justifyContent: "flex-start",
+          }}
+        >
+          <Wallet fontSize="small" />
+          <span>W2W</span>
+        </div>
+      ),
+      component: <Wallet2WalletTransfer />,
+    },
+    {
       label: (
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Wallet fontSize="small" />
           Credit Card
         </div>
       ),
-      content: <CreditCardTxn />,
+      component: <CreditCardTxn />,
     },
   ];
 

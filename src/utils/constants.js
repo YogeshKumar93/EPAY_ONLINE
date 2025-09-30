@@ -1,3 +1,4 @@
+
 import InterpreterModeIcon from "@mui/icons-material/InterpreterMode";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import RecordVoiceOverIcon from "@mui/icons-material/RecordVoiceOver";
@@ -123,7 +124,7 @@ export const genders = [
 ];
 
 export const PROJECTS = {
-  imps: "ImpsGuru",
+  imps: "TRANSUP",
   paisakart: "PaisaKart",
   moneyoddr: "MoneyOddr",
 };
@@ -159,14 +160,14 @@ export const vendor_tab_value = {
 };
 
 export const USER_ROLES = {
-  ADMIN: "adm",
-  ASM: "asm",
-  API: "api",
-  ACC: "acc",
-  RET: "ret",
-  DD: "dd",
-  MD: "md",
-  AD: "di",
+  ADMIN: "Admin",
+  ASM: "Asm",
+  API: "Api",
+  ACC: "Acc",
+  RET: "Ret",
+  DD: "Dd",
+  MD: "Md",
+  AD: "Ad",
 };
 
 export const ROLE_LIST = [
@@ -274,80 +275,7 @@ export const BOOKINGSTEP = {
   TRAVELLERS: "TRAVELLERS",
   PAYMENT: "PAYMENT",
 };
-export const REPORTS = [
-  { name: "ACCOUNT LEDGER", url: "/customer/account-ledger" },
-  { name: "COMPLAINTS", url: "/customer/complaints" },
-  { name: "PURCHASE", url: "/customer/purchase" },
-  { name: "KHATA BOOK", url: "/customer/khata-book" },
-];
 
-export const AD_REPORTS = [
-  { name: "SALE", url: "/ad/sale" },
-  { name: "PURCHASE", url: "/ad/purchase" },
-  { name: "LEDGER", url: "/ad/ledger" },
-  { name: "KHATA BOOK", url: "/ad/khata-book" },
-];
-export const MD_REPORTS = [
-  { name: "SALE", url: "/md/sale" },
-  { name: "PURCHASE", url: "/md/purchase" },
-  { name: "LEDGER", url: "/md/ledger" },
-  { name: "KHATA BOOK", url: "/md/khata-book" },
-];
-
-export const navigate_routes = {
-  admin: "admin/dashboard",
-  asm: "asm/dashboard",
-  api: "api-user/dashboard",
-  ad: "ad/dashboard",
-  ret: "customer/dashboard",
-  dd: "customer/dashboard",
-  account: "account/dashboard",
-};
-
-// user table styled tab map
-// export const adminTab = [
-//   { label: "All", value: 0, icon: <Diversity2Icon /> },
-//   { label: "Corporates", value: 1, icon: <InterpreterModeIcon /> },
-//   { label: "ZSM", value: 2, icon: <Person2Icon /> },
-//   { label: "ASM", value: 3, icon: <RecordVoiceOverIcon /> },
-//   { label: "MD", value: 4, icon: <PersonIcon /> },
-//   { label: "AD", value: 5, icon: <SensorOccupiedIcon /> },
-//   { label: "DD", value: 6, icon: <Person4Icon /> },
-//   { label: "RET", value: 7, icon: <PersonIcon /> },
-//   { label: "IRCTC", value: 8, icon: <TrainIcon /> },
-//   { label: "UNVERIFIED", value: 9, icon: <PrivacyTipIcon /> },
-// ];
-export const asmTab = [
-  { label: "All", value: 0 },
-  { label: "Corporates", value: 1 },
-  { label: "MD", value: 2 },
-  { label: "AD", value: 3 },
-
-  { label: "DD", value: 4 },
-  { label: "RET", value: 5 },
-  // { label: "IRCTC", value: 6 },
-];
-export const zsmTab = [
-  { label: "All", value: 0 },
-  { label: "Corporates", value: 1 },
-  { label: "ASM", value: 2 },
-  { label: "MD", value: 3 },
-  { label: "AD", value: 4 },
-  { label: "DD", value: 5 },
-  { label: "RET", value: 6 },
-  // { label: "IRCTC", value: 7 },
-];
-export const mdTab = [
-  { label: "All", value: 0 },
-  { label: "AD", value: 4 },
-  { label: "RET", value: 6 },
-  { label: "IRCTC", value: 7 },
-];
-export const adTab = [
-  { label: "All", value: 0 },
-  { label: "RET", value: 1 },
-  { label: "IRCTC", value: 2 },
-];
 export const paymentModes = [
   {
     name: "IMPS",
@@ -526,3 +454,16 @@ export const Categories = [
     updated_at: "2022-05-24T05:16:46.000000Z",
   },
 ];
+
+export const formatInLakh = (num) => {
+  const value = Number(num);
+
+  // invalid / null / undefined / NaN
+  if (!num || isNaN(value)) return "₹ 0.00 Lakh";
+
+  // अगर value negative है
+  if (value < 0) return `-₹ ${(Math.abs(value) / 100000).toFixed(2)} Lakh`;
+
+  // Normal case
+  return `₹ ${(value / 100000).toFixed(2)} Lakh`;
+};

@@ -9,8 +9,7 @@ import {
 } from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
- 
- 
+
 import CommonModal from "../components/common/CommonModal";
 import CommonLoader from "../components/common/CommonLoader";
 
@@ -59,7 +58,7 @@ export const AssignPlans = ({ open, onClose, row, onSuccess }) => {
         plan_id: selectedPlan,
         user_id: row.id,
       };
-      const { response,error } = await apiCall(
+      const { response, error } = await apiCall(
         "post",
         ApiEndpoints.ASSIGN_PLAN,
         payload

@@ -1,4 +1,4 @@
-import biggpayLogo from "../assets/logo(1).png";
+import biggpayLogo from "../assets/Images/PPALogor.png";
 
 // import biggpayLogo from "./assets/festivalVideo.mp4";
 // import biggpayLogo_sm from "./assets/impsguru.ico";

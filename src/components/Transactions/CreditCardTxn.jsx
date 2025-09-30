@@ -1,5 +1,13 @@
 import { useMemo, useContext, useState } from "react";
-import { Box, Tooltip, IconButton, Drawer, Typography } from "@mui/material";
+import {
+  Box,
+  Tooltip,
+  IconButton,
+  Drawer,
+  Typography,
+  MenuItem,
+  Menu,
+} from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import AuthContext from "../../contexts/AuthContext";
@@ -14,7 +22,6 @@ import ComplaintForm from "../ComplaintForm";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CloseIcon from "@mui/icons-material/Close";
 import TransactionDetailsCard from "../common/TransactionDetailsCard";
-import biggpayLogo from "../../assets/Images/PPALogor.png";
 import companylogo from "../../assets/Images/logo(1).png";
 import {
   android2,
@@ -33,6 +40,11 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import DoneIcon from "@mui/icons-material/Done";
+import { useToast } from "../../utils/ToastContext";
+import { apiCall } from "../../api/apiClient";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import AddLein from "../LienAmount/AddLein";
+
 const CreditCardTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
@@ -41,10 +53,16 @@ const CreditCardTxn = ({ query }) => {
   const [selectedTxn, setSelectedTxn] = useState(null);
   const [responseModalOpen, setResponseModalOpen] = useState(false);
   const [selectedApiResponse, setSelectedApiResponse] = useState("");
-
+  const [selectedTransaction, setSelectedTrancation] = useState("");
+  const [openLeinModal, setOpenLeinModal] = useState(false);
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [selectedForRefund, setSelectedForRefund] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const navigate = useNavigate();
+  const [refundLoading, setRefundLoading] = useState(false);
+
+  const { showToast } = useToast();
   const filters = useMemo(
     () => [
       {
@@ -71,6 +89,108 @@ const CreditCardTxn = ({ query }) => {
     ],
     []
   );
+
+  const handleRefundClick = (row) => {
+    setSelectedForRefund(row);
+    setConfirmModalOpen(true);
+  };
+  const handleConfirmRefund = async () => {
+    if (!selectedForRefund) return;
+    setRefundLoading(true);
+
+    const { error, response } = await apiCall("post", ApiEndpoints.REFUND_TXN, {
+      txn_id: selectedForRefund.txn_id,
+    });
+
+    if (response) {
+      showToast(
+        response?.message || "Refund processed successfully",
+        "success"
+      );
+
+      // Close modal and reset selected row
+      setConfirmModalOpen(false);
+      setSelectedForRefund(null);
+    } else {
+      showToast(error?.message || "Failed to process refund", "error");
+    }
+
+    setRefundLoading(false);
+  };
+  const handleOpenLein = (row) => {
+    setOpenLeinModal(true);
+    setSelectedTrancation(row);
+  };
+  const handleCloseLein = () => setOpenLeinModal(false);
+  const ActionColumn = ({ row, handleRefundClick, handleOpenLein }) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+
+    const handleClick = (event) => setAnchorEl(event.currentTarget);
+    const handleClose = () => setAnchorEl(null);
+
+    return (
+      <div style={{ textAlign: "center" }}>
+        <IconButton size="small" onClick={handleClick}>
+          <MoreVertIcon />
+        </IconButton>
+
+        <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+          {row?.status === "SUCCESS" && (
+            <MenuItem
+              onClick={() => {
+                handleRefundClick(row);
+                handleClose();
+              }}
+            >
+              Refund
+            </MenuItem>
+          )}
+
+          {row?.status === "PENDING" && (
+            <>
+              <MenuItem
+                onClick={() => {
+                  // mark as success handler
+                  handleClose();
+                }}
+              >
+                Mark as Success
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  handleRefundClick(row);
+                  handleClose();
+                }}
+              >
+                Refund
+              </MenuItem>
+            </>
+          )}
+
+          {(row?.status === "FAILED" || row?.status === "REFUND") && (
+            <MenuItem
+              onClick={() => {
+                // rollback handler
+                handleClose();
+              }}
+            >
+              Rollback
+            </MenuItem>
+          )}
+
+          <MenuItem
+            onClick={() => {
+              handleOpenLein(row);
+              handleClose();
+            }}
+          >
+            Mark Lein
+          </MenuItem>
+        </Menu>
+      </div>
+    );
+  };
 
   const columns = useMemo(() => {
     const baseColumns = [
@@ -172,29 +292,37 @@ const CreditCardTxn = ({ query }) => {
         selector: (row) => (
           <div style={{ textAlign: "left", fontWeight: "600" }}>
             {row.operator} <br />
-            <span
-              style={{ fontWeight: "normal", fontSize: "8px", color: "blue" }}
-            >
-              STATUS
-            </span>
-            <span
-              style={{
-                fontWeight: "normal",
-                fontSize: "8px",
-                color: "blue",
-                cursor: "pointer",
-                textDecoration: "underline",
-                marginLeft: "6px", // gap between status and response
-              }}
-              onClick={() => {
-                setSelectedApiResponse(
-                  row.api_response || "No response available"
-                );
-                setResponseModalOpen(true);
-              }}
-            >
-              RESPONSE
-            </span>
+            {["adm", "sadm"].includes(user?.role) && (
+              <>
+                <span
+                  style={{
+                    fontWeight: "normal",
+                    fontSize: "8px",
+                    color: "blue",
+                  }}
+                >
+                  STATUS
+                </span>
+                <span
+                  style={{
+                    fontWeight: "normal",
+                    fontSize: "8px",
+                    color: "blue",
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                    marginLeft: "6px",
+                  }}
+                  onClick={() => {
+                    setSelectedApiResponse(
+                      row.api_response || "No response available"
+                    );
+                    setResponseModalOpen(true);
+                  }}
+                >
+                  RESPONSE
+                </span>
+              </>
+            )}
           </div>
         ),
         wrap: true,
@@ -347,7 +475,24 @@ const CreditCardTxn = ({ query }) => {
         : []),
       {
         name: "Status",
-        selector: (row) => <CommonStatus value={row.status} />,
+        selector: (row) => (
+          <div
+            style={{ textAlign: "right", fontSize: "11px", fontWeight: 600 }}
+          >
+            <div>
+              <CommonStatus value={row.status} />{" "}
+            </div>
+            <div
+              style={{
+                whiteSpace: "normal", // allow wrapping
+                wordBreak: "break-word", // break long values
+                textAlign: "right",
+              }}
+            >
+              {row.operator_id}
+            </div>
+          </div>
+        ),
         center: true,
         width: "70px",
       },
@@ -373,55 +518,14 @@ const CreditCardTxn = ({ query }) => {
             {
               name: "Action",
               selector: (row) => (
-                <div
-                  style={{
-                    fontSize: "10px",
-                    fontWeight: "600",
-                    display: "flex",
-                    gap: "4px",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  {/* SUCCESS: only Replay */}
-                  {row?.status === "SUCCESS" && (
-                    <Tooltip title="Click To Refund">
-                      <ReplayIcon
-                        sx={{ color: "red", fontSize: 25, cursor: "pointer" }}
-                      />
-                    </Tooltip>
-                  )}
-
-                  {/* PENDING: CheckCircle + Replay */}
-                  {row?.status === "PENDING" && (
-                    <>
-                      <Tooltip title="Click To Success">
-                        <DoneIcon sx={{ color: "green", fontSize: 25 }} />
-                      </Tooltip>
-                      <Tooltip title="Click To Refund">
-                        <ReplayIcon
-                          sx={{ color: "red", fontSize: 25, cursor: "pointer" }}
-                        />
-                      </Tooltip>
-                    </>
-                  )}
-
-                  {/* FAILED or REFUND: Refresh */}
-                  {(row?.status === "FAILED" || row?.status === "REFUND") && (
-                    <Tooltip title="Click To Rollback">
-                      <RefreshIcon
-                        sx={{
-                          color: "orange",
-                          fontSize: 25,
-                          cursor: "pointer",
-                        }}
-                      />
-                    </Tooltip>
-                  )}
-                </div>
+                <ActionColumn
+                  row={row}
+                  handleRefundClick={handleRefundClick}
+                  handleOpenLein={handleOpenLein}
+                />
               ),
               center: true,
-              width: "70px",
+              width: "100px",
             },
           ]
         : []),
@@ -522,7 +626,7 @@ const CreditCardTxn = ({ query }) => {
               amount={selectedRow.amount}
               status={selectedRow.status}
               onClose={() => setDrawerOpen(false)} // ✅ Close drawer
-              companyLogoUrl={biggpayLogo}
+              companyLogoUrl={Logo}
               dateTime={ddmmyyWithTime(selectedRow.created_at)}
               message={selectedRow.message || "No message"}
               details={[
@@ -570,6 +674,38 @@ const CreditCardTxn = ({ query }) => {
           {selectedApiResponse}
         </Typography>
       </CommonModal>
+      <CommonModal
+        open={confirmModalOpen}
+        onClose={() => setConfirmModalOpen(false)}
+        title="Confirm Refund"
+        footerButtons={[
+          {
+            text: "Cancel",
+            variant: "outlined",
+            onClick: () => setConfirmModalOpen(false),
+          },
+          {
+            text: "Confirm",
+            variant: "contained",
+            onClick: handleConfirmRefund,
+            disabled: refundLoading,
+          },
+        ]}
+      >
+        <Typography sx={{ fontSize: 14 }}>
+          Are you sure you want to refund transaction ID:{" "}
+          {selectedForRefund?.txn_id}?
+        </Typography>
+      </CommonModal>
+      {openLeinModal && (
+        <AddLein
+          open={openLeinModal}
+          handleClose={handleCloseLein}
+          onFetchRef={() => {}}
+          selectedRow={selectedTransaction}
+          type="transaction"
+        />
+      )}
     </>
   );
 };

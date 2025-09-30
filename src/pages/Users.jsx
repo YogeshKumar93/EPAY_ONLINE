@@ -27,14 +27,11 @@ import AdWalletTransfer from "./AdWalletTransfer";
 import CommonStatus from "../components/common/CommonStatus";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import VisibilityIcon from "@mui/icons-material/Visibility";
- 
 import EditUser from "./EditUser";
 import ViewDocuments from "./ViewDocuments";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Assignment, CurrencyRupee } from "@mui/icons-material";
- 
- 
-import AddLein from "./AddLein";
+import AddLein from "../components/LienAmount/AddLein";
 import { AssignPlans } from "./AssignPlans";
 import AdminCreateUser from "./AdminCreateUser";
 
@@ -288,7 +285,7 @@ const Users = ({ query }) => {
         selector: (row) => (
           <Tooltip title={row?.id}>
             <div style={{ textAlign: "left", fontWeight: "bold" }}>
-              TRANS{row?.id}
+              P2PAE{row?.id}
             </div>
           </Tooltip>
         ),

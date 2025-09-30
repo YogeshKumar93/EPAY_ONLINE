@@ -27,7 +27,7 @@ const AdminLayoutWrapper = ({ children }) => {
         sx={{
           flex: 1,
           display: "flex",
-        //   flexDirection: "column",
+          //   flexDirection: "column",
           minHeight: "100vh",
           pt: isMobile ? 0 : "52px",
         }}
@@ -94,8 +94,8 @@ const AdminLayoutWrapper = ({ children }) => {
                 lineHeight: 1.4,
               }}
             >
-              Disclaimer: Disputes shall be subject to the jurisdiction of the
-              courts of Delhi.
+              Disclainbnbnnbmer: Disputes shall be subject to the jurisdiction
+              of the courts of Delhi.
             </Typography>
           </Box>
         </Box>
