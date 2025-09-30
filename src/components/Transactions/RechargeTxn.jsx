@@ -336,13 +336,13 @@ const RechargeTxn = ({ query }) => {
         wrap: true,
         right: true,
       },
-      {
-        name: "Operator Id",
-        selector: (row) => (
-          <div style={{ textAlign: "left" }}>{row.operator_id || "N/A"}</div>
-        ),
-        center: true,
-      },
+      // {
+      //   name: "Operator Id",
+      //   selector: (row) => (
+      //     <div style={{ textAlign: "left" }}>{row.operator_id || "N/A"}</div>
+      //   ),
+      //   center: true,
+      // },
       ...(user?.role === "adm" ||
       user?.role === "di" ||
       user?.role === "md" ||

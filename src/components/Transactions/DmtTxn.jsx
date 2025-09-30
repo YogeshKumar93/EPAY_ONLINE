@@ -19,10 +19,6 @@ import {
 import CommonStatus from "../common/CommonStatus";
 import ComplaintForm from "../ComplaintForm";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import CloseIcon from "@mui/icons-material/Close";
-import TransactionDetailsCard from "../common/TransactionDetailsCard";
-import companylogo from "../../assets/Images/logo(1).png";
-import biggpayLogo from "../../assets/Images/PPALogor.png";
 import {
   android2,
   linux2,
@@ -34,7 +30,7 @@ import {
 import LaptopIcon from "@mui/icons-material/Laptop";
 import PrintIcon from "@mui/icons-material/Print";
 import { useNavigate } from "react-router-dom";
-import { Logo } from "../../iconsImports";
+import { Logo, smLogo } from "../../iconsImports";
 import CommonModal from "../common/CommonModal";
 import ReplayIcon from "@mui/icons-material/Replay";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -42,6 +38,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import DoneIcon from "@mui/icons-material/Done";
 import { apiCall } from "../../api/apiClient";
 import { useToast } from "../../utils/ToastContext";
+import TransactionDrawer from "../TransactionDrawer";
 const DmtTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
@@ -130,24 +127,18 @@ const DmtTxn = ({ query }) => {
       {
         name: "Date",
         selector: (row) => (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              // fontSize: "",
-              fontWeight: "600",
-            }}
-          >
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <Tooltip title={`Created: ${ddmmyyWithTime(row.created_at)}`} arrow>
-              <span>
-                {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
-              </span>
+              <div style={{ display: "inline-flex", gap: 4 }}>
+                <span>{ddmmyy(row.created_at)}</span>
+                <span>{dateToTime1(row.created_at)}</span>
+              </div>
             </Tooltip>
             {!(user?.role === "ret" || user?.role === "dd") && (
               <Tooltip title={`Updated: ${dateToTime(row.updated_at)}`} arrow>
                 <span style={{ marginTop: "8px" }}>
                   {ddmmyy(row.updated_at)}
-                  {dateToTime(row.updated_at)}
+                  {dateToTime1(row.updated_at)}
                 </span>
               </Tooltip>
             )}
@@ -156,20 +147,21 @@ const DmtTxn = ({ query }) => {
         wrap: true,
         width: "80px",
       },
-      ...(user?.role === "adm" || user?.role === "sadm"
-        ? [
-            {
-              name: "Route",
-              selector: (row) => (
-                <div style={{ fontSize: "10px", fontWeight: "600" }}>
-                  {row.route}
-                </div>
-              ),
-              center: true,
-              width: "70px",
-            },
-          ]
-        : []),
+
+      // ...(user?.role === "adm" || user?.role === "sadm"
+      //   ? [
+      //       {
+      //         name: "Route",
+      //         selector: (row) => (
+      //           <div style={{ fontSize: "10px", fontWeight: "600" }}>
+      //             {row.route}
+      //           </div>
+      //         ),
+      //         center: true,
+      //         width: "70px",
+      //       },
+      //     ]
+      //   : []),
 
       {
         name: "Pf",
@@ -188,21 +180,28 @@ const DmtTxn = ({ query }) => {
           else if (row.pf.toLowerCase().includes("okhttp"))
             icon = <img src={okhttp} style={{ width: "22px" }} alt="" />;
           else icon = <LaptopIcon sx={{ color: "blue", width: "22px" }} />;
+
           return (
             <Box
               sx={{
                 display: "flex",
+                flexDirection: "column", // stack vertically
                 alignItems: "center",
                 fontSize: "13px",
-                textAlign: "justify",
-                gap: 2,
+                textAlign: "center",
+                gap: 0.5,
               }}
             >
               {icon}
+              {(user?.role === "adm" || user?.role === "sadm") && (
+                <Typography variant="caption" sx={{ fontSize: 10 }}>
+                  {row.route || "-"}
+                </Typography>
+              )}
             </Box>
           );
         },
-        width: "20px",
+        width: "40px", // increase width to accommodate text
         wrap: true,
         left: true,
       },
@@ -294,8 +293,8 @@ const DmtTxn = ({ query }) => {
             style={{ textAlign: "left", fontSize: "10px", fontWeight: "600" }}
           >
             {row.beneficiary_name?.toUpperCase()} <br />
-            {row.account_number} <br />
-            {row.ifsc_code}
+            {/* {row.account_number} <br />
+            {row.ifsc_code} */}
           </div>
         ),
         wrap: true,
@@ -435,7 +434,24 @@ const DmtTxn = ({ query }) => {
         : []),
       {
         name: "Status",
-        selector: (row) => <CommonStatus value={row.status} />,
+        selector: (row) => (
+          <div
+            style={{ textAlign: "right", fontSize: "11px", fontWeight: 600 }}
+          >
+            <div>
+              <CommonStatus value={row.status} />{" "}
+            </div>
+            <div
+              style={{
+                whiteSpace: "normal", // allow wrapping
+                wordBreak: "break-word", // break long values
+                textAlign: "right",
+              }}
+            >
+              {row.operator_id}
+            </div>
+          </div>
+        ),
         center: true,
         width: "70px",
       },
@@ -550,7 +566,7 @@ const DmtTxn = ({ query }) => {
                   color="secondary"
                   size="small"
                   onClick={() =>
-                    navigate("/print-dmt2",  { state: { txnData: row } })
+                    navigate("/print-dmt2", { state: { txnData: row } })
                   }
                   sx={{ backgroundColor: "transparent" }}
                 >
@@ -609,30 +625,14 @@ const DmtTxn = ({ query }) => {
           }}
         >
           {selectedRow && (
-            <TransactionDetailsCard
-              amount={selectedRow.amount}
-              status={selectedRow.status}
-              onClose={() => setDrawerOpen(false)} // ✅ Close drawer
-              companyLogoUrl={biggpayLogo}
-              dateTime={ddmmyyWithTime(selectedRow.created_at)}
-              message={selectedRow.message || "No message"}
-              details={[
-                { label: "Operator", value: selectedRow.operator },
-                { label: "Operator Id", value: selectedRow.operator_id },
-                { label: "Order Id", value: selectedRow.order_id },
-                { label: "MOP", value: selectedRow.mop },
-
-                { label: "Customer Number", value: selectedRow.sender_mobile },
-                { label: "CCF", value: selectedRow.ccf },
-                { label: "Charge", value: selectedRow.charges },
-                { label: "GST", value: selectedRow.gst },
-
-                { label: "TDS", value: selectedRow.tds },
-              ]}
+            <TransactionDrawer
+              row={selectedRow} // pass whole row
               onRaiseIssue={() => {
                 setSelectedTxn(selectedRow.txn_id);
                 setOpenCreate(true);
               }}
+              onClose={() => setDrawerOpen(false)}
+              companyLogoUrl={Logo}
             />
           )}
         </Box>

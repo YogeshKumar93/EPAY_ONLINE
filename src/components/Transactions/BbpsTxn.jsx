@@ -1,16 +1,29 @@
-import { useMemo, useCallback, useContext, useState } from "react";
-import { Box, Tooltip, Typography, Button, Drawer } from "@mui/material";
+import { useMemo, useCallback, useContext, useState, useRef } from "react";
+import {
+  Box,
+  Tooltip,
+  Typography,
+  Button,
+  Drawer,
+  Menu,
+  MenuItem,
+} from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import AuthContext from "../../contexts/AuthContext";
-import { dateToTime1, ddmmyy, ddmmyyWithTime } from "../../utils/DateUtils";
+import {
+  dateToTime,
+  dateToTime1,
+  ddmmyy,
+  ddmmyyWithTime,
+} from "../../utils/DateUtils";
 import CommonStatus from "../common/CommonStatus";
 import { IconButton } from "rsuite";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CloseIcon from "@mui/icons-material/Close";
 import PrintIcon from "@mui/icons-material/Print";
 import TransactionDetailsCard from "../common/TransactionDetailsCard";
-import ReplayIcon from "@mui/icons-material/Replay";
+
 import RefreshIcon from "@mui/icons-material/Refresh";
 import DoneIcon from "@mui/icons-material/Done";
 
@@ -21,17 +34,20 @@ import {
   linux2,
   macintosh2,
   okhttp,
+  postman,
   windows2,
 } from "../../utils/iconsImports";
-import LaptopIcon from "@mui/icons-material/Laptop";
-import { Logo } from "../../iconsImports";
-import CommonModal from "../common/CommonModal";
+
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import AddLein from "../LienAmount/AddLein";
 
 const BbpxTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const [openCreate, setOpenCreate] = useState(false);
   const [selectedTxn, setSelectedTxn] = useState(null);
+  // const [responseModalOpen, setResponseModalOpen] = useState(false);
+  // const [selectedApiResponse, setSelectedApiResponse] = useState("");
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [selectedForRefund, setSelectedForRefund] = useState(null);
   const [refundLoading, setRefundLoading] = useState(false);
@@ -41,9 +57,29 @@ const BbpxTxn = ({ query }) => {
   const [selectedApiResponse, setSelectedApiResponse] = useState("");
 
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const handleRefundClick = (row) => {
     setSelectedForRefund(row);
     setConfirmModalOpen(true);
+  };
+  const fetchUsersRef = useRef(null);
+  const [selectedTransaction, setSelectedTrancation] = useState("");
+
+  const [openLeinModal, setOpenLeinModal] = useState(false);
+
+  const handleOpenLein = (row) => {
+    setOpenLeinModal(true);
+    setSelectedTrancation(row);
+  };
+  const handleCloseLein = () => setOpenLeinModal(false);
+
+  const handleFetchRef = (fetchFn) => {
+    fetchUsersRef.current = fetchFn;
+  };
+  const refreshPlans = () => {
+    if (fetchUsersRef.current) {
+      fetchUsersRef.current();
+    }
   };
   const handleConfirmRefund = async () => {
     if (!selectedForRefund) return;
@@ -97,44 +133,114 @@ const BbpxTxn = ({ query }) => {
     ],
     []
   );
+  const ActionColumn = ({ row, handleRefundClick, handleOpenLein }) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+
+    const handleClick = (event) => setAnchorEl(event.currentTarget);
+    const handleClose = () => setAnchorEl(null);
+
+    return (
+      <div style={{ textAlign: "center" }}>
+        <IconButton size="small" onClick={handleClick}>
+          <MoreVertIcon />
+        </IconButton>
+
+        <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+          {row?.status === "SUCCESS" && (
+            <MenuItem
+              onClick={() => {
+                handleRefundClick(row);
+                handleClose();
+              }}
+            >
+              Refund
+            </MenuItem>
+          )}
+
+          {row?.status === "PENDING" && (
+            <>
+              <MenuItem
+                onClick={() => {
+                  // mark as success handler if needed
+                  handleClose();
+                }}
+              >
+                Mark as Success
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  handleRefundClick(row);
+                  handleClose();
+                }}
+              >
+                Refund
+              </MenuItem>
+            </>
+          )}
+
+          {(row?.status === "FAILED" || row?.status === "REFUND") && (
+            <MenuItem
+              onClick={() => {
+                // rollback handler if needed
+                handleClose();
+              }}
+            >
+              Rollback
+            </MenuItem>
+          )}
+
+          <MenuItem
+            onClick={() => {
+              handleOpenLein(row);
+              handleClose();
+            }}
+          >
+            Mark Lein
+          </MenuItem>
+        </Menu>
+      </div>
+    );
+  };
+
   const columns = useMemo(
     () => [
       {
         name: "Date",
         selector: (row) => (
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <Tooltip
-              title={`Created: ${ddmmyyWithTime(row?.created_at)}`}
-              arrow
-            >
-              <span>
-                {ddmmyy(row?.created_at)} {dateToTime1(row?.created_at)}
-              </span>
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <Tooltip title={`Created: ${ddmmyyWithTime(row.created_at)}`} arrow>
+              <div style={{ display: "inline-flex", gap: 4 }}>
+                <span>{ddmmyy(row.created_at)}</span>
+                <span>{dateToTime1(row.created_at)}</span>
+              </div>
             </Tooltip>
-
-            <Tooltip
-              title={`Updated: ${ddmmyyWithTime(row?.updated_at)}`}
-              arrow
-            >
-              <span>
-                {ddmmyy(row?.updated_at)} {dateToTime1(row?.updated_at)}
+            <Tooltip title={`Updated: ${dateToTime(row.updated_at)}`} arrow>
+              <span style={{ marginTop: "8px" }}>
+                {ddmmyy(row.updated_at)}
+                {dateToTime1(row.updated_at)}
               </span>
             </Tooltip>
           </div>
         ),
         wrap: true,
-        width: "140px",
+        width: "80px",
       },
 
-      {
-        name: "Route",
-        selector: (row) => (
-          <div style={{ display: "flex", fontSize: "13px" }}>{row.route}</div>
-        ),
-
-        center: true,
-        width: "140px",
-      },
+      ...(user?.role === "adm" || user?.role === "sadm"
+        ? [
+            {
+              name: "Route",
+              selector: (row) => (
+                <div style={{ fontSize: "10px", fontWeight: "600" }}>
+                  {row.route}
+                </div>
+              ),
+              center: true,
+              width: "70px",
+            },
+          ]
+        : []),
       {
         name: "Pf",
         selector: (row) => {
@@ -145,6 +251,8 @@ const BbpxTxn = ({ query }) => {
             icon = <img src={android2} style={{ width: "22px" }} alt="" />;
           else if (row.pf.toLowerCase().includes("mac"))
             icon = <img src={macintosh2} style={{ width: "22px" }} alt="" />;
+          else if (row.pf.toLowerCase().includes("postman"))
+            icon = <img src={postman} style={{ width: "22px" }} alt="" />;
           else if (row.pf.toLowerCase().includes("linux"))
             icon = <img src={linux2} style={{ width: "22px" }} alt="" />;
           else if (row.pf.toLowerCase().includes("okhttp"))
@@ -182,19 +290,42 @@ const BbpxTxn = ({ query }) => {
               width: "70px",
             },
           ]),
-      {
-        name: "TxnId/Ref",
-        selector: (row) => (
-          <>
-            <div style={{ textAlign: "left", fontSize: "13px" }}>
-              {row.txn_id}
-              <br />
-              {row.client_ref}
-            </div>
-          </>
-        ),
-        wrap: true,
-      },
+      ...(user?.role === "adm" || user?.role === "sadm" || user?.role === "api"
+        ? [
+            {
+              name: "TxnId/Ref",
+              selector: (row) => (
+                <div style={{ textAlign: "left", fontSize: "13px" }}>
+                  {row.txn_id}
+                  <br />
+                  {row.client_ref}
+                </div>
+              ),
+              wrap: true,
+            },
+          ]
+        : []),
+      ...(user?.role !== "adm" && user?.role !== "sadm" && user?.role !== "api"
+        ? [
+            {
+              name: "TxnId",
+              selector: (row) => (
+                <div
+                  style={{
+                    textAlign: "left",
+                    fontSize: "10px",
+                    fontWeight: "600",
+                  }}
+                >
+                  {row.txn_id} <br />
+                </div>
+              ),
+              wrap: true,
+              width: "100px",
+            },
+          ]
+        : []),
+
       // {
       //   name: "RRN",
       //   selector: (row) => <div style={{ textAlign: "left" }}>{row.rrn}</div>,
@@ -202,11 +333,41 @@ const BbpxTxn = ({ query }) => {
       // },
 
       {
-        name: "Biller",
+        name: "Service",
         selector: (row) => (
           <div style={{ textAlign: "left" }}>
             <strong>{row.biller_name}</strong> <br />
-            ID: {row.biller_id}
+            {["adm", "sadm"].includes(user?.role) && (
+              <>
+                <span
+                  style={{
+                    fontWeight: "normal",
+                    fontSize: "8px",
+                    color: "blue",
+                  }}
+                >
+                  STATUS
+                </span>
+                <span
+                  style={{
+                    fontWeight: "normal",
+                    fontSize: "8px",
+                    color: "blue",
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                    marginLeft: "6px",
+                  }}
+                  onClick={() => {
+                    setSelectedApiResponse(
+                      row.api_response || "No response available"
+                    );
+                    setResponseModalOpen(true);
+                  }}
+                >
+                  RESPONSE
+                </span>
+              </>
+            )}
           </div>
         ),
         wrap: true,
@@ -247,7 +408,7 @@ const BbpxTxn = ({ query }) => {
         right: true,
       },
       {
-        name: "Comm / Tds",
+        name: "Ret Comm",
         selector: (row) => (
           <div
             style={{ textAlign: "right", fontSize: "10px", fontWeight: 600 }}
@@ -263,10 +424,14 @@ const BbpxTxn = ({ query }) => {
         right: true,
         width: "60px",
       },
-      ...(user?.role === "adm"
+      ...(user?.role === "adm" ||
+      user?.role === "di" ||
+      user?.role === "md" ||
+      user?.role === "asm" ||
+      user?.role === "zsm"
         ? [
             {
-              name: "di Comm/ tds",
+              name: "Di Comm",
               selector: (row) => (
                 <div
                   style={{
@@ -286,8 +451,15 @@ const BbpxTxn = ({ query }) => {
               right: true,
               width: "60px",
             },
+          ]
+        : []),
+      ...(user?.role === "adm" ||
+      user?.role === "md" ||
+      user?.role === "asm" ||
+      user?.role === "zsm"
+        ? [
             {
-              name: "Md Comm/ tds",
+              name: "Md Comm",
               selector: (row) => (
                 <div
                   style={{
@@ -309,82 +481,50 @@ const BbpxTxn = ({ query }) => {
             },
           ]
         : []),
-
       {
         name: "Status",
         selector: (row) => (
           <div
             style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
+              textAlign: "right",
+              fontSize: "11px",
+              fontWeight: 600,
             }}
           >
-            <CommonStatus value={row.status} />
-            <span>{row.rrn}</span>
+            <div>
+              <CommonStatus value={row.status} />
+            </div>
+            <div
+              style={{
+                whiteSpace: "normal", // allow wrapping
+                wordBreak: "break-word", // break long values
+                textAlign: "right",
+              }}
+            >
+              {row.operator_id}
+            </div>
           </div>
         ),
         center: true,
+        width: "70px",
       },
       ...(user?.role === "adm" || user?.role === "sadm"
         ? [
             {
               name: "Action",
               selector: (row) => (
-                <div
-                  style={{
-                    fontSize: "10px",
-                    fontWeight: "600",
-                    display: "flex",
-                    gap: "4px",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  {/* SUCCESS: only Replay */}
-                  {row?.status === "SUCCESS" && (
-                    <Tooltip title="Click To Refund">
-                      <ReplayIcon
-                        sx={{ color: "red", fontSize: 25, cursor: "pointer" }}
-                        onClick={() => handleRefundClick(row)}
-                      />
-                    </Tooltip>
-                  )}
-
-                  {/* PENDING: CheckCircle + Replay */}
-                  {row?.status === "PENDING" && (
-                    <>
-                      <Tooltip title="Click To Success">
-                        <DoneIcon sx={{ color: "green", fontSize: 25 }} />
-                      </Tooltip>
-                      <Tooltip title="Click To Refund">
-                        <ReplayIcon
-                          sx={{ color: "red", fontSize: 25, cursor: "pointer" }}
-                          onClick={() => handleRefundClick(row)}
-                        />
-                      </Tooltip>
-                    </>
-                  )}
-
-                  {/* FAILED or REFUND: Refresh */}
-                  {(row?.status === "FAILED" || row?.status === "REFUND") && (
-                    <Tooltip title="Click To Rollback">
-                      <RefreshIcon
-                        sx={{
-                          color: "orange",
-                          fontSize: 25,
-                          cursor: "pointer",
-                        }}
-                      />
-                    </Tooltip>
-                  )}
-                </div>
+                <ActionColumn
+                  row={row}
+                  handleRefundClick={handleRefundClick}
+                  handleOpenLein={handleOpenLein}
+                />
               ),
               center: true,
-              width: "70px",
+              width: "100px",
             },
           ]
         : []),
+
       {
         name: "View",
         selector: (row) => (
@@ -443,12 +583,12 @@ const BbpxTxn = ({ query }) => {
     <>
       <CommonTable
         columns={columns}
+        onFetchRef={handleFetchRef}
         endpoint={ApiEndpoints.GET_BBPS_TXN}
         filters={filters}
         queryParam={queryParam}
         enableActionsHover={true}
       />
-
       <CommonModal
         open={responseModalOpen}
         onClose={() => setResponseModalOpen(false)}
@@ -473,7 +613,6 @@ const BbpxTxn = ({ query }) => {
           {selectedApiResponse}
         </Typography>
       </CommonModal>
-
       <CommonModal
         open={confirmModalOpen}
         onClose={() => setConfirmModalOpen(false)}
@@ -497,7 +636,6 @@ const BbpxTxn = ({ query }) => {
           {selectedForRefund?.txn_id}?
         </Typography>
       </CommonModal>
-
       {/* BBPS Details Drawer */}
 
       <Drawer
@@ -546,6 +684,15 @@ const BbpxTxn = ({ query }) => {
           )}
         </Box>
       </Drawer>
+      {openLeinModal && (
+        <AddLein
+          open={openLeinModal}
+          handleClose={handleCloseLein}
+          onFetchRef={() => {}}
+          selectedRow={selectedTransaction}
+          type="transaction"
+        />
+      )}
     </>
   );
 };

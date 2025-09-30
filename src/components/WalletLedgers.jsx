@@ -17,60 +17,24 @@ export const WalletLedgers = () => {
   };
 
   const tabItems = [
-      {
-    label: (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          minWidth: "80px",
-          justifyContent: "flex-start",
-           
-        }}
-      >
-        <SwapHorizIcon fontSize="small" />
-        <span>Wallet Ledger 1</span>
-      </div>
-    ),
-    component: <AccountLadger />,
-  },
-     {
-    label: (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          minWidth: "80px",
-          justifyContent: "flex-start",
-        }}
-      >
-        <ReceiptIcon fontSize="small" />
-        <span>Wallet Ledger 2</span>
-      </div>
-    ),
-    component: <WalletLedger2 />,
-  },
-         {
-    label: (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          minWidth: "80px",
-          justifyContent: "flex-start",
-        }}
-      >
-       <AccountBalanceWalletIcon fontSize="small" />
-
-        <span>Wallet Ledger 3</span>
-      </div>
-    ),
-    // component: <WalletLedger3 />,
-  },
-    
+    {
+      label: (
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <SwapHorizIcon fontSize="small" />
+          Wallet Ledger 1
+        </div>
+      ),
+      component: <AccountLadger />,
+    },
+    {
+      label: (
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <ReceiptIcon fontSize="small" />
+          Wallet Ledger 2
+        </div>
+      ),
+      component: <WalletLedger2 />,
+    },
   ];
 
   return <CommonTabs tabs={tabItems} value={tab} onChange={handleChange} />;

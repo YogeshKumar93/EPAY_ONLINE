@@ -741,7 +741,7 @@ const CommonTable = ({
                 padding: "6px 10px",
                 verticalAlign: "middle",
                 textAlign: "left",
-                fontSize: "13px",
+                fontSize: "15px",
                 lineHeight: "1",
                 fontFamily: "DM Sans, sans-serif",
                 fontWeight: 400,

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Box,
   Typography,
@@ -13,6 +13,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import DownloadIcon from "@mui/icons-material/Download";
 import PanToolIcon from "@mui/icons-material/PanTool"; // This is the hand icon
 import { ArrowDropDownIcon } from "@mui/x-date-pickers";
+import AuthContext from "../../contexts/AuthContext";
 
 // Status color mapping
 const statusColors = {
@@ -32,6 +33,8 @@ const TransactionDetailsCard = ({
   companyLogoUrl,
   width = 400,
 }) => {
+  const authCtx = useContext(AuthContext);
+  const user = authCtx?.user;
   return (
     <Paper
       elevation={0}
@@ -80,7 +83,7 @@ const TransactionDetailsCard = ({
               component="img"
               src={companyLogoUrl}
               alt="Company Logo"
-              sx={{ height: 72, width: 122, objectFit: "contain", mr:18 }}
+              sx={{ height: 72, width: 122, objectFit: "contain" }}
             />
           )}
         </Box>
@@ -144,18 +147,23 @@ const TransactionDetailsCard = ({
               Transaction Details
             </Typography>
             <Box sx={{ display: "flex", gap: 1 }}>
-              <Tooltip title="Raise Complaint">
-                <IconButton
-                  size="small"
-                  onClick={onRaiseIssue}
-                  sx={{ color: "#55a3f1ff" }}
-                >
-                  <PanToolIcon fontSize="small" />
+              {user?.role !== "adm" && user?.role !== "sadm" && (
+                <Tooltip title="Raise Complaint">
+                  <IconButton
+                    size="small"
+                    onClick={onRaiseIssue}
+                    sx={{ color: "#55a3f1ff" }}
+                  >
+                    <PanToolIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              )}
+
+              <Tooltip title="Download Receipt">
+                <IconButton size="small" onClick={() => window.print()}>
+                  <DownloadIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <IconButton size="small" onClick={() => window.print()}>
-                <DownloadIcon fontSize="small" />
-              </IconButton>
             </Box>
           </Box>
 

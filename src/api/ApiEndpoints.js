@@ -253,7 +253,7 @@ const ApiEndpoints = {
   DMT1_OUTLET_INITIATE: "aeps/initiateSignupAeps",
   DMT1_OUTLET_INITIATE_SCHEMA: "aeps/getInitiateSchema",
   VALIDATE_DMT1_OUTLET: "aeps/validateSignupAeps",
- ADD_LEIN: "lien/addLien",
+  ADD_LEIN: "lien/addLien",
   REMOVE_LEIN: "lien/removeLien",
   GET_LEIN: "lien/getLien",
 
@@ -279,7 +279,7 @@ const ApiEndpoints = {
   GET_PENDING_ACCOUNT_TRANSACTION: "admin/getPendingBankTxn",
   GET_STATUS: "admin/checkTxnStatus",
   CHANGE_STATUS: "admin/changeTxnStatus",
-   REFUND_TXN: "refund/refundTxn",
+  REFUND_TXN: "refund/refundTxn",
 
   BLOCK_UNBLOCK_PLANS: "",
   ADD_PLAN: "admin/createPlan",
@@ -354,7 +354,10 @@ const ApiEndpoints = {
   DMR_MONEY_TRANSFER: "dmr/transactionDmr",
   VERIFY_ACC: "dmr/accountVerification",
   DMT2_MT: "dmr/transactionDmt2",
-
+  GET_BANK_BALANCE: "bank/getBankBalance",
+  GET_DASHBOARD1: "dashboard/getRoleWiseCounts",
+  GET_DASHBOARD2: "dashboard/getServiceWiseSummary",
+  API_BALANCE: "misc/apiBalance",
   BBPS_CATEGORIES: "prepaid/getCategories",
   // BBPS_GET_BILLERS: "prepaid/getBillers",
   // BBPS_GET_BILLERS_DETAILS: "prepaid/getBillerDetails",
@@ -398,6 +401,7 @@ const ApiEndpoints = {
   AEPS_OUTLET_LOGIN: "aeps/outletLogin",
 
   DMR_WALLET_TRANSFER: "dmr/walletTransfer",
+  GET_WEBHOOKS: "webhook/getWebhook",
 
   CHANGE_USERNAME_OTP: "",
   CHANGE_USERNAME: "",

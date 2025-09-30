@@ -395,22 +395,20 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
           }}
           sx={{
             width: "100%",
-
-            px: 8,
+            px: 4,
             display: "flex",
-
             alignItems: "center",
-            color: "#6c4bc7",
+            color: "#2275b7",
             borderRadius: "4px",
             mb: 0,
             "&:hover": {
-              backgroundColor: "#ebeef2", // hover bg
-              color: "#6c4bc7", // hover text
+              backgroundColor: "#ebeef2",
+              color: "#2275b7",
             },
-            gap: 1, // space between icon and text
+            gap: 4,
           }}
         >
-          <LogoutIcon fontSize="small" /> Logout
+          <LogoutIcon fontSize="medium" /> Logout
         </MenuItem>
 
         {/* App Version text */}
@@ -802,8 +800,14 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
               color: "#6c4bc7",
             }}
           >
-            Disclaimer: Disputes shall be subject to the jurisdiction of the
-            courts of Delhi.
+            <a
+              href="https://biggbrains.com" // Replace with your desired URL
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "#6c4bc7", textDecoration: "underline" }} // Styling for link
+            >
+              Developed and Maintained by Biggbrains Solution Pvt. Ltd.
+            </a>
           </Typography>
         </Box>
       </MainContent>
