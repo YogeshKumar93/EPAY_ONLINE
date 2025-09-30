@@ -111,6 +111,10 @@ const ApiEndpoints = {
   CREATE_NEWS: "news/createNews",
   DELETE_NEWS: "news/deleteNews",
 
+  
+LOGIN_HISTORY:"userDevice/getUserDevice",
+GET_WEBHOOKS:"webhook/getWebhook",
+
   // ****************************** NEW API'S ABOVE ******************************
 
   GET_FUND_REQUESTS: "fundrequest/getFundRequests",
