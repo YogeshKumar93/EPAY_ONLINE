@@ -39,7 +39,7 @@ const SuperTransfer = () => {
       mobile_number: number,
     });
   // stop loader
-
+   setLoading(false);
     if (response) {
       // ✅ success path
       const data = response?.data || response?.response?.data;
@@ -71,7 +71,7 @@ const SuperTransfer = () => {
       } else {
         showToast(error?.message || "Something went wrong");
       }
-        setLoading(false); 
+       
     }
   };
 
