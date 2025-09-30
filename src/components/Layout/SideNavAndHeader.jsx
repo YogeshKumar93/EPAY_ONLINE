@@ -431,6 +431,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
     { match: ["di", "md"], wallets: ["w1", "w3"] },
     { match: ["ret", "dd"], wallets: ["w1", "w2"] },
     { match: ["api"], wallets: ["w1"] },
+    {match: ["lein"], wallets:["lien"]},
   ];
 
   const getWallets = (role) => {
@@ -485,6 +486,14 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                 amount={`₹${((user?.[wallet] || 0) / 100).toFixed(2)}`}
               />
             ))}
+             {user?.lien > 0 &&
+              ["md", "adm", "di", "ret", "dd"].includes(user?.role) && (
+                <WalletCard
+                  key="lien"
+                  label="Lien"
+                  amount={`₹${user.lien.toFixed(2)}`}
+                />
+              )}
           </Box>
           <IconButton onClick={refreshUser}>
             <RefreshIcon sx={{ color: "yellow" }} />
