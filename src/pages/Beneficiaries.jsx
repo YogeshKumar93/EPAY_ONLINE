@@ -74,10 +74,17 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
   const [sendMoneyOpen, setSendMoneyOpen] = useState(false);
   const [selectedForSend, setSelectedForSend] = useState(null);
 
-  const { schema, formData, handleChange, errors, setErrors, loading } =
-    useSchemaForm(ApiEndpoints.ADD_DMT1_SCHEMA, openModal, {
-      sender_id: sender?.id,
-    });
+  const {
+    schema,
+    formData,
+    handleChange,
+    errors,
+    setErrors,
+    loading,
+    setFormData,
+  } = useSchemaForm(ApiEndpoints.ADD_DMT1_SCHEMA, openModal, {
+    sender_id: sender?.id,
+  });
 
   // 👉 Add Beneficiary
   const handleAddBeneficiary = async () => {
@@ -97,7 +104,9 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
 
       if (response) {
         okSuccessToast(response?.message || "Beneficiary added successfully");
+        setFormData({});
         setOpenModal(false);
+
         onSuccess?.(sender.mobile_number);
       } else {
         apiErrorToast(error?.message || "Failed to add beneficiary");

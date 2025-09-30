@@ -54,11 +54,12 @@ import {
 } from "../utils/iconsImports";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import BeneficiaryDetails from "./BeneficiaryDetails";
+import { useToast } from "../utils/ToastContext";
 
 const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
+  const { showToast } = useToast();
   const [openModal, setOpenModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [openList, setOpenList] = useState(true);
@@ -86,23 +87,26 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
     setSubmitting(true);
     setErrors({});
     try {
-      const payload = { ...formData, sender_id: sender.id };
-      const res = await apiCall(
+      const payload = { ...formData, sender_id: sender.id,type:"BANK" };
+      const { response, error } = await apiCall(
         "post",
         ApiEndpoints.CREATE_BENEFICIARY,
         payload
       );
 
-      if (res) {
-        okSuccessToast(res?.message || "Beneficiary added successfully");
+      if (response) {
+        okSuccessToast(response?.message || "Beneficiary added successfully");
         setOpenModal(false);
         onSuccess?.(sender.mobile_number);
       } else {
-        apiErrorToast(res?.message || "Failed to add beneficiary");
+        showToast(
+          error?.errors || errors?.message || "Failed to add beneficiary",
+          "error"
+        );
       }
-    } catch (err) {
-      apiErrorToast(err);
-      setErrors(err?.response?.data?.errors || {});
+    } catch (error) {
+      showToast(error, "error");
+      setErrors(error?.response?.data?.errors || {});
     } finally {
       setSubmitting(false);
     }

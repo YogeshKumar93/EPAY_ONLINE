@@ -27,23 +27,23 @@ export const MoneyTransfer = () => {
       ),
       component: <Dmt />,
     },
-    {
-      label: (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            minWidth: "80px", // same width for consistency
-            justifyContent: "flex-start",
-          }}
-        >
-          <CurrencyRupeeIcon fontSize="small" />
-          <span>Fino Dmt</span>
-        </div>
-      ),
-      component: <Dmt2 />,
-    },
+    // {
+    //   label: (
+    //     <div
+    //       style={{
+    //         display: "flex",
+    //         alignItems: "center",
+    //         gap: "12px",
+    //         minWidth: "80px", // same width for consistency
+    //         justifyContent: "flex-start",
+    //       }}
+    //     >
+    //       <CurrencyRupeeIcon fontSize="small" />
+    //       <span>Fino Dmt</span>
+    //     </div>
+    //   ),
+    //   component: <Dmt2 />,
+    // },
   ];
 
   return <CommonTabs tabs={tabItems} defaultTab={0} />;

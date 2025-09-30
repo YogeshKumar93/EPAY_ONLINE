@@ -153,6 +153,7 @@ const SelectedBeneficiary = ({
       onClose();
     } else {
       showToast(error?.message, "error");
+      setLoading(false);
     }
   };
 

@@ -7,6 +7,7 @@
 export const BASE_URL = "https://api.p2pae.com/";
 // export const BASE_URL = "https://api.transup.in/";
 
+
 const ApiEndpoints = {
   COOKIE: "sanctum/csrf-cookie",
 
@@ -70,6 +71,20 @@ const ApiEndpoints = {
   BBPS_GET_BILLERS_DETAILS: "bbps/getBillerDetails",
   BBPS_FETCH_BILL: "bbps/fetchBill",
 
+  CREDIT_CARD_BILL_PAYMENT: "creditcard/payCreditCard",
+  GET_CREDIT_CARD: "/creditcard/getCreditCard",
+
+  GET_BANK_BALANCE: "bank/getBankBalance",
+
+  CREATE_WHITE_LISTED_ACCOUNT: "risk/createWhiteListedAccount",
+  UPDATE_WHITE_LISTED_ACCOUNT: "risk/updateWhiteListedAccount",
+  DELETE_WHITE_LISTED_ACCOUNT: "risk/deleteWhiteListedAccount",
+  GET_WHITE_LISTED_ACCOUNT: "risk/getWhiteListedAccount",
+
+  CREATE_BLACK_LISTED_ACCOUNT: "risk/createBlackListedAccount",
+  UPDATE_BLACK_LISTED_ACCOUNT: "risk/updateBlackListedAccount",
+  DELETE_BLACK_LISTED_ACCOUNT: "risk/deleteBlackListedAccount",
+  GET_BLACK_LISTED_ACCOUNT: "risk/getBlackListedAccount",
   // ****************************** NEW API'S ******************************
   SIGN_IN: "auth/signIn",
   LOGIN_OTP_VALIDATE: "auth/secureLogin",
@@ -117,6 +132,8 @@ const ApiEndpoints = {
   CREATE_FUND_REQUEST: "fundrequest/createFundRequest",
   UPDATE_FUND_REQUEST: "fundrequest/updateFundRequest",
   DELETE_FUND_REQUEST: "fundrequest/deleteFundRequest",
+
+  EDIT_FUND_REQUEST: "fundrequest/editFundRequest",
   GET_BANKS: "bank/getBanks",
 
   QR_LOGIN: "auth/generateQr",
@@ -129,9 +146,14 @@ const ApiEndpoints = {
   AEPS_LOGIN_STATUS: "aeps/outletLoginStatus",
   AEPS_BALANCE_ENQUIRY: "/aeps/balanceEnquiry",
   AEPS_CASHWITHDRAWAL: "/aeps/cashWithdrawl",
-
+  AEPS_MINI_STATEMENT: "/aeps/miniStatement",
   AEPS_BANKS: "/aeps/getBanks",
   BBPS_PAY_BILL: "/bbps/payBill",
+
+  WALLET_LEDGER_TXNDATA: "walletledger/getTxnData",
+
+
+
 
   // ****************************** NEW API'S ABOVE ******************************
   GET_COMMISSION_RULE: "commission/getCommissions",
@@ -146,13 +168,14 @@ const ApiEndpoints = {
   UPDATE_BANK_STATEMENT: "bankStatement/updateBankStatement",
   DELETE_BANK_STATEMENT: "bankStatement/deleteBankStatement",
   GET_BANK_STATEMENT_SCHEMA: "bankStatement/getBankStatementSchema",
-
+  GET_DASHBOARD1: "dashboard/getRoleWiseCounts",
+  GET_DASHBOARD2: "dashboard/getServiceWiseSummary",
   GET_ACCOUNT_STATEMENTS: "accountStatement/getAccountStatement",
   CREATE_ACCOUNT_STATEMENT: "accountStatement/createAccountStatement",
   UPDATE_ACCOUNT_STATEMENT: "accountStatement/updateAccountStatement",
-  DELETE_ACCOUNT_STATEMENT: "accountStatement/deleteAccountStatement",
+  // DELETE_ACCOUNT_STATEMENT: "accountStatement/deleteAccountStatement",
   GET_ACCOUNT_STATEMENT_SCHEMA: "accountStatement/getAccountStatementSchema",
-
+  DELETE_ACCOUNT_STATEMENT: "account/deleteLastTransaction",
   CREATE_BANK: "bank/createBank",
   UPDATE_BANK: "bank/updateBank",
   DELETE_BANK: "bank/deleteBank",
@@ -194,6 +217,8 @@ const ApiEndpoints = {
   GET_PLANS: "plan/getPlans",
   CREATE_PLAN: "plan/createPlan",
   UPDATE_PLAN: "plan/updatePlan",
+
+  ASSIGN_PLAN: "plan/asignPlan",
   GET_PLAN_SCHEMA: "plan/getPlanSchema",
   GET_UPI_SCHEMA: "payout/getBeneficiarySchemaUpi",
   UPDATE_USER_STATUS: "user/blockAndUnblock",
@@ -209,6 +234,11 @@ const ApiEndpoints = {
   DMT1_TXN: "dmt1/dmtTxn",
   DMT1_VERIFY_BENEFICIARY: "dmt1/accountVerification",
 
+  DMT1_REGISTER_REMMITER: "dmt1/registerRemitter",
+  VALIDATE_REMITTER_DMT1: "dmt1/validateRemitter",
+
+  DMT1_REGISTER_REMMITER_SCHEMA: "dmt1/getRegisterRemitterSchema",
+  DMT1_KYC_REMITTER: "dmt1/kycRemitter",
   DMT2: "dmt2/remitterStatusDmt2",
   OTP_DMT2: "dmt2/transactionOtpDmt2",
   DMT2_ADD_BENE_SCHEMA: "dmt2/getBeneficiarySchemaDmt2",
@@ -220,7 +250,6 @@ const ApiEndpoints = {
   CREATE_USER: "signup/createUser",
   GET_SIGNUP_SCHEMA: "signup/getSignupSchema",
   DMT1: "dmt1/remitterStatus",
-  DMT1_REGISTER: "dmt1/registerRemitter",
 
   CREATE_BASIC: "business/createBasic",
   CREATE_CONTACT: "business/createContact",
@@ -240,8 +269,6 @@ const ApiEndpoints = {
   KYC_SCHEMA: "business/kycSchema",
   STATUS_SCHEMA: "business/statusSchema",
 
-  WALLET_LEDGER_TXNDATA: "walletledger/getTxnData",
-
   WALLET_LIST: "wallet/getW2WTransaction",
   WALLET_GET_RECEIVER: "wallet/getReceiver",
   WALLET_GET_W2W_TRANSACTION: "wallet/getW2WTransaction",
@@ -253,15 +280,14 @@ const ApiEndpoints = {
   DMT1_OUTLET_INITIATE: "aeps/initiateSignupAeps",
   DMT1_OUTLET_INITIATE_SCHEMA: "aeps/getInitiateSchema",
   VALIDATE_DMT1_OUTLET: "aeps/validateSignupAeps",
+
   ADD_LEIN: "lien/addLien",
   REMOVE_LEIN: "lien/removeLien",
   GET_LEIN: "lien/getLien",
-
+  API_BALANCE: "misc/apiBalance",
   // WALLET_UPDATE: "wallet/update",
   // WALLET_DELETE: "wallet/delete",
 
-  GET_DASHBOARD1: "dashboard/getRoleWiseCounts",
-  GET_DASHBOARD2: "dashboard/getServiceWiseSummary",
   // ****************************** NEW API'S ABOVE ******************************
 
   GET_ACC_BANKS: "",
@@ -279,7 +305,9 @@ const ApiEndpoints = {
   GET_PENDING_ACCOUNT_TRANSACTION: "admin/getPendingBankTxn",
   GET_STATUS: "admin/checkTxnStatus",
   CHANGE_STATUS: "admin/changeTxnStatus",
-  REFUND_TXN: "refund/refundTxn",
+
+LOGIN_HISTORY:"userDevice/getUserDevice",
+GET_WEBHOOKS:"webhook/getWebhook",
 
   BLOCK_UNBLOCK_PLANS: "",
   ADD_PLAN: "admin/createPlan",
@@ -302,7 +330,10 @@ const ApiEndpoints = {
   GET_API_KEY: "user/getApiKey",
   RESET_API_TOKEN: "user/resetApiToken",
   RESET_API_KEY: "user/resetApiKey",
-
+  GET_UNCLAIMED_ENTERIES: "bankStatement/getUnclaimedEntries",
+  CHECK_STAUS: "",
+  BUSINESS_DETAILS: "business/getAllByUser",
+  REFUND_TXN: "refund/refundTxn",
   // wallet
   GET_BANK_CREDIT_REQ: "wallet/getBanksForCrRequest",
   CREDIT_REQ: "wallet/createCrRequest",
@@ -354,10 +385,7 @@ const ApiEndpoints = {
   DMR_MONEY_TRANSFER: "dmr/transactionDmr",
   VERIFY_ACC: "dmr/accountVerification",
   DMT2_MT: "dmr/transactionDmt2",
-  GET_BANK_BALANCE: "bank/getBankBalance",
-  GET_DASHBOARD1: "dashboard/getRoleWiseCounts",
-  GET_DASHBOARD2: "dashboard/getServiceWiseSummary",
-  API_BALANCE: "misc/apiBalance",
+
   BBPS_CATEGORIES: "prepaid/getCategories",
   // BBPS_GET_BILLERS: "prepaid/getBillers",
   // BBPS_GET_BILLERS_DETAILS: "prepaid/getBillerDetails",
@@ -367,10 +395,7 @@ const ApiEndpoints = {
   //recharges and bill payment
   RECH_FETCH_BILL: "prepaid/fetchBill",
   RECH_PAY_BILL: "prepaid/payBill",
-  GET_UNCLAIMED_ENTERIES: "bankStatement/getUnclaimedEntries",
 
-  CREDIT_CARD_BILL_PAYMENT: "creditcard/payCreditCard",
-  GET_CREDIT_CARD: "/creditcard/getCreditCard",
   // user
   GET_ROLL: "",
   RAISE_ISSUE_USER: "user/raiseIssue",
@@ -401,7 +426,6 @@ const ApiEndpoints = {
   AEPS_OUTLET_LOGIN: "aeps/outletLogin",
 
   DMR_WALLET_TRANSFER: "dmr/walletTransfer",
-  GET_WEBHOOKS: "webhook/getWebhook",
 
   CHANGE_USERNAME_OTP: "",
   CHANGE_USERNAME: "",

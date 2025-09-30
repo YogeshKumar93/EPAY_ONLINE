@@ -15,6 +15,7 @@ import SenderRegisterModal from "./SenderRegisterModal";
 import VerifySenderModal from "./VerifySenderModal";
 import BeneficiaryDetails from "./BeneficiaryDetails";
 import CommonLoader from "../components/common/CommonLoader";
+import { useToast } from "../utils/ToastContext";
 
 const SuperTransfer = () => {
   const theme = useTheme();
@@ -27,7 +28,7 @@ const SuperTransfer = () => {
   const [otpData, setOtpData] = useState(null);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
   const [loading, setLoading] = useState(false);
-
+ const {showToast} = useToast();
   // Fetch sender by mobile number
   const handleFetchSender = async (number = mobile) => {
     if (!number || number.length !== 10) return;
@@ -68,7 +69,7 @@ const SuperTransfer = () => {
         });
         setOpenVerifyModal(true);
       } else {
-        apiErrorToast(error?.message || "Something went wrong");
+        showToast(error?.message || "Something went wrong");
       }
     }
   };

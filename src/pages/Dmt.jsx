@@ -32,12 +32,12 @@ const Dmt = () => {
   const { showToast } = useToast();
   const { user } = useContext(AuthContext); // Get auth user data
   const [openDmt1Modal, setOpenDmt1Modal] = useState(false);
-
+  const [referenceKey, setRefrenceKey] = useState("");
   const instId = user?.instId; // Check if instId exists
 
   // Fetch sender details
   const handleFetchSender = async (number = mobile) => {
-    if (!number || number.length !== 10) return;
+    if (!number) return;
 
     setLoading(true); // start loader
 
@@ -61,6 +61,7 @@ const Dmt = () => {
         setSender(null);
         setOpenRegisterModal(true);
         setBeneficiaries([]);
+        setRefrenceKey(response?.data?.referenceKey);
         setShowRegister(true);
       } else {
         apiErrorToast(message || "Unexpected response");
@@ -203,6 +204,7 @@ const Dmt = () => {
                 open={openRegisterModal}
                 onClose={() => setOpenRegisterModal(false)}
                 mobile={mobile}
+                referenceKey={referenceKey}
                 onSuccess={setSender}
               />
             )}

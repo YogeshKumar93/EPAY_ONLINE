@@ -48,10 +48,10 @@ const Prepaid = () => {
   const [MpinCallBackVal, setMpinCallBackVal] = useState("");
   const { location } = useContext(AuthContext);
   const { showToast } = useToast();
- const [resetMpinModalOpen, setResetMpinModalOpen] = useState(false);
-   const authCtx = useContext(AuthContext);
+  const [resetMpinModalOpen, setResetMpinModalOpen] = useState(false);
+  const authCtx = useContext(AuthContext);
   const username = `TRANS${authCtx?.user?.id}`;
-    const loadUserProfile = authCtx.loadUserProfile;
+  const loadUserProfile = authCtx.loadUserProfile;
 
   // Fetch services and auto-select first operator
   useEffect(() => {
@@ -110,7 +110,7 @@ const Prepaid = () => {
     if (!location?.lat || !location?.long) {
       return apiErrorToast("Location not available, please enable GPS.");
     }
-      setLoading(true);
+    setLoading(true);
 
     const payload = {
       mobile_number: mobileNumber,
@@ -126,32 +126,16 @@ const Prepaid = () => {
       ApiEndpoints.RECHARGE,
       payload
     );
-      setLoading(false); 
-    if (error) return showToast(error?.message, "error");
-loadUserProfile()
+    setLoading(false);
+    if (error)
+      return showToast(
+        [error?.message, error?.errors?.response?.data],
+        "error"
+      );
+    loadUserProfile();
     okSuccessToast(response?.message);
     setStep(4); // Success step
-
-   
   };
-
-  // if (loading) {
-  //   return (
-  //     <Box
-  //       display="flex"
-  //       justifyContent="center"
-  //       alignItems="center"
-  //       minHeight="60vh"
-  //     >
-  //       {/* <Box textAlign="center">
-  //         <CircularProgress size={60} thickness={4} />
-  //         <Typography variant="h6" sx={{ mt: 2 }}>
-  //           Loading Operators...
-  //         </Typography>
-  //       </Box> */}
-  //     </Box>
-  //   );
-  // }
 
   return (
     <Container maxWidth="xl" sx={{ py: 2 }}>
@@ -298,7 +282,7 @@ loadUserProfile()
                       <Grid
                         item
                         key={plan.id}
-                        xs={3} 
+                        xs={3}
                         sm={3}
                         md={3}
                         sx={{ display: "flex", justifyContent: "center" }}
@@ -556,29 +540,26 @@ loadUserProfile()
                           id={`mpin-${index}`}
                         />
                       ))}
-                     
                     </Box>
-                      <Box
-                                   
-                                    sx={{ display: "flex", justifyContent: "center", ml: 32 }}
-                                  >
-                                    <Button
-                                      variant="contained"
-                                      size="small"
-                                      sx={{ fontSize: "11px" }}
-                                      onClick={() => setResetMpinModalOpen(true)}
-                                    >
-                                      Reset MPIN
-                                    </Button>
-                                  </Box>
-                     {resetMpinModalOpen && (
-                            <ResetMpin
-                              open={resetMpinModalOpen}
-                              onClose={() => setResetMpinModalOpen(false)}
-                              username={username}
-                            />
-                          )}
-
+                    <Box
+                      sx={{ display: "flex", justifyContent: "center", ml: 32 }}
+                    >
+                      <Button
+                        variant="contained"
+                        size="small"
+                        sx={{ fontSize: "11px" }}
+                        onClick={() => setResetMpinModalOpen(true)}
+                      >
+                        Reset MPIN
+                      </Button>
+                    </Box>
+                    {resetMpinModalOpen && (
+                      <ResetMpin
+                        open={resetMpinModalOpen}
+                        onClose={() => setResetMpinModalOpen(false)}
+                        username={username}
+                      />
+                    )}
                   </Box>
                 )}
 
