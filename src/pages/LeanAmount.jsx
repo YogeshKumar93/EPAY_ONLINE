@@ -18,7 +18,6 @@ import DeleteRiskAccount from "../components/Risks/DeleteRiskAccount";
 import CommonDeleteModal from "../components/CommonDeleteModal";
 import CancelIcon from "@mui/icons-material/Cancel";
 
-
 const LeanAmount = ({ filters = [] }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
@@ -117,7 +116,7 @@ const LeanAmount = ({ filters = [] }) => {
     ];
 
     // Actions column: only for adm or sadm
-    if (["ret"].includes(user?.role)) {
+    if (["adm", "sadm"].includes(user?.role)) {
       baseColumns.push({
         name: "Actions",
         selector: (row) => (
@@ -128,7 +127,7 @@ const LeanAmount = ({ filters = [] }) => {
                 color="error"
                 onClick={() => handleDelete(row)}
               >
-               <CancelIcon fontSize="small" />
+                <CancelIcon fontSize="small" />
               </IconButton>
             </Tooltip>
           </Box>
