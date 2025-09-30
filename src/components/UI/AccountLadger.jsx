@@ -10,11 +10,14 @@ import CommonStatus from "../common/CommonStatus";
 import CommonLoader from "../common/CommonLoader";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { RemoveRedEye } from "@mui/icons-material";
+import WalletTxnData from "../WalletTxnData";
 
 const AccountLadger = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const [loading, setLoading] = useState(true); // initially true
+  const [selectedRowId, setSelectedRowId] = useState(null);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -209,6 +212,11 @@ const AccountLadger = ({ query }) => {
           refresh={true}
         />
       )}
+      <WalletTxnData
+        open={detailOpen}
+        onClose={() => setDetailOpen(false)}
+        rowId={selectedRowId}
+      />
     </>
   );
 };
