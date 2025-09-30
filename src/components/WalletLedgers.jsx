@@ -5,9 +5,6 @@ import ReceiptIcon from "@mui/icons-material/Receipt";
 
 import AccountLadger from "./UI/AccountLadger";
 import WalletLedger2 from "./UI/WalletLedger2";
- 
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-
 
 export const WalletLedgers = () => {
   const [tab, setTab] = useState(0);
@@ -24,7 +21,7 @@ export const WalletLedgers = () => {
           Wallet Ledger 1
         </div>
       ),
-      component: <AccountLadger />,
+      content: <AccountLadger />,
     },
     {
       label: (
@@ -33,7 +30,7 @@ export const WalletLedgers = () => {
           Wallet Ledger 2
         </div>
       ),
-      component: <WalletLedger2 />,
+      content: <WalletLedger2 />,
     },
   ];
 
