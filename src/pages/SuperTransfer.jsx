@@ -38,7 +38,7 @@ const SuperTransfer = () => {
     const { error, response } = await apiCall("post", ApiEndpoints.GET_SENDER, {
       mobile_number: number,
     });
-    setLoading(false); // stop loader
+  // stop loader
 
     if (response) {
       // ✅ success path
@@ -71,6 +71,7 @@ const SuperTransfer = () => {
       } else {
         showToast(error?.message || "Something went wrong");
       }
+        setLoading(false); 
     }
   };
 
