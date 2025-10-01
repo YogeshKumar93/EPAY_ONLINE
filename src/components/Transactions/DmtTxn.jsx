@@ -373,10 +373,10 @@ const DmtTxn = ({ query }) => {
             style={{ textAlign: "right", fontSize: "14px", fontWeight: 600 }}
           >
             <div style={{ color: "green" }}>
-              {parseFloat(row.comm).toFixed(2)}
+              {parseFloat(row.ret_comm).toFixed(2)}
             </div>
             <div style={{ color: "blue" }}>
-              {parseFloat(row.tds).toFixed(2)}
+              {parseFloat(row.ret_tds).toFixed(2)}
             </div>
           </div>
         ),

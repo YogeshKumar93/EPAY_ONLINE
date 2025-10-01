@@ -372,7 +372,7 @@ const AepsTxn = ({ query }) => {
         right: true,
       },
       {
-        name: " Ret Comm",
+        name: "Ret Comm",
         selector: (row) => (
           <div
             style={{ textAlign: "right", fontSize: "10px", fontWeight: 600 }}
