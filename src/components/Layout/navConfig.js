@@ -110,12 +110,12 @@ export const Admin_nav = [
 
 // Customer Navigation
 export const customer_nav = [
-  // {
-  //   title: "Dashboard",
-  //   icon: dashboardImage,
-  //   icon2: "📊",
-  //   to: "/customer/dashboard",
-  // },
+  {
+    title: "Dashboard",
+    icon: dashboardImage,
+    icon2: "📊",
+    to: "/customer/dashboard",
+  },
   {
     title: "Recharge",
     icon: rechargeNew,
