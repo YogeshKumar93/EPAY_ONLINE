@@ -95,8 +95,8 @@ const Layouts = ({ filters = [], query }) => {
       },
   {
   name: "Actions",
-  selector: (row, { hoveredRow, enableActionsHover }) => {
-    const isHovered = hoveredRow === row.id && enableActionsHover;
+  selector: (row) => {
+ 
 
     return (
       <Box
@@ -114,7 +114,7 @@ const Layouts = ({ filters = [], query }) => {
           sx={{
             display: "flex",
             gap: 1,
-            visibility: isHovered ? "visible" : "hidden",
+            visibility:  "visible" ,
             transition: "visibility 0.2s, opacity 0.2s",
           }}
         >
@@ -125,19 +125,7 @@ const Layouts = ({ filters = [], query }) => {
           </Tooltip>
         </Box>
 
-        {/* Dash overlay */}
-        <Typography
-          variant="body2"
-          sx={{
-            color: "#999",
-            textAlign: "center",
-            position: "absolute",
-            pointerEvents: "none",
-            visibility: isHovered ? "hidden" : "visible",
-          }}
-        >
-          -
-        </Typography>
+      
       </Box>
     );
   },

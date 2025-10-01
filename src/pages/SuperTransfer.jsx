@@ -38,8 +38,8 @@ const SuperTransfer = () => {
     const { error, response } = await apiCall("post", ApiEndpoints.GET_SENDER, {
       mobile_number: number,
     });
-    setLoading(false); // stop loader
-
+  // stop loader
+   setLoading(false);
     if (response) {
       // ✅ success path
       const data = response?.data || response?.response?.data;
@@ -71,6 +71,7 @@ const SuperTransfer = () => {
       } else {
         showToast(error?.message || "Something went wrong");
       }
+       
     }
   };
 
@@ -134,13 +135,13 @@ const SuperTransfer = () => {
         <Box width="100%">
           <SenderDetails sender={sender} />
 
-          {/* {selectedBeneficiary && (
+           {selectedBeneficiary && (
       <BeneficiaryDetails
         beneficiary={selectedBeneficiary}
         senderMobile={mobile}
         sender={sender}
       />
-    )} */}
+    )} 
         </Box>
 
         {/* Beneficiary List */}

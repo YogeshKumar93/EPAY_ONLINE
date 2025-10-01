@@ -339,7 +339,7 @@ const Users = ({ query }) => {
                 return (
                   <Tooltip title={parentName}>
                     <div style={{ textAlign: "left", cursor: "pointer" }}>
-                      {row.parent}
+                      {parentName}
                     </div>
                   </Tooltip>
                 );

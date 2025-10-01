@@ -76,7 +76,7 @@ const fetchWalletTxnData = async () => {
     "& .MuiDrawer-paper": {
       width: { xs: "100%", sm: 450 },
       p: 2,
-      zIndex: (theme) => theme.zIndex.appBar + 2, // 👈 AppBar ke upar
+      zIndex: (theme) => theme.zIndex.appBar + 1, // 👈 AppBar ke upar
     },
   }}
     >

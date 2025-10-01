@@ -431,9 +431,10 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
     { match: ["di", "md"], wallets: ["w1", "w3"] },
     { match: ["ret", "dd"], wallets: ["w1", "w2"] },
     { match: ["api"], wallets: ["w1"] },
+    { match: ["lein"], wallets: ["lien"] },
   ];
 
-  const getWallets = (role) => {
+ const getWallets = (role) => {
     const found = walletConfig.find((cfg) =>
       cfg.match.some((m) => role?.includes(m))
     );
@@ -456,7 +457,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
               : "100%",
           },
           ml: { md: desktopOpen ? `${themeSettings.drawerWidth}px` : 0 },
-          zIndex: (theme) => theme.zIndex.drawer + 1,
+          zIndex: 1,
           transition: (theme) =>
             theme.transitions.create(["width", "margin"], {
               easing: theme.transitions.easing.sharp,
@@ -478,13 +479,21 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             {title}
           </Typography>
           <Box sx={{ display: "flex", gap: 2, mr: 2 }}>
-            {getWallets(user?.role).map((wallet) => (
+                {getWallets(user?.role).map((wallet) => (
               <WalletCard
                 key={wallet}
                 label={wallet.toUpperCase()}
                 amount={`₹${((user?.[wallet] || 0) / 100).toFixed(2)}`}
               />
             ))}
+            {user?.lien > 0 &&
+              ["md", "di", "ret", "dd"].includes(user?.role) && (
+                <WalletCard
+                  key="lien"
+                  label="Lien"
+                  amount={`₹${user.lien.toFixed(2)}`}
+                />
+              )}
           </Box>
           <IconButton onClick={refreshUser}>
             <RefreshIcon sx={{ color: "yellow" }} />

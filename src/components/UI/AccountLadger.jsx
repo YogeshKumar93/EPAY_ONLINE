@@ -217,7 +217,6 @@ const AccountLadger = ({ query }) => {
         onClose={() => setDetailOpen(false)}
         rowId={selectedRowId}
       />
-
     </>
   );
 };

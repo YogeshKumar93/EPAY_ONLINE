@@ -1,68 +1,105 @@
 import React from "react";
-import { Avatar, Box, Tooltip, Typography } from "@mui/material";
+import { Avatar, Box, Typography } from "@mui/material";
+import {
+  ArrowUpward,
+  ArrowDownward,
+  AccountBalanceWallet,
+} from "@mui/icons-material";
 
-const WalletCard = ({ label = "", amount = "" }) => {
+const WalletCard = ({
+  label = "",
+  amount = "",
+  icon = <AccountBalanceWallet />,
+  trend = "up",
+}) => {
   return (
     <Box
       sx={{
-        px: 2,
+        px: 1,
         py: 1,
-        borderRadius: "16px",
-        background: "#13c3c1",
+        borderRadius: 2,
+        background:
+          "linear-gradient(135deg, #2275b7, #6ab0f3, #1e3c72, #6ab0f3)",
+        backgroundSize: "300% 300%",
+        color: "#000",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        gap: 2,
-        boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-        border: "1px solid rgba(255,255,255,0.2)",
+        gap: 1.5,
+        border: "2px solid #2275b7",
+        boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
         cursor: "pointer",
         transition: "all 0.3s ease",
+        // minWidth: 180,   ❌ remove this
+        width: "auto", // ✅ let it auto expand
+        maxWidth: "100%", // ✅ safe for responsiveness
+        backdropFilter: "blur(6px)",
+        animation: "gradientAnimation 8s ease infinite",
         "&:hover": {
-          transform: "translateY(-3px)",
-          boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+          transform: "translateY(-4px)",
+          boxShadow: "0 12px 28px rgba(0,0,0,0.25)",
         },
       }}
     >
-      {/* Left: Label + optional icon */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        {/* Optional icon placeholder */}
-        <Box
-          sx={{
-            width: 24,
-            height: 24,
-            borderRadius: "50%",
-            background: "#f0eff3ff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "0.8rem",
-          }}
-        >
-          💰
-        </Box>
+      {/* Left: Icon */}
+      <Avatar
+        sx={{
+          bgcolor: "#2275b7",
+          width: 22,
+          height: 22,
+        }}
+      >
+        {icon}
+      </Avatar>
+
+      {/* Middle: Text */}
+      <Box sx={{ ml: 1 }}>
         <Typography
           sx={{
-            fontSize: "0.8rem",
-            fontWeight: 600,
-            letterSpacing: 0.5,
-            color: "#000",
+            fontSize: "1.2rem", // overall font size
+            fontWeight: 700,
+            display: "flex",
+            alignItems: "center",
+            gap: 0.5,
+            color: "#fff",
           }}
         >
-          {label}
+          <span style={{ fontSize: "1.4rem", fontWeight: 600 }}>{label}</span>
+          <span style={{ fontSize: "1.4rem", fontWeight: 700 }}>{amount}</span>
         </Typography>
       </Box>
 
-      {/* Right: Amount */}
-      <Typography
+      {/* <Typography
+          sx={{
+            fontSize: "1.2rem", // amount font size
+            fontWeight: 700,
+            lineHeight: 1.2,
+            color: "#fff",
+          }}
+        ></Typography> */}
+      {/* </Box> */}
+
+      {/* Right: Trend Icon */}
+      {/* <Avatar
         sx={{
-          fontSize: "1rem",
-          fontWeight: 700,
-          letterSpacing: 0.5,
-          color: "#000",
+          bgcolor: trend === "up" ? "rgba(40, 180, 99, 0.85)" : "rgba(219, 68, 55, 0.85)",
+          width: 28,
+          height: 28,
         }}
       >
-        {amount}
-      </Typography>
+        {trend === "up" ? <ArrowUpward sx={{ fontSize: 18, color: "#fff" }} /> : <ArrowDownward sx={{ fontSize: 18, color: "#fff" }} />}
+      </Avatar> */}
+
+      {/* Gradient Animation Keyframes */}
+      <style>
+        {`
+          @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+        `}
+      </style>
     </Box>
   );
 };

@@ -212,7 +212,7 @@ const BbpsBillers = ({ category, onBack }) => {
                       <Typography
                         variant={is_layout === 2 ? "body2" : "subtitle2"}
                         fontWeight="600"
-                        Wrap
+                        wrap
                         sx={{
                           maxWidth: "100%",
                           textOverflow: "ellipsis",

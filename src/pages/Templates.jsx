@@ -125,8 +125,8 @@ const columns = useMemo(
     },
     {
       name: "Status",
-      selector: (row, { hoveredRow, enableActionsHover }) => {
-        const isHovered = hoveredRow === row.id || !enableActionsHover;
+      selector: (row) => {
+ 
         return (
           <Box
             sx={{
@@ -146,8 +146,8 @@ const columns = useMemo(
     },
     {
       name: "Actions",
-      selector: (row, { hoveredRow, enableActionsHover }) => {
-        const isHovered = hoveredRow === row.id || !enableActionsHover;
+      selector: (row) => {
+   
         return (
           <Box
             sx={{
@@ -158,7 +158,7 @@ const columns = useMemo(
               gap: 1,
             }}
           >
-            {isHovered ? (
+            
               <>
                 <IconButton
                   color="primary"
@@ -181,11 +181,8 @@ const columns = useMemo(
                   <Delete fontSize="small" />
                 </IconButton>
               </>
-            ) : (
-              <Typography variant="body2" sx={{ color: "#999" }}>
-                -
-              </Typography>
-            )}
+            
+          
           </Box>
         );
       },

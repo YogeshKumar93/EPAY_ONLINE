@@ -1,141 +1,147 @@
-import { useMemo, useContext, useState, useEffect, useRef } from "react";
-import { Tooltip, IconButton, Box, Typography } from "@mui/material";
-import { Edit } from "@mui/icons-material";
-import CommonTable from "../components/common/CommonTable";
+import React, { useContext, useState, useRef, useMemo } from "react";
+import {
+  Box,
+  Grid,
+  IconButton,
+  Tooltip,
+  Typography,
+  TextField,
+} from "@mui/material";
+
+import { ddmmyy, dateToTime } from "../utils/DateUtils";
+import LaptopIcon from "@mui/icons-material/Laptop";
+import CachedIcon from "@mui/icons-material/Cached";
 import ApiEndpoints from "../api/ApiEndpoints";
 import AuthContext from "../contexts/AuthContext";
-import { dateToTime1, ddmmyy, ddmmyyWithTime } from "../utils/DateUtils";
-import CommonLoader from "../components/common/CommonLoader";
-import LaptopIcon from "@mui/icons-material/Laptop";
-import { useNavigate } from "react-router-dom";
-import { android2, linux2, macintosh2, windows2 } from "../iconsImports";
-import { okhttp, postman } from "../utils/iconsImports";
+// import { android2, macintosh2, windows2, linux2 } from "../iconsImports";
+import CommonTable from "../components/common/CommonTable";
+import {
+  android2,
+  linux2,
+  macintosh2,
+  okhttp,
+  postman,
+  windows2,
+} from "../utils/iconsImports";
 
-const Login_History = ({ filters = [] }) => {
-  const authCtx = useContext(AuthContext);
-  const user = authCtx?.user;
-  const navigate = useNavigate();
-  const [openDelete, setOpenDelete] = useState(false);
-  const [selectedBank, setSelectedBank] = useState(null);
-  const [loading, setLoading] = useState(true);
+// Global refresh reference
+let refreshRef = null;
 
-  // ✅ keep a ref to CommonTable for refreshing
-  const fetchBanksRef = useRef(null);
+const Login_History = ({ query }) => {
+  const { userRole } = useContext(AuthContext);
+  const fetchRef = useRef(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
+  // Assign fetch function to ref for global refresh
   const handleFetchRef = (fetchFn) => {
-    fetchBanksRef.current = fetchFn;
+    fetchRef.current = fetchFn;
+    refreshRef = fetchFn;
   };
 
-  const refreshBanks = () => {
-    if (fetchBanksRef.current) {
-      fetchBanksRef.current();
-    }
+  const refreshLoginHistory = () => {
+    if (fetchRef.current) fetchRef.current();
   };
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  // Client-side filtering for top search input
+  const filterRows = (rows) => {
+    if (!searchTerm) return rows;
+    const lowerSearch = searchTerm.toLowerCase();
+    return rows.filter((row) =>
+      Object.values(row).some((val) =>
+        String(val || "")
+          .toLowerCase()
+          .includes(lowerSearch)
+      )
+    );
+  };
 
-  // memoized columns
+  // Table columns
   const columns = useMemo(
     () => [
       {
-        name: "Date",
+        name: "Login At",
         selector: (row) => (
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <Tooltip title={`Created: ${ddmmyyWithTime(row.created_at)}`} arrow>
-              <span>{ddmmyy(row.created_at)}</span>
-            </Tooltip>
-            <br />
-
-            <Tooltip title={`Updated: ${ddmmyyWithTime(row.updated_at)}`} arrow>
-              <span>{ddmmyy(row.updated_at)}</span>
-            </Tooltip>
+          <div>
+            {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
           </div>
         ),
-        wrap: true,
-        width: "140px",
       },
       {
-        name: "Pf",
-        selector: (row) => {
-          let icon;
-          if (row.device.toLowerCase().includes("windows"))
-            icon = <img src={windows2} style={{ width: "22px" }} alt="" />;
-          else if (row.device.toLowerCase().includes("android"))
-            icon = <img src={android2} style={{ width: "22px" }} alt="" />;
-          else if (row.device.toLowerCase().includes("mac"))
-            icon = <img src={macintosh2} style={{ width: "22px" }} alt="" />;
-          else if (row.device.toLowerCase().includes("linux"))
-            icon = <img src={linux2} style={{ width: "22px" }} alt="" />;
-          else if (row.device.toLowerCase().includes("postman"))
-            icon = <img src={postman} style={{ width: "22px" }} alt="" />;
-          else if (row.device.toLowerCase().includes("okhttp"))
-            icon = <img src={okhttp} style={{ width: "22px" }} alt="" />;
-          else icon = <LaptopIcon sx={{ color: "blue", width: "22px" }} />;
-
-          return (
-            <Box
-              sx={{
+        name: "User Id",
+        selector: (row) => <div>{row.user_id}</div>,
+        omit: userRole?.role !== "Admin",
+      },
+      {
+        name: "Login IP",
+        selector: (row) => (
+          <Tooltip title={row.ip}>
+            <div
+              style={{
                 display: "flex",
-                flexDirection: "column", // stack vertically
                 alignItems: "center",
-                fontSize: "13px",
-                textAlign: "center",
-                gap: 0.5,
+                fontSize: 15,
+                wordBreak: "break-word",
+                overflowWrap: "break-word",
+                whiteSpace: "normal",
+                textAlign: "justify",
               }}
             >
+              {row.ip}
+            </div>
+          </Tooltip>
+        ),
+      },
+      {
+        name: "Login Device",
+        selector: (row) => {
+          let icon;
+          const device = (row.device || "").toLowerCase();
+          if (device.includes("windows"))
+            icon = <img src={windows2} alt="Windows" style={{ width: 22 }} />;
+          else if (device.includes("android"))
+            icon = <img src={android2} alt="Android" style={{ width: 22 }} />;
+          else if (device.includes("mac"))
+            icon = <img src={macintosh2} alt="Mac" style={{ width: 22 }} />;
+          else if (device.includes("linux"))
+            icon = <img src={linux2} alt="Linux" style={{ width: 22 }} />;
+          else icon = <LaptopIcon sx={{ color: "blue", width: 22 }} />;
+
+          return (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               {icon}
+              <Typography>{row.device}</Typography>
             </Box>
           );
         },
-        width: "40px", // increase width to accommodate text
-        wrap: true,
-        left: true,
-      },
-      ...(user?.role !== "ret" && user?.role !== "dd"
-        ? [
-            {
-              name: "User Id",
-              selector: (row) => (
-                <Tooltip title={row.user_id}>
-                  <div style={{ textAlign: "left" }}>{row.user_id}</div>
-                </Tooltip>
-              ),
-              wrap: true,
-            },
-          ]
-        : []),
-      {
-        name: "IP",
-        selector: (row) => <div style={{ textAlign: "left" }}>{row.ip}</div>,
-        wrap: true,
+        width: "300px",
       },
     ],
-    []
+    [userRole]
   );
 
-  const queryParam = "";
+  // Filters for table
+  const filters = useMemo(
+    () => [
+      { id: "user_id", label: "User Id", type: "textfield", roles: ["Admin"] },
+      { id: "ip", label: "IP Address", type: "textfield" },
+      { id: "device", label: "Device", type: "textfield" },
+    ],
+    [userRole]
+  );
 
   return (
-    <>
-      <CommonLoader loading={loading} text="Loading Banks" />
+    <Box p={2}>
+      {/* Top search + refresh */}
 
-      {!loading && (
-        <>
-          <CommonTable
-            onFetchRef={handleFetchRef}
-            columns={columns}
-            endpoint={ApiEndpoints.GET_USER_DEVICE}
-            filters={filters}
-            queryParam={queryParam}
-          />
-        </>
-      )}
-    </>
+      <CommonTable
+        columns={columns}
+        endpoint={ApiEndpoints.LOGIN_HISTORY}
+        queryParam={query}
+        filters={filters}
+        transformData={filterRows} // client-side search
+        onFetchRef={handleFetchRef}
+      />
+    </Box>
   );
 };
 

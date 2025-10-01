@@ -75,8 +75,10 @@ const BeneficiaryDetails = ({
   const handleProceed = async () => {
     // if (!otp || otp.length !== 6)
     //   return apiErrorToast("Please enter the 6-digit OTP");
-    if (!mpin || mpin.length !== 6)
-      return apiErrorToast("Please enter the 6-digit M-PIN");
+   if (!mpin || mpin.length !== 6) {
+  return showToast("Please enter the 6-digit M-PIN", "error");
+}
+
 
     setLoading(true);
     try {
@@ -87,7 +89,7 @@ const BeneficiaryDetails = ({
         account_number: beneficiary.account_number,
         ifsc_code: beneficiary.ifsc_code,
         bank_name: beneficiary.bank_name,
-        mobile_number: beneficiary.mobile_number,
+        mobile_number: sender.mobile_number,
         operator: 11,
         latitude: location?.lat || "",
         longitude: location?.long || "",
@@ -105,17 +107,17 @@ const BeneficiaryDetails = ({
         payload
       );
       if (response) {
-        okSuccessToast("Payout successful!");
+        showToast(response?.message || "Payout successful!", "success");
         setAmount("");
         setOtp("");
         setMpin("");
         setOtpRef(null);
         onClose();
       } else {
-        apiErrorToast(error?.message);
+        showToast(error?.message || "Payout unsuccessfull" ,"error");
       }
     } catch (err) {
-      apiErrorToast(err);
+      showToast(err);
     } finally {
       setLoading(false);
     }

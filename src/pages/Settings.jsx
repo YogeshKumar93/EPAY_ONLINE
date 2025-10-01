@@ -4,12 +4,13 @@ import Templates from "./Templates";
 import CommissionRule from "./CommissionRule";
 import Layouts from "./Layouts";
 import Logs from "./Logs";
-import WebHooks from "./WebHooks";
+
 import Plans from "./Plans";
 import Notification from "../components/Notification/Notification";
-import EventNoteIcon from "@mui/icons-material/EventNote";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
-import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
+import EventNoteIcon from '@mui/icons-material/EventNote';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import EmojiObjectsIcon from '@mui/icons-material/EmojiObjects';
+import LinkIcon from "@mui/icons-material/Link";
 
 // Icons
 import DescriptionIcon from "@mui/icons-material/Description"; // Template
@@ -21,6 +22,7 @@ import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive"; /
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import News from "./News";
 import Purposes from "./Purposes";
+import WebHooks from "./WebHooks";
 
 export const Settings = () => {
   const tabItems = [
@@ -37,7 +39,11 @@ export const Settings = () => {
       component: <Notification />,
     },
     { label: "Color Layout", icon: <SwapHorizIcon />, component: <Layouts /> },
-    { label: "Webhooks", icon: <SwapHorizIcon />, component: <WebHooks /> },
+       {
+    label: "WebHooks",
+    icon: <LinkIcon />,       // changed icon
+    content: <WebHooks />,
+  },
   ];
 
   return <CommonTabs tabs={tabItems} defaultTab={0} />;
