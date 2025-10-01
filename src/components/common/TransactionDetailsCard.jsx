@@ -159,11 +159,13 @@ const TransactionDetailsCard = ({
                 </Tooltip>
               )}
 
+              {user.role !== "adm" &&
               <Tooltip title="Download Receipt">
                 <IconButton size="small" onClick={() => window.print()}>
                   <DownloadIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
+            }
             </Box>
           </Box>
 

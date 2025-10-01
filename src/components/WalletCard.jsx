@@ -19,13 +19,13 @@ const WalletCard = ({
         py: 1,
         borderRadius: 2,
         background:
-          "linear-gradient(135deg, #2275b7, #6ab0f3, #1e3c72, #6ab0f3)",
+          "linear-gradient(135deg, #90c9d8ff, #3b88cfff, #2960c5ff, #6ab0f3)",
         backgroundSize: "300% 300%",
         color: "#000",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        gap: 1.5,
+        gap: 1,
         border: "2px solid #2275b7",
         boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
         cursor: "pointer",
@@ -57,10 +57,10 @@ const WalletCard = ({
         <Typography
           sx={{
             fontSize: "1.2rem", // overall font size
-            fontWeight: 700,
+            fontWeight: 600,
             display: "flex",
             alignItems: "center",
-            gap: 0.5,
+            gap: 1,
             color: "#fff",
           }}
         >
