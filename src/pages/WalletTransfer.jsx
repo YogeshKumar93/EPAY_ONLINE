@@ -43,11 +43,17 @@ export const WalletTransfer = () => {
     // Retailer
     tabItems = [
       {
-        label: createTabLabel(<WalletIcon fontSize="small" />, "W1 TO W1 Transfer"),
+        label: createTabLabel(
+          <WalletIcon fontSize="small" />,
+          "W1 TO W1 Transfer"
+        ),
         component: <Wallet2WalletTransfer />,
       },
       {
-        label: createTabLabel(<WalletIcon fontSize="small" />, "W2 TO W1 Transfer"),
+        label: createTabLabel(
+          <WalletIcon fontSize="small" />,
+          "W2 TO W1 Transfer"
+        ),
         component: <Wallet2Wallet1 />,
       },
       // Uncomment if needed
@@ -60,11 +66,17 @@ export const WalletTransfer = () => {
     // Distributor / Master Distributor
     tabItems = [
       {
-        label: createTabLabel(<WalletIcon fontSize="small" />, "W1 TO W1 Transfer"),
+        label: createTabLabel(
+          <WalletIcon fontSize="small" />,
+          "W1 TO W1 Transfer"
+        ),
         component: <Wallet2WalletTransfer />,
       },
       {
-        label: createTabLabel(<WalletIcon fontSize="small" />, "W3 TO W1 Transfer"),
+        label: createTabLabel(
+          <WalletIcon fontSize="small" />,
+          "W3 TO W1 Transfer"
+        ),
         component: <Wallet3ToWallet1 />,
       },
     ];

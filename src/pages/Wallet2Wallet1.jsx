@@ -34,8 +34,8 @@ import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import W2W1Transfer from "../components/WalletTransfer/W2W1Transfer";
 
-const Wallet2Wallet1 = ({   }) => {
-   const authCtx = useContext(AuthContext);
+const Wallet2Wallet1 = ({}) => {
+  const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const navigate = useNavigate();
 
@@ -375,7 +375,7 @@ const Wallet2Wallet1 = ({   }) => {
         }}
       >
         {user.role !== "adm" && (
-          <W2W1Transfer  type="w2w" handleFetchRef={refreshTransfer} />
+          <W2W1Transfer type="w2w" handleFetchRef={refreshTransfer} />
         )}
       </Box>
 

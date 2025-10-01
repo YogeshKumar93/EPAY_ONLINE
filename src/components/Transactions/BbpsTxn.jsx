@@ -42,6 +42,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AddLein from "../LienAmount/AddLein";
 import { useToast } from "../../utils/ToastContext";
 import CommonModal from "../common/CommonModal";
+import { Logo } from "../../iconsImports";
 
 const BbpxTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
