@@ -268,6 +268,10 @@ export default function AppRoutes() {
               <Route path="customer/profile" element={<ProfilePage />} />
               <Route path="customer/cms" element={<Cms />} />
               {/* <Route path="customer/print-dmt" element={<PrintDmt />} /> */}
+              <Route
+                path="customer/login_history"
+                element={<Login_History />}
+              />
 
               <Route
                 path="customer/*"
@@ -293,6 +297,7 @@ export default function AppRoutes() {
                 path="di/wallet-transfer"
                 element={<Wallet2WalletTransfer />}
               /> */}
+              <Route path="di/login_history" element={<Login_History />} />
               <Route path="di/wallet-transfer" element={<WalletTransfer />} />
               <Route path="di/profile" element={<ProfilePage />} />
             </>
@@ -305,6 +310,7 @@ export default function AppRoutes() {
               <Route path="asm/transcations" element={<Transaction />} />
               <Route path="asm/profile" element={<ProfilePage />} />
               <Route path="asm/wallet-ledger" element={<AccountLadger />} />
+              <Route path="asm/login_history" element={<Login_History />} />
             </>
           )}
 
@@ -315,6 +321,7 @@ export default function AppRoutes() {
               <Route path="zsm/transcations" element={<Transaction />} />
               <Route path="zsm/profile" element={<ProfilePage />} />
               <Route path="zsm/wallet-ledger" element={<AccountLadger />} />
+              <Route path="zsm/login_history" element={<Login_History />} />
             </>
           )}
 
@@ -327,7 +334,8 @@ export default function AppRoutes() {
               <Route path="api/complaint" element={<Complaint />} />
               <Route path="api/fund-request" element={<FundRequest />} />
               <Route path="api/wallet-ledger" element={<AccountLadger />} />
-              <Route path="asm/profile" element={<ProfilePage />} />
+              <Route path="api/profile" element={<ProfilePage />} />
+              <Route path="api/login_history" element={<Login_History />} />
             </>
           )}
 
@@ -340,6 +348,7 @@ export default function AppRoutes() {
               <Route path="md/fund-request" element={<FundRequest />} />
               <Route path="md/wallet-transfer" element={<WalletTransfer />} />
               <Route path="md/wallet-ledger" element={<AccountLadger />} />
+              <Route path="md/login_history" element={<Login_History />} />
             </>
           )}
 

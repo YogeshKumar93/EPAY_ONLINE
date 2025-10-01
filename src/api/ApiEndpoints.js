@@ -7,7 +7,6 @@
 export const BASE_URL = "https://api.p2pae.com/";
 // export const BASE_URL = "https://api.transup.in/";
 
-
 const ApiEndpoints = {
   COOKIE: "sanctum/csrf-cookie",
 
@@ -155,9 +154,6 @@ GET_WEBHOOKS:"webhook/getWebhook",
   BBPS_PAY_BILL: "/bbps/payBill",
 
   WALLET_LEDGER_TXNDATA: "walletledger/getTxnData",
-
-
-
 
   // ****************************** NEW API'S ABOVE ******************************
   GET_COMMISSION_RULE: "commission/getCommissions",
@@ -311,8 +307,8 @@ GET_WEBHOOKS:"webhook/getWebhook",
   GET_STATUS: "admin/checkTxnStatus",
   CHANGE_STATUS: "admin/changeTxnStatus",
 
-LOGIN_HISTORY:"userDevice/getUserDevice",
-GET_WEBHOOKS:"webhook/getWebhook",
+  LOGIN_HISTORY: "userDevice/getUserDevice",
+  GET_WEBHOOKS: "webhook/getWebhook",
 
   BLOCK_UNBLOCK_PLANS: "",
   ADD_PLAN: "admin/createPlan",
@@ -360,7 +356,7 @@ GET_WEBHOOKS:"webhook/getWebhook",
   BENE_KYC: "dmr/beneKyc",
   VALIDATE_OTP: "dmr/validateRemitter",
   VALIDATE_DMT2: "dmr/validateRemitterDmt2",
-
+  GET_USER_DEVICE: "userDevice/getUserDevice",
   NEW_VALIDATE_OTP: "dmr/verifyExpRemitter",
   VERIFY_REM_UPI: "dmr/verifyRemitterUpi",
   EKYC_INITIATE: "dmr/initiateEkyc",

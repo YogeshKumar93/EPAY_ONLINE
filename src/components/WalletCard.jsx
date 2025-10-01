@@ -1,99 +1,89 @@
 import React from "react";
 import { Avatar, Box, Typography } from "@mui/material";
-import {
-  ArrowUpward,
-  ArrowDownward,
-  AccountBalanceWallet,
-} from "@mui/icons-material";
+import { ArrowUpward, ArrowDownward } from "@mui/icons-material";
+import PaymentsIcon from "@mui/icons-material/Payments";
 
 const WalletCard = ({
   label = "",
   amount = "",
-  icon = <AccountBalanceWallet />,
+  icon = <PaymentsIcon />,
   trend = "up",
 }) => {
   return (
     <Box
       sx={{
-        px: 1,
-        py: 1,
-        borderRadius: 2,
-        background:
-          "linear-gradient(135deg, #2275b7, #6ab0f3, #1e3c72, #6ab0f3)",
-        backgroundSize: "300% 300%",
-        color: "#000",
+        px: 2,
+      
+        borderRadius: 3,
+        background: "linear-gradient(135deg, #13c3c1, #6c4bc7)",
+        backgroundSize: "200% 200%",
+        color: "#fff",
         display: "flex",
         alignItems: "center",
-        justifyContent: "space-between",
-        gap: 1.5,
-        border: "2px solid #2275b7",
-        boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+        gap: 3,
+        border: "1px solid rgba(255, 255, 255, 0.2)",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
         cursor: "pointer",
         transition: "all 0.3s ease",
-        // minWidth: 180,   ❌ remove this
-        width: "auto", // ✅ let it auto expand
-        maxWidth: "100%", // ✅ safe for responsiveness
-        backdropFilter: "blur(6px)",
-        animation: "gradientAnimation 8s ease infinite",
+        maxWidth: "260px",
+        backdropFilter: "blur(8px)",
+        animation: "gradientShift 6s ease infinite",
         "&:hover": {
-          transform: "translateY(-4px)",
-          boxShadow: "0 12px 28px rgba(0,0,0,0.25)",
+          transform: "translateY(-2px)",
+          boxShadow: "0 6px 20px rgba(0,0,0,0.2)",
+          backgroundPosition: "right center",
         },
       }}
     >
-      {/* Left: Icon */}
-      <Avatar
+      {/* Icon with subtle background */}
+      <Box
         sx={{
-          bgcolor: "#2275b7",
-          width: 22,
-          height: 22,
+          p: 0,
+          borderRadius: 2,
+          bgcolor: "rgba(255, 255, 255, 0.1)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         {icon}
-      </Avatar>
+      </Box>
 
-      {/* Middle: Text */}
-      <Box sx={{ ml: 1 }}>
-        <Typography
-          sx={{
-            fontSize: "1.2rem", // overall font size
-            fontWeight: 700,
-            display: "flex",
-            alignItems: "center",
-            gap: 0.5,
-            color: "#fff",
-          }}
-        >
-          <span style={{ fontSize: "1.4rem", fontWeight: 600 }}>{label}</span>
-          <span style={{ fontSize: "1.4rem", fontWeight: 700 }}>{amount}</span>
+      {/* Content */}
+      <Box sx={{ flexGrow: 1}}>
+        <Typography sx={{ fontSize: "1.8rem", opacity: 0.9, fontWeight:700   }}>
+          {label}
+        </Typography>
+        <Typography sx={{ fontSize: "1.1rem", fontWeight: 600 }}>
+          {amount}
         </Typography>
       </Box>
 
-      {/* <Typography
+      {/* Trend Indicator */}
+      {trend && (
+        <Box
           sx={{
-            fontSize: "1.2rem", // amount font size
-            fontWeight: 700,
-            lineHeight: 1.2,
-            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 24,
+            height: 14,
+            borderRadius: "50%",
+            bgcolor: trend === "up" ? "rgba(40, 180, 99, 0.9)" : "rgba(219, 68, 55, 0.9)",
           }}
-        ></Typography> */}
-      {/* </Box> */}
+        >
+          {trend === "up" ? (
+            <ArrowUpward sx={{ fontSize: 14, color: "#fff" }} />
+          ) : (
+            <ArrowDownward sx={{ fontSize: 14, color: "#fff" }} />
+          )}
+        </Box>
+      )}
 
-      {/* Right: Trend Icon */}
-      {/* <Avatar
-        sx={{
-          bgcolor: trend === "up" ? "rgba(40, 180, 99, 0.85)" : "rgba(219, 68, 55, 0.85)",
-          width: 28,
-          height: 28,
-        }}
-      >
-        {trend === "up" ? <ArrowUpward sx={{ fontSize: 18, color: "#fff" }} /> : <ArrowDownward sx={{ fontSize: 18, color: "#fff" }} />}
-      </Avatar> */}
-
-      {/* Gradient Animation Keyframes */}
+      {/* Gradient Animation */}
       <style>
         {`
-          @keyframes gradientAnimation {
+          @keyframes gradientShift {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }

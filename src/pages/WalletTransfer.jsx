@@ -18,10 +18,6 @@ export const WalletTransfer = () => {
 
   const [tab, setTab] = useState(0);
 
-  const handleChange = (event, newValue) => {
-    setTab(newValue);
-  };
-
   let tabItems = [];
 
   const createTabLabel = (icon, text) => (
@@ -40,35 +36,75 @@ export const WalletTransfer = () => {
   );
 
   if (user?.role === "ret" || user?.role === "dd") {
-    // Retailer
     tabItems = [
+      // {
+      //   label: createTabLabel(
+      //     <WalletIcon fontSize="small" />,
+      //     "W1 TO W1 Transfer"
+      //   ),
+      //   component: <Wallet2WalletTransfer />,
+      // },
       {
-        label: createTabLabel(<WalletIcon fontSize="small" />, "W1 TO W1 Transfer"),
+        label: (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              minWidth: "80px",
+              justifyContent: "flex-start",
+            }}
+          >
+            <WalletIcon fontSize="small" />
+            <span>W1 TO W1 Transfer</span>
+          </div>
+        ),
         component: <Wallet2WalletTransfer />,
       },
       {
-        label: createTabLabel(<WalletIcon fontSize="small" />, "W2 TO W1 Transfer"),
+        label: (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              minWidth: "80px",
+              justifyContent: "flex-start",
+            }}
+          >
+            <WalletIcon fontSize="small" />
+            <span>W2 TO W1 Transfer</span>
+          </div>
+        ),
         component: <Wallet2Wallet1 />,
       },
-      // Uncomment if needed
       // {
-      //   label: createTabLabel(<CurrencyRupee fontSize="small" />, "W3 TO W1 Transfer"),
-      //   component: <Wallet3ToWallet1 />,
+      //   label: createTabLabel(
+      //     <WalletIcon fontSize="small" />,
+      //     "W2 TO W1 Transfer"
+      //   ),
+      //   component: <Wallet2Wallet1 />,
       // },
     ];
   } else if (user?.role === "di" || user?.role === "md") {
     // Distributor / Master Distributor
     tabItems = [
       {
-        label: createTabLabel(<WalletIcon fontSize="small" />, "W1 TO W1 Transfer"),
+        label: createTabLabel(
+          <WalletIcon fontSize="small" />,
+          "W1 TO W1 Transfer"
+        ),
         component: <Wallet2WalletTransfer />,
       },
       {
-        label: createTabLabel(<WalletIcon fontSize="small" />, "W3 TO W1 Transfer"),
+        label: createTabLabel(
+          <WalletIcon fontSize="small" />,
+          "W3 TO W1 Transfer"
+        ),
         component: <Wallet3ToWallet1 />,
       },
     ];
   }
 
-  return <CommonTabs tabs={tabItems} defaultTab={0} onChange={handleChange} />;
+  return <CommonTabs tabs={tabItems} defaultTab={0} />;
 };

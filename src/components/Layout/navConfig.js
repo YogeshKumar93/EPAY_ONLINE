@@ -220,20 +220,20 @@ export const customer_nav = [
   //   to: "/customer/complaint",
   // },
 
-  // {
-  //   title: "Activity Logs",
-  //   icon: riskImage,
-  //   icon2: "📒",
-  //   to: "/customer/retailerlogs",
-  // },
+  {
+    title: "Login History",
+    icon: riskImage,
+    icon2: "📒",
+    to: "/customer/login_history",
+  },
 ];
 export const di_nav = [
-  {
-    title: "Dashboard",
-    icon: dashboardImage,
-    icon2: "📊",
-    to: "/di/dashboard",
-  },
+  // {
+  //   title: "Dashboard",
+  //   icon: dashboardImage,
+  //   icon2: "📊",
+  //   to: "/di/dashboard",
+  // },
   { title: "Users", icon: usersImage, icon2: "👥", to: "/di/users" },
   {
     title: "Transaction",
@@ -253,27 +253,33 @@ export const di_nav = [
     icon2: "📒",
     to: "/di/wallet-ledger",
   },
+  {
+    title: "Login History",
+    icon: riskImage,
+    icon2: "📒",
+    to: "/di/login_history",
+  },
 ];
 
 export const service_nav = [
-  {
-    title: "Dashboard",
-    icon: dashboardImage,
-    icon2: "📊",
-    to: "/customer/dashboard",
-  },
+  // {
+  //   title: "Dashboard",
+  //   icon: dashboardImage,
+  //   icon2: "📊",
+  //   to: "/customer/dashboard",
+  // },
   {
     title: "All Services",
     icon: serviceImage,
     icon2: "🛠️",
     to: "/customer/allServices",
   },
-  {
-    title: "Wallet Transfer",
-    icon: walletTransferImage,
-    icon2: "🛠️",
-    to: "/customer/wallet-transfer",
-  },
+  // {
+  //   title: "Wallet Transfer",
+  //   icon: walletTransferImage,
+  //   icon2: "🛠️",
+  //   to: "/customer/wallet-transfer",
+  // },
   {
     title: "Wallet Ledger",
     icon: walletLdgerImage,
@@ -296,7 +302,7 @@ export const service_nav = [
     title: "Activity Logs",
     icon: riskImage,
     icon2: "📒",
-    to: "/customer/retailerlogs",
+    to: "/customer/login_history",
   },
 ];
 
@@ -326,15 +332,21 @@ export const asm_nav = [
     icon2: "📊",
     to: "/asm/wallet-ledger",
   },
+  {
+    title: "Login History",
+    icon: riskImage,
+    icon2: "📒",
+    to: "/asm/login_history",
+  },
 ];
 
 export const zsm_nav = [
-  {
-    title: "Dashboard",
-    icon: dashboardImage,
-    icon2: "📊",
-    to: "/zsm/dashboard",
-  },
+  // {
+  //   title: "Dashboard",
+  //   icon: dashboardImage,
+  //   icon2: "📊",
+  //   to: "/zsm/dashboard",
+  // },
   { title: "Users", icon: usersImage, icon2: "📊", to: "/zsm/users" },
   {
     title: "Transcations",
@@ -348,6 +360,12 @@ export const zsm_nav = [
     icon: walletLdgerImage,
     icon2: "📊",
     to: "/zsm/wallet-ledger",
+  },
+  {
+    title: "Login History",
+    icon: riskImage,
+    icon2: "📒",
+    to: "/zsm/login_history",
   },
 ];
 
@@ -377,6 +395,12 @@ export const api_nav = [
     icon: bankImage,
     icon2: "📊",
     to: "/api/fund-request",
+  },
+  {
+    title: "Login History",
+    icon: riskImage,
+    icon2: "📒",
+    to: "/api/login_history",
   },
 ];
 
@@ -412,5 +436,11 @@ export const md_nav = [
     icon: walletLedgerImg,
     icon2: "🛠️",
     to: "/md/wallet-ledger",
+  },
+  {
+    title: "Login History",
+    icon: riskImage,
+    icon2: "📒",
+    to: "/md/login_history",
   },
 ];

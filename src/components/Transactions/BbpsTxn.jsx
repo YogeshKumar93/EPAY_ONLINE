@@ -42,6 +42,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AddLein from "../LienAmount/AddLein";
 import { useToast } from "../../utils/ToastContext";
 import CommonModal from "../common/CommonModal";
+import { Logo } from "../../iconsImports";
 
 const BbpxTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
@@ -416,10 +417,10 @@ const BbpxTxn = ({ query }) => {
             style={{ textAlign: "right", fontSize: "10px", fontWeight: 600 }}
           >
             <div style={{ color: "green" }}>
-              {parseFloat(row.commission).toFixed(2)}
+              {parseFloat(row.ret_comm).toFixed(2)}
             </div>
             <div style={{ color: "blue" }}>
-              {parseFloat(row.tds).toFixed(2)}
+              {parseFloat(row.ret_tds).toFixed(2)}
             </div>
           </div>
         ),

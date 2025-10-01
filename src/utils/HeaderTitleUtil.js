@@ -35,7 +35,6 @@ const titleMap = {
     "/admin/pg-orders": "PG Orders",
     "/admin/virtual_accounts": "Virtual Accounts",
     "/admin/invoice": "Invoices",
-    "admin/bankstatements": "Bankstatements",
   },
 
   customer: {
@@ -66,7 +65,7 @@ const titleMap = {
     "/customer/khata-book": "Khata Book",
     "/customer/my-profile": "My Profile",
     "/customer/services": "Services",
-    "/customer/loginHistory": "Login History",
+    "/customer/login_history": "Login History",
     "/customer/invoice": "Invoices",
     "/customer/travel": "Travel Booking",
   },
@@ -77,6 +76,7 @@ const titleMap = {
     "/asm/transactions": "Transactions",
     "/asm/cred-req": "Fund Requests",
     "/asm/my-profile": "My Profile",
+    "/asm/login_history": "Login History",
   },
 
   zsm: {
@@ -85,6 +85,7 @@ const titleMap = {
     "/zsm/transactions": "Transactions",
     "/zsm/cred-req": "Fund Requests",
     "/zsm/my-profile": "My Profile",
+    "/zsm/login_history": "Login History",
   },
 
   md: {
@@ -97,6 +98,7 @@ const titleMap = {
     "/md/ledger": "My Ledger",
     "/md/my-profile": "My Profile",
     "/md/khata-book": "Khata Book",
+    "/md/login_history": "Login History",
   },
 
   ad: {
@@ -109,6 +111,7 @@ const titleMap = {
     "/ad/ledger": "My Ledger",
     "/ad/my-profile": "My Profile",
     "/ad/khata-book": "Khata Book",
+    "/ad/login_history": "Login History",
   },
 
   "api-user": {
@@ -117,6 +120,7 @@ const titleMap = {
     "/api-user/cred-req": "Fund Requests",
     "/api-user/invoice": "Invoices",
     "/api-user/my-profile": "My Profile",
+    "/api-user/login_history": "Login History",
   },
 
   // ✅ New DI role
@@ -128,6 +132,7 @@ const titleMap = {
     "/di/wallet-transfer": "Wallet Transfer",
     "/di/wallet-ledger": "Wallet Ledger",
     "/di/my-profile": "My Profile",
+    "/di/login_history": "Login History",
   },
 };
 
