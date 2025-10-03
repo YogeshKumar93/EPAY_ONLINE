@@ -369,7 +369,14 @@ const roleHierarchy = {
       "Risk",
       "Login History",
     ],
-    2: ["Services", "Transactions", "Wallet Ledger", "Risk"],
+    2: [
+      "Dashboard",
+      "Services",
+      "Fund Request",
+      "Transactions",
+      "Wallet Ledger",
+      "Risk",
+    ],
   },
   dd: {
     default: [
@@ -389,7 +396,14 @@ const roleHierarchy = {
       "Risk",
       "Login History",
     ],
-    2: ["Services", "Transactions", "Wallet Ledger", "Risk"],
+    2: [
+      "Dashboard",
+      "Services",
+      "Fund Request",
+      "Transactions",
+      "Wallet Ledger",
+      "Risk",
+    ],
   },
   asm: {
     default: [
