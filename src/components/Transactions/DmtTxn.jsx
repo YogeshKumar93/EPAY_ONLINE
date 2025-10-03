@@ -43,6 +43,10 @@ import { useToast } from "../../utils/ToastContext";
 import TransactionDrawer from "../TransactionDrawer";
 import Scheduler from "../common/Scheduler";
 import AddLein from "../../pages/AddLein";
+import { json2Excel } from "../../utils/exportToExcel";
+import { apiErrorToast } from "../../utils/ToastUtil";
+import FileDownloadIcon from "@mui/icons-material/FileDownload"; // Excel export icon
+
 const DmtTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
@@ -57,7 +61,7 @@ const DmtTxn = ({ query }) => {
   const { showToast } = useToast();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
-      const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
   const [selectedTransaction, setSelectedTrancation] = useState("");
 
   const [openLeinModal, setOpenLeinModal] = useState(false);
@@ -81,6 +85,26 @@ const DmtTxn = ({ query }) => {
   const refreshPlans = () => {
     if (fetchUsersRef.current) {
       fetchUsersRef.current();
+    }
+  };
+  const handleExportExcel = async () => {
+    try {
+      // Fetch all users (without pagination/filters) from API
+      const { error, response } = await apiCall(
+        "post",
+        ApiEndpoints.GET_DMT_TXN,
+        { export: 1 }
+      );
+      const usersData = response?.data?.data || [];
+
+      if (usersData.length > 0) {
+        json2Excel("DmtTxns", usersData); // generates and downloads Users.xlsx
+      } else {
+        apiErrorToast("no data found");
+      }
+    } catch (error) {
+      console.error("Excel export failed:", error);
+      alert("Failed to export Excel");
     }
   };
   const handleConfirmRefund = async () => {
@@ -617,32 +641,32 @@ const DmtTxn = ({ query }) => {
   }, [user]);
 
   const columnsWithSelection = useMemo(() => {
-     // Only show checkbox if user is NOT adm or sadm
+    // Only show checkbox if user is NOT adm or sadm
     if (user?.role === "adm" || user?.role === "sadm") {
       return columns; // no selection column
     }
-  return [
-    {
-      name: "",
-      selector: (row) => (
-        <input
-          type="checkbox"
-          checked={selectedRows.some((r) => r.id === row.id)}
-          disabled={row.status?.toLowerCase() === "failed"}
-          onChange={() => {
-            const isSelected = selectedRows.some((r) => r.id === row.id);
-            const newSelectedRows = isSelected
-              ? selectedRows.filter((r) => r.id !== row.id)
-              : [...selectedRows, row];
-            setSelectedRows(newSelectedRows);
-          }}
-        />
-      ),
-      width: "40px",
-    },
-    ...columns,
-  ];
-}, [selectedRows, columns]);
+    return [
+      {
+        name: "",
+        selector: (row) => (
+          <input
+            type="checkbox"
+            checked={selectedRows.some((r) => r.id === row.id)}
+            disabled={row.status?.toLowerCase() === "failed"}
+            onChange={() => {
+              const isSelected = selectedRows.some((r) => r.id === row.id);
+              const newSelectedRows = isSelected
+                ? selectedRows.filter((r) => r.id !== row.id)
+                : [...selectedRows, row];
+              setSelectedRows(newSelectedRows);
+            }}
+          />
+        ),
+        width: "40px",
+      },
+      ...columns,
+    ];
+  }, [selectedRows, columns]);
 
   const queryParam = "";
 
@@ -656,62 +680,66 @@ const DmtTxn = ({ query }) => {
           filters={filters}
           queryParam={queryParam}
           enableActionsHover={true}
-            enableSelection={false}
+          enableSelection={false}
           selectedRows={selectedRows}
           onSelectionChange={setSelectedRows}
-           customHeader={
-  <>
-  <Box
-    sx={{
-      display: "flex",
-      alignItems: "center",
-      gap: 1,
-      padding: "8px",
-       
-    }}
-  >
-    {selectedRows.length > 0 && (
-      <Tooltip title="View Selected Details">
-       <Button
-        variant="contained"
-        size="small"
-        color="primary"
-        onClick={() => {
-          // Save selected rows to sessionStorage
-          sessionStorage.setItem("txnData", JSON.stringify(selectedRows));
-      
-          // Open new tab/window
-          window.open("/print-dmt2", "_blank");
-        }}
-      >
-      <PrintIcon sx={{ fontSize: 20, color: '#e3e6e9ff', mr:1 }} />
-   DMT
-      </Button>
-      </Tooltip>
-    )}
-  </Box>
-      <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              padding: "8px",
-              flexWrap: "wrap",
-            }}
-          >
-            {user?.role === "adm" && (
-              <IconButton
-                color="primary"
-                onClick={handleExportExcel}
-                title="Export to Excel"
+          customHeader={
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  padding: "8px",
+                }}
               >
-                <FileDownloadIcon />
-              </IconButton>
-            )}
-            <Scheduler onRefresh={refreshPlans} />
-          </Box>
-          </>
-}
+                {selectedRows.length > 0 && (
+                  <Tooltip title="View Selected Details">
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color="primary"
+                      onClick={() => {
+                        // Save selected rows to sessionStorage
+                        sessionStorage.setItem(
+                          "txnData",
+                          JSON.stringify(selectedRows)
+                        );
+
+                        // Open new tab/window
+                        window.open("/print-dmt2", "_blank");
+                      }}
+                    >
+                      <PrintIcon
+                        sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
+                      />
+                      DMT
+                    </Button>
+                  </Tooltip>
+                )}
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  padding: "8px",
+                  flexWrap: "wrap",
+                }}
+              >
+                {user?.role === "adm" && (
+                  <IconButton
+                    color="primary"
+                    onClick={handleExportExcel}
+                    title="Export to Excel"
+                  >
+                    <FileDownloadIcon />
+                  </IconButton>
+                )}
+                <Scheduler onRefresh={refreshPlans} />
+              </Box>
+            </>
+          }
         />
       </Box>
 

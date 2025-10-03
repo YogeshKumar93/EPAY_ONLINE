@@ -25,7 +25,7 @@ const Banks = ({ filters = [] }) => {
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [selectedBank, setSelectedBank] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // ✅ keep a ref to CommonTable for refreshing
   const fetchBanksRef = useRef(null);
@@ -70,15 +70,12 @@ const Banks = ({ filters = [] }) => {
         selector: (row) => (
           <div style={{ display: "flex", flexDirection: "column" }}>
             <Tooltip title={`Created: ${ddmmyyWithTime(row.created_at)}`} arrow>
-              <span>
-                {ddmmyy(row.created_at)}  
-              </span>
-            </Tooltip><br/>
+              <span>{ddmmyy(row.created_at)}</span>
+            </Tooltip>
+            <br />
 
             <Tooltip title={`Updated: ${ddmmyyWithTime(row.updated_at)}`} arrow>
-              <span>
-                {ddmmyy(row.updated_at)}  
-              </span>
+              <span>{ddmmyy(row.updated_at)}</span>
             </Tooltip>
           </div>
         ),
@@ -122,70 +119,68 @@ const Banks = ({ filters = [] }) => {
         selector: (row) => <CommonStatus value={row.status} />,
         center: true,
       },
-{
-  name: "Actions",
-  selector: (row) => {
-    
-
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minWidth: "120px",
-          position: "relative",
-        }}
-      >
-        {/* Icons are always rendered but hidden when not hovered */}
-        <Box
-          sx={{
-            display: "flex",
-            gap: 1,
-            visibility:  "visible", // keeps layout stable
-          }}
-        >
-          <Tooltip title="Statement">
-            <IconButton color="info" size="small" onClick={() => handleStatement(row)}>
-              <DescriptionIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title="Edit">
-            <IconButton
-              size="small"
-              color="primary"
-              onClick={() => {
-                setSelectedRow(row);
-                setOpenEdit(true);
+      {
+        name: "Actions",
+        selector: (row) => {
+          return (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth: "120px",
+                position: "relative",
               }}
             >
-              <Edit fontSize="small" />
-            </IconButton>
-          </Tooltip>
+              {/* Icons are always rendered but hidden when not hovered */}
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  visibility: "visible", // keeps layout stable
+                }}
+              >
+                <Tooltip title="Statement">
+                  <IconButton
+                    color="info"
+                    size="small"
+                    onClick={() => handleStatement(row)}
+                  >
+                    <DescriptionIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
 
-          {user?.role === "adm" && (
-            <Tooltip title="Delete">
-              <IconButton color="error" size="small" onClick={() => handleDelete(row)}>
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          )}
-        </Box>
+                <Tooltip title="Edit">
+                  <IconButton
+                    size="small"
+                    color="primary"
+                    onClick={() => {
+                      setSelectedRow(row);
+                      setOpenEdit(true);
+                    }}
+                  >
+                    <Edit fontSize="small" />
+                  </IconButton>
+                </Tooltip>
 
-         
-       
-      </Box>
-    );
-  },
-  width: "120px",
-  center: true,
-}
-
-
-
-
-
+                {user?.role === "adm" && (
+                  <Tooltip title="Delete">
+                    <IconButton
+                      color="error"
+                      size="small"
+                      onClick={() => handleDelete(row)}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                )}
+              </Box>
+            </Box>
+          );
+        },
+        width: "120px",
+        center: true,
+      },
     ],
     []
   );
