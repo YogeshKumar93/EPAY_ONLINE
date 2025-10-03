@@ -8,12 +8,12 @@ import { useToast } from "../utils/ToastContext";
 
 const TAB_CONFIG = [
   { key: "basic", label: "Basic" },
-  { key: "contact", label: "Contact" },
+  // { key: "contact", label: "Contact" },
   { key: "address", label: "Address" },
-  { key: "identification", label: "Identification" },
-  { key: "bank", label: "Bank" },
-  { key: "documents", label: "Documents" },
-  { key: "kyc", label: "KYC" },
+  // { key: "identification", label: "Identification" },
+  // { key: "bank", label: "Bank" },
+  // { key: "documents", label: "Documents" },
+  // { key: "kyc", label: "KYC" },
 ];
 
 // Convert key_name to Label (e.g., business_email -> Business Email)

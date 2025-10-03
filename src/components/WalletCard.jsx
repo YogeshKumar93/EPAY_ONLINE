@@ -12,25 +12,23 @@ const WalletCard = ({
   return (
     <Box
       sx={{
-        px: 2,
-      
-        borderRadius: 3,
+        borderRadius: 2,
         background: "linear-gradient(135deg, #13c3c1, #6c4bc7)",
         backgroundSize: "200% 200%",
         color: "#fff",
         display: "flex",
         alignItems: "center",
-        gap: 3,
+        gap: 2,
         border: "1px solid rgba(255, 255, 255, 0.2)",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
         cursor: "pointer",
         transition: "all 0.3s ease",
-        maxWidth: "260px",
+        maxWidth: "200px",
         backdropFilter: "blur(8px)",
         animation: "gradientShift 6s ease infinite",
         "&:hover": {
-          transform: "translateY(-2px)",
-          boxShadow: "0 6px 20px rgba(0,0,0,0.2)",
+          transform: "translateY(-1px)",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
           backgroundPosition: "right center",
         },
       }}
@@ -38,8 +36,8 @@ const WalletCard = ({
       {/* Icon with subtle background */}
       <Box
         sx={{
-          p: 0,
-          borderRadius: 2,
+          p: 0.5,
+          borderRadius: 1.5,
           bgcolor: "rgba(255, 255, 255, 0.1)",
           display: "flex",
           alignItems: "center",
@@ -48,39 +46,14 @@ const WalletCard = ({
       >
         {icon}
       </Box>
-
       {/* Content */}
-      <Box sx={{ flexGrow: 1}}>
-        <Typography sx={{ fontSize: "1.8rem", opacity: 0.9, fontWeight:700   }}>
-          {label}
-        </Typography>
-        <Typography sx={{ fontSize: "1.1rem", fontWeight: 600 }}>
+      <Box sx={{ flexGrow: 1 }}>
+        <Typography sx={{ opacity: 0.8, fontWeight: 700 }}>{label}</Typography>
+        <Typography sx={{ fontSize: "1rem", fontWeight: 600 }}>
           {amount}
         </Typography>
       </Box>
 
-      {/* Trend Indicator */}
-      {trend && (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 24,
-            height: 14,
-            borderRadius: "50%",
-            bgcolor: trend === "up" ? "rgba(40, 180, 99, 0.9)" : "rgba(219, 68, 55, 0.9)",
-          }}
-        >
-          {trend === "up" ? (
-            <ArrowUpward sx={{ fontSize: 14, color: "#fff" }} />
-          ) : (
-            <ArrowDownward sx={{ fontSize: 14, color: "#fff" }} />
-          )}
-        </Box>
-      )}
-
-      {/* Gradient Animation */}
       <style>
         {`
           @keyframes gradientShift {

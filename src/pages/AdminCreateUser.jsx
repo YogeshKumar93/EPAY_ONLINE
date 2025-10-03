@@ -15,14 +15,9 @@ import {
   Typography,
   Divider,
 } from "@mui/material";
- 
- 
- 
- 
 import { useToast } from "../utils/ToastContext";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
-import { okSuccessToast } from "../utils/ToastUtil";
 
 const AdminCreateUser = ({ open, onClose, onFetchRef }) => {
   const { showToast } = useToast();
@@ -34,7 +29,7 @@ const AdminCreateUser = ({ open, onClose, onFetchRef }) => {
   const [schemaFields, setSchemaFields] = useState([]);
   const [formData, setFormData] = useState({});
   const [loadingSchema, setLoadingSchema] = useState(false);
-
+  console.log("The schema fiels is ", schemaFields);
   const rolesList = [
     "sadm",
     "adm",
@@ -46,6 +41,17 @@ const AdminCreateUser = ({ open, onClose, onFetchRef }) => {
     "dd",
     "api",
   ];
+  const roleFullNameMap = {
+    sadm: "Super Admin",
+    adm: "Admin",
+    zsm: "Zonal Sales Manager",
+    asm: "Area Sales Manager",
+    md: "Master Distributor",
+    di: "Distributor",
+    ret: "Retailer",
+    dd: "Direct Dealer",
+    api: "API User",
+  };
 
   const roleMapping = {
     ret: "di",
@@ -131,14 +137,38 @@ const AdminCreateUser = ({ open, onClose, onFetchRef }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const buildUserBusinessPayload = (flatObj) => {
+    const user = {};
+    const business = {};
+    const business_address = {};
+
+    Object.entries(flatObj).forEach(([key, value]) => {
+      if (key.startsWith("user.")) {
+        user[key.split(".")[1]] = value;
+      } else if (key.startsWith("business.")) {
+        business[key.split(".")[1]] = value;
+      } else if (key.startsWith("business_address.")) {
+        business_address[key.split(".")[1]] = value;
+      }
+    });
+
+    return { user, business, business_address };
+  };
+
   const handleSubmit = async () => {
     if (!role) {
       showToast("Please select a role", "error");
       return;
     }
 
-    const payload = { role, ...formData };
+    // Convert flat formData → user + business + business_address
+    const { user, business, business_address } =
+      buildUserBusinessPayload(formData);
+
+    const payload = { role, user, business, business_address };
     if (selectedUser) payload.parent = selectedUser;
+
+    console.log("Payload sending to API:", payload); // debug
 
     setSubmitting(true);
     try {
@@ -148,7 +178,7 @@ const AdminCreateUser = ({ open, onClose, onFetchRef }) => {
         payload
       );
       if (response) {
-        okSuccessToast(response?.message || "User created successfully");
+        showToast(response?.message || "User created successfully", "success");
         onFetchRef?.();
         onClose();
       } else {
@@ -183,7 +213,7 @@ const AdminCreateUser = ({ open, onClose, onFetchRef }) => {
           >
             {rolesList.map((r) => (
               <MenuItem key={r} value={r}>
-                {r.toUpperCase()}
+                {roleFullNameMap[r] || r.toUpperCase()}
               </MenuItem>
             ))}
           </Select>

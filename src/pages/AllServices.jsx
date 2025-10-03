@@ -62,7 +62,14 @@ import Aeps from "./Aeps";
 import Cms from "./Cms";
 import Prepaid from "../components/UI/rechange and bill/Prepaid";
 import Dth from "../components/UI/rechange and bill/Dth";
-import { AIR1, FINO } from "../utils/iconsImports";
+import {
+  AIR1,
+  FINO,
+  PG1,
+  QRCODE1,
+  TATAPOWER1,
+  UBER1,
+} from "../utils/iconsImports";
 import { bg } from "date-fns/locale";
 import { color } from "framer-motion";
 import Wallet2WalletTransfer from "./Wallet2WalletTransfer";
@@ -483,14 +490,14 @@ export default function AllServices() {
         {
           key: "Airtel cms",
           label: " Airtel Cms",
-          icon: DashboardIcon,
+          icon: AIR1,
           component: ComingSoon,
           type: "C04",
         },
         {
           key: "Uber cms",
           label: " Uber Cms",
-          icon: DashboardIcon,
+          icon: UBER1,
           component: Cms,
           type: "C04",
         },
@@ -545,6 +552,53 @@ export default function AllServices() {
           component: Wallet2Wallet1,
         },
       ],
+    },
+    {
+      key: "pg",
+      label: "Paymnent Gateway",
+      icon: PG1,
+      component: ComingSoon,
+
+      // subMenu: [
+      //   {
+      //     key: "upiPay",
+      //     label: "UPI Pay",
+      //     icon: PG1,
+      //     component: ComingSoon,
+      //     type: "upi",
+      //   },
+      // ],
+    },
+    {
+      key: "qrcoll",
+      label: "Qr Collection",
+      icon: QRCODE1,
+      component: ComingSoon,
+      // subMenu: [
+      //   {
+      //     key: "upiPay",
+      //     label: "UPI Pay",
+      //     icon: QrCodeIcon,
+      //     component: UpiTransfer,
+      //     type: "upi",
+      //   },
+      // ],
+    },
+    {
+      key: "partpaynent",
+      label: "Part Payment",
+      icon: TATAPOWER1,
+      component: ComingSoon,
+
+      // subMenu: [
+      //   {
+      //     key: "upiPay",
+      //     label: "UPI Pay",
+      //     icon: QrCodeIcon,
+      //     component: UpiTransfer,
+      //     type: "upi",
+      //   },
+      // ],
     },
   ].filter(Boolean);
 

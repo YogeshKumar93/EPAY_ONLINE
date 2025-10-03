@@ -100,7 +100,7 @@ const PrivateRoute = ({ children }) => {
     } else if (user.status === 2) {
       // ✅ KYC pending
       return <KycPending />;
-    } else if (user.status > 2) {
+    } else if (user.status === 3) {
       // ✅ Some other case → go to profile
       return <ProfilePage user={user} />;
     }
