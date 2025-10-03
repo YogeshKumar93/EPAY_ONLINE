@@ -79,7 +79,7 @@ const ApiEndpoints = {
   UPDATE_WHITE_LISTED_ACCOUNT: "risk/updateWhiteListedAccount",
   DELETE_WHITE_LISTED_ACCOUNT: "risk/deleteWhiteListedAccount",
   GET_WHITE_LISTED_ACCOUNT: "risk/getWhiteListedAccount",
-
+   
   CREATE_BLACK_LISTED_ACCOUNT: "risk/createBlackListedAccount",
   UPDATE_BLACK_LISTED_ACCOUNT: "risk/updateBlackListedAccount",
   DELETE_BLACK_LISTED_ACCOUNT: "risk/deleteBlackListedAccount",
@@ -168,6 +168,7 @@ GET_WEBHOOKS:"webhook/getWebhook",
   UPDATE_BANK_STATEMENT: "bankStatement/updateBankStatement",
   DELETE_BANK_STATEMENT: "bankStatement/deleteBankStatement",
   GET_BANK_STATEMENT_SCHEMA: "bankStatement/getBankStatementSchema",
+
   GET_DASHBOARD1: "dashboard/getRoleWiseCounts",
   GET_DASHBOARD2: "dashboard/getServiceWiseSummary",
   GET_ACCOUNT_STATEMENTS: "accountStatement/getAccountStatement",

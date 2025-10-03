@@ -14,7 +14,7 @@ import { okhttp, postman } from "../utils/iconsImports";
 const Login_History = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
-   const { userRole } = useContext(AuthContext);
+  const { userRole } = useContext(AuthContext);
   const navigate = useNavigate();
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedBank, setSelectedBank] = useState(null);
@@ -33,23 +33,25 @@ const Login_History = ({ query }) => {
     }
   };
 
-   const filterRows = (rows) => {
+  const filterRows = (rows) => {
     if (!searchTerm) return rows;
     const lowerSearch = searchTerm.toLowerCase();
     return rows.filter((row) =>
       Object.values(row).some((val) =>
-        String(val || "").toLowerCase().includes(lowerSearch)
+        String(val || "")
+          .toLowerCase()
+          .includes(lowerSearch)
       )
     );
   };
 
   const filters = useMemo(
     () => [
-      { id: "user_id", label: "User Id", type: "textfield", roles: ["Admin"] },
+      { id: "user_id", label: "User Id", type: "textfield", roles: ["adm"] },
       { id: "ip", label: "IP Address", type: "textfield" },
       { id: "device", label: "Device", type: "textfield" },
     ],
-    [userRole]
+    []
   );
 
   useEffect(() => {
@@ -126,7 +128,6 @@ const Login_History = ({ query }) => {
                 </Tooltip>
               ),
               wrap: true,
-              
             },
           ]
         : []),
@@ -135,7 +136,7 @@ const Login_History = ({ query }) => {
         selector: (row) => <div style={{ textAlign: "left" }}>{row.ip}</div>,
         wrap: true,
       },
-       {
+      {
         name: "Login Device",
         selector: (row) => {
           let icon;
@@ -148,9 +149,9 @@ const Login_History = ({ query }) => {
             icon = <img src={macintosh2} alt="Mac" style={{ width: 22 }} />;
           else if (device.includes("linux"))
             icon = <img src={linux2} alt="Linux" style={{ width: 22 }} />;
-            else if (device.includes("postman"))
+          else if (device.includes("postman"))
             icon = <img src={postman} alt="Postman" style={{ width: 22 }} />;
-              else if (device.includes("okhttp"))
+          else if (device.includes("okhttp"))
             icon = <img src={okhttp} alt="okhttp" style={{ width: 22 }} />;
           else icon = <LaptopIcon sx={{ color: "blue", width: 22 }} />;
 
@@ -175,16 +176,14 @@ const Login_History = ({ query }) => {
 
       {!loading && (
         <>
-         
-      <CommonTable
-        columns={columns}
-        endpoint={ApiEndpoints.LOGIN_HISTORY}
-        queryParam={query}
-        filters={filters}
-        transformData={filterRows} // client-side search
-        onFetchRef={handleFetchRef}
-      
-      />
+          <CommonTable
+            columns={columns}
+            endpoint={ApiEndpoints.LOGIN_HISTORY}
+            queryParam={query}
+            filters={filters}
+            transformData={filterRows} // client-side search
+            onFetchRef={handleFetchRef}
+          />
         </>
       )}
     </>

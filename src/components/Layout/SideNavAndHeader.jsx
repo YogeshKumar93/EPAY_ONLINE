@@ -469,12 +469,28 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
         }}
         className="header"
       >
+        
         <Toolbar sx={{ minHeight: "64px !important" }}>
+            <IconButton
+    color="inherit"
+    aria-label="open drawer"
+    edge="start"
+    onClick={handleDrawerToggle}
+    sx={{
+      mr: 2,
+      display: { xs: "flex", sm: "flex", md: "none" }, // only show on xs/sm
+      color: "#6c4bc7",
+    }}
+  >
+    <MenuIcon />
+  </IconButton>
+
           <Typography
             variant="h5"
             noWrap
             component="div"
             sx={{ flexGrow: 1, color: "#6c4bc7", fontWeight: 700 }}
+
           >
             {title}
           </Typography>
@@ -663,6 +679,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                 </ListItemIcon>
                 Logs Activity
               </MenuItem>
+              
 
               {/* <MenuItem>
     <ListItemIcon>
