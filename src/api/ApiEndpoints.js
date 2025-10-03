@@ -79,7 +79,7 @@ const ApiEndpoints = {
   UPDATE_WHITE_LISTED_ACCOUNT: "risk/updateWhiteListedAccount",
   DELETE_WHITE_LISTED_ACCOUNT: "risk/deleteWhiteListedAccount",
   GET_WHITE_LISTED_ACCOUNT: "risk/getWhiteListedAccount",
-   
+
   CREATE_BLACK_LISTED_ACCOUNT: "risk/createBlackListedAccount",
   UPDATE_BLACK_LISTED_ACCOUNT: "risk/updateBlackListedAccount",
   DELETE_BLACK_LISTED_ACCOUNT: "risk/deleteBlackListedAccount",
@@ -125,12 +125,15 @@ const ApiEndpoints = {
   CREATE_NEWS: "news/createNews",
   DELETE_NEWS: "news/deleteNews",
 
-  
-LOGIN_HISTORY:"userDevice/getUserDevice",
-GET_WEBHOOKS:"webhook/getWebhook",
+  LOGIN_HISTORY: "userDevice/getUserDevice",
+  GET_WEBHOOKS: "webhook/getWebhook",
 
   // ****************************** NEW API'S ABOVE ******************************
-
+  GET_TXN_SUMMARY: "dashboard/getRetTxnSummary",
+  GET_SERVICE_WISE_PROFIT: "dashboard/getServiceWiseProfitSummary",
+  GET_SERVICE_WISE_PROFIT_DI: "dashboard/getServiceWiseProfitSummaryForDi",
+  GET_SERVICE_WISE_PROFIT_MD: "dashboard/getServiceWiseProfitSummaryForMd",
+  GET_SERVICE_WISE_PROFIT_ADMIN: "dashboard/getServiceWiseProfitSummaryNew",
   GET_FUND_REQUESTS: "fundrequest/getFundRequests",
   CREATE_FUND_REQUEST: "fundrequest/createFundRequest",
   UPDATE_FUND_REQUEST: "fundrequest/updateFundRequest",
