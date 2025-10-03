@@ -181,23 +181,127 @@ const SelectedBeneficiary = ({
       );
     }
   };
-  const handleSubmitRow = async (rowId) => {
-    // ✅ Accept rowId parameter
+  // const handleSubmitRow = async (rowId) => {
+  //   // ✅ Accept rowId parameter
+  //   const row = amountRows.find((r) => r.id === rowId);
+  //   if (!row) return;
+
+  //   if (!row.otp || row.otp.length !== 6) {
+  //     showToast("Please enter 6-digit OTP", "Error");
+  //     return;
+  //   }
+
+  //   if (!row.mpin || row.mpin.length !== 6) {
+  //     showToast("Please enter 6-digit M-PIN", "Error");
+  //     return;
+  //   }
+
+  //   setAmountRows(
+  //     (prev) => prev.map((r) => (r.id === rowId ? { ...r, loading: true } : r)) // ✅ Fixed comparison
+  //   );
+
+  //   try {
+  //     const payload = {
+  //       sender_id: senderId,
+  //       ben_id: beneficiary.bene_id,
+  //       ben_name: beneficiary.beneficiary_name,
+  //       ben_acc: beneficiary.account_number,
+  //       ifsc: beneficiary.ifsc_code,
+  //       bank_name: beneficiary.bank_name,
+  //       mobile_number: beneficiary.mobile_number,
+  //       operator: 13,
+  //       latitude: location?.lat || "",
+  //       longitude: location?.long || "",
+  //       amount: row.amount,
+  //       otp: row.otp,
+  //       referenceKey: row.otpRef,
+  //       type: row.transferMode,
+  //       mpin: row.mpin,
+  //       pf: "web",
+  //     };
+
+  //     const { response, error } = await apiCall(
+  //       "post",
+  //       ApiEndpoints.DMT1_TXN,
+  //       payload
+  //     );
+
+  //     if (error) {
+  //       showToast(error, "error");
+  //       // setAmountRows((prev) =>
+  //       //   prev.map(
+  //       //     (r) =>
+  //       //       r.id === rowId ? { ...r, submitted: true, status: "failed" } : r // ✅ Fixed
+  //       //   )
+  //       // );
+  //     } else if (response?.status && response?.data?.message === "Success") {
+  //       showToast(`Transaction of ₹${row.amount} successful!`, "success");
+  //       setAmountRows((prev) =>
+  //         prev.map(
+  //           (r) =>
+  //             r.id === rowId
+  //               ? {
+  //                   ...r,
+  //                   submitted: true,
+  //                   status: "success",
+  //                   rrn: response?.data?.rrn,
+  //                 }
+  //               : r // ✅ Fixed
+  //         )
+  //       );
+
+  //       showSuccessToast({
+  //         txnID: response?.data?.rrn,
+  //         message: response?.message,
+  //         redirectUrl: "/print-dmt",
+  //       });
+  //       loadUserProfile();
+  //       setTimeout(() => {
+  //         if (currentRow < amountRows.length - 1) {
+  //           setCurrentRow((prev) => prev + 1);
+  //         }
+  //       }, 2000);
+  //     } else {
+  //       showToast(response?.message || "Transaction failed", "error");
+  //       setAmountRows((prev) =>
+  //         prev.map(
+  //           (r) =>
+  //             r.id === rowId ? { ...r, submitted: true, status: "failed" } : r // ✅ Fixed
+  //         )
+  //       );
+  //     }
+  //   } catch (err) {
+  //     showToast(err, "error");
+  //     setAmountRows((prev) =>
+  //       prev.map(
+  //         (r) =>
+  //           r.id === rowId ? { ...r, submitted: true, status: "failed" } : r // ✅ Fixed
+  //       )
+  //     );
+  //   } finally {
+  //     setAmountRows(
+  //       (prev) =>
+  //         prev.map((r) => (r.id === rowId ? { ...r, loading: false } : r)) // ✅ Fixed
+  //     );
+  //   }
+  // };
+
+  const handleModeClick = (rowId, mode) => {
+    // 1️⃣ Update row transferMode
+    setAmountRows((prev) =>
+      prev.map((r) => (r.id === rowId ? { ...r, transferMode: mode } : r))
+    );
+
+    // 2️⃣ Turant submit row with selected mode
+    submitRowWithMode(rowId, mode);
+  };
+
+  const submitRowWithMode = async (rowId, mode) => {
     const row = amountRows.find((r) => r.id === rowId);
     if (!row) return;
 
-    if (!row.otp || row.otp.length !== 6) {
-      showToast("Please enter 6-digit OTP", "Error");
-      return;
-    }
-
-    if (!row.mpin || row.mpin.length !== 6) {
-      showToast("Please enter 6-digit M-PIN", "Error");
-      return;
-    }
-
-    setAmountRows(
-      (prev) => prev.map((r) => (r.id === rowId ? { ...r, loading: true } : r)) // ✅ Fixed comparison
+    setAmountRows((prev) =>
+      prev.map((r) => (r.id === rowId ? { ...r, loading: true } : r))
     );
 
     try {
@@ -213,10 +317,10 @@ const SelectedBeneficiary = ({
         latitude: location?.lat || "",
         longitude: location?.long || "",
         amount: row.amount,
-        otp: row.otp,
-        referenceKey: row.otpRef,
-        type: row.transferMode,
-        mpin: row.mpin,
+        otp: row.otp, // optional, if needed
+        referenceKey: row.otpRef, // optional
+        type: mode, // ✅ type from button click
+        mpin: row.mpin, // optional
         pf: "web",
       };
 
@@ -228,80 +332,32 @@ const SelectedBeneficiary = ({
 
       if (error) {
         showToast(error, "error");
-        // setAmountRows((prev) =>
-        //   prev.map(
-        //     (r) =>
-        //       r.id === rowId ? { ...r, submitted: true, status: "failed" } : r // ✅ Fixed
-        //   )
-        // );
       } else if (response?.status && response?.data?.message === "Success") {
         showToast(`Transaction of ₹${row.amount} successful!`, "success");
         setAmountRows((prev) =>
-          prev.map(
-            (r) =>
-              r.id === rowId
-                ? {
-                    ...r,
-                    submitted: true,
-                    status: "success",
-                    rrn: response?.data?.rrn,
-                  }
-                : r // ✅ Fixed
+          prev.map((r) =>
+            r.id === rowId
+              ? {
+                  ...r,
+                  submitted: true,
+                  status: "success",
+                  rrn: response?.data?.rrn,
+                }
+              : r
           )
         );
-
-        showSuccessToast({
-          txnID: response?.data?.rrn,
-          message: response?.message,
-          redirectUrl: "/print-dmt",
-        });
-        loadUserProfile();
-        setTimeout(() => {
-          if (currentRow < amountRows.length - 1) {
-            setCurrentRow((prev) => prev + 1);
-          }
-        }, 2000);
       } else {
         showToast(response?.message || "Transaction failed", "error");
-        setAmountRows((prev) =>
-          prev.map(
-            (r) =>
-              r.id === rowId ? { ...r, submitted: true, status: "failed" } : r // ✅ Fixed
-          )
-        );
       }
     } catch (err) {
       showToast(err, "error");
-      setAmountRows((prev) =>
-        prev.map(
-          (r) =>
-            r.id === rowId ? { ...r, submitted: true, status: "failed" } : r // ✅ Fixed
-        )
-      );
     } finally {
-      setAmountRows(
-        (prev) =>
-          prev.map((r) => (r.id === rowId ? { ...r, loading: false } : r)) // ✅ Fixed
+      setAmountRows((prev) =>
+        prev.map((r) => (r.id === rowId ? { ...r, loading: false } : r))
       );
     }
   };
 
-  // Also fix the handleModeChange function
-  const handleModeChange = (rowId, mode) => {
-    setAmountRows((prev) => {
-      const updatedRows = prev.map((r) =>
-        r.id === rowId ? { ...r, transferMode: mode } : r
-      );
-      return updatedRows;
-    });
-console.log("THe thing is ",updatedRows)
-    const row = amountRows.find((r) => r.id === rowId);
-
-    // Trigger API only if OTP and M-PIN are filled
-    if (row?.otp.length === 6 && row?.mpin.length === 6) {
-      handleSubmitRow(rowId); // ✅ Pass rowId instead of object
-    }
-  };
   const handleResendOtp = async (row) => {
     await handleGetOtp(row);
   };
@@ -350,8 +406,8 @@ console.log("THe thing is ",updatedRows)
         sx={{
           background: "linear-gradient(135deg, #2275b7 0%, #1a5f9a 100%)",
           color: "#fff",
-          py: 1.5,
-          px: 3,
+          py: 1,
+          px: 2,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -399,7 +455,7 @@ console.log("THe thing is ",updatedRows)
         {/* Beneficiary Card */}
         <Paper
           sx={{
-            p: 3,
+            p: 1,
             mb: 3,
             border: "1px solid",
             borderColor: "divider",
@@ -408,7 +464,14 @@ console.log("THe thing is ",updatedRows)
             boxShadow: "0 2px 12px rgba(34,117,183,0.1)",
           }}
         >
-          <Box display="flex" alignItems="flex-start" gap={3}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: { xs: "flex-start", md: "center" },
+              gap: { xs: 2, md: 3 },
+              flexDirection: { xs: "column", md: "row" },
+            }}
+          >
             {/* Bank Logo */}
             <Box
               sx={{
@@ -418,6 +481,8 @@ console.log("THe thing is ",updatedRows)
                 boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
                 border: "1px solid",
                 borderColor: "divider",
+                flexShrink: 0,
+                alignSelf: { xs: "flex-start", md: "center" },
               }}
             >
               {bankImageMapping[beneficiary.ifsc_code?.slice(0, 4)] ? (
@@ -426,18 +491,18 @@ console.log("THe thing is ",updatedRows)
                   src={bankImageMapping[beneficiary.ifsc_code.slice(0, 4)]}
                   alt={beneficiary.bank_name}
                   sx={{
-                    width: 56,
-                    height: 56,
+                    width: { xs: 48, sm: 56 },
+                    height: { xs: 48, sm: 56 },
                     objectFit: "contain",
                   }}
                 />
               ) : (
                 <Avatar
                   sx={{
-                    width: 56,
-                    height: 56,
+                    width: { xs: 38, sm: 46 },
+                    height: { xs: 38, sm: 46 },
                     bgcolor: "primary.light",
-                    fontSize: 20,
+                    fontSize: { xs: 15, sm: 17 },
                   }}
                 >
                   <AccountBalance />
@@ -445,60 +510,110 @@ console.log("THe thing is ",updatedRows)
               )}
             </Box>
 
-            <Box flexGrow={1}>
-              <Typography
-                variant="h6"
-                fontWeight="600"
-                gutterBottom
-                color="primary.dark"
-              >
-                {beneficiary.beneficiary_name}
-              </Typography>
+            {/* Beneficiary Details */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", lg: "row" },
+                alignItems: { lg: "center" },
+                gap: { xs: 2, lg: 3 },
+                flexGrow: 1,
+                width: "100%",
+              }}
+            >
+              {/* Name and Account Info */}
+              <Box sx={{ flex: { lg: 1 } }}>
+                <Typography
+                  variant="h6"
+                  fontWeight="600"
+                  gutterBottom
+                  color="primary.dark"
+                  sx={{ fontSize: { xs: "1.1rem", sm: "1.25rem" } }}
+                >
+                  {beneficiary.beneficiary_name}
+                </Typography>
 
-              <Grid container spacing={2} sx={{ mb: 2 }}>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>Account:</strong> {beneficiary.account_number}
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: { xs: "column", sm: "row" },
+                    gap: { xs: 1, sm: 3 },
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ display: "flex", gap: 0.5 }}
+                  >
+                    <Box component="strong" sx={{ minWidth: 70 }}>
+                      Account:
+                    </Box>
+                    {beneficiary.account_number}
                   </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>IFSC:</strong> {beneficiary.ifsc_code}
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ display: "flex", gap: 0.5 }}
+                  >
+                    <Box component="strong" sx={{ minWidth: 45 }}>
+                      IFSC:
+                    </Box>
+                    {beneficiary.ifsc_code}
                   </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>Bank:</strong> {beneficiary.bank_name}
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ display: "flex", gap: 0.5 }}
+                  >
+                    <Box component="strong" sx={{ minWidth: 45 }}>
+                      Bank:
+                    </Box>
+                    {beneficiary.bank_name}
                   </Typography>
-                </Grid>
-              </Grid>
+                </Box>
+              </Box>
 
               {/* Amount Input */}
-              <TextField
-                label="Total Amount (₹)"
-                type="number"
-                fullWidth
-                variant="outlined"
-                size="small"
-                value={totalAmount}
-                onChange={(e) => handleAmountChange(e.target.value)}
+              <Box
                 sx={{
-                  maxWidth: 300,
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 2,
-                    background: "white",
-                  },
+                  flexShrink: 0,
+                  minWidth: { xs: "100%", sm: 200, lg: 250 },
                 }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Typography fontWeight="600" color="primary">
-                        ₹
-                      </Typography>
-                    </InputAdornment>
-                  ),
-                }}
-              />
+              >
+                <TextField
+                  label="Total Amount (₹)"
+                  type="number"
+                  fullWidth
+                  variant="outlined"
+                  size="small"
+                  value={totalAmount}
+                  onChange={(e) => handleAmountChange(e.target.value)}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 2,
+                      background: "white",
+                      fontSize: { xs: "0.9rem", sm: "1rem" },
+                    },
+                    "& .MuiInputLabel-root": {
+                      fontSize: { xs: "0.9rem", sm: "1rem" },
+                    },
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Typography
+                          fontWeight="600"
+                          color="primary"
+                          sx={{ fontSize: { xs: "0.9rem", sm: "1rem" } }}
+                        >
+                          ₹
+                        </Typography>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Box>
             </Box>
           </Box>
         </Paper>
@@ -553,34 +668,6 @@ console.log("THe thing is ",updatedRows)
                 gap: { xs: 1, sm: 0 },
               }}
             >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                <Box
-                  sx={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: "50%",
-                    background:
-                      "linear-gradient(135deg, #2275b7 0%, #1a5f9a 100%)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "white",
-                    fontSize: "0.875rem",
-                    fontWeight: "bold",
-                    boxShadow: "0 2px 8px rgba(34,117,183,0.3)",
-                  }}
-                >
-                  {idx + 1}
-                </Box>
-                <Typography
-                  fontWeight="600"
-                  fontSize={{ xs: "0.9rem", sm: "1rem" }}
-                  color="text.primary"
-                >
-                  Transaction Part {idx + 1}
-                </Typography>
-              </Box>
-
               <Box
                 sx={{
                   display: "flex",
@@ -589,19 +676,6 @@ console.log("THe thing is ",updatedRows)
                   flexWrap: "wrap",
                 }}
               >
-                <Chip
-                  label={`₹${row.amount.toLocaleString()}`}
-                  color="primary"
-                  variant="filled"
-                  size="small"
-                  sx={{
-                    fontWeight: "600",
-                    background:
-                      "linear-gradient(135deg, #2275b7 0%, #1a5f9a 100%)",
-                    boxShadow: "0 2px 4px rgba(34,117,183,0.2)",
-                  }}
-                />
-
                 {row.submitted && (
                   <Chip
                     icon={
@@ -666,72 +740,202 @@ console.log("THe thing is ",updatedRows)
                     </Button>
                   </Box>
                 ) : (
-                  <Box>
-                    {/* Single Line Layout - All Components in One Row */}
+                  <Box
+                    sx={{ display: "flex", alignItems: "flex-start", gap: 2 }}
+                  >
+                    {/* Index Number */}
                     <Box
                       sx={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: "50%",
+                        background:
+                          "linear-gradient(135deg, #2275b7 0%, #1a5f9a 100%)",
                         display: "flex",
-                        alignItems: "flex-end",
-                        gap: { xs: 1, sm: 2 },
-                        flexWrap: { xs: "wrap", lg: "nowrap" },
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "white",
+                        fontSize: "0.875rem",
+                        fontWeight: "bold",
+                        boxShadow: "0 2px 8px rgba(34,117,183,0.3)",
+                        flexShrink: 0,
+                        mt: 0.5, // Small top margin to align with content
                       }}
                     >
-                      {/* OTP Input */}
+                      {idx + 1}
+                    </Box>
+
+                    {/* Content Area */}
+                    <Box sx={{ flex: 1 }}>
                       <Box
                         sx={{
-                          flex: { xs: "1 1 100%", md: 2, lg: 2.5 },
-                          minWidth: 0,
+                          display: "flex",
+                          alignItems: "flex-end",
+                          gap: { xs: 1, sm: 2 },
+                          flexWrap: { xs: "wrap", lg: "nowrap" },
                         }}
                       >
-                        <Typography
-                          variant="subtitle2"
-                          fontWeight="600"
-                          gutterBottom
-                          color="text.primary"
-                          sx={{ fontSize: { xs: "0.75rem", sm: "0.8rem" } }}
-                        >
-                          OTP Verification
-                        </Typography>
+                        {/* OTP Input */}
                         <Box
                           sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            background: "white",
-                            border: "1.5px solid #E0E6ED",
-                            borderRadius: 2,
-                            overflow: "hidden",
-                            transition: "all 0.3s ease",
-                            height: 50,
-                            "&:focus-within": {
-                              borderColor: "#2275b7",
-                              boxShadow: "0 0 0 3px rgba(34,117,183,0.1)",
-                            },
+                            flex: { xs: "1 1 100%", md: 2, lg: 2.5 },
+                            minWidth: 0,
                           }}
                         >
+                          <Typography
+                            variant="subtitle2"
+                            fontWeight="600"
+                            gutterBottom
+                            color="text.primary"
+                            sx={{ fontSize: { xs: "0.75rem", sm: "0.8rem" } }}
+                          >
+                            OTP Verification
+                          </Typography>
                           <Box
                             sx={{
-                              flex: 1,
-                              px: { xs: 1, sm: 2 },
                               display: "flex",
-                              // alignItems: "center",
-                              // justifyContent: "center",
+                              alignItems: "center",
+                              background: "white",
+                              border: "1.5px solid #E0E6ED",
+                              borderRadius: 2,
+                              overflow: "hidden",
+                              transition: "all 0.3s ease",
+                              height: 50,
+                              "&:focus-within": {
+                                borderColor: "#2275b7",
+                                boxShadow: "0 0 0 3px rgba(34,117,183,0.1)",
+                              },
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                flex: 1,
+                                px: { xs: 1, sm: 2 },
+                                display: "flex",
+                              }}
+                            >
+                              <OTPInput
+                                value={row.otp}
+                                onChange={(val) =>
+                                  setAmountRows((prev) =>
+                                    prev.map((r) =>
+                                      r.id === row.id ? { ...r, otp: val } : r
+                                    )
+                                  )
+                                }
+                                numInputs={6}
+                                renderInput={(props) => (
+                                  <input
+                                    {...props}
+                                    style={{
+                                      width: 25,
+                                      height: 30,
+                                      margin: "0 2px",
+                                      fontSize: 14,
+                                      border: "none",
+                                      borderBottom: "2px solid #E0E0E0",
+                                      borderRadius: 0,
+                                      textAlign: "center",
+                                      background: "transparent",
+                                      fontWeight: "600",
+                                      outline: "none",
+                                      transition: "all 0.2s ease",
+                                    }}
+                                    onFocus={(e) => {
+                                      e.target.style.borderBottomColor =
+                                        "#2275b7";
+                                      e.target.style.background = "#f8fbff";
+                                    }}
+                                    onBlur={(e) => {
+                                      e.target.style.borderBottomColor =
+                                        "#E0E0E0";
+                                      e.target.style.background = "transparent";
+                                    }}
+                                  />
+                                )}
+                                inputType="tel"
+                              />
+                            </Box>
+
+                            <Button
+                              onClick={() => handleResendOtp(row.id)}
+                              disabled={row.resendLoading}
+                              sx={{
+                                minWidth: 70,
+                                height: "100%",
+                                px: 1.5,
+                                fontSize: "0.7rem",
+                                fontWeight: 700,
+                                whiteSpace: "nowrap",
+                                background: "transparent",
+                                color: row.resendLoading ? "#999" : "#2275b7",
+                                border: "none",
+                                borderRadius: 0,
+                                "&:hover": {
+                                  background: row.resendLoading
+                                    ? "transparent"
+                                    : "#f0f8ff",
+                                },
+                              }}
+                            >
+                              {row.resendLoading ? (
+                                <CircularProgress size={14} />
+                              ) : (
+                                "Resend"
+                              )}
+                            </Button>
+                          </Box>
+                        </Box>
+
+                        {/* MPIN Input */}
+                        <Box
+                          sx={{
+                            flex: { xs: "1 1 100%", md: 1.5, lg: 2 },
+                            minWidth: 0,
+                          }}
+                        >
+                          <Typography
+                            variant="subtitle2"
+                            fontWeight="600"
+                            gutterBottom
+                            color="text.primary"
+                            sx={{ fontSize: { xs: "0.75rem", sm: "0.8rem" } }}
+                          >
+                            M-PIN
+                          </Typography>
+                          <Box
+                            sx={{
+                              background: "white",
+                              border: "1.5px solid #E0E6ED",
+                              borderRadius: 2,
+                              px: { xs: 1, sm: 2 },
+                              py: 1.5,
+                              transition: "all 0.3s ease",
+                              height: 50,
+                              display: "flex",
+                              alignItems: "center",
+                              "&:focus-within": {
+                                borderColor: "#2275b7",
+                                boxShadow: "0 0 0 3px rgba(34,117,183,0.1)",
+                              },
                             }}
                           >
                             <OTPInput
-                              value={row.otp}
+                              value={row.mpin}
                               onChange={(val) =>
                                 setAmountRows((prev) =>
                                   prev.map((r) =>
-                                    r.id === row.id ? { ...r, otp: val } : r
+                                    r.id === row.id ? { ...r, mpin: val } : r
                                   )
                                 )
                               }
                               numInputs={6}
+                              inputType="password"
                               renderInput={(props) => (
                                 <input
                                   {...props}
                                   style={{
-                                    width: 50,
+                                    width: 25,
                                     height: 30,
                                     margin: "0 2px",
                                     fontSize: 14,
@@ -756,198 +960,85 @@ console.log("THe thing is ",updatedRows)
                                   }}
                                 />
                               )}
-                              inputType="tel"
                             />
                           </Box>
-                          {/* 
+                        </Box>
+
+                        {/* Transfer Mode */}
+                        <Box
+                          sx={{
+                            flex: { xs: "1 1 100%", md: 1.5, lg: 1.5 },
+                            minWidth: 0,
+                          }}
+                        >
+                          <Typography
+                            variant="subtitle2"
+                            fontWeight="600"
+                            gutterBottom
+                            color="text.primary"
+                            sx={{ fontSize: { xs: "0.75rem", sm: "0.8rem" } }}
+                          >
+                            Transfer Mode
+                          </Typography>
                           <Box
                             sx={{
-                              height: 30,
-                              width: 1,
-                              background:
-                                "linear-gradient(180deg, #E0E6ED 0%, #D0D5DD 100%)",
-                            }}
-                          /> */}
-
-                          <Button
-                            onClick={() => handleResendOtp(row.id)}
-                            disabled={row.resendLoading}
-                            sx={{
-                              minWidth: 90,
-                              height: "100%",
-                              px: 1.5,
-                              fontSize: "0.9rem",
-                              fontWeight: 700,
-                              whiteSpace: "nowrap",
-                              background: "transparent",
-                              color: row.resendLoading ? "#999" : "#2275b7",
-                              border: "none",
-                              borderRadius: 0,
-                              "&:hover": {
-                                background: row.resendLoading
-                                  ? "transparent"
-                                  : "#f0f8ff",
-                              },
+                              display: "flex",
+                              gap: 1,
+                              height: 50,
+                              alignItems: "center",
                             }}
                           >
-                            {row.resendLoading ? (
-                              <CircularProgress size={14} />
-                            ) : (
-                              "Resend"
-                            )}
-                          </Button>
-                        </Box>
-                      </Box>
-
-                      {/* MPIN Input */}
-                      <Box
-                        sx={{
-                          flex: { xs: "1 1 100%", md: 1.5, lg: 2 },
-                          minWidth: 0,
-                        }}
-                      >
-                        <Typography
-                          variant="subtitle2"
-                          fontWeight="600"
-                          gutterBottom
-                          color="text.primary"
-                          sx={{ fontSize: { xs: "0.75rem", sm: "0.8rem" } }}
-                        >
-                          M-PIN
-                        </Typography>
-                        <Box
-                          sx={{
-                            background: "white",
-                            border: "1.5px solid #E0E6ED",
-                            borderRadius: 2,
-                            px: { xs: 1, sm: 2 },
-                            py: 1.5,
-                            transition: "all 0.3s ease",
-                            height: 50,
-                            display: "flex",
-                            alignItems: "center",
-                            "&:focus-within": {
-                              borderColor: "#2275b7",
-                              boxShadow: "0 0 0 3px rgba(34,117,183,0.1)",
-                            },
-                          }}
-                        >
-                          <OTPInput
-                            value={row.mpin}
-                            onChange={(val) =>
-                              setAmountRows((prev) =>
-                                prev.map((r) =>
-                                  r.id === row.id ? { ...r, mpin: val } : r
-                                )
-                              )
-                            }
-                            numInputs={6}
-                            inputType="password"
-                            renderInput={(props) => (
-                              <input
-                                {...props}
-                                style={{
-                                  width: 50,
-                                  height: 30,
-                                  margin: "0 2px",
-                                  fontSize: 14,
-                                  border: "none",
-                                  borderBottom: "2px solid #E0E0E0",
-                                  borderRadius: 0,
-                                  textAlign: "center",
-                                  background: "transparent",
-                                  fontWeight: "600",
-                                  outline: "none",
-                                  transition: "all 0.2s ease",
-                                }}
-                                onFocus={(e) => {
-                                  e.target.style.borderBottomColor = "#2275b7";
-                                  e.target.style.background = "#f8fbff";
-                                }}
-                                onBlur={(e) => {
-                                  e.target.style.borderBottomColor = "#E0E0E0";
-                                  e.target.style.background = "transparent";
-                                }}
-                              />
-                            )}
-                          />
-                        </Box>
-                      </Box>
-
-                      {/* Transfer Mode */}
-                      <Box
-                        sx={{
-                          flex: { xs: "1 1 100%", md: 1.5, lg: 1.5 },
-                          minWidth: 0,
-                        }}
-                      >
-                        <Typography
-                          variant="subtitle2"
-                          fontWeight="600"
-                          gutterBottom
-                          color="text.primary"
-                          sx={{ fontSize: { xs: "0.75rem", sm: "0.8rem" } }}
-                        >
-                          Transfer Mode
-                        </Typography>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            gap: 1,
-                            height: 50,
-                            alignItems: "center",
-                          }}
-                        >
-                          <Button
-                            variant={
-                              row.transferMode === "IMPS"
-                                ? "contained"
-                                : "outlined"
-                            }
-                            color="primary"
-                            onClick={() => handleModeChange(row.id, "IMPS")}
-                            size="small"
-                            sx={{
-                              flex: 1,
-                              height: 36,
-                              borderRadius: 2,
-                              fontWeight: 600,
-                              textTransform: "none",
-                              fontSize: "0.7rem",
-                              boxShadow:
+                            <Button
+                              variant={
                                 row.transferMode === "IMPS"
-                                  ? "0 2px 6px rgba(34,117,183,0.3)"
-                                  : "none",
-                              minWidth: 60,
-                            }}
-                          >
-                            IMPS
-                          </Button>
-                          <Button
-                            variant={
-                              row.transferMode === "NEFT"
-                                ? "contained"
-                                : "outlined"
-                            }
-                            color="primary"
-                            onClick={() => handleModeChange(row.id, "NEFT")}
-                            size="small"
-                            sx={{
-                              flex: 1,
-                              height: 36,
-                              borderRadius: 2,
-                              fontWeight: 600,
-                              textTransform: "none",
-                              fontSize: "0.7rem",
-                              boxShadow:
+                                  ? "contained"
+                                  : "outlined"
+                              }
+                              color="primary"
+                              onClick={() => handleModeClick(row.id, "IMPS")}
+                              size="small"
+                              sx={{
+                                flex: 1,
+                                height: 36,
+                                borderRadius: 2,
+                                fontWeight: 600,
+                                textTransform: "none",
+                                fontSize: "0.7rem",
+                                boxShadow:
+                                  row.transferMode === "IMPS"
+                                    ? "0 2px 6px rgba(34,117,183,0.3)"
+                                    : "none",
+                                minWidth: 60,
+                              }}
+                            >
+                              ₹{row.amount} IMPS
+                            </Button>
+                            <Button
+                              variant={
                                 row.transferMode === "NEFT"
-                                  ? "0 2px 6px rgba(34,117,183,0.3)"
-                                  : "none",
-                              minWidth: 60,
-                            }}
-                          >
-                            NEFT
-                          </Button>
+                                  ? "contained"
+                                  : "outlined"
+                              }
+                              color="primary"
+                              onClick={() => handleModeClick(row.id, "NEFT")}
+                              size="small"
+                              sx={{
+                                flex: 1,
+                                height: 36,
+                                borderRadius: 2,
+                                fontWeight: 600,
+                                textTransform: "none",
+                                fontSize: "0.7rem",
+                                boxShadow:
+                                  row.transferMode === "NEFT"
+                                    ? "0 2px 6px rgba(34,117,183,0.3)"
+                                    : "none",
+                                minWidth: 60,
+                              }}
+                            >
+                              ₹{row.amount} NEFT
+                            </Button>
+                          </Box>
                         </Box>
                       </Box>
                     </Box>
@@ -995,6 +1086,12 @@ console.log("THe thing is ",updatedRows)
           </Paper>
         ))}
       </CardContent>
+
+      {/* <ResetMpin
+        open={openResetModal}
+        onClose={() => setOpenResetModal(false)}
+        username={username}
+      /> */}
     </Card>
   );
 };
