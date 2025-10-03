@@ -82,6 +82,7 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
         amount: parseFloat(amount),
         remark,
         mpin,
+        operator: 17,
       };
 
       const { response } = await apiCall(
