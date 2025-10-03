@@ -506,19 +506,15 @@ const CommonTable = ({
               </Box>
             </Box>
           ) : (
-            <TextField
+          <TextField
               fullWidth
               size="small"
               label={filter.label}
+              type={filter.textType || "text"}
               value={filterValues[filter.id] || ""}
               onChange={(e) => {
                 let value = e.target.value;
-                if (filter.id === "mobile") {
-                  // Keep only digits
-                  value = value.replace(/\D/g, "");
-                  // Limit to max 10 digits
-                  if (value.length > 10) value = value.slice(0, 10);
-                }
+
                 handleFilterChange(filter.id, value);
               }}
               inputProps={{
@@ -675,15 +671,11 @@ const CommonTable = ({
               fullWidth
               size="small"
               label={filter.label}
+              type={filter.textType || "text"}
               value={filterValues[filter.id] || ""}
               onChange={(e) => {
                 let value = e.target.value;
-                if (filter.id === "mobile" || "sender_mobile") {
-                  // Keep only digits
-                  value = value.replace(/\D/g, "");
-                  // Limit to max 10 digits
-                  if (value.length > 10) value = value.slice(0, 10);
-                }
+
                 handleFilterChange(filter.id, value);
               }}
               inputProps={{

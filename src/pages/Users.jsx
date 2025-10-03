@@ -263,7 +263,7 @@ const Users = ({ query }) => {
 
   const filters = useMemo(
     () => [
-      { id: "mobile", label: "Mobile Number", type: "textfield" },
+      { id: "mobile", label: "Mobile Number", type: "textfield", textType:"number" },
       { id: "id", label: "User Id", type: "textfield" },
       { id: "Parent", label: "Parent", type: "textfield", roles: ["adm"] },
     ],

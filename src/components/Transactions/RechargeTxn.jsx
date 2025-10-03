@@ -1,10 +1,7 @@
 import { useMemo, useContext, useState, useRef } from "react";
+import { Box, Tooltip, IconButton, Drawer, Typography, Button } from "@mui/material";
 import {
-  Box,
-  Tooltip,
-  IconButton,
-  Drawer,
-  Typography,
+
   MenuItem,
 } from "@mui/material";
 import CommonTable from "../common/CommonTable";
@@ -26,6 +23,8 @@ import {
   windows2,
 } from "../../utils/iconsImports";
 import LaptopIcon from "@mui/icons-material/Laptop";
+import PrintIcon from "@mui/icons-material/Print";
+
 import DrawerDetails from "../common/DrawerDetails";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import biggpayLogo from "../../assets/Images/PPALogor.png";
@@ -34,7 +33,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import companylogo from "../../assets/Images/logo(1).png";
 import TransactionDetailsCard from "../common/TransactionDetailsCard";
 import ComplaintForm from "../ComplaintForm";
-import PrintIcon from "@mui/icons-material/Print";
+// import PrintIcon from "@mui/icons-material/Print";
 import { useNavigate } from "react-router-dom";
 import { Logo } from "../../iconsImports";
 import CommonModal from "../common/CommonModal";
@@ -44,6 +43,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import DoneIcon from "@mui/icons-material/Done";
 import { useToast } from "../../utils/ToastContext";
 import { apiCall } from "../../api/apiClient";
+import Scheduler from "../common/Scheduler";
 import AddLein from "../../pages/AddLein";
 const RechargeTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
@@ -57,6 +57,8 @@ const RechargeTxn = ({ query }) => {
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [selectedForRefund, setSelectedForRefund] = useState(null);
   const [refundLoading, setRefundLoading] = useState(false);
+    const [selectedRows, setSelectedRows] = useState([]);
+
   const [selectedTransaction, setSelectedTrancation] = useState("");
   const [openLeinModal, setOpenLeinModal] = useState(false);
 
@@ -542,6 +544,35 @@ const RechargeTxn = ({ query }) => {
     ],
     []
   );
+const columnsWithSelection = useMemo(() => {
+     // Only show checkbox if user is NOT adm or sadm
+    if (user?.role === "adm" || user?.role === "sadm") {
+      return columns; // no selection column
+    }
+  return [
+    {
+      name: "",
+      selector: (row) => (
+        <input
+          type="checkbox"
+          checked={selectedRows.some((r) => r.id === row.id)}
+          disabled={row.status?.toLowerCase() === "failed"}
+          onChange={() => {
+            const isSelected = selectedRows.some((r) => r.id === row.id);
+            const newSelectedRows = isSelected
+              ? selectedRows.filter((r) => r.id !== row.id)
+              : [...selectedRows, row];
+            setSelectedRows(newSelectedRows);
+          }}
+        />
+      ),
+      width: "40px",
+    },
+    ...columns,
+  ];
+}, [selectedRows, columns]);
+
+
 
   const queryParam = "";
 
@@ -550,11 +581,67 @@ const RechargeTxn = ({ query }) => {
       <Box sx={{}}>
         <CommonTable
           onFetchRef={handleFetchRef}
-          columns={columns}
+         columns={columnsWithSelection}
           endpoint={ApiEndpoints.GET_RECHARGE_TXN}
           filters={filters}
           queryParam={queryParam}
           enableActionsHover={true}
+           enableSelection={false}
+          selectedRows={selectedRows}
+          onSelectionChange={setSelectedRows}
+          customHeader={
+  <>
+  <Box
+    sx={{
+      display: "flex",
+      alignItems: "center",
+      gap: 1,
+      padding: "8px",
+       
+    }}
+  >
+    {selectedRows.length > 0 && (
+      <Tooltip title="View Selected Details">
+       <Button
+        variant="contained"
+        size="small"
+        color="primary"
+        onClick={() => {
+          // Save selected rows to sessionStorage
+          sessionStorage.setItem("txnData", JSON.stringify(selectedRows));
+      
+          // Open new tab/window
+          window.open("/print-recharge", "_blank");
+        }}
+      >
+      <PrintIcon sx={{ fontSize: 20, color: '#e3e6e9ff', mr:1 }} />
+   Recharge
+      </Button>
+      </Tooltip>
+    )}
+  </Box>
+      <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              padding: "8px",
+              flexWrap: "wrap",
+            }}
+          >
+            {user?.role === "adm" && (
+              <IconButton
+                color="primary"
+                onClick={handleExportExcel}
+                title="Export to Excel"
+              >
+                <FileDownloadIcon />
+              </IconButton>
+            )}
+            <Scheduler onRefresh={refreshPlans} />
+          </Box>
+          </>
+}
         />
       </Box>
 

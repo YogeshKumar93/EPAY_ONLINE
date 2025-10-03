@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import AuthContext from "../contexts/AuthContext";
-import biggpayLogo from "../assets/Images/PPALogo.jpeg";
+import biggpayLogo from "../assets/Images/PPALogor.png";
 
 const PrintDmt2 = () => {
   const [receiptType, setReceiptType] = useState("large");
@@ -18,18 +18,26 @@ const PrintDmt2 = () => {
   const authCtx = useContext(AuthContext);
   const user = authCtx.user;
 
-  const [data, setData] = useState(null);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     let txnData = location.state?.txnData;
+
     if (!txnData) {
       const storedData = sessionStorage.getItem("txnData");
       if (storedData) txnData = JSON.parse(storedData);
     }
-    if (txnData) setData(txnData);
-  }, [location.state]);
 
-  if (!data) {
+    if (txnData) {
+      setData(Array.isArray(txnData) ? txnData : [txnData]);
+    }
+  }, [location.state]);
+  
+ const totalAmountValue = data
+  .filter(txn => txn.status?.toLowerCase() === "success")
+  .reduce((acc, txn) => acc + parseFloat(txn.amount || 0), 0);
+
+  if (!data || data.length === 0) {
     return (
       <Box
         display="flex"
@@ -44,46 +52,16 @@ const PrintDmt2 = () => {
     );
   }
 
-  // Parse amounts
-  const amount = parseFloat(data.amount || 0);
-  const ccf = parseFloat(data.ccf || 0);
-  const gst = parseFloat(data.gst || 0);
-  const totalAmount = amount + ccf;
 
-  // Headers (always same, role conditions removed)
+  // Updated headers: Combine Beneficiary details
   const headers = [
     "Date",
-    
-  
     "Service",
-    "Txn ID",
     "Sender Mobile",
-    "Beneficiary Name",
-    "Account No",
-    "IFSC Code",
+    "Beneficiary Details", // Combined
     "Amount",
     "CCF",
-    "Status",
     "Total Amount",
-  ];
-
-  // Values in same order
-  const values = [
-    `${data.created_at ? new Date(data.created_at).toLocaleDateString() : ""} ${
-      data.created_at ? new Date(data.created_at).toLocaleTimeString() : ""
-    }`,
-  
-  
-    data.operator || "",
-    data.txn_id || "",
-    data.sender_mobile || "",
-    data.beneficiary_name || "",
-    data.account_number || "",
-    data.ifsc_code || "",
-    `₹ ${amount.toFixed(2)}`,
-    `₹ ${ccf.toFixed(2)}`,
-    data.status || "",
-    `₹ ${totalAmount.toFixed(2)}`,
   ];
 
   return (
@@ -113,7 +91,7 @@ const PrintDmt2 = () => {
           pt: 4,
         }}
       >
-        {/* Receipt Settings (hide when printing) */}
+        {/* Receipt Settings */}
         <Box display="flex" justifyContent="center" mb={2} className="no-print">
           <RadioGroup
             row
@@ -142,11 +120,10 @@ const PrintDmt2 = () => {
               control={<Radio />}
               label="Portrait"
             />
-          
           </RadioGroup>
         </Box>
 
-        {/* Receipt */}
+        {/* Combined Receipt Container */}
         <Box
           className="receipt-container"
           sx={{
@@ -159,6 +136,7 @@ const PrintDmt2 = () => {
             px: { xs: 2, md: 3 },
             py: { xs: 2, md: 3 },
             fontFamily: "Roboto, sans-serif",
+            mb: 4,
           }}
         >
           {/* Header */}
@@ -203,20 +181,17 @@ const PrintDmt2 = () => {
               sx={{
                 borderRadius: 2,
                 border: "2px solid #2b9bd7",
-                color: "#000",
+                color: "#0e6593ff",
                 textTransform: "none",
                 px: 3,
-                "&:hover": {
-                  borderColor: "#ff9a3c",
-                  color: "#ff9a3c",
-                },
+                "&:hover": { borderColor: "#ff9a3c", color: "#ff9a3c" },
               }}
             >
-              Transaction Summary
+             DMT Transaction Summary
             </Button>
           </Box>
 
-          {/* Large Receipt */}
+          {/* Large Receipt Table */}
           {receiptType === "large" ? (
             <Box className="table-container" mt={2}>
               <Box className="table-row">
@@ -226,25 +201,59 @@ const PrintDmt2 = () => {
                   </Box>
                 ))}
               </Box>
-              <Box className="table-row">
-                {values.map((v, i) => (
-                  <Box
-                    key={i}
-                    className={`table-cell ${
-                      i === headers.length - 1
-                        ? "amount-red"
-                        : i >= headers.length - 3
-                        ? "amount-gray"
-                        : ""
-                    }`}
-                  >
-                    {v}
+              {data.map((txn, idx) => {
+                const amount = parseFloat(txn.amount || 0);
+                const ccf = parseFloat(txn.ccf || 0);
+                const totalAmount = amount + ccf;
+
+                const beneficiaryDetails = (
+                  <Box>
+                    <div>{txn.beneficiary_name || ""}</div>
+                    <div>A/C: {txn.account_number || ""}</div>
+                    <div>IFSC: {txn.ifsc_code || ""}</div>
                   </Box>
-                ))}
-              </Box>
+                );
+
+                const values = [
+                  `${
+                    txn.created_at
+                      ? new Date(txn.created_at).toLocaleDateString()
+                      : ""
+                  } ${
+                    txn.created_at
+                      ? new Date(txn.created_at).toLocaleTimeString()
+                      : ""
+                  }`,
+                  txn.operator || "",
+                  txn.sender_mobile || "",
+                  beneficiaryDetails,
+                  `₹ ${amount.toFixed(2)}`,
+                  `₹ ${ccf.toFixed(2)}`,
+                  `₹ ${totalAmount.toFixed(2)}`,
+                ];
+
+                return (
+                  <Box key={idx} className="table-row">
+                    {values.map((v, i) => (
+                      <Box
+                        key={i}
+                        className={`table-cell ${
+                          i >= headers.length - 3
+                            ? "amount-gray"
+                            : i === headers.length - 1
+                            ? "amount-red"
+                            : ""
+                        }`}
+                      >
+                        {v}
+                      </Box>
+                    ))}
+                  </Box>
+                );
+              })}
             </Box>
           ) : (
-            // Small Receipt
+            // Small receipt stacked view
             <Box
               mt={2}
               sx={{
@@ -253,53 +262,99 @@ const PrintDmt2 = () => {
                 overflow: "hidden",
               }}
             >
-              {headers.map((label, i) => (
-                <Box
-                  key={i}
-                  display="flex"
-                  justifyContent="space-between"
-                  sx={{
-                    px: 1,
-                    py: 1.3,
-                    borderBottom:
-                      i !== headers.length - 1 ? "1px solid #f0f0f0" : "none",
-                    bgcolor: i % 2 === 0 ? "#fafafa" : "transparent",
-                  }}
-                >
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 600, fontSize: "0.85rem" }}
-                  >
-                    {label}:
-                  </Typography>
-                  <Typography
-                    variant="body2"
+              {data.map((txn, idx) => {
+                const amount = parseFloat(txn.amount || 0);
+                const ccf = parseFloat(txn.ccf || 0);
+                const totalAmount = amount + ccf;
+                const beneficiaryDetails = (
+                  <Box>
+                    <div>{txn.beneficiary_name || ""}</div>
+                    <div>A/C: {txn.account_number || ""}</div>
+                    <div>IFSC: {txn.ifsc_code || ""}</div>
+                  </Box>
+                );
+
+                const values = [
+                  `${
+                    txn.created_at
+                      ? new Date(txn.created_at).toLocaleDateString()
+                      : ""
+                  } ${
+                    txn.created_at
+                      ? new Date(txn.created_at).toLocaleTimeString()
+                      : ""
+                  }`,
+                  txn.operator || "",
+                  txn.sender_mobile || "",
+                  beneficiaryDetails,
+                  `₹ ${amount.toFixed(2)}`,
+                  `₹ ${ccf.toFixed(2)}`,
+                  `₹ ${totalAmount.toFixed(2)}`,
+                ];
+
+                return (
+                  <Box
+                    key={idx}
                     sx={{
-                      fontWeight:
-                        i >= headers.length - 3 || i === headers.length - 1
-                          ? "bold"
-                          : "normal",
-                      fontSize: "0.85rem",
-                      color:
-                        i === headers.length - 1
-                          ? "#d32f2f"
-                          : i >= headers.length - 3
-                          ? "#555"
-                          : "inherit",
+                      mb: 2,
+                      borderBottom:
+                        idx !== data.length - 1 ? "1px solid #f0f0f0" : "none",
                     }}
                   >
-                    {values[i]}
-                  </Typography>
-                </Box>
-              ))}
+                    {headers.map((label, i) => (
+                      <Box
+                        key={i}
+                        display="flex"
+                        justifyContent="space-between"
+                        sx={{ px: 1, py: 1.3 }}
+                      >
+                        <Typography
+                          variant="body2"
+                          sx={{ fontWeight: 600, fontSize: "0.85rem" }}
+                        >
+                          {label}:
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontWeight:
+                              i >= headers.length - 3 ||
+                              i === headers.length - 1
+                                ? "bold"
+                                : "normal",
+                            fontSize: "0.85rem",
+                            color:
+                              i === headers.length - 1
+                                ? "#d32f2f"
+                                : i >= headers.length - 3
+                                ? "#555"
+                                : "inherit",
+                          }}
+                        >
+                          {values[i]}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                );
+              })}
             </Box>
           )}
 
+           <Box display="flex" justifyContent="flex-end" mt={1} sx={{ pr: 2 }}>
+         <Typography variant="body1" sx={{ fontWeight: 700 }}>
+           Total Amount: ₹ {totalAmountValue.toFixed(2)}
+         </Typography>
+       </Box>
           {/* Print Button */}
-          <Box display="flex" justifyContent="flex-end" mt={{ xs: 1, sm: 1 }}>
+          <Box
+            display="flex"
+            justifyContent="flex-end"
+            mt={{ xs: 1, sm: 1 }}
+            className="no-print"
+          >
             <Button
               onClick={() => window.print()}
-              className="no-print"
               variant="contained"
               sx={{
                 borderRadius: 2,
