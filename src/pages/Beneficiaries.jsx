@@ -57,6 +57,7 @@ import { apiErrorToast, okSuccessToast } from "../utils/ToastUtil";
 import DeleteBeneficiaryModal from "./DeleteBeneficiaryModal";
 import AuthContext from "../contexts/AuthContext";
 import SelectedBeneficiary from "./SelectedBeneficiary";
+import { useToast } from "../utils/ToastContext";
 
 const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
   const theme = useTheme();
@@ -69,60 +70,69 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
   const [verifyOpen, setVerifyOpen] = useState(false); // 🔑 verify modal state
   const [mpinDigits, setMpinDigits] = useState(Array(6).fill(""));
   const [searchText, setSearchText] = useState("");
-
+  const [pendingPayload, setPendingPayload] = useState(null);
+  const { showToast } = useToast();
+  const [amountInputs, setAmountInputs] = useState({});
   const { location } = useContext(AuthContext);
-  const [sendMoneyOpen, setSendMoneyOpen] = useState(false);
-  const [selectedForSend, setSelectedForSend] = useState(null);
+  const { schema, formData, handleChange, errors, setErrors, loading } =
+    useSchemaForm(ApiEndpoints.ADD_DMT1_SCHEMA, openModal, {
+      sender_id: sender?.id,
+    });
 
-  const {
-    schema,
-    formData,
-    handleChange,
-    errors,
-    setErrors,
-    loading,
-    setFormData,
-  } = useSchemaForm(ApiEndpoints.ADD_DMT1_SCHEMA, openModal, {
-    sender_id: sender?.id,
-  });
+  const handleAmountChange = (beneficiaryId, value) => {
+    // Allow only numbers and decimal
+    const numericValue = value.replace(/[^\d.]/g, "");
 
-  // 👉 Add Beneficiary
-  const handleAddBeneficiary = async () => {
-    setSubmitting(true);
-    setErrors({});
-    try {
-      const payload = {
-        ...formData,
-        sender_id: sender?.id,
-        rem_mobile: sender?.mobileNumber,
-      };
-      const { error, response } = await apiCall(
-        "post",
-        ApiEndpoints.REGISTER_DMT1_BENEFICIARY,
-        payload
-      );
-
-      if (response) {
-        okSuccessToast(response?.message || "Beneficiary added successfully");
-        setFormData({});
-        setOpenModal(false);
-
-        onSuccess?.(sender.mobile_number);
-      } else {
-        apiErrorToast(error?.message || "Failed to add beneficiary");
-      }
-    } catch (err) {
-      apiErrorToast(err);
-      setErrors(err?.response?.data?.errors || {});
-    } finally {
-      setSubmitting(false);
-    }
+    setAmountInputs((prev) => ({
+      ...prev,
+      [beneficiaryId]: numericValue,
+    }));
   };
 
-  // 👉 Verify Beneficiary
+  // ✅ Handle Send Money with amount
+  const handleSendMoney = (beneficiary) => {
+    const amount = amountInputs[beneficiary.id] || "";
+
+    if (!amount || parseFloat(amount) <= 0) {
+      showToast("Please enter a valid amount");
+      return;
+    }
+
+    // ✅ Pass beneficiary with entered amount to parent component
+    onSelect?.({
+      ...beneficiary,
+      enteredAmount: parseFloat(amount),
+    });
+
+    // ✅ Clear the amount input after sending
+    setAmountInputs((prev) => ({
+      ...prev,
+      [beneficiary.id]: "",
+    }));
+  };
+
+  const handleAddAndVerifyBeneficiary = () => {
+    setErrors({});
+    const payload = {
+      ...formData,
+      sender_id: sender?.id,
+      mobile_number: sender?.mobileNumber,
+      rem_mobile: sender?.mobileNumber,
+      ben_name: formData.name,
+      ben_acc: formData.account_number,
+      ifsc: formData.ifsc,
+      operator: 18,
+      latitude: location?.lat || "",
+      longitude: location?.long || "",
+      pf: "WEB",
+    };
+    setPendingPayload(payload); // 🔹 save payload
+    setVerifyOpen(true); // 🔹 open MPIN modal
+  };
+
   const handleVerify = async () => {
     if (mpinDigits.some((d) => !d)) {
-      apiErrorToast("Please enter all 6 digits of MPIN");
+      showToast("Please enter all 6 digits of MPIN", "error");
       return;
     }
     const mpin = mpinDigits.join("");
@@ -130,46 +140,114 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
     try {
       setSubmitting(true);
 
-      const payload = {
-        mobile_number: sender?.mobileNumber,
-        sender_id: sender?.id,
-        ben_id: selectedBeneficiary.id,
-        ben_name: selectedBeneficiary.beneficiary_name,
-        ben_acc: selectedBeneficiary.account_number,
-        ifsc: selectedBeneficiary.ifsc_code,
-        operator: 18,
-        latitude: location?.lat || "",
-        longitude: location?.long || "",
-        pf: "WEB",
+      // 🔹 Step 1: Verify
+      const verifyPayload = {
+        ...pendingPayload,
         mpin,
       };
 
-      const { error, response } = await apiCall(
+      const { error: verifyError, response: verifyResponse } = await apiCall(
         "post",
         ApiEndpoints.DMT1_VERIFY_BENEFICIARY,
-        payload
+        verifyPayload
       );
 
-      if (response) {
+      if (!verifyResponse) {
+        showToast(
+          verifyError?.message || "Failed to verify beneficiary",
+          "error"
+        );
+        setSubmitting(false);
+        setVerifyOpen(false);
+        setMpinDigits(Array(6).fill(""));
+        return;
+      }
+
+      // ✅ Extract name & encrypted_data from verify response
+      const verifiedName = verifyResponse?.data || verifyResponse?.message;
+      const encryptedData = verifyResponse?.encrypted_data;
+
+      // 🔹 Step 2: Add Beneficiary with verified data
+      const addPayload = {
+        ...pendingPayload,
+        ben_name: verifiedName, // ✅ Verified name
+        rem_mobile: sender?.mobileNumber, // ✅ Sender mobile
+        encrypted_data: encryptedData, // 🔐 If backend needs it
+      };
+
+      const { error: addError, response: addResponse } = await apiCall(
+        "post",
+        ApiEndpoints.REGISTER_DMT1_BENEFICIARY,
+        addPayload
+      );
+
+      if (addResponse) {
         okSuccessToast(
-          response?.message || "Beneficiary verified successfully"
+          addResponse?.message || "Beneficiary verified & added successfully"
         );
         setVerifyOpen(false);
+        setOpenModal(false);
         setMpinDigits(Array(6).fill(""));
         onSuccess?.(sender.mobileNumber);
       } else {
-        setVerifyOpen(false);
-        setMpinDigits(Array(6).fill(""));
-        apiErrorToast(error?.message || "Failed to verify beneficiary");
+        showToast(addError?.message || "Failed to add beneficiary", "error");
       }
     } catch (err) {
-      apiErrorToast(err);
+      showToast(err, "error");
     } finally {
       setSubmitting(false);
     }
   };
 
-  // 👉 Handle MPIN change
+  // const handleVerify = async () => {
+  //   if (mpinDigits.some((d) => !d)) {
+  //     apiErrorToast("Please enter all 6 digits of MPIN");
+  //     return;
+  //   }
+  //   const mpin = mpinDigits.join("");
+
+  //   try {
+  //     setSubmitting(true);
+
+  //     const payload = {
+  //       mobile_number: sender?.mobileNumber,
+  //       sender_id: sender?.id,
+  //       ben_id: selectedBeneficiary.id || "",
+  //       ben_name: selectedBeneficiary.beneficiary_name,
+  //       ben_acc: selectedBeneficiary.account_number,
+  //       ifsc: selectedBeneficiary.ifsc_code,
+  //       operator: 18,
+  //       latitude: location?.lat || "",
+  //       longitude: location?.long || "",
+  //       pf: "WEB",
+  //       mpin,
+  //     };
+
+  //     const { error, response } = await apiCall(
+  //       "post",
+  //       ApiEndpoints.DMT1_VERIFY_BENEFICIARY,
+  //       payload
+  //     );
+
+  //     if (response) {
+  //       okSuccessToast(
+  //         response?.message || "Beneficiary verified successfully"
+  //       );
+  //       setVerifyOpen(false);
+  //       setMpinDigits(Array(6).fill(""));
+  //       onSuccess?.(sender.mobileNumber);
+  //     } else {
+  //       setVerifyOpen(false);
+  //       setMpinDigits(Array(6).fill(""));
+  //       apiErrorToast(error?.message || "Failed to verify beneficiary");
+  //     }
+  //   } catch (err) {
+  //     apiErrorToast(err);
+  //   } finally {
+  //     setSubmitting(false);
+  //   }
+  // };
+
   const handleMpinChange = (index, value) => {
     if (/^[0-9]?$/.test(value)) {
       const newDigits = [...mpinDigits];
@@ -238,7 +316,7 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
       {/* Header */}
       <Box
         sx={{
-          bgcolor: "#9d72ff",
+          bgcolor: "#2275b7",
           color: "#fff",
           py: 1,
           px: 2,
@@ -263,7 +341,7 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
               sx={{
                 minWidth: "auto",
                 px: 1.5,
-                backgroundColor: "#5c3ac8",
+                backgroundColor: "#2275b7",
                 py: 0.5,
                 fontSize: "0.75rem",
                 borderRadius: 1,
@@ -286,7 +364,7 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
       {/* Collapse wrapper */}
       <Collapse in={open} timeout="auto" unmountOnExit>
         <CardContent sx={{ p: 2 }}>
-          {normalized.length > 1 && (
+          {
             <Box mb={2}>
               <TextField
                 fullWidth
@@ -296,7 +374,7 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
                 onChange={(e) => setSearchText(e.target.value)}
               />
             </Box>
-          )}
+          }
           <List dense sx={{ py: 0 }}>
             {filteredBeneficiaries.map((b) => (
               <ListItem
@@ -354,16 +432,35 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
                         </Button>
                       )}
 
+                      <TextField
+                        size="small"
+                        placeholder="Amount"
+                        value={amountInputs[b.id] || ""}
+                        onChange={(e) =>
+                          handleAmountChange(b.id, e.target.value)
+                        }
+                        inputProps={{
+                          style: {
+                            width: "80px",
+                            textAlign: "center",
+                            fontSize: "0.75rem",
+                          },
+                        }}
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            height: "32px",
+                          },
+                        }}
+                      />
+
+                      {/* ✅ Send Money Button */}
                       <Button
                         size="small"
                         variant="contained"
                         color="primary"
-                        onClick={() => {
-                          setSelectedForSend(b); // set selected beneficiary
-                          setSendMoneyOpen(true); // open modal
-                        }}
+                        onClick={() => handleSendMoney(b)}
                         sx={{
-                          backgroundColor: "#5c3ac8",
+                          backgroundColor: "#2275b7",
                           borderRadius: 1,
                           textTransform: "none",
                           fontSize: isMobile ? "0.6rem" : "0.75rem",
@@ -508,10 +605,10 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
               sx: { borderRadius: 1 },
             },
             {
-              text: submitting ? "Saving..." : "Save Beneficiary",
+              text: submitting ? "Processing..." : "Add & Verify",
               variant: "contained",
               color: "primary",
-              onClick: handleAddBeneficiary,
+              onClick: handleAddAndVerifyBeneficiary, // ✅ नया function
               disabled: submitting,
               sx: { borderRadius: 1 },
             },
@@ -553,6 +650,7 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
                 <TextField
                   id={`mpin-${idx}`}
                   value={digit}
+                  type="password"
                   onChange={(e) => handleMpinChange(idx, e.target.value)}
                   inputProps={{
                     maxLength: 1,
@@ -578,20 +676,6 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
           onSuccess?.(sender.mobileNumber);
         }}
       />
-      {sendMoneyOpen && selectedForSend && (
-        <SelectedBeneficiary
-          open={sendMoneyOpen}
-          onClose={() => {
-            setSendMoneyOpen(false);
-            setSelectedForSend(null);
-          }}
-          beneficiary={selectedForSend}
-          senderId={sender?.id}
-          senderMobile={sender?.mobileNumber}
-          referenceKey={sender?.referenceKey || ""} // or generate if needed
-          sender={sender}
-        />
-      )}
     </Card>
   );
 };

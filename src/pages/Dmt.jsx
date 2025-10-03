@@ -28,25 +28,24 @@ const Dmt = () => {
   const [showRegister, setShowRegister] = useState(false);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
   const [openRegisterModal, setOpenRegisterModal] = useState(false);
+  const [referenceKey, setRefrenceKey] = useState("");
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
-  const { user } = useContext(AuthContext); // Get auth user data
+  const { user } = useContext(AuthContext);
   const [openDmt1Modal, setOpenDmt1Modal] = useState(false);
-  const [referenceKey, setRefrenceKey] = useState("");
-  const instId = user?.instId; // Check if instId exists
 
-  // Fetch sender details
+  const instId = user?.instId;
+
+  // Fetch sender details - same as before
   const handleFetchSender = async (number = mobile) => {
-    if (!number) return;
+    if (!number ) return;
 
-    setLoading(true); // start loader
-
+    setLoading(true);
     const { error, response } = await apiCall("post", ApiEndpoints.DMT1, {
       mobile_number: number,
       account_number: account || undefined,
     });
-
-    setLoading(false); // stop loader
+    setLoading(false);
 
     if (response) {
       const data = response?.data || response?.response?.data;
@@ -60,14 +59,12 @@ const Dmt = () => {
       } else if (message === "Remitter Not Found") {
         setSender(null);
         setOpenRegisterModal(true);
-        setBeneficiaries([]);
         setRefrenceKey(response?.data?.referenceKey);
+        setBeneficiaries([]);
         setShowRegister(true);
-      } else {
-        apiErrorToast(message || "Unexpected response");
       }
     } else if (error) {
-      apiErrorToast(error?.message || "Something went wrong");
+      showToast(error?.message || "Something went wrong", "error");
       setSender(null);
       setBeneficiaries([]);
       setShowRegister(true);
@@ -81,7 +78,6 @@ const Dmt = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Handle mobile input change
   const handleMobileChange = (e) => {
     const value = e.target.value.replace(/\D/g, "");
     if (value.length <= 10) {
@@ -96,140 +92,130 @@ const Dmt = () => {
     }
   };
 
-  // Delete a beneficiary
   const handleDeleteBeneficiary = (id) => {
     setBeneficiaries((prev) => prev.filter((b) => b.id !== id));
     if (selectedBeneficiary?.id === id) setSelectedBeneficiary(null);
   };
 
-  <OutletDmt1
-    open={openDmt1Modal}
-    handleClose={() => setOpenDmt1Modal(false)}
-    onSuccess={() => {
-      setOpenDmt1Modal(false);
-      window.location.reload(); // optional, depending on your logic
-    }}
-  />;
-  console.log("THe insti fin dmt1", instId);
   return (
-    <CommonLoader loading={loading}>
-      <Box>
-        {!instId ? (
-          <Box
-            textAlign="center"
-            mt={4}
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            gap={2}
+    <Box>
+      <CommonLoader loading={loading} />
+      {!instId ? (
+        <Box
+          textAlign="center"
+          mt={4}
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          gap={2}
+        >
+          <Typography variant="h6" color="text.secondary">
+            You need to complete Outlet Registration to use DMT1.
+          </Typography>
+          <button
+            onClick={() => setOpenDmt1Modal(true)}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#1976d2",
+              color: "#fff",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
           >
-            <Typography variant="h6" color="text.secondary">
-              You need to complete Outlet Registration to use DMT1.
-            </Typography>
-            <button
-              onClick={() => setOpenDmt1Modal(true)}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#1976d2",
-                color: "#fff",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
-            >
-              Register Outlet
-            </button>
+            Register Outlet
+          </button>
 
-            <OutletDmt1
-              open={openDmt1Modal}
-              handleClose={() => setOpenDmt1Modal(false)}
-              onSuccess={() => {
-                setOpenDmt1Modal(false);
-                window.location.reload(); // Or refresh instId via context if dynamic
-              }}
+          <OutletDmt1
+            open={openDmt1Modal}
+            handleClose={() => setOpenDmt1Modal(false)}
+            onSuccess={() => {
+              setOpenDmt1Modal(false);
+            }}
+          />
+        </Box>
+      ) : (
+        <>
+          {/* Mobile and Account Input Fields */}
+          <Box
+            display="flex"
+            flexDirection={{ xs: "column", sm: "row" }}
+            alignItems="center"
+            gap={1}
+            mb={1}
+          >
+            <TextField
+              label="Mobile Number"
+              variant="outlined"
+              value={mobile}
+              onChange={handleMobileChange}
+              inputProps={{ maxLength: 10 }}
+              sx={{ flex: 1 }}
+              fullWidth
             />
-          </Box>
-        ) : (
-          <>
-            {/* ✅ Full DMT UI goes here when instId is present */}
 
             <Box
-              display="flex"
-              flexDirection={{ xs: "column", sm: "row" }}
-              alignItems="center"
-              gap={1}
-              mb={1}
+              sx={{
+                display: { xs: "flex", sm: "none" },
+                justifyContent: "center",
+                width: "100%",
+                my: 0.5,
+              }}
             >
-              <TextField
-                label="Mobile Number"
-                variant="outlined"
-                value={mobile}
-                onChange={handleMobileChange}
-                inputProps={{ maxLength: 10 }}
-                sx={{ flex: 1 }}
-                fullWidth
-                autoComplete="tel" // ✅ enables browser autocomplete
-              />
-
-              <Box
-                sx={{
-                  display: { xs: "flex", sm: "none" },
-                  justifyContent: "center",
-                  width: "100%",
-                  my: 0.5,
-                }}
-              >
-                <Divider sx={{ width: "30%", textAlign: "center" }}>
-                  <Typography variant="body2" color="text.secondary">
-                    OR
-                  </Typography>
-                </Divider>
-              </Box>
-
-              <TextField
-                label="Account Number"
-                variant="outlined"
-                value={account}
-                onChange={(e) => setAccount(e.target.value.replace(/\D/g, ""))}
-                inputProps={{ maxLength: 18 }}
-                sx={{ flex: 1 }}
-                fullWidth
-              />
+              <Divider sx={{ width: "30%", textAlign: "center" }}>
+                <Typography variant="body2" color="text.secondary">
+                  OR
+                </Typography>
+              </Divider>
             </Box>
 
-            {/* <Divider sx={{ my: 1, display: { xs: "none", sm: "block" } }} /> */}
+            <TextField
+              label="Account Number"
+              variant="outlined"
+              value={account}
+              onChange={(e) => setAccount(e.target.value.replace(/\D/g, ""))}
+              inputProps={{ maxLength: 18 }}
+              sx={{ flex: 1 }}
+              fullWidth
+            />
+          </Box>
 
-            {openRegisterModal && (
-              <RemitterRegister
-                open={openRegisterModal}
-                onClose={() => setOpenRegisterModal(false)}
-                mobile={mobile}
-                referenceKey={referenceKey}
-                onSuccess={setSender}
+          {openRegisterModal && (
+            <RemitterRegister
+              open={openRegisterModal}
+              onClose={() => setOpenRegisterModal(false)}
+              referenceKey={referenceKey}
+              mobile={mobile}
+              onSuccess={setSender}
+            />
+          )}
+
+          {/* ✅ MODIFIED LAYOUT: When beneficiary is selected, it takes full width */}
+          {selectedBeneficiary ? (
+            // ✅ Selected Beneficiary takes full width
+            <Box>
+              <SelectedBeneficiary
+                beneficiary={selectedBeneficiary}
+                senderId={sender?.id}
+                sender={sender}
+                senderMobile={sender?.mobileNumber}
+                referenceKey={sender?.referenceKey}
+                amount={selectedBeneficiary.enteredAmount}
+                onBack={() => setSelectedBeneficiary(null)}
               />
-            )}
-
-            <Box display="flex" flexDirection="column" gap={1} width="100%">
-              {/* Remitter Details */}
-              <Box width="100%">
+            </Box>
+          ) : (
+            // ✅ Default layout when no beneficiary selected
+            <Box
+              display="flex"
+              flexDirection={{ xs: "column", md: "row" }}
+              gap={0.5}
+            >
+              <Box flex="0 0 30%" display="flex" flexDirection="column">
                 <RemitterDetails sender={sender} />
               </Box>
 
-              {/* Selected Beneficiary */}
-              {/* {selectedBeneficiary && (
-              <Box width="100%">
-                <SelectedBeneficiary
-                  beneficiary={selectedBeneficiary}
-                  senderId={sender.id}
-                  sender={sender}
-                  senderMobile={sender.mobileNumber}
-                  referenceKey={sender.referenceKey}
-                />
-              </Box>
-            )} */}
-
-              {/* Beneficiaries List */}
-              <Box width="100%">
+              <Box flex="0 0 70%">
                 <Beneficiaries
                   sender={sender}
                   onSuccess={handleFetchSender}
@@ -239,11 +225,10 @@ const Dmt = () => {
                 />
               </Box>
             </Box>
-          </>
-        )}
-      </Box>
-    </CommonLoader>
+          )}
+        </>
+      )}
+    </Box>
   );
 };
-
 export default Dmt;
