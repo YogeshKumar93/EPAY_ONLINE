@@ -9,8 +9,7 @@ import {
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import AuthContext from "../contexts/AuthContext";
-import biggpayLogo from "../assets/Images/PPALogo.jpeg";
-
+import biggpayLogo from "../assets/Images/PPALogor.png";
 import { ddmmyyWithTime } from "../utils/DateUtils";
 
 const PrintIrctc = () => {
@@ -74,6 +73,10 @@ const PrintIrctc = () => {
     "TDS (₹)",
     "Status",
   ];
+
+   const totalAmountValue = data
+  .filter(txn => txn.status?.toLowerCase() === "success")
+  .reduce((acc, txn) => acc + parseFloat(txn.amount || 0), 0);
 
   const values = [
     data.created_at ? ddmmyyWithTime(data.created_at) : "",
@@ -298,6 +301,12 @@ const PrintIrctc = () => {
               ))}
             </Box>
           )}
+
+ <Box display="flex" justifyContent="flex-end" mt={1} sx={{ pr: 2 }}>
+         <Typography variant="body1" sx={{ fontWeight: 700 }}>
+           Total Amount: ₹ {totalAmountValue.toFixed(2)}
+         </Typography>
+       </Box>
 
           {/* Print Button */}
           <Box display="flex" justifyContent="flex-end" mt={1}>

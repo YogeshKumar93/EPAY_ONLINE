@@ -7,6 +7,7 @@ import {
   Typography,
   MenuItem,
   Menu,
+  Button,
 } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
@@ -44,6 +45,7 @@ import { useToast } from "../../utils/ToastContext";
 import { apiCall } from "../../api/apiClient";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AddLein from "../../pages/AddLein";
+import Scheduler from "../common/Scheduler";
 
 const CreditCardTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
@@ -61,6 +63,7 @@ const CreditCardTxn = ({ query }) => {
   const [selectedRow, setSelectedRow] = useState(null);
   const navigate = useNavigate();
   const [refundLoading, setRefundLoading] = useState(false);
+    const [selectedRows, setSelectedRows] = useState([]);
 
   const { showToast } = useToast();
   const filters = useMemo(
@@ -120,6 +123,11 @@ const CreditCardTxn = ({ query }) => {
   const handleOpenLein = (row) => {
     setOpenLeinModal(true);
     setSelectedTrancation(row);
+  };
+   const refreshPlans = () => {
+    if (fetchUsersRef.current) {
+      fetchUsersRef.current();
+    }
   };
   const handleCloseLein = () => setOpenLeinModal(false);
   // const ActionColumn = ({ row, handleRefundClick, handleOpenLein }) => {
@@ -635,9 +643,37 @@ const CreditCardTxn = ({ query }) => {
         center: true,
       },
     ];
-
-    return [...baseColumns, ...remainingColumns];
+  return [...baseColumns, ...remainingColumns];
   }, [user]);
+
+
+     const columnsWithSelection = useMemo(() => {
+    // Only show checkbox if user is NOT adm or sadm
+    if (user?.role === "adm" || user?.role === "sadm") {
+      return columns; // no selection column
+    }
+    return [
+      {
+        name: "",
+        selector: (row) => (
+          <input
+            type="checkbox"
+            checked={selectedRows.some((r) => r.id === row.id)}
+            disabled={row.status?.toLowerCase() === "failed"}
+            onChange={() => {
+              const isSelected = selectedRows.some((r) => r.id === row.id);
+              const newSelectedRows = isSelected
+                ? selectedRows.filter((r) => r.id !== row.id)
+                : [...selectedRows, row];
+              setSelectedRows(newSelectedRows);
+            }}
+          />
+        ),
+        width: "40px",
+      },
+      ...columns,
+    ];
+  }, [selectedRows, columns]);
 
   const queryParam = "";
 
@@ -645,11 +681,71 @@ const CreditCardTxn = ({ query }) => {
     <>
       <Box sx={{}}>
         <CommonTable
-          columns={columns}
+          columns={columnsWithSelection}
           endpoint={ApiEndpoints.GET_CREDIT_CARD}
           filters={filters}
           queryParam={queryParam}
           enableActionsHover={true}
+          enableSelection={false}
+          selectedRows={selectedRows}
+          onSelectionChange={setSelectedRows}
+            customHeader={
+                      <>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                            padding: "8px",
+                          }}
+                        >
+                          {selectedRows.length > 0 && (
+                            <Tooltip title="View Selected Details">
+                              <Button
+                                variant="contained"
+                                size="small"
+                                color="primary"
+                                onClick={() => {
+                                  // Save selected rows to sessionStorage
+                                  sessionStorage.setItem(
+                                    "txnData",
+                                    JSON.stringify(selectedRows)
+                                  );
+          
+                                  // Open new tab/window
+                                  window.open("/print-dmt2", "_blank");
+                                }}
+                              >
+                                <PrintIcon
+                                  sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
+                                />
+                                DMT
+                              </Button>
+                            </Tooltip>
+                          )}
+                        </Box>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                            padding: "8px",
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          {user?.role === "adm" && (
+                            <IconButton
+                              color="primary"
+                              onClick={handleExportExcel}
+                              title="Export to Excel"
+                            >
+                              <FileDownloadIcon />
+                            </IconButton>
+                          )}
+                          <Scheduler onRefresh={refreshPlans} />
+                        </Box>
+                      </>
+                    }
         />
       </Box>
 
@@ -765,6 +861,7 @@ const CreditCardTxn = ({ query }) => {
       )}
     </>
   );
+ 
 };
 
 export default CreditCardTxn;
