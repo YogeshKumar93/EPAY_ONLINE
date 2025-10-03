@@ -72,6 +72,10 @@ import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import AuthContext from "../contexts/AuthContext";
 import { formatInLakh } from "../utils/constants";
+import TransactionDetail from "../components/TransactionDetail";
+import ServiceWiseProfit from "../components/ServiceWiseProfilt";
+// import TransactionDetail from "../components/TransactionDetail";
+// import ServiceWiseProfit from "../components/ServiceWiseProfilt";
 
 ChartJS.register(
   CategoryScale,
@@ -157,7 +161,7 @@ const Dashboard = () => {
         console.log("Dashboard data:", response);
 
         // Transform API data into table-friendly format
-        const stats = response.data.map((item) => ({
+        const stats = response?.data?.map((item) => ({
           type: item.role,
           count: item.total_users,
           w1: item.total_w1,
@@ -245,7 +249,7 @@ const Dashboard = () => {
   };
 
   const userStatsDynamic = dashboardData?.data?.map((roleItem) => {
-    const role = roleItem.role.toLowerCase();
+    const role = roleItem?.role?.toLowerCase();
     return {
       type:
         role === "ret"
@@ -276,31 +280,6 @@ const Dashboard = () => {
   });
 
   const cards = [
-    {
-      title: "Primary",
-      value: "1.3 Cr",
-      icon: <AccountBalance sx={{ color: "#fff" }} />,
-    },
-    {
-      title: "Tertiary",
-      value: "1.6 Cr",
-      icon: <TrendingUp sx={{ color: "#16a34a" }} />,
-    },
-    {
-      title: "TOTAL",
-      value: "2953",
-      icon: <PointOfSale sx={{ color: "#9333ea" }} />,
-    },
-    {
-      title: "SUCCESS",
-      value: "2023",
-      icon: <CheckCircle sx={{ color: "#22c55e" }} />,
-    },
-    {
-      title: "PENDING",
-      value: "22",
-      icon: <Schedule sx={{ color: "#f97316" }} />,
-    },
     {
       title: "Wallet Balance",
       value: `₹${formatNumber(grandTotal)}`,
@@ -350,7 +329,7 @@ const Dashboard = () => {
   ];
 
   const serviceData = dashboardData2?.data
-    ? Object.entries(dashboardData2.data).map(([service, stats]) => {
+    ? Object.entries(dashboardData2?.data).map(([service, stats]) => {
         const mtd = parseFloat(stats.mtd_amount); // This month till date
         const lmtd = parseFloat(stats.lmtd_amount); // Last month till date
 
@@ -394,110 +373,29 @@ const Dashboard = () => {
   }, [totalW1, totalW2, totalW3]);
 
   return (
-    <Box sx={{ backgroundColor: "#f8fafc", minHeight: "100vh", p: 2 }}>
-      {/* Header */}
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        flexWrap="wrap"
-        mb={4}
-      >
-        {isMobile && (
-          <IconButton sx={{ mr: 1, color: "text.secondary" }} aria-label="menu">
-            <MenuIcon />
-          </IconButton>
-        )}
-        <Box display="flex" alignItems="center" flexWrap="wrap">
-          <Select
-            value={range}
-            onChange={(e) => setRange(e.target.value)}
-            size="small"
-            sx={{
-              minWidth: 180,
-              bgcolor: "white",
-              borderRadius: 2,
-              mr: 2,
-              boxShadow: "0 2px 6px rgba(0,0,0,0.04)",
-              "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-            }}
-          >
-            <MenuItem value="7">Last 7 Days</MenuItem>
-            <MenuItem value="30">Last 30 Days</MenuItem>
-            <MenuItem value="90">Last 90 Days</MenuItem>
-          </Select>
-          <Box sx={{ display: "flex", gap: 1.5, mr: 2 }}>
-            {["today", "week", "month"].map((item) => {
-              const label =
-                item === "today"
-                  ? "Today"
-                  : item === "week"
-                  ? "Last Week"
-                  : "This Month";
-              const isSelected = range === item;
-              return (
-                <Button
-                  key={item}
-                  onClick={() => setRange(item)}
-                  variant={isSelected ? "contained" : "outlined"}
-                  size="small"
+    <Box
+      sx={{
+        backgroundColor: "#f8fafc",
+      }}
+    >
+      {<TransactionDetail />}
+      {user.role !== "ret" && (
+        <Grid container spacing={2} mb={4}>
+          {cards.map((card, i) => {
+            let textColor = "#111827";
+            return (
+              <Grid item key={i} sx={{}}>
+                <Card
                   sx={{
-                    borderRadius: 3,
-                    textTransform: "none",
-                    px: 2.5,
-                    py: 0.8,
-                    fontWeight: 500,
-                    fontSize: 14,
-                    color: isSelected ? "#fff" : "#2563eb",
-                    background: isSelected
-                      ? "linear-gradient(135deg, #3b82f6, #60a5fa)"
-                      : "transparent",
-                    borderColor: "#3b82f6",
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      background: isSelected
-                        ? "linear-gradient(135deg, #2563eb, #3b82f6)"
-                        : "rgba(59,130,246,0.1)",
-                    },
+                    width: "350px",
+                    height: "100%",
+                    p: 2,
+                    borderRadius: 2,
+                    boxShadow: "0px 2px 8px rgba(0,0,0,0.1)",
+                  alignItems:"center",
+                  ml:4
                   }}
                 >
-                  {label}
-                </Button>
-              );
-            })}
-          </Box>
-        </Box>
-      </Box>
-      {/* Cards */}
-      <Grid container spacing={1.6} mb={4}>
-        {cards.map((card, i) => {
-          let customStyle = { ...cardStyle };
-          let textColor = "#111827"; // default dark text
-
-          if (card.title === "Primary") {
-            customStyle = {
-              ...customStyle,
-              background: "linear-gradient(135deg, #f472b6, #f9a8d4)", // pink gradient similar to Tertiary
-              color: "#fff",
-              border: "none",
-              boxShadow: "0 6px 16px rgba(244, 114, 182, 0.3)", // pinkish shadow
-            };
-            textColor = "#fff";
-          } else if (card.title === "Tertiary") {
-            customStyle = {
-              ...customStyle,
-              background: "#f0fdf4", // light green background
-              color: "#16a34a",
-              border: "1px solid #16a34a",
-              boxShadow: "0 4px 12px rgba(22, 163, 74, 0.15)",
-            };
-            textColor = "#16a34a";
-          }
-
-          return (
-            <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={i}>
-              <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
-                <Card sx={customStyle}>
                   <Box
                     display="flex"
                     justifyContent="space-between"
@@ -506,10 +404,7 @@ const Dashboard = () => {
                   >
                     <Typography
                       variant="subtitle2"
-                      sx={{
-                        fontWeight: 600,
-                        color: textColor,
-                      }}
+                      sx={{ fontWeight: 600, color: textColor }}
                     >
                       {card.title}
                     </Typography>
@@ -517,201 +412,633 @@ const Dashboard = () => {
                   </Box>
                   <Typography
                     variant="h6"
-                    sx={{
-                      fontWeight: 700,
-                      color: textColor,
-                    }}
+                    sx={{ fontWeight: 700, color: textColor }}
                   >
                     {card.value}
                   </Typography>
                 </Card>
-              </motion.div>
-            </Grid>
-          );
-        })}
-      </Grid>
-      <Grid container spacing={2} mb={4}>
-        {/* Service-wise Transaction Summary */}
-        <Grid item xs={12} md={6}>
-          <Card sx={cardStyle}>
-            <Typography variant="h6" fontWeight={600} mb={2}>
-              Service-wise Transaction Summary
-            </Typography>
-            <TableContainer
-              component={Paper}
-              elevation={0}
-              sx={{
-                border: "1px solid #e2e8f0",
-                borderRadius: 2,
-                maxHeight: 400,
-              }}
+              </Grid>
+            );
+          })}
+        </Grid>
+      )}
+
+      <ServiceWiseProfit />
+      {user.role === "adm" && (
+        <Grid container spacing={2} sx={{ mt: 2 }}>
+          <Grid item xs={12} lg={6}>
+            <Box
+              sx={{ height: "100%", minHeight: { xs: "400px", md: "500px" } }}
             >
-              <Table stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: "bold", bgcolor: "#f8fafc" }}>
-                      Service
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: "bold", bgcolor: "#f8fafc" }}>
-                      LMTD Amount
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: "bold", bgcolor: "#f8fafc" }}>
-                      MTD Amount
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: "bold", bgcolor: "#f8fafc" }}>
-                      Today's Amount
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: "bold", bgcolor: "#f8fafc" }}>
-                      Total Txns
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: "bold", bgcolor: "#f8fafc" }}>
-                      % Change
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {loadingDashboard2 ? (
-                    <TableRow>
-                      <TableCell colSpan={6}>
-                        <Typography>Loading...</Typography>
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    serviceData.map((item, i) => (
-                      <TableRow
-                        key={i}
-                        hover
-                        sx={{ "&:hover": { bgcolor: "#f9fafb" } }}
-                      >
-                        <TableCell>{item.service}</TableCell>
-                        <TableCell>
-                          ₹{item.lmtdAmount} ({item.lmtdCount})
-                        </TableCell>
-                        <TableCell>
-                          ₹{item.mtdAmount} ({item.mtdCount})
-                        </TableCell>
-                        <TableCell>
-                          ₹{item.tdAmount} ({item.tdCount})
-                        </TableCell>
-                        <TableCell>{item.totalTxns}</TableCell>
+              <Card
+                sx={{
+                  p: 1,
+                  height: "100%",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  fontWeight={700}
+                  sx={{
+                    p: { xs: 1, sm: 1.5 },
+                    background: "#fff",
+                    fontSize: { xs: "0.85rem", sm: "0.9rem", md: "0.95rem" },
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    borderBottom: "1px solid #e2e8f0",
+                  }}
+                >
+                  <TrendingUp
+                    sx={{ fontSize: { xs: 18, sm: 20 }, color: "#000" }}
+                  />
+                  Service-wise Summary
+                </Typography>
+
+                <TableContainer
+                  component={Paper}
+                  elevation={0}
+                  sx={{
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "0 0 8px 8px",
+                    borderTop: "none",
+
+                    maxHeight: { xs: "350px", sm: "400px", md: "440px" },
+                    overflow: "auto",
+                  }}
+                >
+                  <Table
+                    stickyHeader
+                    sx={{
+                      "& .MuiTableCell-root": {
+                        fontSize: {
+                          xs: "0.65rem",
+                          sm: "0.7rem",
+                          md: "0.75rem",
+                        },
+                        py: { xs: 0.5, sm: 1 },
+                      },
+                    }}
+                  >
+                    <TableHead>
+                      <TableRow>
                         <TableCell
                           sx={{
-                            color: item.percentChange >= 0 ? "green" : "red",
+                            fontWeight: "bold",
+                            bgcolor: "#f8fafc",
+                            width: { xs: "30%", sm: "28%", md: "25%" },
+                            py: { xs: 0.5, sm: 1 },
                           }}
                         >
-                          {item.percentChange}%
+                          Service
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            fontWeight: "bold",
+                            bgcolor: "#f8fafc",
+                            width: { xs: "16%", sm: "17%", md: "18%" },
+                            py: { xs: 0.5, sm: 1 },
+                          }}
+                        >
+                          LMTD
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            fontWeight: "bold",
+                            bgcolor: "#f8fafc",
+                            width: { xs: "16%", sm: "17%", md: "18%" },
+                            py: { xs: 0.5, sm: 1 },
+                          }}
+                        >
+                          MTD
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            fontWeight: "bold",
+                            bgcolor: "#f8fafc",
+                            width: { xs: "16%", sm: "17%", md: "18%" },
+                            py: { xs: 0.5, sm: 1 },
+                          }}
+                        >
+                          Today
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            fontWeight: "bold",
+                            bgcolor: "#f8fafc",
+                            width: { xs: "11%", sm: "11%", md: "12%" },
+                            textAlign: "center",
+                            py: { xs: 0.5, sm: 1 },
+                          }}
+                        >
+                          Txns
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            fontWeight: "bold",
+                            bgcolor: "#f8fafc",
+                            width: { xs: "11%", sm: "10%", md: "9%" },
+                            textAlign: "center",
+                            py: { xs: 0.5, sm: 1 },
+                          }}
+                        >
+                          %
                         </TableCell>
                       </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Card>
-        </Grid>
+                    </TableHead>
 
-        {/* User Table */}
-        <Grid item xs={12} md={6}>
-          <Card sx={cardStyle}>
-            <Typography variant="h6" fontWeight={600} mb={2}>
-              User Table
-            </Typography>
-            <TableContainer
-              component={Paper}
-              elevation={0}
-              sx={{
-                border: "1px solid #e2e8f0",
-                borderRadius: 2,
-                maxHeight: 360,
-              }}
-            >
-              <Table stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: "bold", bgcolor: "#f8fafc" }}>
-                      Role
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: "bold", bgcolor: "#f8fafc" }}>
-                      Total Users
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: "bold", bgcolor: "#f8fafc" }}>
-                      Wallet 1
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: "bold", bgcolor: "#f8fafc" }}>
-                      Wallet 2
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: "bold", bgcolor: "#f8fafc" }}>
-                      Wallet 3
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: "bold", bgcolor: "#f8fafc" }}>
-                      Total
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {loadingDashboard ? (
-                    <TableRow>
-                      <TableCell colSpan={6}>
-                        <Typography>Loading...</Typography>
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    <>
-                      {userStatsDynamic.map((stat, i) => (
-                        <TableRow
-                          key={i}
-                          hover
-                          sx={{ "&:hover": { backgroundColor: "#f9fafb" } }}
-                        >
-                          <TableCell>
-                            <Box display="flex" alignItems="center">
-                              <Box sx={{ mr: 1 }}>{stat.icon}</Box>
-                              {stat.type}
+                    <TableBody>
+                      {loadingDashboard2 ? (
+                        <TableRow>
+                          <TableCell
+                            colSpan={6}
+                            sx={{
+                              py: 3,
+                              textAlign: "center",
+                              bgcolor: "#ffffff",
+                            }}
+                          >
+                            <Box
+                              display="flex"
+                              justifyContent="center"
+                              alignItems="center"
+                              gap={1}
+                            >
+                              <CircularProgress
+                                size={20}
+                                sx={{ color: "#2275B7" }}
+                              />
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{
+                                  fontSize: { xs: "0.7rem", sm: "0.75rem" },
+                                }}
+                              >
+                                Loading data...
+                              </Typography>
                             </Box>
                           </TableCell>
-                          <TableCell>{stat.count}</TableCell>
-                          <TableCell>
-                            {(stat.w1 / 100).toLocaleString()}
-                          </TableCell>
-                          <TableCell>
-                            {(stat.w2 / 100).toLocaleString()}
-                          </TableCell>
-                          <TableCell>
-                            {(stat.w3 / 100).toLocaleString()}
-                          </TableCell>
-                          <TableCell>
-                            {(
-                              (stat.w1 + stat.w2 + stat.w3) /
-                              100
-                            ).toLocaleString()}
-                          </TableCell>
                         </TableRow>
-                      ))}
+                      ) : (
+                        serviceData?.map((item, i) => (
+                          <TableRow
+                            key={i}
+                            hover
+                            sx={{
+                              "&:hover": { backgroundColor: "#f8fbff" },
+                              "&:last-child td": { borderBottom: "none" },
+                              backgroundColor:
+                                i % 2 === 0 ? "#ffffff" : "#fafcff",
+                            }}
+                          >
+                            <TableCell
+                              sx={{
+                                fontWeight: 600,
+                                py: { xs: 0.5, sm: 1 },
+                                color: "#1e293b",
+                                borderRight: "1px solid #f1f5f9",
+                                fontSize: {
+                                  xs: "0.65rem",
+                                  sm: "0.7rem",
+                                  md: "0.75rem",
+                                },
+                              }}
+                            >
+                              {item.service}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                py: { xs: 0.5, sm: 1 },
+                                borderRight: "1px solid #f1f5f9",
+                              }}
+                            >
+                              <Box>
+                                <Typography
+                                  variant="body2"
+                                  fontWeight={500}
+                                  sx={{
+                                    fontSize: "inherit",
+                                    lineHeight: 1.2,
+                                  }}
+                                >
+                                  ₹{item.lmtdAmount}
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  color="#64748b"
+                                  sx={{
+                                    fontSize: { xs: "0.6rem", sm: "0.65rem" },
+                                    lineHeight: 1.2,
+                                  }}
+                                >
+                                  ({item.lmtdCount})
+                                </Typography>
+                              </Box>
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                py: { xs: 0.5, sm: 1 },
+                                borderRight: "1px solid #f1f5f9",
+                              }}
+                            >
+                              <Box>
+                                <Typography
+                                  variant="body2"
+                                  fontWeight={500}
+                                  sx={{
+                                    fontSize: "inherit",
+                                    lineHeight: 1.2,
+                                  }}
+                                >
+                                  ₹{item.mtdAmount}
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  color="#64748b"
+                                  sx={{
+                                    fontSize: { xs: "0.6rem", sm: "0.65rem" },
+                                    lineHeight: 1.2,
+                                  }}
+                                >
+                                  ({item.mtdCount})
+                                </Typography>
+                              </Box>
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                py: { xs: 0.5, sm: 1 },
+                                borderRight: "1px solid #f1f5f9",
+                              }}
+                            >
+                              <Box>
+                                <Typography
+                                  variant="body2"
+                                  fontWeight={500}
+                                  sx={{
+                                    fontSize: "inherit",
+                                    lineHeight: 1.2,
+                                  }}
+                                >
+                                  ₹{item.tdAmount}
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  color="#64748b"
+                                  sx={{
+                                    fontSize: { xs: "0.6rem", sm: "0.65rem" },
+                                    lineHeight: 1.2,
+                                  }}
+                                >
+                                  ({item.tdCount})
+                                </Typography>
+                              </Box>
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                py: { xs: 0.5, sm: 1 },
+                                fontWeight: 600,
+                                color: "#000",
+                                borderRight: "1px solid #f1f5f9",
+                                textAlign: "center",
+                                fontSize: {
+                                  xs: "0.65rem",
+                                  sm: "0.7rem",
+                                  md: "0.75rem",
+                                },
+                              }}
+                            >
+                              {item.totalTxns}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                py: { xs: 0.5, sm: 1 },
+                                fontWeight: 700,
+                                color:
+                                  item.percentChange >= 0
+                                    ? "#16a34a"
+                                    : "#dc2626",
+                                textAlign: "center",
+                                fontSize: {
+                                  xs: "0.65rem",
+                                  sm: "0.7rem",
+                                  md: "0.75rem",
+                                },
+                              }}
+                            >
+                              {item.percentChange >= 0 ? "+" : ""}
+                              {item.percentChange}%
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Card>
+            </Box>
+          </Grid>
 
-                      {/* Grand Total Row */}
-                      <TableRow sx={{ bgcolor: "#f1f5f9", fontWeight: "bold" }}>
-                        <TableCell colSpan={2}>Total</TableCell>
-                        <TableCell>
-                          {(totalW1 / 100).toLocaleString()}
+          <Grid item xs={12} lg={6}>
+            <Box
+              sx={{
+                height: "100%",
+                minHeight: { xs: "400px", md: "500px" },
+              }}
+            >
+              <Card
+                sx={{
+                  p: 1,
+
+                  minHeight: { xs: "400px", sm: "450px", md: "500px" },
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  fontWeight={700}
+                  sx={{
+                    p: { xs: 1, sm: 1.5 },
+                    background: "#fff",
+                    fontSize: { xs: "0.85rem", sm: "0.9rem", md: "0.95rem" },
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    borderBottom: "1px solid #e2e8f0",
+                  }}
+                >
+                  User Statistics
+                </Typography>
+
+                <TableContainer
+                  component={Paper}
+                  elevation={0}
+                  sx={{
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "0 0 8px 8px",
+                    borderTop: "none",
+                    // flex: 1,
+                    maxHeight: { xs: "350px", sm: "400px", md: "440px" },
+                    overflow: "auto",
+                  }}
+                >
+                  <Table
+                    stickyHeader
+                    sx={{
+                      "& .MuiTableCell-root": {
+                        fontSize: {
+                          xs: "0.65rem",
+                          sm: "0.7rem",
+                          md: "0.75rem",
+                        },
+                        // py: { xs: 0.5, sm: 1 },
+                        px: { xs: 0.5, sm: 1 },
+                      },
+                    }}
+                  >
+                    <TableHead>
+                      <TableRow>
+                        <TableCell
+                          sx={{
+                            fontWeight: "bold",
+                            bgcolor: "#f8fafc",
+                            width: { xs: "28%", sm: "26%", md: "25%" },
+                            py: { xs: 0.5, sm: 1 },
+                          }}
+                        >
+                          Role
                         </TableCell>
-                        <TableCell>
-                          {(totalW2 / 100).toLocaleString()}
+                        <TableCell
+                          sx={{
+                            fontWeight: "bold",
+                            bgcolor: "#f8fafc",
+                            width: { xs: "14%", sm: "15%", md: "15%" },
+                            py: { xs: 0.5, sm: 1 },
+                          }}
+                        >
+                          Total Users
                         </TableCell>
-                        <TableCell>
-                          {(totalW3 / 100).toLocaleString()}
+                        <TableCell
+                          sx={{
+                            fontWeight: "bold",
+                            bgcolor: "#f8fafc",
+                            width: { xs: "14%", sm: "15%", md: "15%" },
+                            py: { xs: 0.5, sm: 1 },
+                          }}
+                        >
+                          Wallet 1
                         </TableCell>
-                        <TableCell>
-                          {(grandTotal / 100).toLocaleString()}
+                        <TableCell
+                          sx={{
+                            fontWeight: "bold",
+                            bgcolor: "#f8fafc",
+                            width: { xs: "14%", sm: "15%", md: "15%" },
+                            py: { xs: 0.5, sm: 1 },
+                          }}
+                        >
+                          Wallet 2
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            fontWeight: "bold",
+                            bgcolor: "#f8fafc",
+                            width: { xs: "14%", sm: "15%", md: "15%" },
+                            py: { xs: 0.5, sm: 1 },
+                          }}
+                        >
+                          Wallet 3
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            fontWeight: "bold",
+                            bgcolor: "#f8fafc",
+                            width: { xs: "16%", sm: "14%", md: "15%" },
+                            py: { xs: 0.5, sm: 1 },
+                          }}
+                        >
+                          Total
                         </TableCell>
                       </TableRow>
-                    </>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Card>
+                    </TableHead>
+                    <TableBody>
+                      {loadingDashboard ? (
+                        <TableRow>
+                          <TableCell
+                            colSpan={6}
+                            sx={{
+                              py: 3,
+                              textAlign: "center",
+                              bgcolor: "#ffffff",
+                            }}
+                          >
+                            <Box
+                              display="flex"
+                              justifyContent="center"
+                              alignItems="center"
+                              gap={1}
+                            >
+                              <CircularProgress
+                                size={20}
+                                sx={{ color: "#2275B7" }}
+                              />
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{
+                                  fontSize: { xs: "0.7rem", sm: "0.75rem" },
+                                }}
+                              >
+                                Loading data...
+                              </Typography>
+                            </Box>
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        <>
+                          {userStatsDynamic?.map((stat, i) => (
+                            <TableRow
+                              key={i}
+                              hover
+                              sx={{
+                                "&:hover": { backgroundColor: "#f8fbff" },
+                                backgroundColor:
+                                  i % 2 === 0 ? "#ffffff" : "#fafcff",
+                              }}
+                            >
+                              <TableCell
+                                sx={{
+                                  fontWeight: 600,
+                                  py: { xs: 0.5, sm: 1 },
+                                  color: "#1e293b",
+                                  borderRight: "1px solid #f1f5f9",
+                                  fontSize: {
+                                    xs: "0.65rem",
+                                    sm: "0.7rem",
+                                    md: "0.75rem",
+                                  },
+                                }}
+                              >
+                                <Box display="flex" alignItems="center">
+                                  <Box
+                                    sx={{
+                                      mr: 1,
+                                      display: { xs: "none", sm: "block" },
+                                    }}
+                                  >
+                                    {stat.icon}
+                                  </Box>
+                                  <Box
+                                    sx={{
+                                      fontSize: {
+                                        xs: "0.65rem",
+                                        sm: "0.7rem",
+                                        md: "0.75rem",
+                                      },
+                                    }}
+                                  >
+                                    {stat.type}
+                                  </Box>
+                                </Box>
+                              </TableCell>
+                              <TableCell
+                                sx={{
+                                  py: { xs: 0.5, sm: 1 },
+                                  borderRight: "1px solid #f1f5f9",
+                                }}
+                              >
+                                {stat.count}
+                              </TableCell>
+                              <TableCell
+                                sx={{
+                                  py: { xs: 0.5, sm: 1 },
+                                  borderRight: "1px solid #f1f5f9",
+                                }}
+                              >
+                                {(stat.w1 / 100).toLocaleString()}
+                              </TableCell>
+                              <TableCell
+                                sx={{
+                                  py: { xs: 0.5, sm: 1 },
+                                  borderRight: "1px solid #f1f5f9",
+                                }}
+                              >
+                                {(stat.w2 / 100).toLocaleString()}
+                              </TableCell>
+                              <TableCell
+                                sx={{
+                                  py: { xs: 0.5, sm: 1 },
+                                  borderRight: "1px solid #f1f5f9",
+                                }}
+                              >
+                                {(stat.w3 / 100).toLocaleString()}
+                              </TableCell>
+                              <TableCell
+                                sx={{
+                                  py: { xs: 0.5, sm: 1 },
+                                  fontWeight: 600,
+                                  color: "#000",
+                                  fontSize: {
+                                    xs: "0.65rem",
+                                    sm: "0.7rem",
+                                    md: "0.75rem",
+                                  },
+                                }}
+                              >
+                                {(
+                                  (stat.w1 + stat.w2 + stat.w3) /
+                                  100
+                                ).toLocaleString()}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+
+                          {/* Grand Total Row */}
+                          <TableRow
+                            sx={{
+                              bgcolor: "#f1f5f9",
+                              "&:last-child td": { borderBottom: "none" },
+                              "& td": {
+                                fontWeight: 700,
+                                py: { xs: 0.5, sm: 1 },
+                                fontSize: {
+                                  xs: "0.65rem",
+                                  sm: "0.7rem",
+                                  md: "0.75rem",
+                                },
+                                borderRight: "1px solid #e2e8f0",
+                                "&:last-child": { borderRight: "none" },
+                              },
+                            }}
+                          >
+                            <TableCell>Total</TableCell>
+                            <TableCell>
+                              {userStatsDynamic.reduce(
+                                (sum, stat) => sum + stat.count,
+                                0
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {(totalW1 / 100).toLocaleString()}
+                            </TableCell>
+                            <TableCell>
+                              {(totalW2 / 100).toLocaleString()}
+                            </TableCell>
+                            <TableCell>
+                              {(totalW3 / 100).toLocaleString()}
+                            </TableCell>
+                            <TableCell>
+                              {(grandTotal / 100).toLocaleString()}
+                            </TableCell>
+                          </TableRow>
+                        </>
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Card>
+            </Box>
+          </Grid>
         </Grid>
-      </Grid>
+      )}
     </Box>
   );
 };

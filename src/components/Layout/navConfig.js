@@ -27,426 +27,351 @@ import {
   walletTransferImage,
 } from "../../iconsImports";
 
-// Normal User Navigation
-export const nav = [
-  { title: "Dashboard", icon: dashboardImage, icon2: "📊", to: "/dashboard" },
-  { title: "Recharge", icon: rechargeNew, icon2: "🔋", to: "/recharge" },
-  {
-    title: "Money Transfer",
-    icon: fundReqImage,
-    icon2: "💸",
-    to: "/money-transfer",
-  },
-];
-
-// Admin Navigation
-export const Admin_nav = [
+export const navConfig = [
+  // Dashboard
   {
     title: "Dashboard",
     icon: dashboardImage,
     icon2: "📊",
-    to: "/admin/dashboard",
+    to: {
+      adm: "/admin/dashboard",
+      ret: "/customer/dashboard",
+      di: "/di/dashboard",
+      md: "/md/dashboard",
+      asm: "/asm/dashboard",
+      zsm: "/zsm/dashboard",
+      api: "/api/dashboard",
+    },
+    roles: ["adm", "ret", "di", "md", "asm", "zsm", "api"],
   },
-  { title: "Manage Users", icon: usersImage, icon2: "👥", to: "/admin/users" },
-  {
-    title: "Fund Request",
-    icon: bankImage,
-    icon2: "🛠️",
-    to: "/admin/fund-request",
-  },
-  // { title: "Notification", icon: "💳", icon2: "💳", to: "/admin/notification" },
-  {
-    title: "Transactions",
-    icon: transImage,
-    icon2: "💳",
-    to: "/admin/transactions",
-  },
-  // { title: "Statement", icon: "💳", icon2: "💳", to: "/admin/statement" },
-  {
-    title: "Bankings",
-    icon: bankImage,
-    icon2: bankImage,
-    to: "/admin/bankings",
-  },
-  { title: "Services", icon: serviceImage, icon2: "👥", to: "/admin/services" },
 
-  // {
-  //   title: "Wallet Transfer",
-  //   icon: walletTransferImage,
-  //   icon2: "🛠️",
-  //   to: "/admin/wallet-transfer",
-  // },
+  // Manage Users
   {
-    title: "Wallet Ledger",
-    icon: walletLedgerImg,
-    icon2: "🛠️",
-    to: "/admin/wallet-ledger",
-  },
-  { title: "Settings", icon: settingImage, icon2: "👥", to: "/admin/settings" },
-  // { title: "Purpose", icon: settingImage, icon2: "👥", to: "/admin/purposes" },
-
-  // {
-  //   title: "Layouts",
-  //   icon: layoutImage,
-  //   icon2: "👥",
-  //   to: "/admin/selectlayout",
-  // },
-
-  {
-    title: "Complaint",
-    icon: complainImage,
+    title: "Manage Users",
+    icon: usersImage,
     icon2: "👥",
-    to: "/admin/complaint",
+    to: {
+      adm: "/admin/users",
+      asm: "/asm/users",
+      zsm: "/zsm/users",
+      md: "/md/users",
+    },
+    roles: ["adm"],
   },
-  { title: "Risk", icon: riskImage, icon2: "👥", to: "/admin/risk" },
-  // { title: "Virtual Accounts", icon: virtuanAccountImage, icon2: "👥", to: "/admin/virtual_accounts" },
-  {
-    title: "Login History",
-    icon: loginHistoryImage,
-    icon2: "👥",
-    to: "/admin/login_history",
-  },
-];
 
-// Customer Navigation
-export const customer_nav = [
-  // {
-  //   title: "Dashboard",
-  //   icon: dashboardImage,
-  //   icon2: "📊",
-  //   to: "/customer/dashboard",
-  // },
+  // Recharge & Bill Payments
   {
     title: "Recharge",
     icon: rechargeNew,
-    icon2: "🛠️",
-    to: "/customer/recharge-bill",
+    icon2: "🔋",
+    to: {
+      ret: "/customer/recharge-bill",
+      default: "/recharge",
+    },
+    roles: ["ret"],
+    permissionKey: "recharge",
   },
 
   {
-    title: "Money transfer",
-    icon: bankImage,
-    icon2: "🛠️",
-    to: "/customer/money-transfer",
+    title: "Money Transfer",
+    icon: transImage,
+    icon2: "💸",
+    to: {
+      ret: "/customer/money-transfer",
+      default: "/money-transfer",
+    },
+    roles: ["ret"],
+    permissionKey: "dmt1",
   },
 
+  // Fund Transfer
   {
     title: "Fund Transfer",
     icon: fundReqImage,
     icon2: "🛠️",
-    to: "/customer/transfer",
+    to: {
+      ret: "/customer/transfer",
+    },
+    roles: ["ret"],
   },
-  { title: "AEPS", icon: aepsImage, icon2: "👥", to: "/customer/aeps" },
 
+  // AEPS
+  {
+    title: "AEPS",
+    icon: aepsImage,
+    icon2: "👥",
+    to: {
+      ret: "/customer/aeps",
+    },
+    roles: ["ret"],
+  },
+
+  // BBPS Online
   {
     title: "BBPS Online",
     icon: bbps_1,
     icon2: "📒",
-    to: "/customer/bbps",
+    to: {
+      ret: "/customer/bbps",
+    },
+    roles: ["ret"],
+    // permissionKey: "bbps_online",
   },
+
+  // BBPS Offline
   {
     title: "BBPS Offline",
     icon: serviceImage,
     icon2: "🛠️",
-    to: "/customer/bbps-offline",
+    to: {
+      ret: "/customer/bbps-offline",
+    },
+    roles: ["ret"],
+    permissionKey: "bbps_offline",
   },
 
-  { title: "Cms", icon: cms1, icon2: "📒", to: "/customer/cms" },
+  // CMS
+  {
+    title: "CMS",
+    icon: cmsImage,
+    icon2: "📒",
+    to: {
+      ret: "/customer/cms",
+    },
+    roles: ["ret"],
+    // permissionKey: "cms",
+  },
 
-  //  {
-  //   title: "Fund Transfer",
-  //   icon: fundReqImage,
-  //   icon2: "🛠️",
-  //   to: "/customer/fund-transfer",
-  // },
-
-  //  {
-  //   title: "Upi Transfer",
-  //   icon: walletTransferImage,
-  //   icon2: "🛠️",
-  //   to: "/customer/upi-transfer",
-  // },
-
+  // Wallet Transfer
   {
     title: "Wallet Transfer",
     icon: walletTransferImage,
     icon2: "🛠️",
-    to: "/customer/wallet-transfer",
+    to: {
+      ret: "/customer/wallet-transfer",
+      di: "/di/wallet-transfer",
+      md: "/md/wallet-transfer",
+    },
+    roles: ["ret", "di", "md"],
   },
 
+  // Fund Request
   {
     title: "Fund Request",
     icon: fundReqImage,
     icon2: "🛠️",
-    to: "/customer/fund-request",
-  },
-  {
-    title: "Transactions",
-    icon: serviceImage,
-    icon2: "💳",
-    to: "/customer/transactions",
+    to: {
+      adm: "/admin/fund-request",
+      ret: "/customer/fund-request",
+      md: "/md/fund-request",
+      api: "/api/fund-request",
+    },
+    roles: ["adm", "ret", "md", "api"],
+    permissionKey: "fund_req",
   },
 
-  // {
-  //   title: "W2W Transfer",
-  //   icon: "🛠️",
-  //   icon2: "🛠️",
-  //   to: "/customer/w2w-transfer",
-  // },
-
-  {
-    title: "Wallet Ledger",
-    icon: walletLedgerImg,
-    icon2: "📒",
-    to: "/customer/wallet-ledger",
-  },
-  {
-    title: "Complaints",
-    icon: complainImageNew,
-    icon2: "📒",
-    to: "/customer/complaint",
-  },
-  { title: "Risk", icon: riskImage, icon2: "👥", to: "/customer/risk" },
-  // {
-  //   title: "My Purchase",
-  //   icon: transImage,
-  //   icon2: "🛠️",
-  //   to: "/customer/purchase",
-  // },
-  // {
-  //   title: "Complaints",
-  //   icon: fundReqImage,
-  //   icon2: "📒",
-  //   to: "/customer/complaint",
-  // },
-
-  {
-    title: "Login History",
-    icon: loginHistoryImage,
-    icon2: "📒",
-    to: "/customer/login_history",
-  },
-];
-export const di_nav = [
-  // {
-  //   title: "Dashboard",
-  //   icon: dashboardImage,
-  //   icon2: "📊",
-  //   to: "/di/dashboard",
-  // },
-  { title: "Users", icon: usersImage, icon2: "👥", to: "/di/users" },
-  {
-    title: "Transaction",
-    icon: serviceImage,
-    icon2: "🛠️",
-    to: "/di/transactions",
-  },
-  {
-    title: "Wallet Transfer",
-    icon: walletTransferImage,
-    icon2: "🛠️",
-    to: "/di/wallet-transfer",
-  },
-  {
-    title: "Wallet Ledger",
-    icon: walletLedgerImg,
-    icon2: "📒",
-    to: "/di/wallet-ledger",
-  },
-  {
-    title: "Login History",
-    icon: loginHistoryImage,
-    icon2: "📒",
-    to: "/di/login_history",
-  },
-];
-
-export const service_nav = [
-  // {
-  //   title: "Dashboard",
-  //   icon: dashboardImage,
-  //   icon2: "📊",
-  //   to: "/customer/dashboard",
-  // },
-  {
-    title: "All Services",
-    icon: serviceImage,
-    icon2: "🛠️",
-    to: "/customer/allServices",
-  },
-  // {
-  //   title: "Wallet Transfer",
-  //   icon: walletTransferImage,
-  //   icon2: "🛠️",
-  //   to: "/customer/wallet-transfer",
-  // },
-  {
-    title: "Wallet Ledger",
-    icon: walletLdgerImage,
-    icon2: "🛠️",
-    to: "/customer/wallet-ledger",
-  },
+  // Transactions
   {
     title: "Transactions",
     icon: transImage,
     icon2: "💳",
-    to: "/customer/transactions",
+    to: {
+      adm: "/admin/transactions",
+      ret: "/customer/transactions",
+      di: "/di/transactions",
+      asm: "/asm/transcations",
+      zsm: "/zsm/transcations",
+      api: "/api/transcations",
+      md: "/md/transcations",
+    },
+    roles: ["adm", "ret", "di", "asm", "zsm", "api", "md"],
   },
+
   {
-    title: "Fund Request",
+    title: "Bankings",
     icon: bankImage,
-    icon2: "🛠️",
-    to: "/customer/fund-request",
+    icon2: "🏦",
+    to: {
+      adm: "/admin/bankings",
+    },
+    permissionKey: "banking",
+    roles: ["adm"],
   },
-  {
-    title: "Activity Logs",
-    icon: riskImage,
-    icon2: "📒",
-    to: "/customer/login_history",
-  },
-   {
-    title: "Login History",
-    icon: loginHistoryImage,
-    icon2: "👥",
-    to: "/customer/login_history",
-  },
-];
 
-export const asm_nav = [
+  // Services
   {
-    title: "Dashboard",
-    icon: dashboardImage,
-    icon2: "📊",
-    to: "/asm/dashboard",
-  },
-  {
-    title: "Manage Users",
-    icon: usersImage,
-    icon2: usersImage,
-    to: "/asm/users",
-  },
-  {
-    title: "Transactions",
+    title: "Services",
     icon: serviceImage,
-    icon2: "📊",
-    to: "/asm/transcations",
+    icon2: "🛠️",
+    to: {
+      adm: "/admin/services",
+      ret: "/customer/allServices",
+    },
+    roles: ["adm", "ret"],
   },
-  // { title: "Profile", icon: serviceImage, icon2: "📊", to: "/asm/profile" },
+
+  // Wallet Ledger
   {
     title: "Wallet Ledger",
     icon: walletLdgerImage,
-    icon2: "📊",
-    to: "/asm/wallet-ledger",
-  },
-  {
-    title: "Login History",
-    icon: loginHistoryImage,
     icon2: "📒",
-    to: "/asm/login_history",
+    to: {
+      adm: "/admin/wallet-ledger",
+      ret: "/customer/wallet-ledger",
+      di: "/di/wallet-ledger",
+      asm: "/asm/wallet-ledger",
+      zsm: "/zsm/wallet-ledger",
+      md: "/md/wallet-ledger",
+    },
+    roles: ["adm", "ret", "di", "asm", "zsm", "md"],
   },
-];
 
-export const zsm_nav = [
-  // {
-  //   title: "Dashboard",
-  //   icon: dashboardImage,
-  //   icon2: "📊",
-  //   to: "/zsm/dashboard",
-  // },
-  { title: "Users", icon: usersImage, icon2: "📊", to: "/zsm/users" },
+  // Settings
   {
-    title: "Transcations",
-    icon: transImage,
-    icon2: "📊",
-    to: "/zsm/transcations",
+    title: "Settings",
+    icon: settingImage,
+    icon2: "⚙️",
+    to: {
+      adm: "/admin/settings",
+    },
+    permissionKey: "settings",
+    roles: ["adm"],
   },
-  { title: "Profile", icon: profileNewImage, icon2: "📊", to: "/zsm/profile" },
-  {
-    title: "Wallet Ledger",
-    icon: walletLdgerImage,
-    icon2: "📊",
-    to: "/zsm/wallet-ledger",
-  },
-  {
-    title: "Login History",
-    icon: loginHistoryImage,
-    icon2: "📒",
-    to: "/zsm/login_history",
-  },
-];
 
-export const api_nav = [
-  {
-    title: "Dashboard",
-    icon: dashboardImage,
-    icon2: "📊",
-    to: "/api/dashboard",
-  },
-  { title: "Users", icon: usersImage, icon2: "📊", to: "/api/users" },
-  {
-    title: "Transcations",
-    icon: transImage,
-    icon2: "📊",
-    to: "/api/transcations",
-  },
-  { title: "Profile", icon: profileNewImage, icon2: "📊", to: "/api/profile" },
+  // Complaint
   {
     title: "Complaint",
-    icon: complainImageNew,
-    icon2: "📊",
-    to: "/api/complaint",
+    icon: complainImage,
+    icon2: "📝",
+    to: {
+      adm: "/admin/complaint",
+      ret: "/customer/complaint",
+      api: "/api/complaint",
+    },
+    roles: ["adm", "ret", "api"],
   },
+
+  // Risk
   {
-    title: "Fund Request",
-    icon: bankImage,
-    icon2: "📊",
-    to: "/api/fund-request",
+    title: "Risk",
+    icon: riskImage,
+    icon2: "⚠️",
+    to: {
+      adm: "/admin/risk",
+      ret: "/customer/risk",
+      di: "/di/risk",
+    },
+    roles: ["adm", "ret", "di"],
   },
+
+  // Login History
   {
     title: "Login History",
     icon: loginHistoryImage,
-    icon2: "📒",
-    to: "/api/login_history",
+    icon2: "📱",
+    to: {
+      adm: "/admin/login_history",
+      ret: "/customer/login_history",
+      di: "/di/login_history",
+      asm: "/asm/login_history",
+      zsm: "/zsm/login_history",
+      md: "/md/login_history",
+    },
+    roles: ["adm", "ret", "di", "asm", "zsm", "md"],
   },
-];
-
-export const md_nav = [
-  {
-    title: "Dashboard",
-    icon: dashboardImage,
-    icon2: "📊",
-    to: "/md/dashboard",
-  },
-  { title: "Users", icon: usersImage, icon2: "📊", to: "/md/users" },
 
   {
-    title: "Fund Request",
-    icon: bankImage,
-    icon2: "🛠️",
-    to: "/md/fund-request",
-  },
-  {
-    title: "Transcations",
-    icon: transImage,
-    icon2: "📊",
-    to: "/md/transcations",
-  },
-  {
-    title: "Wallet Transfer",
-    icon: walletTransferImage,
-    icon2: "🛠️",
-    to: "/md/wallet-transfer",
-  },
-  {
-    title: "Wallet Ledger",
-    icon: walletLedgerImg,
-    icon2: "🛠️",
-    to: "/md/wallet-ledger",
-  },
-  {
-    title: "Login History",
-    icon: loginHistoryImage,
-    icon2: "📒",
-    to: "/md/login_history",
+    title: "Users",
+    icon: usersImage,
+    icon2: "👥",
+    to: {
+      di: "/di/users",
+      md: "/md/users",
+      zsm: "/zsm/users",
+      asm: "/asm/users",
+    },
+    roles: ["di", "asm", "zsm", "md"],
   },
 ];
+// Role-wise hierarchy
+const roleHierarchy = {
+  adm: [
+    "Dashboard",
+    "Manage Users",
+    "Fund Request",
+    "Transactions",
+    "Bankings",
+    "Services",
+    "Wallet Ledger",
+    "Settings",
+    "Complaint",
+    "Risk",
+    "Login History",
+  ],
+  md: [
+    "Dashboard",
+    "Users",
+    "Fund Request",
+    "Transactions",
+    "Wallet Transfer",
+    "Wallet Ledger",
+    "Login History",
+  ],
+  di: [
+    "Dashboard",
+    "Users",
+    "Transactions",
+    "Wallet Transfer",
+    "Wallet Ledger",
+    "Risk",
+    "Login History",
+  ],
+  ret: [
+    "Dashboard",
+    "Recharge",
+    "Money Transfer",
+    "Fund Transfer",
+    "AEPS",
+    "BBPS Online",
+    "BBPS Offline",
+    "CMS",
+    "Wallet Transfer",
+    "Fund Request",
+    "Transactions",
+    "Wallet Ledger",
+    "Complaint",
+    "Risk",
+    "Login History",
+  ],
+  asm: [
+    "Manage Users",
+    "Transactions",
+    "Wallet Ledger",
+    "Transactions",
+    "Login History",
+  ],
+  zsm: [
+    "Dashboard",
+    "Manage Users",
+    "Wallet Ledger",
+    "Transactions",
+    "Login History",
+  ],
+  api: ["Dashboard", "Fund Request", "Transactions", "Complaint"],
+};
+
+// Function to build nav for current role with permission check
+export const buildNavForRole = (role, permissions = {}) => {
+  const allowedItems = navConfig.filter((item) => item.roles.includes(role));
+  const hierarchy = roleHierarchy[role] || [];
+
+  return hierarchy
+    .map((title) =>
+      allowedItems.find((item) => {
+        const hasPermission =
+          !item.permissionKey || permissions[item.permissionKey];
+        return item.title === title && hasPermission;
+      })
+    )
+    .filter(Boolean); // remove undefined if any
+};
