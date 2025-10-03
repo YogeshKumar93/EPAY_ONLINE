@@ -1,5 +1,5 @@
 import { useMemo, useContext, useState, useRef } from "react";
-import { Box, Tooltip, IconButton, Drawer, Typography } from "@mui/material";
+import { Box, Tooltip, IconButton, Drawer, Typography, Button } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import AuthContext from "../../contexts/AuthContext";
@@ -49,6 +49,8 @@ const RechargeTxn = ({ query }) => {
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [selectedForRefund, setSelectedForRefund] = useState(null);
   const [refundLoading, setRefundLoading] = useState(false);
+    const [selectedRows, setSelectedRows] = useState([]);
+
 
   const { showToast } = useToast();
   const handleRefundClick = (row) => {
@@ -520,6 +522,31 @@ const RechargeTxn = ({ query }) => {
     ],
     []
   );
+   const columnsWithSelection = useMemo(() => {
+      return [
+        {
+          name: "",
+          selector: (row) => (
+            <input
+              type="checkbox"
+              checked={selectedRows.some((r) => r.id === row.id)}
+              onChange={() => {
+                const isSelected = selectedRows.some((r) => r.id === row.id);
+                const newSelectedRows = isSelected
+                  ? selectedRows.filter((r) => r.id !== row.id)
+                  : [...selectedRows, row];
+                setSelectedRows(newSelectedRows);
+  
+                // optional: log to check
+                console.log("Selected Rows:", newSelectedRows);
+              }}
+            />
+          ),
+          width: "40px",
+        },
+        ...columns, // append your normal columns
+      ];
+    }, [selectedRows, columns]);
 
   const queryParam = "";
 
@@ -528,11 +555,65 @@ const RechargeTxn = ({ query }) => {
       <Box sx={{}}>
         <CommonTable
           onFetchRef={handleFetchRef}
-          columns={columns}
+         columns={columnsWithSelection}
           endpoint={ApiEndpoints.GET_RECHARGE_TXN}
           filters={filters}
           queryParam={queryParam}
           enableActionsHover={true}
+           enableSelection={false}
+          selectedRows={selectedRows}
+          onSelectionChange={setSelectedRows}
+          customHeader={
+  <>
+  <Box
+    sx={{
+      display: "flex",
+      alignItems: "center",
+      gap: 1,
+      padding: "8px",
+      flexWrap: "wrap",
+    }}
+  >
+    {selectedRows.length > 0 && (
+      <Tooltip title="View Selected Details">
+       <Button
+        variant="contained"
+        size="small"
+        color="primary"
+        onClick={() => {
+          // Save selected rows to sessionStorage
+          sessionStorage.setItem("txnData", JSON.stringify(selectedRows));
+      
+          // Open new tab/window
+          window.open("/print-recharge", "_blank");
+        }}
+      >
+        View Selected Details
+      </Button>
+      </Tooltip>
+    )}
+  </Box>
+      <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              padding: "8px",
+              flexWrap: "wrap",
+            }}
+          >
+            {user?.role === "adm" && (
+              <IconButton
+                color="primary"
+                onClick={handleExportExcel}
+                title="Export to Excel"
+              >
+                <FileDownloadIcon />
+              </IconButton>
+            )}
+          </Box>
+          </>
+}
         />
       </Box>
 
