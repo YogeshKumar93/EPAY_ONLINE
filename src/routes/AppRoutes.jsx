@@ -293,7 +293,8 @@ export default function AppRoutes() {
 
               <Route path="di/wallet-ledger" element={<DiMdLedgers />} />
               <Route path="di/transactions" element={<Transaction />} />
-              <Route path="md/fund-request" element={<FundRequest />} />
+              <Route path="di/fund-request" element={<FundRequest />} />
+               <Route path="di/risk" element={<Risk />} />
 
               {/* <Route
                 path="di/wallet-transfer"
