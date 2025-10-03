@@ -40,8 +40,8 @@ const Accounts = ({ filters = [] }) => {
   };
 
   const handleAccountStatement = (row) => {
-    navigate(`/admin/accountstatements/${row.id}`, {
-      state: { account_id: row.id },
+    navigate(`/admin/accountstatements`, {
+      state: { account_id: row.id, balance: row.balance, user_id: row.user_id },
     });
   };
 
@@ -59,92 +59,85 @@ const Accounts = ({ filters = [] }) => {
   };
 
   // ✅ Columns definition
- const columns = [
-  { name: "Name", selector: (row) => row.name },
-  { name: "User ID", selector: (row) => row.user_id },
-  { name: "Establishment", selector: (row) => row.establishment },
-  { name: "Mobile", selector: (row) => row.mobile },
-  { name: "Type", selector: (row) => row.type },
-  { name: "ASM", selector: (row) => row.asm || "-" },
-  { name: "Credit Limit", selector: (row) => row.credit_limit },
-  { name: "Balance", selector: (row) => row.balance },
-  {
-    name: "Status",
-    selector: (row) => <CommonStatus value={row.status} />,
-  },
-{
-  name: "Actions",
-  selector: (row) => {
- 
-
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minWidth: "120px",
-          position: "relative",
-          height: 40, // reserve fixed height to prevent fluctuation
-        }}
-      >
-        {/* Icons always rendered, visibility toggled */}
-        <Box
-          sx={{
-            display: "flex",
-            gap: 1,
-            visibility: "visible" ,
-            transition: "visibility 0.2s, opacity 0.2s",
-          }}
-        >
-          <Tooltip title="Account Statement">
-            <IconButton
-              color="info"
-              size="small"
-              onClick={() => handleAccountStatement(row)}
-            >
-              <DescriptionIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title="Edit">
-            <IconButton
-              color="primary"
-              size="small"
-              onClick={() => {
-                setSelectedAccount(row);
-                setOpenUpdate(true);
+  const columns = [
+    { name: "Name", selector: (row) => row.name },
+    { name: "User ID", selector: (row) => row.user_id },
+    { name: "Establishment", selector: (row) => row.establishment },
+    { name: "Mobile", selector: (row) => row.mobile },
+    { name: "Type", selector: (row) => row.type },
+    { name: "ASM", selector: (row) => row.asm || "-" },
+    { name: "Credit Limit", selector: (row) => row.credit_limit },
+    { name: "Balance", selector: (row) => row.balance },
+    {
+      name: "Status",
+      selector: (row) => <CommonStatus value={row.status} />,
+    },
+    {
+      name: "Actions",
+      selector: (row) => {
+        return (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minWidth: "120px",
+              position: "relative",
+              height: 40, // reserve fixed height to prevent fluctuation
+            }}
+          >
+            {/* Icons always rendered, visibility toggled */}
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                visibility: "visible",
+                transition: "visibility 0.2s, opacity 0.2s",
               }}
             >
-              <EditIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+              <Tooltip title="Account Statement">
+                <IconButton
+                  color="info"
+                  size="small"
+                  onClick={() => handleAccountStatement(row)}
+                >
+                  <DescriptionIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
 
-          <Tooltip title="Delete">
-            <IconButton
-              color="error"
-              size="small"
-              onClick={() => {
-                setSelectedAccount(row);
-                setOpenDelete(true);
-              }}
-            >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        </Box>
+              <Tooltip title="Edit">
+                <IconButton
+                  color="primary"
+                  size="small"
+                  onClick={() => {
+                    setSelectedAccount(row);
+                    setOpenUpdate(true);
+                  }}
+                >
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
 
-        
-      </Box>
-    );
-  },
-  width: "120px",
-  center: true,
-}
-
-
-];
-
+              <Tooltip title="Delete">
+                <IconButton
+                  color="error"
+                  size="small"
+                  onClick={() => {
+                    setSelectedAccount(row);
+                    setOpenDelete(true);
+                  }}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
+        );
+      },
+      width: "120px",
+      center: true,
+    },
+  ];
 
   const queryParam = "";
 

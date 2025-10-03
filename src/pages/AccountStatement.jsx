@@ -23,7 +23,7 @@ import { useLocation, useParams } from "react-router-dom";
 import { excelIcon } from "../iconsImports";
 import { Banking } from "./Banking";
 import { Delete } from "@mui/icons-material";
-// import DeleteConfirmationModal from "./DeleteConfirmationModal";
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import { apiCall } from "../api/apiClient";
 import { useToast } from "../utils/ToastContext";
 import { DateRangePicker } from "rsuite";
@@ -167,7 +167,7 @@ const AccountStatement = ({ filters = [] }) => {
         name: "By",
         selector: (row) => (
           <Tooltip title={row?.bank_id}>
-            <div style={{ textAlign: "left" }}>{row?.bank_id}</div>
+            <div style={{ textAlign: "left" }}>{row?.created_by}</div>
           </Tooltip>
         ),
         width: "150px",
@@ -307,12 +307,12 @@ const AccountStatement = ({ filters = [] }) => {
         handleSave={handleSaveUpdate}
         onFetchRef={refreshUsers}
       />
-      {/* <DeleteConfirmationModal
+      <DeleteConfirmationModal
         open={openDelete}
         handleClose={() => setOpenDelete(false)}
         onFetchRef={refreshUsers}
         userId={user?.id}
-      /> */}
+      />
     </Box>
   );
 };

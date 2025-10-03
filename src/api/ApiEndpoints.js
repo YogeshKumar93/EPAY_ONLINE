@@ -125,12 +125,15 @@ const ApiEndpoints = {
   CREATE_NEWS: "news/createNews",
   DELETE_NEWS: "news/deleteNews",
 
-  
-LOGIN_HISTORY:"userDevice/getUserDevice",
-GET_WEBHOOKS:"webhook/getWebhook",
+  LOGIN_HISTORY: "userDevice/getUserDevice",
+  GET_WEBHOOKS: "webhook/getWebhook",
 
   // ****************************** NEW API'S ABOVE ******************************
-
+  GET_TXN_SUMMARY: "dashboard/getRetTxnSummary",
+  GET_SERVICE_WISE_PROFIT: "dashboard/getServiceWiseProfitSummary",
+  GET_SERVICE_WISE_PROFIT_DI: "dashboard/getServiceWiseProfitSummaryForDi",
+  GET_SERVICE_WISE_PROFIT_MD: "dashboard/getServiceWiseProfitSummaryForMd",
+  GET_SERVICE_WISE_PROFIT_ADMIN: "dashboard/getServiceWiseProfitSummaryNew",
   GET_FUND_REQUESTS: "fundrequest/getFundRequests",
   CREATE_FUND_REQUEST: "fundrequest/createFundRequest",
   UPDATE_FUND_REQUEST: "fundrequest/updateFundRequest",
@@ -168,6 +171,7 @@ GET_WEBHOOKS:"webhook/getWebhook",
   UPDATE_BANK_STATEMENT: "bankStatement/updateBankStatement",
   DELETE_BANK_STATEMENT: "bankStatement/deleteBankStatement",
   GET_BANK_STATEMENT_SCHEMA: "bankStatement/getBankStatementSchema",
+
   GET_DASHBOARD1: "dashboard/getRoleWiseCounts",
   GET_DASHBOARD2: "dashboard/getServiceWiseSummary",
   GET_ACCOUNT_STATEMENTS: "accountStatement/getAccountStatement",

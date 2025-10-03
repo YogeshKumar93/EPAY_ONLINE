@@ -183,6 +183,7 @@ const BankStatements = () => {
   return (
     <>
       <CommonLoader loading={loading} text="Loading Statements..." />
+      
 
       {!loading && (
         <Box>

@@ -38,17 +38,7 @@ import {
   AccountCircle,
 } from "@mui/icons-material";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
-import {
-  Admin_nav,
-  api_nav,
-  asm_nav,
-  customer_nav,
-  di_nav,
-  md_nav,
-  nav,
-  service_nav,
-  zsm_nav,
-} from "./navConfig";
+
 import AuthContext from "../../contexts/AuthContext";
 import { Switch } from "@mui/material";
 
@@ -70,24 +60,11 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 import EmailIcon from "@mui/icons-material/Email";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import WalletCard from "../WalletCard";
+import { buildNavForRole } from "./navConfig";
 
 // ✅ Default male avatar image (replace with your own asset if available)
 
 // Navigation configuration
-
-const roleNavigation = {
-  user: nav,
-  adm: Admin_nav,
-  sadm: Admin_nav,
-  ret: customer_nav,
-  dd: customer_nav,
-  service_nav: service_nav,
-  di: di_nav,
-  asm: asm_nav,
-  zsm: zsm_nav,
-  api: api_nav,
-  md: md_nav,
-};
 
 const roleRoutes = {
   adm: "/admin/profile",
@@ -98,17 +75,17 @@ const roleRoutes = {
   ret: "/customer/profile",
   zsm: "/zsm/profile",
   md: "/md/profile",
-  api: "/api-user/profile",
+  api: "/api/profile",
 };
 
 const themeSettings = {
   drawerWidth: 240,
   palette: {
     primary: {
-      main: "#6c4bc7",
+      main: "#0037D7",
     },
     secondary: {
-      main: "#13c3c1",
+      main: "#dc004e",
     },
     background: {
       default: "#f5f5f5",
@@ -118,20 +95,14 @@ const themeSettings = {
 };
 
 const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
-  // console.log("inroute",userRole);
-  const roleLabels = {
-    adm: "Admin",
-    sadm: "Super Admin",
-    ret: "Retailer",
-    dd: "DD",
-    user: "User",
-  };
-
   const { colours } = useContext(AuthContext);
 
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const userLayout = user?.is_layout;
+  const permissions = user?.permissions || {};
+  const role = user?.role;
+
   const refreshUser = authCtx.loadUserProfile;
   const colour = authCtx.loadColours;
   const isMobile = useMediaQuery("(max-width: 900px)");
@@ -172,16 +143,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
     }
   };
 
-  const getNavigationItems = () => {
-    if ((userRole === "ret" || userRole === "dd") && userLayout === 2) {
-      return service_nav; // Show service nav for layout 2
-    }
-
-    // Default navigation based on role
-    return roleNavigation[userRole] || nav;
-  };
-
-  const navigationItems = getNavigationItems();
+  const navigationItems = buildNavForRole(user?.role, user?.permissions || {});
 
   const handleDrawerToggle = () => {
     if (isMobile) {
@@ -198,63 +160,49 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
   const handleUserMenuClose = () => {
     setUserMenuAnchor(null);
   };
-
-  const handleNavigation = (path, hasSubmenus) => {
+  const handleNavigation = (item, hasSubmenus) => {
     if (hasSubmenus) {
-      setExpandedItems((prev) => ({ ...prev, [path]: !prev[path] }));
+      setExpandedItems((prev) => ({
+        ...prev,
+        [item.title]: !prev[item.title],
+      }));
     } else {
+      const path = getResolvedPath(item); // ✅ path for navigation
       navigate(path);
-      if (isMobile) {
-        setMobileOpen(false);
-      }
+      if (isMobile) setMobileOpen(false);
     }
+  };
+  const isActive = (path, submenus) => {
+    if (submenus) {
+      return submenus.some(
+        (submenu) => getResolvedPath(submenu) === location.pathname
+      );
+    }
+    return path === location.pathname;
   };
 
   const handleLogout = () => {
     handleUserMenuClose();
     authCtx.logout();
   };
+  const getResolvedPath = (item) =>
+    item.to?.[user?.role] || item.to?.default || "/";
 
-  const isActive = (path, submenus) => {
-    if (submenus) {
-      return submenus.some((submenu) => submenu.to === location.pathname);
-    }
-    return path === location.pathname;
-  };
-
-  // Render navigation items recursively
   const renderNavItems = (items, level = 0) => {
     return items.map((item, index) => {
       const hasSubmenus = item.submenus && item.submenus.length > 0;
-      const isItemActive = isActive(item.to, item.submenus);
-      const isExpanded = expandedItems[item.to] || false;
+      const resolvedPath = getResolvedPath(item); // for navigation & active
+      const isItemActive = isActive(resolvedPath, item.submenus);
+      const isExpanded = expandedItems[item.title] || false; // use title as key
 
       return (
-        <Box
-          key={index}
-          className=""
-          sx={{
-            padding: "4px 12px",
-          }}
-        >
+        <Box key={index} sx={{ padding: "4px 12px" }}>
           <ListItem
             button
-            onClick={() => handleNavigation(item.to, hasSubmenus)}
+            onClick={() => handleNavigation(item, hasSubmenus)}
             sx={{
               position: "relative",
-              backgroundColor: isItemActive ? "#ebeef2" : "transparent",
-              color: isItemActive ? "#6c4bc7" : "#6e82a5",
-              borderRadius: "4px",
-              mb: 0,
-              "&:hover": {
-                backgroundColor: "#ebeef2", // hover pe bhi active jaisa bg
-                color: "#6c4bc7", // hover pe bhi active jaisa text color
-                "& .MuiListItemIcon-root img": {
-                  filter:
-                    "invert(41%) sepia(83%) saturate(7421%) hue-rotate(261deg) brightness(97%) contrast(101%)",
-                },
-              },
-
+              backgroundColor: isItemActive ? "#e6f0fb" : "transparent",
               "&::before": isItemActive
                 ? {
                     content: '""',
@@ -263,59 +211,39 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                     top: 0,
                     height: "100%",
                     width: "4px",
-                    backgroundColor: "#6c4bc7", // left border only for active
+                    backgroundColor: "#2275b7",
                     borderRadius: "2px",
-                    color: "#6c4bc7",
                   }
                 : {},
             }}
           >
-            <ListItemIcon
-              sx={{
-                "& img": {
-                  width: 26,
-                  height: 26,
-                  filter: isItemActive
-                    ? "invert(41%) sepia(83%) saturate(7421%) hue-rotate(261deg) brightness(97%) contrast(101%)"
-                    : "none",
-                  transition: "filter 0.2s ease-in-out",
-                },
-                "&:hover img": {
-                  filter: isItemActive
-                    ? "invert(41%) sepia(83%) saturate(7421%) hue-rotate(261deg) brightness(97%) contrast(101%)"
-                    : "brightness(0) invert(0.6)",
-                },
-              }}
-            >
-              <img src={item.icon} alt={item.title} />
+            <ListItemIcon>
+              <img
+                src={item.icon}
+                alt={item.title}
+                style={{ width: 26, height: 26 }}
+              />
             </ListItemIcon>
 
-            {(desktopOpen || isMobile) && (
-              <>
-                <ListItemText
-                  primary={item.title}
-                  sx={{
-                    "& .MuiTypography-root": {
-                      fontFamily: "DM Sans, sans-serif",
-                      fontWeight: 550,
-                      fontSize: "15px",
-                      color: isItemActive ? "#6c4bc7" : "#6e82a5", // ✅ active text color
-                    },
-                    ".MuiListItem-root:hover & .MuiTypography-root": {
-                      color: "#6c4bc7",
-                    },
-                  }}
-                />
+            {/* Always render title */}
+            <ListItemText
+              primary={item.title} // ✅ Make sure title is not replaced
+              sx={{
+                "& .MuiTypography-root": {
+                  color: isItemActive ? "#2275b7" : "#6e82a5",
+                  fontWeight: 550,
+                  fontSize: "15px",
+                },
+              }}
+            />
 
-                {hasSubmenus &&
-                  (isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />)}
-              </>
-            )}
+            {hasSubmenus &&
+              (isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />)}
           </ListItem>
 
           {hasSubmenus && (
             <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding className="sub-nav">
+              <List component="div" disablePadding>
                 {renderNavItems(item.submenus, level + 1)}
               </List>
             </Collapse>
@@ -348,7 +276,6 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
           height: "64px",
           borderBottom: `1px solid rgba(0, 0, 0, 0.12)`,
           minHeight: "64px", // Matching the header height
-          width: "100%",
         }}
       >
         {desktopOpen && (
@@ -357,8 +284,8 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             src={logo}
             alt="App Logo"
             sx={{
-              height: 50, // adjust as needed
-              width: "auto",
+              height: 35, // adjust as needed
+              width: "120",
             }}
           />
         )}
@@ -387,6 +314,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
         }}
       >
         {renderNavItems(navigationItems)}
+
         <MenuItem
           disableRipple
           onClick={() => {
@@ -422,7 +350,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             color: "#000",
           }}
         >
-          App Version 2.0.0
+          App Version 1.0.0
         </Typography>
       </List>
     </Box>
@@ -434,7 +362,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
     { match: ["lein"], wallets: ["lien"] },
   ];
 
- const getWallets = (role) => {
+  const getWallets = (role) => {
     const found = walletConfig.find((cfg) =>
       cfg.match.some((m) => role?.includes(m))
     );
@@ -470,31 +398,16 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
         className="header"
       >
         <Toolbar sx={{ minHeight: "64px !important" }}>
-            <IconButton
-    color="inherit"
-    aria-label="open drawer"
-    edge="start"
-    onClick={handleDrawerToggle}
-    sx={{
-      mr: 2,
-      display: { xs: "flex", sm: "flex", md: "none" }, // only show on xs/sm
-      color: "#6c4bc7",
-    }}
-  >
-    <MenuIcon />
-  </IconButton>
-
           <Typography
             variant="h5"
             noWrap
             component="div"
-            sx={{ flexGrow: 1, color: "#6c4bc7", fontWeight: 700 }}
-
+            sx={{ flexGrow: 1, color: "#2275b7", fontWeight: 700 }}
           >
             {title}
           </Typography>
           <Box sx={{ display: "flex", gap: 2, mr: 2 }}>
-                {getWallets(user?.role).map((wallet) => (
+            {getWallets(user?.role).map((wallet) => (
               <WalletCard
                 key={wallet}
                 label={wallet.toUpperCase()}
@@ -511,11 +424,11 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
               )}
           </Box>
           <IconButton onClick={refreshUser}>
-            <RefreshIcon sx={{ color: "yellow" }} />
+            <RefreshIcon sx={{ color: "#2275b7" }} />
           </IconButton>
 
           <IconButton onClick={colour}>
-            <RefreshIcon sx={{ color: "#13c3c1" }} />
+            <RefreshIcon sx={{ color: "#ec9e9eff" }} />
           </IconButton>
 
           <Box
@@ -535,13 +448,14 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                 sx={{
                   width: 30,
                   height: 30,
-                  bgcolor: "#6c4bc7",
+                  bgcolor: "#2275b7",
                 }}
               >
                 <PersonOutlineIcon sx={{ color: "#FFF", fontSize: 20 }} />
               </Avatar>
             </IconButton>
 
+            {/* Role + Name as separate text (not clickable) */}
             {/* Role + Name as separate text (not clickable) */}
             <Box
               onClick={handleUserMenuOpen}
@@ -555,7 +469,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                 variant="caption"
                 sx={{
                   fontWeight: 500,
-                  color: "#6c4bc7",
+                  color: "#2275B7",
                   fontSize: "11px",
                   lineHeight: 1,
                 }}
@@ -584,7 +498,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                   variant="subtitle1"
                   sx={{
                     fontWeight: 600,
-                    color: "#13c3c1",
+                    color: "#2275b7",
                     fontSize: "12px",
                     lineHeight: "16px",
                   }}
@@ -596,7 +510,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                   onClick={handleUserMenuOpen}
                   sx={{ p: 0, ml: 1, width: 20, height: 20 }}
                 >
-                  <ExpandMoreIcon sx={{ fontSize: 20, color: "#6c4bc7" }} />
+                  <ExpandMoreIcon sx={{ fontSize: 20, color: "#2275B7" }} />
                 </IconButton>
               </Box>
             </Box>
@@ -629,7 +543,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                 gap: 2,
                 color: "#220ad7ff",
                 bgcolor: "#e6eef4ff",
-                borderTop: "3px solid #6c4bc7",
+                borderTop: "3px solid #2275b7 ",
               }}
             >
               <Avatar
@@ -676,7 +590,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                 <ListItemIcon>
                   <TimelineIcon fontSize="small" />
                 </ListItemIcon>
-                Logs Activity
+                Activity Logs
               </MenuItem>
 
               {/* <MenuItem>
@@ -798,8 +712,8 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             textAlign: "center",
             py: { xs: 2, sm: 1.5 },
             px: { xs: 1, sm: 2 },
-            backgroundColor: "#d4e8e8ff",
-            color: "#6c4bc7",
+            backgroundColor: "#2275b7",
+            color: "#d4e8e8",
             borderRadius: "10px",
             mt: 4,
             flexShrink: 0,
@@ -813,7 +727,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
           >
             © 2025{" "}
             <Box component="span" sx={{ fontWeight: 700 }}>
-              P2PA SOLUTIONS PVT LTD.
+              JITO FINTECH LLP.
             </Box>{" "}
             All Rights Reserved.
           </Typography>
@@ -821,14 +735,14 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             sx={{
               fontSize: { xs: "11.5px", sm: "13px", md: "14.5px" },
               mt: 1,
-              color: "#6c4bc7",
+              color: "#d4e8e8",
             }}
           >
             <a
               href="https://biggbrains.com" // Replace with your desired URL
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: "#6c4bc7", textDecoration: "underline" }} // Styling for link
+              style={{ color: "#d4e8e8", textDecoration: "underline" }} // Styling for link
             >
               Developed and Maintained by Biggbrains Solution Pvt. Ltd.
             </a>
@@ -840,3 +754,4 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
 };
 
 export default SideNavAndHeader;
+
