@@ -106,7 +106,7 @@ const Complaint = ({ filters = [] }) => {
       {
         name: "Actions",
         selector: (row, { hoveredRow, enableActionsHover }) => {
-          const isHovered = hoveredRow === row.id || !enableActionsHover;
+          // const isHovered = hoveredRow === row.id || !enableActionsHover;
 
           return (
             <Box
@@ -116,26 +116,17 @@ const Complaint = ({ filters = [] }) => {
                 minWidth: "100px",
               }}
             >
-              {isHovered ? (
-                row.status === "open" && (
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => {
-                      setSelectedRow(row);
-                      setOpenUpdate(true);
-                    }}
-                  >
-                    Update
-                  </Button>
-                )
-              ) : (
-                <Typography
-                  variant="body2"
-                  sx={{ color: "#999", textAlign: "center" }}
+              {row.status === "open" && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => {
+                    setSelectedRow(row);
+                    setOpenUpdate(true);
+                  }}
                 >
-                  -
-                </Typography>
+                  Update
+                </Button>
               )}
             </Box>
           );

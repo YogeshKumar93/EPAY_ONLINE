@@ -268,7 +268,7 @@ const FundRequest = () => {
           >
             {/* Left: Tab buttons */}
             <Box sx={{ display: "flex", gap: 1 }}>
-              {["pending", "approved", "rejected"].map((status) => (
+              {["all", "pending", "approved", "rejected"].map((status) => (
                 <Button
                   key={status}
                   variant={activeTab === status ? "contained" : "outlined"}
