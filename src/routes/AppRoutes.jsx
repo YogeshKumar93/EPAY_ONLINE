@@ -87,6 +87,7 @@ import { DiMdLedgers } from "../pages/DIMdLedgers";
 import WebHooks from "../pages/WebHooks";
 import { BbpsOffline } from "../pages/BbpsOffline";
 import PrintAeps from "../pages/PrintAeps";
+import PrintCreditCard from "../pages/PrintCreditCard";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading, user } = useContext(AuthContext);
@@ -146,6 +147,7 @@ export default function AppRoutes() {
         <Route path="/print-irctc" element={<PrintIrctc />} />
         <Route path="/print-payout" element={<PrintPayout />} />
         <Route path="/print-w2w" element={<PrintW2W />} />
+        <Route path="/print-creditCard" element={<PrintCreditCard />} />
 
         <Route path="/adminagreement" element={<AdminAgreement />} />
         <Route
