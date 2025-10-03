@@ -1,9 +1,13 @@
 import { useMemo, useContext, useState, useRef } from "react";
-import { Box, Tooltip, IconButton, Drawer, Typography, Button } from "@mui/material";
 import {
-
-  MenuItem,
+  Box,
+  Tooltip,
+  IconButton,
+  Drawer,
+  Typography,
+  Button,
 } from "@mui/material";
+import { MenuItem } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import AuthContext from "../../contexts/AuthContext";
@@ -29,6 +33,7 @@ import DrawerDetails from "../common/DrawerDetails";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import biggpayLogo from "../../assets/Images/PPALogor.png";
 import CloseIcon from "@mui/icons-material/Close";
+import FileDownloadIcon from "@mui/icons-material/FileDownload"; // Excel export icon
 
 import companylogo from "../../assets/Images/logo(1).png";
 import TransactionDetailsCard from "../common/TransactionDetailsCard";
@@ -45,6 +50,8 @@ import { useToast } from "../../utils/ToastContext";
 import { apiCall } from "../../api/apiClient";
 import Scheduler from "../common/Scheduler";
 import AddLein from "../../pages/AddLein";
+import { json2Excel } from "../../utils/exportToExcel";
+import { apiErrorToast } from "../../utils/ToastUtil";
 const RechargeTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
@@ -57,7 +64,7 @@ const RechargeTxn = ({ query }) => {
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [selectedForRefund, setSelectedForRefund] = useState(null);
   const [refundLoading, setRefundLoading] = useState(false);
-    const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
 
   const [selectedTransaction, setSelectedTrancation] = useState("");
   const [openLeinModal, setOpenLeinModal] = useState(false);
@@ -102,6 +109,26 @@ const RechargeTxn = ({ query }) => {
     }
 
     setRefundLoading(false);
+  };
+  const handleExportExcel = async () => {
+    try {
+      // Fetch all users (without pagination/filters) from API
+      const { error, response } = await apiCall(
+        "post",
+        ApiEndpoints.GET_RECHARGE_TXN,
+        { export: 1 }
+      );
+      const usersData = response?.data?.data || [];
+
+      if (usersData.length > 0) {
+        json2Excel("RechargeTxns", usersData); // generates and downloads Users.xlsx
+      } else {
+        apiErrorToast("no data found");
+      }
+    } catch (error) {
+      console.error("Excel export failed:", error);
+      alert("Failed to export Excel");
+    }
   };
   const navigate = useNavigate();
   const handleOpenLein = (row) => {
@@ -544,35 +571,33 @@ const RechargeTxn = ({ query }) => {
     ],
     []
   );
-const columnsWithSelection = useMemo(() => {
-     // Only show checkbox if user is NOT adm or sadm
+  const columnsWithSelection = useMemo(() => {
+    // Only show checkbox if user is NOT adm or sadm
     if (user?.role === "adm" || user?.role === "sadm") {
       return columns; // no selection column
     }
-  return [
-    {
-      name: "",
-      selector: (row) => (
-        <input
-          type="checkbox"
-          checked={selectedRows.some((r) => r.id === row.id)}
-          disabled={row.status?.toLowerCase() === "failed"}
-          onChange={() => {
-            const isSelected = selectedRows.some((r) => r.id === row.id);
-            const newSelectedRows = isSelected
-              ? selectedRows.filter((r) => r.id !== row.id)
-              : [...selectedRows, row];
-            setSelectedRows(newSelectedRows);
-          }}
-        />
-      ),
-      width: "40px",
-    },
-    ...columns,
-  ];
-}, [selectedRows, columns]);
-
-
+    return [
+      {
+        name: "",
+        selector: (row) => (
+          <input
+            type="checkbox"
+            checked={selectedRows.some((r) => r.id === row.id)}
+            disabled={row.status?.toLowerCase() === "failed"}
+            onChange={() => {
+              const isSelected = selectedRows.some((r) => r.id === row.id);
+              const newSelectedRows = isSelected
+                ? selectedRows.filter((r) => r.id !== row.id)
+                : [...selectedRows, row];
+              setSelectedRows(newSelectedRows);
+            }}
+          />
+        ),
+        width: "40px",
+      },
+      ...columns,
+    ];
+  }, [selectedRows, columns]);
 
   const queryParam = "";
 
@@ -581,67 +606,71 @@ const columnsWithSelection = useMemo(() => {
       <Box sx={{}}>
         <CommonTable
           onFetchRef={handleFetchRef}
-         columns={columnsWithSelection}
+          columns={columnsWithSelection}
           endpoint={ApiEndpoints.GET_RECHARGE_TXN}
           filters={filters}
           queryParam={queryParam}
           enableActionsHover={true}
-           enableSelection={false}
+          enableSelection={false}
           selectedRows={selectedRows}
           onSelectionChange={setSelectedRows}
           customHeader={
-  <>
-  <Box
-    sx={{
-      display: "flex",
-      alignItems: "center",
-      gap: 1,
-      padding: "8px",
-       
-    }}
-  >
-    {selectedRows.length > 0 && (
-      <Tooltip title="View Selected Details">
-       <Button
-        variant="contained"
-        size="small"
-        color="primary"
-        onClick={() => {
-          // Save selected rows to sessionStorage
-          sessionStorage.setItem("txnData", JSON.stringify(selectedRows));
-      
-          // Open new tab/window
-          window.open("/print-recharge", "_blank");
-        }}
-      >
-      <PrintIcon sx={{ fontSize: 20, color: '#e3e6e9ff', mr:1 }} />
-   Recharge
-      </Button>
-      </Tooltip>
-    )}
-  </Box>
-      <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              padding: "8px",
-              flexWrap: "wrap",
-            }}
-          >
-            {user?.role === "adm" && (
-              <IconButton
-                color="primary"
-                onClick={handleExportExcel}
-                title="Export to Excel"
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  padding: "8px",
+                }}
               >
-                <FileDownloadIcon />
-              </IconButton>
-            )}
-            <Scheduler onRefresh={refreshPlans} />
-          </Box>
-          </>
-}
+                {selectedRows.length > 0 && (
+                  <Tooltip title="View Selected Details">
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color="primary"
+                      onClick={() => {
+                        // Save selected rows to sessionStorage
+                        sessionStorage.setItem(
+                          "txnData",
+                          JSON.stringify(selectedRows)
+                        );
+
+                        // Open new tab/window
+                        window.open("/print-recharge", "_blank");
+                      }}
+                    >
+                      <PrintIcon
+                        sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
+                      />
+                      Recharge
+                    </Button>
+                  </Tooltip>
+                )}
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  padding: "8px",
+                  flexWrap: "wrap",
+                }}
+              >
+                {user?.role === "adm" && (
+                  <IconButton
+                    color="primary"
+                    onClick={handleExportExcel}
+                    title="Export to Excel"
+                  >
+                    <FileDownloadIcon />
+                  </IconButton>
+                )}
+                <Scheduler onRefresh={refreshPlans} />
+              </Box>
+            </>
+          }
         />
       </Box>
 

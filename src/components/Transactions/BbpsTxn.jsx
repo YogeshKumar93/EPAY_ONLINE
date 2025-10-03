@@ -46,6 +46,9 @@ import { Logo } from "../../iconsImports";
 import Scheduler from "../common/Scheduler";
 import { apiCall } from "../../api/apiClient";
 import AddLein from "../../pages/AddLein";
+import { json2Excel } from "../../utils/exportToExcel";
+import { apiErrorToast } from "../../utils/ToastUtil";
+import FileDownloadIcon from "@mui/icons-material/FileDownload"; // Excel export icon
 
 const BbpxTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
@@ -61,7 +64,7 @@ const BbpxTxn = ({ query }) => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [responseModalOpen, setResponseModalOpen] = useState(false);
   const [selectedApiResponse, setSelectedApiResponse] = useState("");
-     const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
 
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -86,6 +89,26 @@ const BbpxTxn = ({ query }) => {
   const refreshPlans = () => {
     if (fetchUsersRef.current) {
       fetchUsersRef.current();
+    }
+  };
+  const handleExportExcel = async () => {
+    try {
+      // Fetch all users (without pagination/filters) from API
+      const { error, response } = await apiCall(
+        "post",
+        ApiEndpoints.GET_BBPS_TXN,
+        { export: 1 }
+      );
+      const usersData = response?.data?.data || [];
+
+      if (usersData.length > 0) {
+        json2Excel("BbpsTxns", usersData); // generates and downloads Users.xlsx
+      } else {
+        apiErrorToast("no data found");
+      }
+    } catch (error) {
+      console.error("Excel export failed:", error);
+      alert("Failed to export Excel");
     }
   };
   const handleConfirmRefund = async () => {
@@ -641,33 +664,33 @@ const BbpxTxn = ({ query }) => {
     []
   );
 
-   const columnsWithSelection = useMemo(() => {
-     // Only show checkbox if user is NOT adm or sadm
+  const columnsWithSelection = useMemo(() => {
+    // Only show checkbox if user is NOT adm or sadm
     if (user?.role === "adm" || user?.role === "sadm") {
       return columns; // no selection column
     }
-  return [
-    {
-      name: "",
-      selector: (row) => (
-        <input
-          type="checkbox"
-          checked={selectedRows.some((r) => r.id === row.id)}
-          disabled={row.status?.toLowerCase() === "failed"}
-          onChange={() => {
-            const isSelected = selectedRows.some((r) => r.id === row.id);
-            const newSelectedRows = isSelected
-              ? selectedRows.filter((r) => r.id !== row.id)
-              : [...selectedRows, row];
-            setSelectedRows(newSelectedRows);
-          }}
-        />
-      ),
-      width: "40px",
-    },
-    ...columns,
-  ];
-}, [selectedRows, columns]);
+    return [
+      {
+        name: "",
+        selector: (row) => (
+          <input
+            type="checkbox"
+            checked={selectedRows.some((r) => r.id === row.id)}
+            disabled={row.status?.toLowerCase() === "failed"}
+            onChange={() => {
+              const isSelected = selectedRows.some((r) => r.id === row.id);
+              const newSelectedRows = isSelected
+                ? selectedRows.filter((r) => r.id !== row.id)
+                : [...selectedRows, row];
+              setSelectedRows(newSelectedRows);
+            }}
+          />
+        ),
+        width: "40px",
+      },
+      ...columns,
+    ];
+  }, [selectedRows, columns]);
 
   const queryParam = "";
 
@@ -681,61 +704,65 @@ const BbpxTxn = ({ query }) => {
         queryParam={queryParam}
         enableActionsHover={true}
         enableSelection={false}
-          selectedRows={selectedRows}
-          onSelectionChange={setSelectedRows}
-           customHeader={
-            <>
+        selectedRows={selectedRows}
+        onSelectionChange={setSelectedRows}
+        customHeader={
+          <>
             <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
                 gap: 1,
                 padding: "8px",
-                 
               }}
             >
               {selectedRows.length > 0 && (
                 <Tooltip title="View Selected Details">
-                 <Button
-                  variant="contained"
-                  size="small"
-                  color="primary"
-                  onClick={() => {
-                    // Save selected rows to sessionStorage
-                    sessionStorage.setItem("txnData", JSON.stringify(selectedRows));
-                
-                    // Open new tab/window
-                    window.open("/print-dmt2", "_blank");
-                  }}
-                >
-                <PrintIcon sx={{ fontSize: 20, color: '#e3e6e9ff', mr:1 }} />
-             DMT
-                </Button>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    color="primary"
+                    onClick={() => {
+                      // Save selected rows to sessionStorage
+                      sessionStorage.setItem(
+                        "txnData",
+                        JSON.stringify(selectedRows)
+                      );
+
+                      // Open new tab/window
+                      window.open("/print-dmt2", "_blank");
+                    }}
+                  >
+                    <PrintIcon
+                      sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
+                    />
+                    DMT
+                  </Button>
                 </Tooltip>
               )}
             </Box>
-                <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        padding: "8px",
-                        flexWrap: "wrap",
-                      }}
-                    >
-                      {user?.role === "adm" && (
-                        <IconButton
-                          color="primary"
-                          onClick={handleExportExcel}
-                          title="Export to Excel"
-                        >
-                          <FileDownloadIcon />
-                        </IconButton>
-                      )}
-                      <Scheduler onRefresh={refreshPlans} />
-                    </Box>
-                    </>
-          }
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                padding: "8px",
+                flexWrap: "wrap",
+              }}
+            >
+              {user?.role === "adm" && (
+                <IconButton
+                  color="primary"
+                  onClick={handleExportExcel}
+                  title="Export to Excel"
+                >
+                  <FileDownloadIcon />
+                </IconButton>
+              )}
+              <Scheduler onRefresh={refreshPlans} />
+            </Box>
+          </>
+        }
       />
       <CommonModal
         open={responseModalOpen}

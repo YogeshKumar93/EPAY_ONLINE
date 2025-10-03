@@ -1,5 +1,5 @@
 // import jsPDF from "jspdf";
-import XLSX from "xlsx";
+import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 
 export const json2Csv = (fileName, data) => {
