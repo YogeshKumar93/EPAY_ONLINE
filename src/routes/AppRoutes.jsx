@@ -78,6 +78,7 @@ import WebHooks from "../pages/WebHooks";
 import { BbpsOffline } from "../pages/BbpsOffline";
 import PrintAeps from "../pages/PrintAeps";
 import OnBoarding from "../components/OnBoarding";
+import PrintCreditCard from "../pages/PrintCreditCard";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading, user } = useContext(AuthContext);
@@ -137,6 +138,7 @@ export default function AppRoutes() {
         <Route path="/print-irctc" element={<PrintIrctc />} />
         <Route path="/print-payout" element={<PrintPayout />} />
         <Route path="/print-w2w" element={<PrintW2W />} />
+        <Route path="/print-creditCard" element={<PrintCreditCard />} />
 
         <Route path="/adminagreement" element={<AdminAgreement />} />
         <Route
@@ -282,7 +284,8 @@ export default function AppRoutes() {
 
               <Route path="di/wallet-ledger" element={<DiMdLedgers />} />
               <Route path="di/transactions" element={<Transaction />} />
-              <Route path="md/fund-request" element={<FundRequest />} />
+              <Route path="di/fund-request" element={<FundRequest />} />
+              <Route path="di/risk" element={<Risk />} />
 
               {/* <Route
                 path="di/wallet-transfer"

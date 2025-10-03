@@ -260,7 +260,7 @@ const user = authCtx.user;
         "&:hover": { borderColor: "#ff9a3c", color: "#ff9a3c" },
       }}
     >
-      Transaction Summary
+      DMT Transaction Summary
     </Button>
 </Box>
           {/* Receipt Table & Summary */}

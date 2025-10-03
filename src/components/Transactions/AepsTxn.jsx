@@ -591,26 +591,21 @@ const AepsTxn = ({ query }) => {
             >
               {selectedRows.length > 0 && (
                 <Tooltip title="View Selected Details">
-                  <Button
-                    variant="contained"
-                    size="small"
-                    color="primary"
-                    onClick={() => {
-                      // Save selected rows to sessionStorage
-                      sessionStorage.setItem(
-                        "txnData",
-                        JSON.stringify(selectedRows)
-                      );
-
-                      // Open new tab/window
-                      window.open("/print-dmt2", "_blank");
-                    }}
-                  >
-                    <PrintIcon
-                      sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
-                    />
-                    DMT
-                  </Button>
+                 <Button
+                  variant="contained"
+                  size="small"
+                  color="primary"
+                  onClick={() => {
+                    // Save selected rows to sessionStorage
+                    sessionStorage.setItem("txnData", JSON.stringify(selectedRows));
+                
+                    // Open new tab/window
+                    window.open("/print-dmt2", "_blank");
+                  }}
+                >
+                <PrintIcon sx={{ fontSize: 20, color: '#e3e6e9ff', mr:1 }} />
+             AEPS
+                </Button>
                 </Tooltip>
               )}
             </Box>

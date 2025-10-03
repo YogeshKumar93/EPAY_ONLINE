@@ -730,13 +730,13 @@ const BbpxTxn = ({ query }) => {
                       );
 
                       // Open new tab/window
-                      window.open("/print-dmt2", "_blank");
+                      window.open("/print-bbps", "_blank");
                     }}
                   >
                     <PrintIcon
                       sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
                     />
-                    DMT
+                    BBPS
                   </Button>
                 </Tooltip>
               )}

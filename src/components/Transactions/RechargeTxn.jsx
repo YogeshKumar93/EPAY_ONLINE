@@ -374,7 +374,7 @@ const RechargeTxn = ({ query }) => {
         selector: (row) => (
           <div style={{ textAlign: "left" }}>
             {/* GST: ₹{parseFloat(row.gst).toFixed(2)} <br /> */}₹
-            {parseFloat(row.comm).toFixed(2)}
+            {parseFloat(row.ret_comm).toFixed(2)}
           </div>
         ),
         wrap: true,
