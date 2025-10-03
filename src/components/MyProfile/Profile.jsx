@@ -275,7 +275,7 @@ const ProfilePage = () => {
                       },
                       transition: "all 0.2s ease",
                     }}
-                    onClick={handleEditToggle}
+                    // onClick={handleEditToggle}
                   >
                     <Edit sx={{ fontSize: 16, color: "#1E3A8A" }} />
                   </IconButton>

@@ -53,9 +53,6 @@ const CommonMpinModal = ({
 
   const handleChange = (value) => {
     setOtp(value);
-    if (value.length === 6) {
-      handleMpinCB(value);
-    }
     if (err !== "") {
       setErr("");
     }

@@ -22,8 +22,8 @@ import ApiEndpoints from "../../api/ApiEndpoints";
 import CommonMpinModal from "../common/CommonMpinModal";
 import Loader from "../common/Loader";
 import CommonLoader from "../common/CommonLoader";
-import defaultLayout from '../../assets/Images/defaultLayout.png';
-import servicelayout  from "../../assets/Images/layout2.png";
+import defaultLayout from "../../assets/Images/defaultLayout.png";
+import servicelayout from "../../assets/Images/layout2.png";
 
 const style = {
   position: "absolute",
@@ -51,7 +51,7 @@ const ChangeLayoutModal = ({ open, onClose, onSuccess, username }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx.user;
   const loadUserProfile = authCtx?.loadUserProfile;
-  
+
   const [value, setValue] = React.useState(user?.layout * 1);
   const navigate = useNavigate();
 
@@ -59,56 +59,66 @@ const ChangeLayoutModal = ({ open, onClose, onSuccess, username }) => {
     const newValue = event.target.value * 1;
     setValue(newValue);
     setSelectedLayout(newValue);
-    setMpinModalOpen(true);
+    setMpinModalOpen(true); // just opens modal, does NOT call API
   };
-const changeSwitch = useCallback(
-  async (mpin) => {
-    if (!selectedLayout) return;
 
-    const data = { is_layout: selectedLayout, mpin: mpin * 1 };
-    setRequest(true);
-    
-    try {
-      const { error, response } = await apiCall(
-        "POST",
-        ApiEndpoints.CHANGE_USER_LAYOUT,
-        data,
-        null
-      );
+  const changeSwitch = useCallback(
+    async (mpin) => {
+      if (!selectedLayout) return;
 
-      if (response) {
-        const userData = response?.data?.data;
-        showToast(response?.data?.message || "Layout changed successfully", "success");
-        // authCtx.saveUser(userData);
-        
-         loadUserProfile(); // Refresh user profile to get updated layout
-        onClose();
-        setMpinCallBackVal(false);
-      
-      } else {
-        showToast(error?.message || "Failed to change layout", "error");
-       
+      const data = { is_layout: selectedLayout, mpin: mpin * 1 };
+      setRequest(true);
+
+      try {
+        const { error, response } = await apiCall(
+          "POST",
+          ApiEndpoints.CHANGE_USER_LAYOUT,
+          data,
+          null
+        );
+
+        if (response) {
+          const userData = response?.data?.data;
+          showToast(
+            response?.data?.message || "Layout changed successfully",
+            "success"
+          );
+          // authCtx.saveUser(userData);
+
+          loadUserProfile(); // Refresh user profile to get updated layout
+          onClose();
+          setMpinCallBackVal(false);
+        } else {
+          showToast(error?.message || "Failed to change layout", "error");
+        }
+      } catch (err) {
+        console.error("Error changing layout:", err);
+        showToast("Something went wrong while changing layout", "error");
+      } finally {
+        setRequest(false);
       }
-    } catch (err) {
-      console.error("Error changing layout:", err);
-      showToast("Something went wrong while changing layout", "error");
-    } finally {
-      setRequest(false);
-    }
-  },
-  [selectedLayout, authCtx, onClose, onSuccess, showToast, setRequest, setMpinCallBackVal]
-);
+    },
+    [
+      selectedLayout,
+      authCtx,
+      onClose,
+      onSuccess,
+      showToast,
+      setRequest,
+      setMpinCallBackVal,
+    ]
+  );
   useEffect(() => {
     if (user?.is_layout) {
       setValue(user?.is_layout * 1);
     }
   }, [user]);
 
-  useEffect(() => {
-    if (MpinCallBackVal && selectedLayout) {
-      changeSwitch(MpinCallBackVal);
-    }
-  }, [MpinCallBackVal, selectedLayout, changeSwitch]);
+  // useEffect(() => {
+  //   if (MpinCallBackVal && selectedLayout) {
+  //     changeSwitch(MpinCallBackVal);
+  //   }
+  // }, [MpinCallBackVal, selectedLayout, changeSwitch]);
 
   const handleClose = () => {
     setSelectedLayout(null);
@@ -164,15 +174,15 @@ const changeSwitch = useCallback(
                       Default Layout
                     </Typography>
                     <img
-        src={defaultLayout} 
-        alt="default layout"
-        style={{
-          width: 300,
-          height: 150,
-          borderRadius: 8,
-          objectFit: "cover",
-        }}
-      />
+                      src={defaultLayout}
+                      alt="default layout"
+                      style={{
+                        width: 300,
+                        height: 150,
+                        borderRadius: 8,
+                        objectFit: "cover",
+                      }}
+                    />
                     {/* <img src={defaultLayout} alt="default" width="300px" /> */}
                     <Box
                       sx={{
@@ -202,7 +212,7 @@ const changeSwitch = useCallback(
                       display: "flex",
                       flexDirection: "column",
                       alignItems: "center",
-                         border: "2px solid #7d7fa8ff",
+                      border: "2px solid #7d7fa8ff",
                     }}
                   >
                     <Typography
@@ -217,16 +227,16 @@ const changeSwitch = useCallback(
                     >
                       Services Layout
                     </Typography>
-                              <img
-        src={servicelayout} 
-        alt="default layout"
-        style={{
-          width: 300,
-          height: 150,
-          borderRadius: 8,
-          objectFit: "cover",
-        }}
-      />
+                    <img
+                      src={servicelayout}
+                      alt="default layout"
+                      style={{
+                        width: 300,
+                        height: 150,
+                        borderRadius: 8,
+                        objectFit: "cover",
+                      }}
+                    />
                     {/* <img src={servicelayout} alt="new_nav" width="300px" /> */}
                     <Box
                       sx={{
@@ -256,7 +266,11 @@ const changeSwitch = useCallback(
         open={mpinModalOpen}
         setOpen={setMpinModalOpen}
         mPinCallBack={(mPinValue) => {
-          setMpinCallBackVal(mPinValue);
+          // Trigger API call only when "Verify" is pressed inside the modal
+          if (mPinValue) {
+            changeSwitch(mPinValue);
+            setMpinModalOpen(false);
+          }
         }}
         title="Verify MPIN to Change Layout"
         onClose={() => {
