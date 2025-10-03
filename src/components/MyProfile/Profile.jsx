@@ -55,6 +55,7 @@ const ProfilePage = () => {
   const [resetMpinModalOpen, setResetMpinModalOpen] = useState(false);
   const [changePasswordModal, setChangePasswordModal] = useState(false);
   const [changeMpinModal, setChangeMpinModal] = useState(false);
+  const [viewInfoModalOpen, setViewInfoModalOpen] = useState(false);
 
   const [newNumberModal, setNewNumberModal] = useState(false);
   const [changeLayout, setChangeLayout] = useState(false);
@@ -154,6 +155,14 @@ const ProfilePage = () => {
       gradient: "#fff",
       hoverGradient: "linear-gradient(135deg, #c9ffbf, #7bed9f)",
     },
+    {
+      id: 6,
+      label: "View Information",
+      icon: <Dashboard sx={{ fontSize: { xs: 18, sm: 20 } }} />,
+      onClick: () => setViewInfoModalOpen(true),
+      gradient: "#fff",
+      hoverGradient: "linear-gradient(135deg, #c9ffbf, #7bed9f)",
+    },
   ].filter(
     (btn) =>
       btn.label !== "Change Layout" || allowedRolesForLayout.includes(userRole)
@@ -167,7 +176,7 @@ const ProfilePage = () => {
       }}
     >
       <Slide in={true} direction="up" timeout={500}>
-    <Paper
+        <Paper
           elevation={isMobile ? 1 : 4}
           sx={{
             borderRadius: { xs: 2, sm: 4 },
@@ -182,8 +191,7 @@ const ProfilePage = () => {
             fontFamily: '"DM Sans", sans-serif',
           }}
         >
-    
-  <Box
+          <Box
             sx={{
               p: { xs: 2, sm: 3, md: 4 },
               borderRadius: "12px 12px 0 0",
@@ -202,9 +210,10 @@ const ProfilePage = () => {
                 background: "#9D72F0",
                 zIndex: 1,
               },
-            }}>
+            }}
+          >
             {/* Decorative elements */}
-              <Box
+            <Box
               sx={{
                 position: "absolute",
                 top: -20,
@@ -559,7 +568,6 @@ const ProfilePage = () => {
               </Box>
             </Fade>
           )}
-          {user?.status === 1 && <ProfileTabs />}
         </Paper>
       </Slide>
       {/* Modals */}
@@ -611,6 +619,12 @@ const ProfilePage = () => {
         <BusinessInformation
           open={businessModal}
           onClose={() => setBusinessModal(false)}
+        />
+      )}
+      {viewInfoModalOpen && (
+        <ProfileTabs
+          open={viewInfoModalOpen}
+          onClose={() => setViewInfoModalOpen(false)}
         />
       )}
     </Box>

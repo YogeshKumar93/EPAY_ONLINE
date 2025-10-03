@@ -522,7 +522,6 @@ const CommonTable = ({
                 inputMode: filter.id === "mobile" ? "numeric" : undefined,
               }}
             />
-
           )}
         </Box>
       )),
@@ -684,7 +683,6 @@ const CommonTable = ({
                 inputMode: filter.id === "mobile" ? "numeric" : undefined,
               }}
             />
-
           )}
         </Box>
       )),

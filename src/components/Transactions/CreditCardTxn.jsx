@@ -43,7 +43,7 @@ import DoneIcon from "@mui/icons-material/Done";
 import { useToast } from "../../utils/ToastContext";
 import { apiCall } from "../../api/apiClient";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import AddLein from "../LienAmount/AddLein";
+import AddLein from "../../pages/AddLein";
 
 const CreditCardTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
@@ -122,75 +122,75 @@ const CreditCardTxn = ({ query }) => {
     setSelectedTrancation(row);
   };
   const handleCloseLein = () => setOpenLeinModal(false);
-  const ActionColumn = ({ row, handleRefundClick, handleOpenLein }) => {
-    const [anchorEl, setAnchorEl] = useState(null);
-    const open = Boolean(anchorEl);
+  // const ActionColumn = ({ row, handleRefundClick, handleOpenLein }) => {
+  //   const [anchorEl, setAnchorEl] = useState(null);
+  //   const open = Boolean(anchorEl);
 
-    const handleClick = (event) => setAnchorEl(event.currentTarget);
-    const handleClose = () => setAnchorEl(null);
+  //   const handleClick = (event) => setAnchorEl(event.currentTarget);
+  //   const handleClose = () => setAnchorEl(null);
 
-    return (
-      <div style={{ textAlign: "center" }}>
-        <IconButton size="small" onClick={handleClick}>
-          <MoreVertIcon />
-        </IconButton>
+  //   return (
+  //     <div style={{ textAlign: "center" }}>
+  //       <IconButton size="small" onClick={handleClick}>
+  //         <MoreVertIcon />
+  //       </IconButton>
 
-        <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-          {row?.status === "SUCCESS" && (
-            <MenuItem
-              onClick={() => {
-                handleRefundClick(row);
-                handleClose();
-              }}
-            >
-              Refund
-            </MenuItem>
-          )}
+  //       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+  //         {row?.status === "SUCCESS" && (
+  //           <MenuItem
+  //             onClick={() => {
+  //               handleRefundClick(row);
+  //               handleClose();
+  //             }}
+  //           >
+  //             Refund
+  //           </MenuItem>
+  //         )}
 
-          {row?.status === "PENDING" && (
-            <>
-              <MenuItem
-                onClick={() => {
-                  // mark as success handler
-                  handleClose();
-                }}
-              >
-                Mark as Success
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  handleRefundClick(row);
-                  handleClose();
-                }}
-              >
-                Refund
-              </MenuItem>
-            </>
-          )}
+  //         {row?.status === "PENDING" && (
+  //           <>
+  //             <MenuItem
+  //               onClick={() => {
+  //                 // mark as success handler
+  //                 handleClose();
+  //               }}
+  //             >
+  //               Mark as Success
+  //             </MenuItem>
+  //             <MenuItem
+  //               onClick={() => {
+  //                 handleRefundClick(row);
+  //                 handleClose();
+  //               }}
+  //             >
+  //               Refund
+  //             </MenuItem>
+  //           </>
+  //         )}
 
-          {(row?.status === "FAILED" || row?.status === "REFUND") && (
-            <MenuItem
-              onClick={() => {
-                // rollback handler
-                handleClose();
-              }}
-            >
-              Rollback
-            </MenuItem>
-          )}
+  //         {(row?.status === "FAILED" || row?.status === "REFUND") && (
+  //           <MenuItem
+  //             onClick={() => {
+  //               // rollback handler
+  //               handleClose();
+  //             }}
+  //           >
+  //             Rollback
+  //           </MenuItem>
+  //         )}
 
-          <MenuItem
-            onClick={() => {
-              handleOpenLein(row);
-              handleClose();
-            }}
-          >
-            Mark Lein
-          </MenuItem>
-        </Menu>
-      </div>
-    );
-  };
+  //         <MenuItem
+  //           onClick={() => {
+  //             handleOpenLein(row);
+  //             handleClose();
+  //           }}
+  //         >
+  //           Mark Lein
+  //         </MenuItem>
+  //       </Menu>
+  //     </div>
+  //   );
+  // };
 
   const columns = useMemo(() => {
     const baseColumns = [
@@ -518,11 +518,68 @@ const CreditCardTxn = ({ query }) => {
             {
               name: "Action",
               selector: (row) => (
-                <ActionColumn
-                  row={row}
-                  handleRefundClick={handleRefundClick}
-                  handleOpenLein={handleOpenLein}
-                />
+                // <ActionColumn
+                //   row={row}
+                //   handleRefundClick={handleRefundClick}
+                //   handleOpenLein={handleOpenLein}
+                // />
+                <div
+                  style={{
+                    fontSize: "10px",
+                    fontWeight: "600",
+                    display: "flex",
+                    gap: "4px",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {/* SUCCESS: only Replay */}
+                  {row?.status === "SUCCESS" && (
+                    <Tooltip title="Click To Refund">
+                      <ReplayIcon
+                        sx={{ color: "red", fontSize: 25, cursor: "pointer" }}
+                        onClick={() => handleRefundClick(row)}
+                      />
+                    </Tooltip>
+                  )}
+
+                  {/* PENDING: CheckCircle + Replay */}
+                  {row?.status === "PENDING" && (
+                    <>
+                      <Tooltip title="Click To Success">
+                        <DoneIcon sx={{ color: "green", fontSize: 25 }} />
+                      </Tooltip>
+                      <Tooltip title="Click To Refund">
+                        <ReplayIcon
+                          sx={{ color: "red", fontSize: 25, cursor: "pointer" }}
+                          onClick={() => handleRefundClick(row)}
+                        />
+                      </Tooltip>
+                    </>
+                  )}
+
+                  {/* FAILED or REFUND: Refresh */}
+                  {(row?.status === "FAILED" || row?.status === "REFUND") && (
+                    <Tooltip title="Click To Rollback">
+                      <RefreshIcon
+                        sx={{
+                          color: "orange",
+                          fontSize: 25,
+                          cursor: "pointer",
+                        }}
+                      />
+                    </Tooltip>
+                  )}
+
+                  <MenuItem
+                    onClick={() => {
+                      handleOpenLein(row);
+                      handleClose();
+                    }}
+                  >
+                    Mark Lein
+                  </MenuItem>
+                </div>
               ),
               center: true,
               width: "100px",

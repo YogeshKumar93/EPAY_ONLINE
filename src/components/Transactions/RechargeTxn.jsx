@@ -1,5 +1,13 @@
 import { useMemo, useContext, useState, useRef } from "react";
 import { Box, Tooltip, IconButton, Drawer, Typography, Button } from "@mui/material";
+import {
+  Box,
+  Tooltip,
+  IconButton,
+  Drawer,
+  Typography,
+  MenuItem,
+} from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import AuthContext from "../../contexts/AuthContext";
@@ -40,6 +48,7 @@ import DoneIcon from "@mui/icons-material/Done";
 import { useToast } from "../../utils/ToastContext";
 import { apiCall } from "../../api/apiClient";
 import Scheduler from "../common/Scheduler";
+import AddLein from "../../pages/AddLein";
 const RechargeTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
@@ -54,6 +63,8 @@ const RechargeTxn = ({ query }) => {
   const [refundLoading, setRefundLoading] = useState(false);
     const [selectedRows, setSelectedRows] = useState([]);
 
+  const [selectedTransaction, setSelectedTrancation] = useState("");
+  const [openLeinModal, setOpenLeinModal] = useState(false);
 
   const { showToast } = useToast();
   const handleRefundClick = (row) => {
@@ -97,6 +108,11 @@ const RechargeTxn = ({ query }) => {
     setRefundLoading(false);
   };
   const navigate = useNavigate();
+  const handleOpenLein = (row) => {
+    setOpenLeinModal(true);
+    setSelectedTrancation(row);
+  };
+  const handleCloseLein = () => setOpenLeinModal(false);
   const filters = useMemo(
     () => [
       {
@@ -467,6 +483,13 @@ const RechargeTxn = ({ query }) => {
                       />
                     </Tooltip>
                   )}
+                  <MenuItem
+                    onClick={() => {
+                      handleOpenLein(row);
+                    }}
+                  >
+                    Mark Lein
+                  </MenuItem>
                 </div>
               ),
               center: true,
@@ -721,6 +744,15 @@ const columnsWithSelection = useMemo(() => {
           {selectedForRefund?.txn_id}?
         </Typography>
       </CommonModal>
+      {openLeinModal && (
+        <AddLein
+          open={openLeinModal}
+          handleClose={handleCloseLein}
+          onFetchRef={() => {}}
+          selectedRow={selectedTransaction}
+          type="transaction"
+        />
+      )}
     </>
   );
 };
