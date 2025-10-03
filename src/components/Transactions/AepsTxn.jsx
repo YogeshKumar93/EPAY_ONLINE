@@ -583,7 +583,7 @@ const AepsTxn = ({ query }) => {
                   }}
                 >
                 <PrintIcon sx={{ fontSize: 20, color: '#e3e6e9ff', mr:1 }} />
-             DMT
+             AEPS
                 </Button>
                 </Tooltip>
               )}
