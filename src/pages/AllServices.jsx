@@ -69,6 +69,8 @@ import Wallet2WalletTransfer from "./Wallet2WalletTransfer";
 import Wallet2Wallet1 from "./Wallet2Wallet1";
 import Aeps2 from "./Aeps2";
 import AepsLayout2 from "./AepsLayout2";
+import ComingSoon from "./ComingSoon";
+import CreditCardBillPayment from "../components/CrediCardPayment/CreditCardBill";
 
 const MenuCard = ({ icon, label, onClick, isActive, user }) => {
   return (
@@ -344,47 +346,75 @@ export default function AllServices() {
       icon: BBPS,
       subMenu: [
         {
-          key: "electricity",
-          label: "Electricity",
+          key: "Bbps1",
+          label: "Bbps 1",
           icon: electricity1,
-          component: BBPS,
+          component: ComingSoon,
           type: "C04",
         },
         {
-          key: "broadband",
-          label: "Broadband",
-          icon: broadband_1,
-          component: BBPS,
-          type: "C05",
+          key: "Bbps2",
+          label: "Bbps 2",
+          icon: electricity1,
+          component: ComingSoon,
+          type: "C04",
         },
         {
-          key: "gas",
-          label: "Gas Bill",
-          icon: gas_1,
-          component: BBPS,
-          type: "C07",
+          key: "Bbps3",
+          label: "Bbps 3",
+          icon: electricity1,
+          component: ComingSoon,
+          type: "C04",
         },
         {
-          key: "water",
-          label: "Water Bill",
-          icon: water_1,
-          component: BBPS,
-          type: "C08",
+          key: "Bbps4",
+          label: "Bbps 4",
+          icon: electricity1,
+          component: ComingSoon,
+          type: "C04",
         },
-        {
-          key: "insurance",
-          label: "Insurance",
-          icon: insurance_1,
-          component: BBPS,
-          type: "C11",
-        },
-        {
-          key: "landline",
-          label: "Landline Bill",
-          icon: landline_1,
-          component: BBPS,
-          type: "C02",
-        },
+        // {
+        //   key: "electricity",
+        //   label: "Electricity",
+        //   icon: electricity1,
+        //   component: BBPS,
+        //   type: "C04",
+        // },
+        // {
+        //   key: "broadband",
+        //   label: "Broadband",
+        //   icon: broadband_1,
+        //   component: BBPS,
+        //   type: "C05",
+        // },
+        // {
+        //   key: "gas",
+        //   label: "Gas Bill",
+        //   icon: gas_1,
+        //   component: BBPS,
+        //   type: "C07",
+        // },
+        // {
+        //   key: "water",
+        //   label: "Water Bill",
+        //   icon: water_1,
+        //   component: BBPS,
+        //   type: "C08",
+        // },
+        // {
+        //   key: "insurance",
+        //   label: "Insurance",
+        //   icon: insurance_1,
+        //   component: BBPS,
+        //   type: "C11",
+        // },
+        // {
+        //   key: "landline",
+        //   label: "Landline Bill",
+        //   icon: landline_1,
+        //   component: BBPS,
+        //   type: "C02",
+        // },
       ],
     },
     hasPermission("bbps") && {
@@ -432,11 +462,14 @@ export default function AllServices() {
         {
           key: "pipe1",
           label: "Credit Card Bill Payment",
+          component: CreditCardBillPayment,
+
           icon: CreditCardIcon,
         },
         {
           key: "pipe2",
           label: "Credit Card Bill(BBPS)",
+          component: CreditCardBillPayment,
           icon: CreditCardIcon,
           type: "C15",
         },
@@ -448,10 +481,24 @@ export default function AllServices() {
       icon: cms1,
       subMenu: [
         {
+          key: "Airtel cms",
+          label: " Airtel Cms",
+          icon: DashboardIcon,
+          component: ComingSoon,
+          type: "C04",
+        },
+        {
+          key: "Uber cms",
+          label: " Uber Cms",
+          icon: DashboardIcon,
+          component: Cms,
+          type: "C04",
+        },
+        {
           key: "cms",
           label: "Cms",
           icon: DashboardIcon,
-          component: Cms,
+          component: ComingSoon,
           type: "C04",
         },
       ],
