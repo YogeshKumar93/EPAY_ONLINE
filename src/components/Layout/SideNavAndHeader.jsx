@@ -359,9 +359,9 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
     </Box>
   );
   const walletConfig = [
-    { match: ["di", "md"], wallets: ["w1", "w3"] },
-    { match: ["ret", "dd"], wallets: ["w1", "w2"] },
-    { match: ["api"], wallets: ["w1"] },
+    { match: ["di", "md"], wallets: ["Main Wallet", "Commission Wallet"] },
+    { match: ["ret", "dd"], wallets: ["Main Wallet", "Aeps Wallet"] },
+    { match: ["api"], wallets: ["Main Wallet"] },
     { match: ["lein"], wallets: ["lien"] },
   ];
 
