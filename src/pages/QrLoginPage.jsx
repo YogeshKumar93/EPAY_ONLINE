@@ -4,9 +4,6 @@ import {
   Paper,
   Typography,
   Box,
-  IconButton,
-  InputAdornment,
-  CircularProgress,
   Grid,
   Modal,
   Button,
@@ -14,14 +11,7 @@ import {
   Checkbox,
   Link,
 } from "@mui/material";
-import {
-  Visibility,
-  VisibilityOff,
-  PhoneAndroid,
-  Lock,
-  FiberManualRecord,
-  InfoOutlined,
-} from "@mui/icons-material";
+import { Lock, FiberManualRecord, InfoOutlined } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { set, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -111,7 +101,7 @@ const QrLoginPage = () => {
           if (authCtx.location) {
             localStorage.setItem("location", JSON.stringify(authCtx.location));
           }
-              switch (userData.role) {
+          switch (userData.role) {
             case "adm":
             case "sadm":
               navigate("/admin/dashboard");
@@ -345,8 +335,8 @@ const QrLoginPage = () => {
                 }}
               >
                 Scan this QR with your{" "}
-                <strong style={{ color: "#854fff" }}>P2PAE</strong> app to
-                login instantly
+                <strong style={{ color: "#854fff" }}>P2PAE</strong> app to login
+                instantly
               </Typography>
 
               <Box

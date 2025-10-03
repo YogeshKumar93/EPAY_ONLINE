@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   useMemo,
@@ -507,13 +506,6 @@ const Services = ({ query }) => {
           mb: 3,
         }}
       >
-        <Typography
-          variant="h5"
-          sx={{ fontFamily: "DM Sans, sans-serif", fontWeight: 600 }}
-        >
-          Services
-        </Typography>
-
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           {/* Search Box */}
           <TextField
@@ -555,19 +547,20 @@ const Services = ({ query }) => {
           </Tooltip>
 
           {/* Create Service Button */}
-          {user?.role === "sadm" || user?.role === "adm" && (
-            <Button
-              variant="contained"
-              onClick={() => setOpenCreate(true)}
-              sx={{
-                backgroundColor: "#526484",
-                // "&:hover": { backgroundColor: "#008a00" },
-                fontFamily: "DM Sans, sans-serif",
-              }}
-            >
-              Create Service
-            </Button>
-          )}
+          {user?.role === "sadm" ||
+            (user?.role === "adm" && (
+              <Button
+                variant="contained"
+                onClick={() => setOpenCreate(true)}
+                sx={{
+                  backgroundColor: "#526484",
+                  // "&:hover": { backgroundColor: "#008a00" },
+                  fontFamily: "DM Sans, sans-serif",
+                }}
+              >
+                Create Service
+              </Button>
+            ))}
         </Box>
       </Box>
 
