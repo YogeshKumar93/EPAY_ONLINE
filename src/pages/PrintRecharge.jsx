@@ -46,7 +46,7 @@ const totalAmountValue = data
     );
   }
 
-  const headers = ["Date", "Txn ID", "Mobile", "Operator", "Client Ref", "Status", "Amount"];
+  const headers = ["Date", "Txn ID", "Mobile", "Operator", "Ref No", "Status", "Amount"];
 
   return (
     <>
