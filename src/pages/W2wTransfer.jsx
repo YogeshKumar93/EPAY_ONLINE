@@ -18,6 +18,7 @@ import debounce from "lodash.debounce";
 import { useToast } from "../utils/ToastContext";
 import CommonModal from "../components/common/CommonModal";
 import CommonMpinModal from "../components/common/CommonMpinModal";
+import AuthContext from "../contexts/AuthContext";
 
 const W2wTransfer = ({ handleFetchRef, type }) => {
   const [mobile, setMobile] = useState("");
@@ -31,40 +32,51 @@ const W2wTransfer = ({ handleFetchRef, type }) => {
   const { showToast } = useToast();
   const [modalOpen, setModalOpen] = useState(false);
   const [mpinModalOpen, setMpinModalOpen] = useState(false);
+  const authCtx = useContext(AuthContext);
 
+  const loadUserProfile = authCtx.loadUserProfile;
   const fetchReceiver = async (mobileNumber) => {
     if (!mobileNumber) {
       setReceiver(null);
       return;
     }
+
     setLoading(true);
     setError("");
-    try {
-      const { response } = await apiCall(
-        "post",
-        ApiEndpoints.WALLET_GET_RECEIVER,
-        { mobile_number: mobileNumber }
-      );
 
-      if (response) {
-        setReceiver(response?.data);
-        setModalOpen(true);
-      } else {
-        setReceiver(null);
-        setError("Receiver not found");
-      }
-    } catch (err) {
+    const { response, error } = await apiCall(
+      "post",
+      ApiEndpoints.WALLET_GET_RECEIVER,
+      { user_id: mobileNumber }
+    );
+
+    if (response) {
+      setReceiver(response?.data);
+      setModalOpen(true);
+    } else {
       setReceiver(null);
-      setError("Something went wrong");
-    } finally {
-      setLoading(false);
+
+      console.log("Hr errors wwwe", error);
+
+      // 🔹 Message ko top priority pe rakha
+      const errMsg =
+        error?.message ||
+        (Array.isArray(error?.errors) && error.errors.length > 0
+          ? error.errors.join(", ")
+          : null) ||
+        "Receiver not found";
+
+      showToast(errMsg, "error");
+      setError(errMsg);
     }
+
+    setLoading(false);
   };
 
-  const debouncedFetch = debounce(fetchReceiver, 500);
+  const debouncedFetch = debounce(fetchReceiver, 1000);
 
   useEffect(() => {
-    if (mobile.length === 10) {
+    if (mobile) {
       debouncedFetch(mobile);
     } else {
       setReceiver(null);
@@ -87,10 +99,11 @@ const W2wTransfer = ({ handleFetchRef, type }) => {
         reciever_id: receiver.id,
         amount: parseFloat(amount),
         remark,
-        mpin, // send MPIN here
+        operator: 17,
+        mpin,
       };
 
-      const { response } = await apiCall(
+      const { response,error } = await apiCall(
         "post",
         ApiEndpoints.WALLET_CREATE,
         payload
@@ -104,8 +117,10 @@ const W2wTransfer = ({ handleFetchRef, type }) => {
         setReceiver(null);
         setMobile("");
         setModalOpen(false);
+        loadUserProfile();
       } else {
-        setError(response?.data?.message || "Transfer failed");
+        showToast(error.message || error.errors, "error");
+        setError(error?.message || "Transfer failed");
       }
     } catch (err) {
       setError("Something went wrong while creating transfer");
@@ -150,7 +165,11 @@ const W2wTransfer = ({ handleFetchRef, type }) => {
             variant="outlined"
             fullWidth
             value={mobile}
-            onChange={(e) => setMobile(e.target.value.replace(/\D/, ""))}
+            onChange={(e) => {
+              let val = e.target.value.toUpperCase(); // 🔹 convert to uppercase
+              val = val.replace(/[^A-Z0-9]/g, ""); // 🔹 allow only letters & numbers
+              setMobile(val);
+            }}
             margin="normal"
             inputProps={{ maxLength: 10 }}
             sx={{ mb: 3, "& .MuiOutlinedInput-root": { borderRadius: 2 } }}

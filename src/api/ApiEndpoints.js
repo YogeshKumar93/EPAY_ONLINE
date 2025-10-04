@@ -284,7 +284,10 @@ const ApiEndpoints = {
   DMT1_OUTLET_INITIATE: "aeps/initiateSignupAeps",
   DMT1_OUTLET_INITIATE_SCHEMA: "aeps/getInitiateSchema",
   VALIDATE_DMT1_OUTLET: "aeps/validateSignupAeps",
-
+  GET_ADMIN_COMMISSIONS: "commission/getAdminCommissions",
+  CREATE_ADMIN_COMMISSIONS: "commission/createAdminCommissionRule",
+  UPDATE_ADMIN_COMMISSIONS: "commission/updateAdminCommissionRule",
+  GET_ADMIN_COMMISSIONS_SCHEMA: "commission/getAdminCommissionSchema",
   ADD_LEIN: "lien/addLien",
   REMOVE_LEIN: "lien/removeLien",
   GET_LEIN: "lien/getLien",

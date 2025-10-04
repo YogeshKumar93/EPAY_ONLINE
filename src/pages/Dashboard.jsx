@@ -105,6 +105,25 @@ const Dashboard = () => {
   const [loadingApiBalance, setLoadingApiBank] = useState(false);
   const [totalBalance, setTotalBalance] = useState(0);
   const isAdmin = user?.role === "adm"; // Only admin can see bank/api
+  const [newsData, setNewsData] = useState([]);
+  const [loadingNews, setLoadingNews] = useState(true);
+  const fetchNews = async () => {
+    setLoadingNews(true);
+    try {
+      const { error, response } = await apiCall("post", ApiEndpoints.GET_NEWS);
+
+      if (response?.data) {
+        setNewsData(response.data);
+        console.log("News data:", response.data);
+      } else {
+        console.error("News API error:", error);
+      }
+    } catch (err) {
+      console.error("News fetch failed:", err);
+    } finally {
+      setLoadingNews(false);
+    }
+  };
 
   const fetchBankBalance = async () => {
     setLoadingBank(true);
@@ -219,6 +238,7 @@ const Dashboard = () => {
       fetchBankBalance();
       fetchApiBalance();
     }
+    fetchNews(); // Fetch news as well
   }, [isAdmin]);
   const cardStyle = {
     p: 3,
@@ -371,6 +391,7 @@ const Dashboard = () => {
     const total = totalW1 + totalW2 + totalW3;
     setGrrandTotal(total);
   }, [totalW1, totalW2, totalW3]);
+  const newsLine = newsData.map((item) => item.description).join(" | ");
 
   return (
     <Box
@@ -378,6 +399,55 @@ const Dashboard = () => {
         backgroundColor: "#f8fafc",
       }}
     >
+      <Box
+        sx={{
+          overflow: "hidden",
+          bgcolor: "#eef2ff", // soft card-like background
+          py: 1.5,
+          borderRadius: 2,
+          boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
+          border: "1px solid #c7d2fe",
+          position: "relative",
+        }}
+      >
+        {loadingNews ? (
+          <Box display="flex" alignItems="center" gap={1}>
+            <CircularProgress size={20} sx={{ color: "#6366f1" }} />
+            <Typography variant="body2" color="text.secondary">
+              Loading news...
+            </Typography>
+          </Box>
+        ) : newsData.length > 0 ? (
+          <Box
+            component="div"
+            sx={{
+              display: "inline-block",
+              whiteSpace: "nowrap",
+              fontWeight: 500,
+              color: "#1e40af",
+              fontSize: { xs: "0.75rem", sm: "0.85rem" },
+              animation: "scrollNews 20s linear infinite",
+            }}
+          >
+            {newsLine}
+          </Box>
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            No news available
+          </Typography>
+        )}
+
+        {/* CSS animation */}
+        <style>
+          {`
+      @keyframes scrollNews {
+        0% { transform: translateX(100%); }
+        100% { transform: translateX(-100%); }
+      }
+    `}
+        </style>
+      </Box>
+
       {<TransactionDetail />}
       {user.role !== "ret" && (
         <Grid container spacing={2} mb={4}>

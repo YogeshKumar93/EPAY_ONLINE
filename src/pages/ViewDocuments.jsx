@@ -5,6 +5,7 @@ import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CommonLoader from "../components/common/CommonLoader";
 import { useToast } from "../utils/ToastContext";
+const ALLOWED_SECTIONS = ["basic", "address", "kyc"];
 
 const EXCLUDE_KEYS = ["id", "user_id", "created_at", "updated_at"];
 const DOCUMENT_KEYS = [
@@ -20,6 +21,7 @@ const ViewDocuments = ({ open, onClose, user }) => {
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const { showToast } = useToast();
+
   useEffect(() => {
     if (open && user?.id) fetchUserData();
   }, [open, user]);
@@ -131,7 +133,7 @@ const ViewDocuments = ({ open, onClose, user }) => {
           </Typography>
         )}
 
-        {docKeys.length > 0 ? (
+        {/* {docKeys.length > 0 ? (
           <>
             <Divider sx={{ my: 1 }} />
             <Grid container spacing={1}>
@@ -148,13 +150,14 @@ const ViewDocuments = ({ open, onClose, user }) => {
           >
             No documents uploaded.
           </Typography>
-        )}
+        )} */}
       </>
     );
   };
 
-  const sectionEntries = Object.entries(userData);
-
+  const sectionEntries = Object.entries(userData).filter(([sectionName]) =>
+    ALLOWED_SECTIONS.includes(sectionName)
+  );
   return (
     <CommonModal
       open={open}
@@ -227,7 +230,15 @@ const ViewDocuments = ({ open, onClose, user }) => {
                   >
                     {sectionName}
                   </Typography>
-                  {renderSection(sectionData)}
+                  {sectionData ? (
+                    renderSection(sectionData)
+                  ) : (
+                    <Typography
+                      sx={{ fontStyle: "italic", color: "#777", fontSize: 14 }}
+                    >
+                      No data available for this section.
+                    </Typography>
+                  )}
                 </Paper>
               </Grid>
             ))}

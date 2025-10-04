@@ -38,10 +38,12 @@ const ProfileTabs = ({ open, onClose }) => {
       );
       const data = response?.data || {};
 
-      const tabs = Object.keys(data).map((key) => ({
+      // Only include these tabs, even if null
+      const allowedTabs = ["basic", "address", "kyc"];
+      const tabs = allowedTabs.map((key) => ({
         id: key,
         title: key.charAt(0).toUpperCase() + key.slice(1),
-        content: data[key] || {}, // if null, set empty object so tab still renders
+        content: data[key] || {}, // set empty object if null
       }));
 
       setTabData(tabs);
@@ -124,13 +126,14 @@ const ProfileTabs = ({ open, onClose }) => {
               >
                 {tabIndex === index && (
                   <Grid container spacing={2}>
-                    {tab.id === "kyc"
-                      ? kycImages.map((key) => {
+                    {tab.id === "kyc" ? (
+                      kycImages.some((key) => tab.content[key]) ? (
+                        kycImages.map((key) => {
                           const imageUrl = tab.content[key];
                           return (
                             <Grid item xs={12} sm={6} md={4} key={key}>
                               <Card>
-                                {imageUrl && (
+                                {imageUrl ? (
                                   <CardMedia
                                     component="img"
                                     height="120"
@@ -144,6 +147,16 @@ const ProfileTabs = ({ open, onClose }) => {
                                       cursor: "pointer",
                                     }}
                                   />
+                                ) : (
+                                  <CardContent>
+                                    <Typography
+                                      align="center"
+                                      variant="body2"
+                                      color="textSecondary"
+                                    >
+                                      No image available
+                                    </Typography>
+                                  </CardContent>
                                 )}
                                 <CardContent>
                                   <Typography
@@ -157,25 +170,34 @@ const ProfileTabs = ({ open, onClose }) => {
                             </Grid>
                           );
                         })
-                      : Object.entries(tab.content)
-                          .filter(([key]) => !hiddenFields.includes(key))
-                          .map(([key, value]) => (
-                            <Grid item xs={12} sm={6} md={4} key={key}>
-                              <Card>
-                                <CardContent>
-                                  <Typography
-                                    variant="subtitle2"
-                                    color="textSecondary"
-                                  >
-                                    {key.replace(/_/g, " ").toUpperCase()}
-                                  </Typography>
-                                  <Typography variant="body2">
-                                    {value || "-"}
-                                  </Typography>
-                                </CardContent>
-                              </Card>
-                            </Grid>
-                          ))}
+                      ) : (
+                        <Typography sx={{ m: 2 }}>
+                          No KYC images available
+                        </Typography>
+                      )
+                    ) : Object.keys(tab.content).length > 0 ? (
+                      Object.entries(tab.content)
+                        .filter(([key]) => !hiddenFields.includes(key))
+                        .map(([key, value]) => (
+                          <Grid item xs={12} sm={6} md={4} key={key}>
+                            <Card>
+                              <CardContent>
+                                <Typography
+                                  variant="subtitle2"
+                                  color="textSecondary"
+                                >
+                                  {key.replace(/_/g, " ").toUpperCase()}
+                                </Typography>
+                                <Typography variant="body2">
+                                  {value || "-"}
+                                </Typography>
+                              </CardContent>
+                            </Card>
+                          </Grid>
+                        ))
+                    ) : (
+                      <Typography sx={{ m: 2 }}>No data available</Typography>
+                    )}
                   </Grid>
                 )}
               </div>
