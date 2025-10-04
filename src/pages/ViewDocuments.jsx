@@ -132,25 +132,6 @@ const ViewDocuments = ({ open, onClose, user }) => {
             No text data available.
           </Typography>
         )}
-
-        {/* {docKeys.length > 0 ? (
-          <>
-            <Divider sx={{ my: 1 }} />
-            <Grid container spacing={1}>
-              {docKeys.map((key) => (
-                <Grid item xs={12} sm={6} key={key}>
-                  {renderField(key, sectionData[key])}
-                </Grid>
-              ))}
-            </Grid>
-          </>
-        ) : (
-          <Typography
-            sx={{ fontStyle: "italic", color: "#777", fontSize: 14, mt: 1 }}
-          >
-            No documents uploaded.
-          </Typography>
-        )} */}
       </>
     );
   };

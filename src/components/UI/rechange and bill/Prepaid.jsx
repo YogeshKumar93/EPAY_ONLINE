@@ -541,7 +541,7 @@ const Prepaid = () => {
                         />
                       ))}
                     </Box>
-                    <Box
+                    {/* <Box
                       sx={{ display: "flex", justifyContent: "center", ml: 32 }}
                     >
                       <Button
@@ -559,7 +559,7 @@ const Prepaid = () => {
                         onClose={() => setResetMpinModalOpen(false)}
                         username={username}
                       />
-                    )}
+                    )} */}
                   </Box>
                 )}
 

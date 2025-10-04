@@ -116,7 +116,7 @@ const LeanAmount = ({ filters = [] }) => {
     ];
 
     // Actions column: only for adm or sadm
-    if (["ret"].includes(user?.role)) {
+    if (["adm"].includes(user?.role)) {
       baseColumns.push({
         name: "Actions",
         selector: (row) => (
@@ -125,7 +125,8 @@ const LeanAmount = ({ filters = [] }) => {
               size="small"
               color="error"
               onClick={() => handleDelete(row)}
-              startIcon={<CancelIcon fontSize="small" />}
+              // startIcon={<CancelIcon fontSize="small" />}
+              sx={{ fontSize: "10px" }}
             >
               Remove Lien
             </Button>

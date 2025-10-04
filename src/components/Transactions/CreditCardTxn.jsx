@@ -437,17 +437,17 @@ const CreditCardTxn = ({ query }) => {
     // Add remaining columns (Comm/TDS, di Comm/tds, Md Comm/tds, Status, View)
     const remainingColumns = [
       {
-        name: "Ret Comm",
+        name: "Charges",
         selector: (row) => (
           <div
             style={{ textAlign: "right", fontSize: "14px", fontWeight: 600 }}
           >
-            <div style={{ color: "green" }}>
-              {parseFloat(row.comm).toFixed(2)}
+            <div style={{ color: "red" }}>
+              {parseFloat(row.charges).toFixed(2)}
             </div>
-            <div style={{ color: "blue" }}>
+            {/* <div style={{ color: "blue" }}>
               {parseFloat(row.tds).toFixed(2)}
-            </div>
+            </div> */}
           </div>
         ),
         right: true,

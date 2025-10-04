@@ -321,15 +321,15 @@ const Users = ({ query }) => {
       ...(userRole.role !== "di" && userRole.role !== "md"
         ? [
             {
-              name: "Parent",
+              name: "Parent Est.",
               selector: (row) => {
                 const parentName = userMap[row.parent] || "-";
                 return (
-                  <Tooltip title={parentName}>
-                    <div style={{ textAlign: "left", cursor: "pointer" }}>
-                      {row.parent}
-                    </div>
-                  </Tooltip>
+                  // <Tooltip title={parentName}>
+                  <div style={{ textAlign: "left", cursor: "pointer" }}>
+                    {row.parent_establishment}
+                  </div>
+                  // </Tooltip>
                 );
               },
             },

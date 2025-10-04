@@ -79,7 +79,7 @@ const Dth = () => {
       return apiErrorToast("Please enter your 6-digit MPIN");
     if (!location?.lat || !location?.long)
       return apiErrorToast("Location not available, please enable GPS.");
-  setLoading(true);
+    setLoading(true);
     const payload = {
       customer_id: customerId,
       mobile_number: mobileNumber,
@@ -91,7 +91,7 @@ const Dth = () => {
     };
 
     const { error } = await apiCall("post", ApiEndpoints.RECHARGE, payload);
- setLoading(false); 
+    setLoading(false);
 
     if (error) return showToast(error?.message, "error");
     loadUserProfile();
@@ -119,7 +119,7 @@ const Dth = () => {
 
   return (
     <Container maxWidth="xl" sx={{ py: 1 }}>
-        <CommonLoader loading={loading} />
+      <CommonLoader loading={loading} />
       {step === 2 && (
         <Slide direction="right" in mountOnEnter unmountOnExit>
           <Box sx={{ display: "flex", gap: 3 }}>
@@ -333,7 +333,7 @@ const Dth = () => {
                         />
                       ))}
                     </Box>
-                    <Box
+                    {/* <Box
                       sx={{ display: "flex", justifyContent: "center", ml: 32 }}
                     >
                       <Button
@@ -351,7 +351,7 @@ const Dth = () => {
                         onClose={() => setResetMpinModalOpen(false)}
                         username={username}
                       />
-                    )}
+                    )} */}
                   </Box>
                 )}
 

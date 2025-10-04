@@ -139,14 +139,14 @@ const ProfilePage = () => {
       gradient: "#fff",
       hoverGradient: "linear-gradient(135deg, #ff758c, #ff7eb3)",
     },
-    {
-      id: 4,
-      label: "Change Layout",
-      icon: <Dashboard sx={{ fontSize: { xs: 18, sm: 20 } }} />,
-      onClick: handleChangeLayout,
-      gradient: "#fff",
-      hoverGradient: "linear-gradient(135deg, #c9ffbf, #7bed9f)",
-    },
+    // {
+    //   id: 4,
+    //   label: "Change Layout",
+    //   icon: <Dashboard sx={{ fontSize: { xs: 18, sm: 20 } }} />,
+    //   onClick: handleChangeLayout,
+    //   gradient: "#fff",
+    //   hoverGradient: "linear-gradient(135deg, #c9ffbf, #7bed9f)",
+    // },
     {
       id: 5,
       label: "View Information",
@@ -597,7 +597,7 @@ const ProfilePage = () => {
         />
       )}
 
-      {changeLayout && (
+      {/* {changeLayout && (
         <ChangeLayoutModal
           open={changeLayout}
           onClose={() => setChangeLayout(false)}
@@ -607,7 +607,7 @@ const ProfilePage = () => {
           }}
           username={user?.username}
         />
-      )}
+      )} */}
       {businessModal && (
         <BusinessInformation
           open={businessModal}

@@ -36,6 +36,7 @@ import excelImg from "../assets/animate-icons/ExcelFile.png";
 import uploadImg from "../assets/animate-icons/uploadFile.png";
 import AuthContext from "../contexts/AuthContext";
 import { primaryColor, secondaryColor } from "../utils/setThemeColor";
+import CommonStatus from "../components/common/CommonStatus";
 
 const BankStatements = () => {
   const location = useLocation();
@@ -178,12 +179,23 @@ const BankStatements = () => {
     { name: "Credit", selector: (row) => currencySetter(row.credit) },
     { name: "Debit", selector: (row) => currencySetter(row.debit) },
     { name: "Balance", selector: (row) => currencySetter(row.balance) },
+    {
+      name: "Status",
+      selector: (row) => (
+        <div style={{ textAlign: "right", fontSize: "11px", fontWeight: 600 }}>
+          <div>
+            <CommonStatus value={row.status} />{" "}
+          </div>
+        </div>
+      ),
+      center: true,
+      width: "70px",
+    },
   ];
 
   return (
     <>
       <CommonLoader loading={loading} text="Loading Statements..." />
-      
 
       {!loading && (
         <Box>

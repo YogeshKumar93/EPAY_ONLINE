@@ -47,6 +47,7 @@ import { json2Excel } from "../../utils/exportToExcel";
 import { apiErrorToast } from "../../utils/ToastUtil";
 import FileDownloadIcon from "@mui/icons-material/FileDownload"; // Excel export icon
 import Scheduler from "../common/Scheduler";
+import TransactionDrawer from "../TransactionDrawer";
 
 const PayoutTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
@@ -64,7 +65,7 @@ const PayoutTxn = ({ query }) => {
   const { showToast } = useToast();
   const [selectedTransaction, setSelectedTrancation] = useState("");
   const [openLeinModal, setOpenLeinModal] = useState(false);
-   const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
 
   const handleRefundClick = (row) => {
     setSelectedForRefund(row);
@@ -114,7 +115,7 @@ const PayoutTxn = ({ query }) => {
         ApiEndpoints.GET_PAYOUT_TXN,
         { export: 1 }
       );
-      const usersData = response?.data?.data || [];
+      const usersData = response?.data || [];
 
       if (usersData.length > 0) {
         json2Excel("PayoutTxns", usersData); // generates and downloads Users.xlsx
@@ -289,7 +290,9 @@ const PayoutTxn = ({ query }) => {
       {
         name: "Service",
         selector: (row) => (
-          <div style={{ textAlign: "left", fontWeight: "600" }}>
+          <div
+            style={{ textAlign: "left", fontWeight: "500", fontSize: "13px" }}
+          >
             {row.operator} <br />
             <span
               style={{ fontWeight: "normal", fontSize: "8px", color: "blue" }}
@@ -368,8 +371,8 @@ const PayoutTxn = ({ query }) => {
         selector: (row) => (
           <div style={{ textAlign: "left", fontSize: "12px" }}>
             {row.beneficiary_name?.toUpperCase()} <br />
-            {row.account_number} <br />
-            {row.ifsc_code}
+            {/* {row.account_number} <br />
+            {row.ifsc_code} */}
           </div>
         ),
         wrap: true,
@@ -607,33 +610,33 @@ const PayoutTxn = ({ query }) => {
     []
   );
 
-    const columnsWithSelection = useMemo(() => {
-      // Only show checkbox if user is NOT adm or sadm
-      if (user?.role === "adm" || user?.role === "sadm") {
-        return columns; // no selection column
-      }
-      return [
-        {
-          name: "",
-          selector: (row) => (
-            <input
-              type="checkbox"
-              checked={selectedRows.some((r) => r.id === row.id)}
-              disabled={row.status?.toLowerCase() === "failed"}
-              onChange={() => {
-                const isSelected = selectedRows.some((r) => r.id === row.id);
-                const newSelectedRows = isSelected
-                  ? selectedRows.filter((r) => r.id !== row.id)
-                  : [...selectedRows, row];
-                setSelectedRows(newSelectedRows);
-              }}
-            />
-          ),
-          width: "40px",
-        },
-        ...columns,
-      ];
-    }, [selectedRows, columns]);
+  const columnsWithSelection = useMemo(() => {
+    // Only show checkbox if user is NOT adm or sadm
+    if (user?.role === "adm" || user?.role === "sadm") {
+      return columns; // no selection column
+    }
+    return [
+      {
+        name: "",
+        selector: (row) => (
+          <input
+            type="checkbox"
+            checked={selectedRows.some((r) => r.id === row.id)}
+            disabled={row.status?.toLowerCase() === "failed"}
+            onChange={() => {
+              const isSelected = selectedRows.some((r) => r.id === row.id);
+              const newSelectedRows = isSelected
+                ? selectedRows.filter((r) => r.id !== row.id)
+                : [...selectedRows, row];
+              setSelectedRows(newSelectedRows);
+            }}
+          />
+        ),
+        width: "40px",
+      },
+      ...columns,
+    ];
+  }, [selectedRows, columns]);
 
   const queryParam = "";
 
@@ -646,10 +649,10 @@ const PayoutTxn = ({ query }) => {
         filters={filters}
         queryParam={queryParam}
         enableActionsHover={true}
-         enableSelection={false}
+        enableSelection={false}
         selectedRows={selectedRows}
         onSelectionChange={setSelectedRows}
-       customHeader={
+        customHeader={
           <>
             <Box
               sx={{
@@ -661,21 +664,26 @@ const PayoutTxn = ({ query }) => {
             >
               {selectedRows.length > 0 && (
                 <Tooltip title="View Selected Details">
-                 <Button
-                  variant="contained"
-                  size="small"
-                  color="primary"
-                  onClick={() => {
-                    // Save selected rows to sessionStorage
-                    sessionStorage.setItem("txnData", JSON.stringify(selectedRows));
-                
-                    // Open new tab/window
-                    window.open("/print-payout", "_blank");
-                  }}
-                >
-                <PrintIcon sx={{ fontSize: 20, color: '#e3e6e9ff', mr:1 }} />
-             Payout
-                </Button>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    color="primary"
+                    onClick={() => {
+                      // Save selected rows to sessionStorage
+                      sessionStorage.setItem(
+                        "txnData",
+                        JSON.stringify(selectedRows)
+                      );
+
+                      // Open new tab/window
+                      window.open("/print-payout", "_blank");
+                    }}
+                  >
+                    <PrintIcon
+                      sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
+                    />
+                    Payout
+                  </Button>
                 </Tooltip>
               )}
             </Box>
@@ -709,47 +717,17 @@ const PayoutTxn = ({ query }) => {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
       >
-        <Box
-          sx={{
-            width: 400,
-            display: "flex",
-            flexDirection: "column",
-            height: "100%",
-          }}
-        >
-          {selectedRow && (
-            <TransactionDetailsCard
-              amount={selectedRow.amount}
-              status={selectedRow.status}
-              onClose={() => setDrawerOpen(false)} // ✅ Close drawer
-              companyLogoUrl={biggpayLogo}
-              dateTime={ddmmyyWithTime(selectedRow.created_at)}
-              message={selectedRow.message || "No message"}
-              details={[
-                { label: "Txn ID", value: selectedRow.txn_id },
-                { label: "Client Ref", value: selectedRow.client_ref },
-                { label: "Sender Mobile", value: selectedRow.sender_mobile },
-                {
-                  label: "Beneficiary Name",
-                  value: selectedRow.beneficiary_name,
-                },
-                { label: "Account Number", value: selectedRow.account_number },
-                { label: "IFSC Code", value: selectedRow.ifsc_code },
-                { label: "Bank Name", value: selectedRow.bank_name },
-                { label: "Route", value: selectedRow.route },
-                { label: "Charge", value: selectedRow.charges },
-                { label: "GST", value: selectedRow.gst },
-                { label: "Commission", value: selectedRow.comm },
-                { label: "TDS", value: selectedRow.tds },
-                { label: "purpose", value: selectedRow.purpose },
-              ]}
-              onRaiseIssue={() => {
-                setSelectedTxn(selectedRow.txn_id);
-                setOpenCreate(true);
-              }}
-            />
-          )}
-        </Box>
+        {selectedRow && (
+          <TransactionDrawer
+            row={selectedRow} // pass whole row
+            onRaiseIssue={() => {
+              setSelectedTxn(selectedRow.txn_id);
+              setOpenCreate(true);
+            }}
+            onClose={() => setDrawerOpen(false)}
+            companyLogoUrl={Logo}
+          />
+        )}
       </Drawer>
       <CommonModal
         open={responseModalOpen}

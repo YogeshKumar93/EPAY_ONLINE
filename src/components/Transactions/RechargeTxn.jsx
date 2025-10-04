@@ -118,7 +118,7 @@ const RechargeTxn = ({ query }) => {
         ApiEndpoints.GET_RECHARGE_TXN,
         { export: 1 }
       );
-      const usersData = response?.data?.data || [];
+      const usersData = response?.data || [];
 
       if (usersData.length > 0) {
         json2Excel("RechargeTxns", usersData); // generates and downloads Users.xlsx

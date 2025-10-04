@@ -75,10 +75,9 @@ const BeneficiaryDetails = ({
   const handleProceed = async () => {
     // if (!otp || otp.length !== 6)
     //   return apiErrorToast("Please enter the 6-digit OTP");
-   if (!mpin || mpin.length !== 6) {
-  return showToast("Please enter the 6-digit M-PIN", "error");
-}
-
+    if (!mpin || mpin.length !== 6) {
+      return showToast("Please enter the 6-digit M-PIN", "error");
+    }
 
     setLoading(true);
     try {
@@ -114,7 +113,7 @@ const BeneficiaryDetails = ({
         setOtpRef(null);
         onClose();
       } else {
-        showToast(error?.message || "Payout unsuccessfull" ,"error");
+        showToast(error?.message || "Payout unsuccessfull", "error");
       }
     } catch (err) {
       showToast(err);
@@ -265,7 +264,7 @@ const BeneficiaryDetails = ({
           }}
         />
       </Box>
-        <Box sx={{ display: "flex", justifyContent: "center", ml: 32 }}>
+      {/* <Box sx={{ display: "flex", justifyContent: "center", ml: 32 }}>
           <Button
             variant="contained"
             size="small"
@@ -281,7 +280,7 @@ const BeneficiaryDetails = ({
             onClose={() => setResetMpinModalOpen(false)}
             username={username}
           />
-        )}
+        )} */}
     </Box>
   );
 

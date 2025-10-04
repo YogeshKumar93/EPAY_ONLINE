@@ -203,6 +203,8 @@ const ApiEndpoints = {
   GET_COMMISSION_SCHEMA: "commission/getCommissionSchema",
   UPDATE_COMMISSION_RULE: "commission/updateCommissionRule",
   GET_SENDER: "payout/getSender",
+  LEVIN_SENDER: "payout/remitterStatus2",
+  LEVIN_REGISTER: "payout/registerLevin",
   REGISTER_SENDER: "payout/registerSender",
   REGISTER_SENDER_SCHEMA: "payout/registerSenderSchema",
   VERIFY_SENDER_SCHEMA: "payout/verifySenderSchema",

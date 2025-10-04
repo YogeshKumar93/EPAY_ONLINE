@@ -430,9 +430,9 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             <RefreshIcon sx={{ color: "#2275b7" }} />
           </IconButton>
 
-          <IconButton onClick={colour}>
+          {/* <IconButton onClick={colour}>
             <RefreshIcon sx={{ color: "#ec9e9eff" }} />
-          </IconButton>
+          </IconButton> */}
 
           <Box
             sx={{

@@ -95,7 +95,7 @@ const DmtTxn = ({ query }) => {
         ApiEndpoints.GET_DMT_TXN,
         { export: 1 }
       );
-      const usersData = response?.data?.data || [];
+      const usersData = response?.data || [];
 
       if (usersData.length > 0) {
         json2Excel("DmtTxns", usersData); // generates and downloads Users.xlsx
@@ -261,7 +261,9 @@ const DmtTxn = ({ query }) => {
       {
         name: "Service",
         selector: (row) => (
-          <div style={{ textAlign: "left", fontWeight: "600" }}>
+          <div
+            style={{ textAlign: "left", fontWeight: "400", fontSize: "13px" }}
+          >
             {row.operator} <br />
             {["adm", "sadm"].includes(user?.role) && (
               <>
@@ -302,7 +304,9 @@ const DmtTxn = ({ query }) => {
       {
         name: "TxnId",
         selector: (row) => (
-          <div style={{ textAlign: "left", fontWeight: "600" }}>
+          <div
+            style={{ textAlign: "left", fontWeight: "500", fontSize: "12px" }}
+          >
             {row.txn_id} <br />
           </div>
         ),
@@ -326,7 +330,7 @@ const DmtTxn = ({ query }) => {
       {
         name: "Mobile",
         selector: (row) => (
-          <div style={{ textAlign: "left", fontWeight: "600" }}>
+          <div style={{ textAlign: "left", fontWeight: "500" }}>
             {row.sender_mobile}
           </div>
         ),
@@ -337,7 +341,7 @@ const DmtTxn = ({ query }) => {
         name: "Beneficiary",
         selector: (row) => (
           <div
-            style={{ textAlign: "left", fontSize: "10px", fontWeight: "600" }}
+            style={{ textAlign: "left", fontSize: "10px", fontWeight: "500" }}
           >
             {row.beneficiary_name?.toUpperCase()} <br />
             {/* {row.account_number} <br />

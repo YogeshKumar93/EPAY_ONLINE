@@ -78,6 +78,7 @@ import Aeps2 from "./Aeps2";
 import AepsLayout2 from "./AepsLayout2";
 import ComingSoon from "./ComingSoon";
 import CreditCardBillPayment from "../components/CrediCardPayment/CreditCardBill";
+import LevinFundTransfer from "./LevinFundTransfer";
 
 const MenuCard = ({ icon, label, onClick, isActive, user }) => {
   return (
@@ -306,9 +307,16 @@ export default function AllServices() {
       subMenu: [
         {
           key: "walletSuper",
-          label: "Fund Transfer",
+          label: "Fund Transfer1",
           icon: AccountBalanceWalletIcon,
           component: SuperTransfer,
+          type: "super",
+        },
+        {
+          key: "fundtransfer2",
+          label: "Fund Transfer2",
+          icon: AccountBalanceWalletIcon,
+          component: LevinFundTransfer,
           type: "super",
         },
       ],

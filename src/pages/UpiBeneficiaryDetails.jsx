@@ -9,7 +9,13 @@ import { useToast } from "../utils/ToastContext";
 import ResetMpin from "../components/common/ResetMpin";
 import CommonModal from "../components/common/CommonModal";
 
-const UpiBeneficiaryDetails = ({ open, onClose, beneficiary, senderMobile, senderId }) => {
+const UpiBeneficiaryDetails = ({
+  open,
+  onClose,
+  beneficiary,
+  senderMobile,
+  senderId,
+}) => {
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [otpRef, setOtpRef] = useState(null);
@@ -33,7 +39,10 @@ const UpiBeneficiaryDetails = ({ open, onClose, beneficiary, senderMobile, sende
     const fetchPurposes = async () => {
       setLoadingPurposes(true);
       try {
-        const { error, response } = await apiCall("post", ApiEndpoints.GET_PURPOSES);
+        const { error, response } = await apiCall(
+          "post",
+          ApiEndpoints.GET_PURPOSES
+        );
         if (error) apiErrorToast(error);
         else {
           const purposesData = response?.data || [];
@@ -50,7 +59,8 @@ const UpiBeneficiaryDetails = ({ open, onClose, beneficiary, senderMobile, sende
   }, []);
 
   const handleProceed = async () => {
-    if (!mpin || mpin.length !== 6) return apiErrorToast("Please enter the 6-digit M-PIN");
+    if (!mpin || mpin.length !== 6)
+      return apiErrorToast("Please enter the 6-digit M-PIN");
 
     setLoading(true);
     try {
@@ -71,13 +81,20 @@ const UpiBeneficiaryDetails = ({ open, onClose, beneficiary, senderMobile, sende
         purpose_id: selectedPurpose,
       };
 
-      const { error, response } = await apiCall("post", ApiEndpoints.PAYOUT, payload);
+      const { error, response } = await apiCall(
+        "post",
+        ApiEndpoints.PAYOUT,
+        payload
+      );
       if (response) {
         okSuccessToast("Payout successful!");
-        setAmount(""); setOtp(""); setMpin(""); setOtpRef(null);
+        setAmount("");
+        setOtp("");
+        setMpin("");
+        setOtpRef(null);
         onClose();
       } else {
-        showToast(error?.message || "Something went wrong","error");
+        showToast(error?.message || "Something went wrong", "error");
       }
     } catch (err) {
       apiErrorToast(err);
@@ -90,11 +107,17 @@ const UpiBeneficiaryDetails = ({ open, onClose, beneficiary, senderMobile, sende
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <Box sx={{ bgcolor: "#f0f8ff", p: 2, borderRadius: 2 }}>
         <Box display="flex" mb={1}>
-          <Typography variant="body2" fontWeight={500} sx={{ width: "120px" }}>Name</Typography>
-          <Typography variant="body2">{beneficiary.beneficiary_name}</Typography>
+          <Typography variant="body2" fontWeight={500} sx={{ width: "120px" }}>
+            Name
+          </Typography>
+          <Typography variant="body2">
+            {beneficiary.beneficiary_name}
+          </Typography>
         </Box>
         <Box display="flex">
-          <Typography variant="body2" fontWeight={500} sx={{ width: "120px" }}>VPA</Typography>
+          <Typography variant="body2" fontWeight={500} sx={{ width: "120px" }}>
+            VPA
+          </Typography>
           <Typography variant="body2">{beneficiary.account_number}</Typography>
         </Box>
       </Box>
@@ -108,8 +131,15 @@ const UpiBeneficiaryDetails = ({ open, onClose, beneficiary, senderMobile, sende
         SelectProps={{ native: true }}
         fullWidth
       >
-        {loadingPurposes ? <option>Loading...</option> :
-          purposes.map((p) => <option key={p.id} value={p.id}>{p.type}</option>)}
+        {loadingPurposes ? (
+          <option>Loading...</option>
+        ) : (
+          purposes.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.type}
+            </option>
+          ))
+        )}
       </TextField>
 
       <TextField
@@ -122,7 +152,9 @@ const UpiBeneficiaryDetails = ({ open, onClose, beneficiary, senderMobile, sende
       />
 
       <Box>
-        <Typography variant="body2" mb={0.5}>Enter M-PIN</Typography>
+        <Typography variant="body2" mb={0.5}>
+          Enter M-PIN
+        </Typography>
         <OTPInput
           value={mpin}
           onChange={setMpin}
@@ -130,12 +162,16 @@ const UpiBeneficiaryDetails = ({ open, onClose, beneficiary, senderMobile, sende
           inputType="password"
           renderInput={(props) => <input {...props} />}
           inputStyle={{
-            width: "40px", height: "40px", margin: "0 5px",
-            fontSize: "18px", border: "1px solid #D0D5DD",
-            borderRadius: "6px", textAlign: "center"
+            width: "40px",
+            height: "40px",
+            margin: "0 5px",
+            fontSize: "18px",
+            border: "1px solid #D0D5DD",
+            borderRadius: "6px",
+            textAlign: "center",
           }}
         />
-        <Button variant="text" size="small" onClick={() => setOpenResetModal(true)}>Reset M-PIN</Button>
+        {/* <Button variant="text" size="small" onClick={() => setOpenResetModal(true)}>Reset M-PIN</Button> */}
       </Box>
     </Box>
   );
@@ -166,7 +202,11 @@ const UpiBeneficiaryDetails = ({ open, onClose, beneficiary, senderMobile, sende
         ]}
       />
 
-      <ResetMpin open={openResetModal} onClose={() => setOpenResetModal(false)} username={username} />
+      {/* <ResetMpin
+        open={openResetModal}
+        onClose={() => setOpenResetModal(false)}
+        username={username}
+      /> */}
     </>
   );
 };
