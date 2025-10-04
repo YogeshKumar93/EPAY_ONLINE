@@ -1,6 +1,6 @@
 import { Button, FormControl, Grid, Modal, Typography } from "@mui/material";
 import { Box, useMediaQuery, useTheme } from "@mui/system";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import PinInput from "react-pin-input";
 
 import { useContext } from "react";
@@ -39,11 +39,33 @@ const CommonMpinModal = ({
   const user = authCtx.user;
   const username = user && user.username;
 
+  // State to track which input is focused
+  const [focusedIndex, setFocusedIndex] = useState(0);
+
+  // Ref for first input field
+  const firstInputRef = useRef(null);
+
+  // Direct focus on first input when modal opens
+  useEffect(() => {
+    if (open) {
+      const timer = setTimeout(() => {
+        if (firstInputRef.current) {
+          firstInputRef.current.focus();
+          firstInputRef.current.select();
+          setFocusedIndex(0); // Set first input as focused
+        }
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [open]);
+
   const handleClose = () => {
     setOpen(false);
     if (hooksetterfunc) hooksetterfunc(radioPrevValue);
     setErr("");
     setOtp("");
+    setFocusedIndex(0);
   };
 
   const handleMpinCB = (value) => {
@@ -58,12 +80,49 @@ const CommonMpinModal = ({
     }
   };
 
+  // Handle focus on any input
+  const handleInputFocus = (index) => {
+    setFocusedIndex(index);
+  };
+
+  // Handle blur
+  const handleInputBlur = () => {
+    setFocusedIndex(-1);
+  };
+
   const handleSubmit = () => {
     if (otp.length < 6) {
       setErr("Please enter a 6-digit MPIN");
       return;
     }
     handleMpinCB(otp);
+  };
+  const renderInput = (inputProps, index) => {
+    const isFocused = focusedIndex === index;
+
+    const inputStyle = {
+      width: isMobile ? "40px" : "48px",
+      height: isMobile ? "40px" : "48px",
+      fontSize: isMobile ? "18px" : "20px",
+      borderRadius: "8px",
+      border: isFocused ? "3px solid #4045A1" : "2px solid #e0e0e0",
+      background: isFocused ? "#e3f2fd" : "#f8f9fa",
+      fontWeight: "600",
+      transition: "all 0.3s ease",
+      outline: "none",
+      textAlign: "center",
+      boxShadow: isFocused ? "0 0 10px rgba(64, 69, 161, 0.4)" : "none",
+      transform: isFocused ? "scale(1.05)" : "scale(1)",
+    };
+
+    return (
+      <input
+        {...inputProps}
+        style={inputStyle}
+        onFocus={() => handleInputFocus(index)}
+        onBlur={handleInputBlur}
+      />
+    );
   };
 
   return (
@@ -89,7 +148,6 @@ const CommonMpinModal = ({
         <Typography
           variant="body2"
           color="textSecondary"
-          type="password"
           sx={{
             textAlign: "center",
             mb: 3,
@@ -106,31 +164,16 @@ const CommonMpinModal = ({
             justifyContent: "center",
             width: "100%",
             mb: 2,
+            position: "relative",
           }}
         >
           <OtpInput
             value={otp}
             onChange={handleChange}
             numInputs={6}
-            isInputSecure={true}
-            renderInput={(props) => <input {...props} type="password" />}
-            inputStyle={{
-              width: isMobile ? "35px" : "45px",
-              height: isMobile ? "35px" : "45px",
-              margin: "0 4px",
-              fontSize: isMobile ? "16px" : "18px",
-              borderRadius: "8px",
-              border: "2px solid #e0e0e0",
-              background: "#f8f9fa",
-              fontWeight: "600",
-              transition: "all 0.2s ease",
-              outline: "none",
-              textAlign: "center",
-            }}
-            focusStyle={{
-              border: "2px solid #4045A1",
-              boxShadow: "0 0 5px rgba(64, 69, 161, 0.3)",
-            }}
+            inputType="password"
+            renderSeparator={<span style={{ width: "8px" }}></span>}
+            renderInput={renderInput}
           />
         </Box>
 
@@ -170,32 +213,6 @@ const CommonMpinModal = ({
           </Box>
         )}
 
-        {/* Reset MPIN Link */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            width: "100%",
-            mb: 3,
-          }}
-        >
-          <ResetMpin
-            variant="text"
-            py
-            mt
-            username={username}
-            sx={{
-              fontSize: isMobile ? "0.8rem" : "0.9rem",
-              color: "#4045A1",
-              fontWeight: "500",
-              "&:hover": {
-                color: "#30347a",
-                backgroundColor: "transparent",
-              },
-            }}
-          />
-        </Box>
-
         {/* Submit Button */}
         <Button
           variant="contained"
@@ -217,20 +234,6 @@ const CommonMpinModal = ({
         >
           Verify MPIN
         </Button>
-
-        {/* Helper Text */}
-        <Typography
-          variant="caption"
-          color="textSecondary"
-          sx={{
-            textAlign: "center",
-            mt: 2,
-            display: "block",
-            fontSize: "0.75rem",
-          }}
-        >
-          For security reasons, your MPIN is required to complete this action
-        </Typography>
       </Box>
     </CommonModal>
   );

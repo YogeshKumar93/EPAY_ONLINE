@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   IconButton,
   TextField,
@@ -20,18 +20,23 @@ import debounce from "lodash.debounce";
 }
 import { CurrencyRupee } from "@mui/icons-material";
 import CommonLoader from "../components/common/CommonLoader";
+import AuthContext from "../contexts/AuthContext";
+import { useToast } from "../utils/ToastContext";
 
 const AdWalletTransfer = ({ row, open, onClose }) => {
   const [mpinModalOpen, setMpinModalOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [receiver, setReceiver] = useState(null);
+  const authCtx = useContext(AuthContext);
+
+  const loadUserProfile = authCtx.loadUserProfile;
 
   const [amount, setAmount] = useState("");
   const [remark, setRemark] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const { showToast } = useToast();
   // Fetch receiver details from mobile number
   const fetchReceiver = async () => {
     setLoading(true);
@@ -41,7 +46,7 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
         "post",
         ApiEndpoints.WALLET_GET_RECEIVER,
         {
-          mobile_number: row.mobile,
+          user_id: `P2PAE${row.id}`,
         }
       );
 
@@ -85,18 +90,22 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
         operator: 17,
       };
 
-      const { response } = await apiCall(
+      const { response, error } = await apiCall(
         "post",
         ApiEndpoints.WALLET_CREATE,
         payload
       );
 
       if (response) {
+        showToast(response?.message || "Transfer successful", "success");
         setSuccess(response?.message || "Transfer successful");
         setAmount("");
         setRemark("");
+        loadUserProfile();
+        onClose();
       } else {
-        setError(response?.data?.message || "Transfer failed");
+        showToast(error.message || error.errors, "error");
+        setError(error?.message || "Transfer failed");
       }
     } catch (err) {
       setError("Something went wrong during transfer");
@@ -150,7 +159,11 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
                 background: "linear-gradient(to right, #e3f2fd, #ffffff)",
               }}
             >
-              <Grid container spacing={2}>
+              <Grid
+                container
+                spacing={2}
+                sx={{ justifyContent: "space-between" }}
+              >
                 <Grid item xs={6}>
                   <Typography
                     variant="subtitle2"
