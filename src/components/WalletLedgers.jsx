@@ -6,12 +6,12 @@ import ReceiptIcon from "@mui/icons-material/Receipt";
 import AccountLadger from "./UI/AccountLadger";
 import WalletLedger2 from "./UI/WalletLedger2";
 import WalletLedger3 from "../pages/WalletLedger3";
-import AuthContext from "../contexts/AuthContext"; // ✅ Example if you're using AuthContext
+import AuthContext from "../contexts/AuthContext";
 
 export const WalletLedgers = () => {
   const [tab, setTab] = useState(0);
-  const { user } = useContext(AuthContext) || {}; // ✅ adjust based on your setup
-  const isAdmin = user?.role === "adm"; // or user?.isAdmin, depending on your data
+  const { user } = useContext(AuthContext) || {};
+  const isAdmin = user?.role === "adm";
 
   const handleChange = (event, newValue) => {
     setTab(newValue);
@@ -39,7 +39,6 @@ export const WalletLedgers = () => {
     },
   ];
 
-  // ✅ Add Wallet Ledger 3 only if user is admin
   if (isAdmin) {
     tabItems.push({
       label: (
