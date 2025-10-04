@@ -95,7 +95,7 @@ const DmtTxn = ({ query }) => {
         ApiEndpoints.GET_DMT_TXN,
         { export: 1 }
       );
-      const usersData = response?.data?.data || [];
+      const usersData = response?.data || [];
 
       if (usersData.length > 0) {
         json2Excel("DmtTxns", usersData); // generates and downloads Users.xlsx

@@ -59,6 +59,76 @@ const FundRequest = () => {
     }
   }, [activeTab]);
 
+  // Simple number to words converter (for up to crores)
+  const numberToWords = (num) => {
+    if (!num || isNaN(num)) return "";
+    const a = [
+      "",
+      "One",
+      "Two",
+      "Three",
+      "Four",
+      "Five",
+      "Six",
+      "Seven",
+      "Eight",
+      "Nine",
+      "Ten",
+      "Eleven",
+      "Twelve",
+      "Thirteen",
+      "Fourteen",
+      "Fifteen",
+      "Sixteen",
+      "Seventeen",
+      "Eighteen",
+      "Nineteen",
+    ];
+    const b = [
+      "",
+      "",
+      "Twenty",
+      "Thirty",
+      "Forty",
+      "Fifty",
+      "Sixty",
+      "Seventy",
+      "Eighty",
+      "Ninety",
+    ];
+
+    const inWords = (n) => {
+      if (n < 20) return a[n];
+      if (n < 100)
+        return b[Math.floor(n / 10)] + (n % 10 ? " " + a[n % 10] : "");
+      if (n < 1000)
+        return (
+          a[Math.floor(n / 100)] +
+          " Hundred" +
+          (n % 100 ? " and " + inWords(n % 100) : "")
+        );
+      if (n < 100000)
+        return (
+          inWords(Math.floor(n / 1000)) +
+          " Thousand" +
+          (n % 1000 ? " " + inWords(n % 1000) : "")
+        );
+      if (n < 10000000)
+        return (
+          inWords(Math.floor(n / 100000)) +
+          " Lakh" +
+          (n % 100000 ? " " + inWords(n % 100000) : "")
+        );
+      return (
+        inWords(Math.floor(n / 10000000)) +
+        " Crore" +
+        (n % 10000000 ? " " + inWords(n % 10000000) : "")
+      );
+    };
+
+    return inWords(Math.floor(num));
+  };
+
   const columns = useMemo(
     () => [
       {
@@ -131,12 +201,32 @@ const FundRequest = () => {
       },
       {
         name: "Amount",
-        selector: (row) => (
-          <Typography sx={{ fontWeight: "bold" }}>
-            {currencySetter(parseFloat(row?.amount).toFixed(2))}
-          </Typography>
-        ),
+        selector: (row) => {
+          const num = parseFloat(row?.amount);
+          const formattedAmount = currencySetter(num.toFixed(2));
+          const amountInWords = numberToWords(num);
+
+          return (
+            <Box display="flex" flexDirection="column" alignItems="flex-start">
+              <Typography sx={{ fontWeight: "bold" }}>
+                {formattedAmount}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "text.secondary",
+                  fontStyle: "italic",
+                  fontSize: "8px",
+                }}
+              >
+                {amountInWords ? `${amountInWords} only` : ""}
+              </Typography>
+            </Box>
+          );
+        },
+        width: "200px", // ✅ Increased width for better layout
       },
+
       {
         name: "Remark",
         selector: (row) => (

@@ -327,8 +327,8 @@ const BbpxTxn = ({ query }) => {
               selector: (row) => (
                 <div style={{ textAlign: "left", fontSize: "13px" }}>
                   {row.txn_id}
-                  <br />
-                  {row.client_ref}
+                  {/* <br /> */}
+                  {/* {row.client_ref} */}
                 </div>
               ),
               wrap: true,
