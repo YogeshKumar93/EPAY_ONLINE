@@ -82,7 +82,19 @@ const OnBoarding = () => {
       setSubmitting(false);
     }
   };
+  // Define the required image fields for KYC
+  const requiredImages = [
+    "aadhaar_front",
+    "aadhaar_back",
+    "shop_image",
+    "pan_card",
+    "photo",
+  ];
 
+  // Check if all required images are uploaded
+  const allImagesUploaded = requiredImages.every(
+    (key) => kyc.formData[key] && kyc.formData[key] !== ""
+  );
   return (
     <Box
       sx={{
@@ -254,7 +266,7 @@ const OnBoarding = () => {
                 variant="contained"
                 color="primary"
                 onClick={handleSubmitKYC}
-                disabled={submitting || kyc.loading}
+                disabled={submitting || kyc.loading || !allImagesUploaded}
               >
                 {submitting ? "Saving..." : "Save Business Info"}
               </Button>
