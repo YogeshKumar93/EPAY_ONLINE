@@ -13,7 +13,7 @@ const TAB_CONFIG = [
   // { key: "identification", label: "Identification" },
   // { key: "bank", label: "Bank" },
   // { key: "documents", label: "Documents" },
-  // { key: "kyc", label: "KYC" },
+  { key: "kyc", label: "KYC" },
 ];
 
 // Convert key_name to Label (e.g., business_email -> Business Email)
