@@ -31,7 +31,7 @@ const ApiEndpoints = {
   CREATE_PAYOUT_SCHEME: "schemes/createPayoutScheme",
   CREATE_PAYOUT2_SCHEME: "schemes/createPayout2Scheme",
   CREATE_DMT_SCHEME: "schemes/createDmtScheme",
-  GET_NEWS: "admin/news",
+  // GET_NEWS: "admin/news",
 
   GET_ME_USER: "user/getUser",
 
