@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import ApiEndpoints from "../api/ApiEndpoints";
-import { apiCall } from "../api/apiClient";
+
 import {
   Table,
   TableBody,
@@ -17,9 +16,11 @@ import {
   Button,
 } from "@mui/material";
 import { AccountBalance } from "@mui/icons-material";
-import AuthContext from "../contexts/AuthContext";
-import Spinner from "./Spinner";
-// import Spinner from "./common/Spinner";
+import ApiEndpoints from "../../api/ApiEndpoints";
+import { apiCall } from "../../api/apiClient";
+import AuthContext from "../../contexts/AuthContext";
+import Spinner from "../../pages/Spinner";
+
 const ServiceWiseProfit = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({});
@@ -150,44 +151,55 @@ const ServiceWiseProfit = () => {
         overflow: "hidden",
       }}
     >
-      {/* Header with Date Filter */}
       <Box
         sx={{
-          p: 1.5,
+          p: { xs: 1, sm: 1 },
           background: "linear-gradient(135deg, #2275B7, #1a67a8)",
           color: "white",
           display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          alignItems: { xs: "stretch", md: "center" },
-          gap: 1.5,
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: { xs: "stretch", sm: "center" },
+          gap: { xs: 0.75, sm: 1 },
+          flexWrap: "nowrap",
+          overflowX: { sm: "auto" },
+          "&::-webkit-scrollbar": { display: "none" },
         }}
       >
-        {/* Title */}
+        {/* Title - Compact */}
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
-            gap: 1,
-            flex: 1,
-            minWidth: { md: "200px" },
+            gap: 0.75,
+            flex: { xs: "0 0 100%", sm: "0 0 auto" },
+            justifyContent: { xs: "center", sm: "flex-start" },
+            order: 1,
+            minWidth: { sm: "120px" },
           }}
         >
-          <AccountBalance sx={{ fontSize: 20 }} />
+          <AccountBalance sx={{ fontSize: { xs: 16, sm: 18 } }} />
           <Typography
             variant="h6"
-            sx={{ fontWeight: 700, fontSize: "0.95rem" }}
+            sx={{
+              fontWeight: 700,
+              fontSize: { xs: "0.8rem", sm: "0.85rem" },
+              whiteSpace: "nowrap",
+            }}
           >
             Profit Summary
           </Typography>
         </Box>
 
-        {/* Quick Filter Buttons */}
+        {/* Quick Filter Buttons - Ultra Compact */}
         <Box
           sx={{
             display: "flex",
             gap: 0.5,
-            flexWrap: "wrap",
-            justifyContent: { xs: "center", md: "flex-start" },
+            flexWrap: "nowrap",
+            justifyContent: { xs: "center", sm: "flex-start" },
+            flex: { xs: "0 0 100%", sm: "0 0 auto" },
+            order: { xs: 3, sm: 2 },
+            mt: { xs: 0.5, sm: 0 },
           }}
         >
           {["today", "thisMonth", "lastMonth"].map((filter) => (
@@ -199,9 +211,9 @@ const ServiceWiseProfit = () => {
               disabled={loading}
               sx={{
                 minWidth: "auto",
-                px: 1.5,
-                py: 0.5,
-                fontSize: "0.7rem",
+                px: 0.8,
+                py: 0.3,
+                fontSize: "0.6rem",
                 fontWeight: 600,
                 borderColor: "white",
                 color: activeFilter === filter ? "#2275B7" : "white",
@@ -213,7 +225,8 @@ const ServiceWiseProfit = () => {
                       : "rgba(255,255,255,0.1)",
                   borderColor: "white",
                 },
-                transition: "all 0.2s ease",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
               }}
             >
               {filter === "today" && "Today"}
@@ -223,35 +236,41 @@ const ServiceWiseProfit = () => {
           ))}
         </Box>
 
-        {/* Date Range Picker */}
+        {/* Date Range Picker - Ultra Compact */}
         <Box
           sx={{
             display: "flex",
-            gap: 1,
-            flexWrap: "wrap",
+            gap: 0.5,
+            flexWrap: "nowrap",
             alignItems: "center",
-            justifyContent: { xs: "center", md: "flex-end" },
+            justifyContent: { xs: "center", sm: "flex-end" },
+            flex: { xs: "0 0 100%", sm: 1 },
+            order: { xs: 2, sm: 3 },
           }}
         >
+          {/* Date Label - Compact */}
           <Typography
             variant="body2"
             sx={{
-              fontSize: "0.75rem",
+              fontSize: "0.65rem",
               color: "white",
               fontWeight: 600,
+              whiteSpace: "nowrap",
               display: { xs: "none", sm: "block" },
             }}
           >
-            Date:
+            Date Range:
           </Typography>
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+          {/* From Date - Compact */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.25 }}>
             <Typography
               variant="body2"
               sx={{
-                fontSize: "0.75rem",
+                fontSize: "0.6rem",
                 color: "white",
                 display: { xs: "none", sm: "block" },
+                whiteSpace: "nowrap",
               }}
             >
               From
@@ -266,27 +285,28 @@ const ServiceWiseProfit = () => {
               disabled={loading}
               sx={{
                 "& .MuiInputBase-input": {
-                  py: 0.8,
-                  fontSize: "0.75rem",
+                  py: 0.4,
+                  fontSize: "0.65rem",
                   color: "#1e293b",
                   bgcolor: "white",
-                  borderRadius: 1,
-                  "&:disabled": { bgcolor: "grey.100" },
+                  borderRadius: 0.5,
                 },
                 "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-                width: { xs: "120px", sm: "130px" },
-                minWidth: "120px",
+                width: "100px",
+                minWidth: "100px",
               }}
             />
           </Box>
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+          {/* To Date - Compact */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.25 }}>
             <Typography
               variant="body2"
               sx={{
-                fontSize: "0.75rem",
+                fontSize: "0.6rem",
                 color: "white",
                 display: { xs: "none", sm: "block" },
+                whiteSpace: "nowrap",
               }}
             >
               To
@@ -299,20 +319,20 @@ const ServiceWiseProfit = () => {
               disabled={loading}
               sx={{
                 "& .MuiInputBase-input": {
-                  py: 0.8,
-                  fontSize: "0.75rem",
+                  py: 0.4,
+                  fontSize: "0.65rem",
                   color: "#1e293b",
                   bgcolor: "white",
-                  borderRadius: 1,
-                  "&:disabled": { bgcolor: "grey.100" },
+                  borderRadius: 0.5,
                 },
                 "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-                width: { xs: "120px", sm: "130px" },
-                minWidth: "120px",
+                width: "100px",
+                minWidth: "100px",
               }}
             />
           </Box>
 
+          {/* Reset Button - Compact */}
           <Button
             variant="outlined"
             size="small"
@@ -320,9 +340,9 @@ const ServiceWiseProfit = () => {
             disabled={loading}
             sx={{
               minWidth: "auto",
-              px: 1.5,
-              py: 0.5,
-              fontSize: "0.7rem",
+              px: 0.8,
+              py: 0.3,
+              fontSize: "0.6rem",
               fontWeight: 600,
               borderColor: "white",
               color: "white",
@@ -330,18 +350,14 @@ const ServiceWiseProfit = () => {
                 borderColor: "white",
                 bgcolor: "rgba(255,255,255,0.1)",
               },
-              "&:disabled": {
-                borderColor: "grey.400",
-                color: "grey.400",
-              },
-              transition: "all 0.2s ease",
+              whiteSpace: "nowrap",
+              flexShrink: 0,
             }}
           >
             Reset
           </Button>
         </Box>
       </Box>
-
       <TableContainer
         sx={{
           flex: 1,
@@ -499,7 +515,7 @@ const ServiceWiseProfit = () => {
                       minWidth: "80px",
                     }}
                   >
-                    Total Comm
+                    Ret Comm
                   </TableCell>
                   <TableCell
                     align="right"
@@ -513,7 +529,7 @@ const ServiceWiseProfit = () => {
                       minWidth: "80px",
                     }}
                   >
-                    Total TDS
+                    Ret TDS
                   </TableCell>
                   <TableCell
                     align="right"
@@ -673,7 +689,6 @@ const ServiceWiseProfit = () => {
                 <TableCell
                   colSpan={isAdmin ? 11 : isMd ? 4 : isDi ? 4 : isRet ? 6 : 5}
                   sx={{
-                    py: 4,
                     textAlign: "center",
                     bgcolor: "#ffffff",
                   }}
@@ -684,7 +699,7 @@ const ServiceWiseProfit = () => {
                       sx={{
                         color: "#64748b",
                         fontSize: "0.8rem",
-                        mb: 1,
+                        // mb: 1,
                       }}
                     >
                       📊

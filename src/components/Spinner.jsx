@@ -1,8 +1,6 @@
 import React from "react";
 import styled, { keyframes } from "styled-components";
 import biggpayLogo from "../assets/Images/PPALogo.jpeg";
-;
-
 // Spinner rotation animation
 const spin = keyframes`
   0% { transform: rotate(0deg); }
@@ -61,7 +59,11 @@ const Spinner = ({ loading, size, color, text }) => {
       <LoaderWrapper>
         <Logo src={biggpayLogo} alt="Loading..." />
         <SpinnerWrapper size={size} color={color} />
-        {text && <div style={{ marginTop: 10, color: "#000", textAlign: "center" }}>{text}</div>}
+        {text && (
+          <div style={{ marginTop: 10, color: "#000", textAlign: "center" }}>
+            {text}
+          </div>
+        )}
       </LoaderWrapper>
     </Overlay>
   );
