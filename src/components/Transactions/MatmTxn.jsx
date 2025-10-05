@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useContext, useState } from "react";
+import { useMemo, useCallback, useContext, useState, useEffect } from "react";
 import {
   Box,
   Tooltip,
@@ -31,6 +31,33 @@ const MatmTxn = ({ query }) => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
+  const [routes, setRoutes] = useState([]);
+
+  useEffect(() => {
+    const fetchRoutes = async () => {
+      try {
+        const { error, response } = await apiCall(
+          "post",
+          ApiEndpoints.GET_ROUTES
+        );
+        if (response) {
+          console.log("response", response);
+
+          const routeOptions = response.data.map((r) => ({
+            label: r.name, // shown in dropdown
+            value: r.code, // sent in API calls
+          }));
+          setRoutes(routeOptions);
+        } else {
+          console.error("Failed to fetch routes", error);
+        }
+      } catch (err) {
+        console.error("Error fetching routes:", err);
+      }
+    };
+
+    fetchRoutes();
+  }, []);
   const filters = useMemo(
     () => [
       {
@@ -45,17 +72,19 @@ const MatmTxn = ({ query }) => {
         ],
         defaultValue: "pending",
       },
-      // { id: "customer_mobile", label: "Customer Mobile", type: "textfield" },
-      { id: "txn_id", label: "Txn ID", type: "textfield" },
-      { id: "route", label: "Route", type: "textfield", roles: ["adm"] },
       {
-        id: "client_ref",
-        label: "Client Ref",
-        type: "textfield",
+        id: "route",
+        label: "Route",
+        type: "dropdown",
+        options: routes, // ✅ dynamic routes here
         roles: ["adm"],
       },
+      // { id: "customer_mobile", label: "Customer Mobile", type: "textfield" },
+      { id: "txn_id", label: "Txn ID", type: "textfield" },
+      { id: "user_id", label: "User ID", type: "textfield" },
+      { id: "date_range", type: "daterange" },
     ],
-    []
+    [routes] // ✅ depends on routes, so dropdown updates automatically
   );
   const handleExportExcel = async () => {
     try {

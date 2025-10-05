@@ -7,18 +7,17 @@ import {
   TextField,
   IconButton,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { DateRangePicker } from "rsuite";
-import CachedIcon from "@mui/icons-material/Cached";
-import DownloadIcon from "@mui/icons-material/Download";
-import UploadFileIcon from "@mui/icons-material/UploadFile"; // Upload icon
-import Icon from "@mdi/react";
-import { mdiFileExcel } from "@mdi/js";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CommonTable from "../components/common/CommonTable";
 import CreateBankStatement from "./CreateBankStatement";
 import CommonLoader from "../components/common/CommonLoader";
-
+import DeleteIcon from "@mui/icons-material/Delete";
 import predefinedRanges from "../utils/predefinedRanges";
 import {
   yyyymmdd,
@@ -37,12 +36,19 @@ import uploadImg from "../assets/animate-icons/uploadFile.png";
 import AuthContext from "../contexts/AuthContext";
 import { primaryColor, secondaryColor } from "../utils/setThemeColor";
 import CommonStatus from "../components/common/CommonStatus";
+import { apiCall } from "../api/apiClient";
+import { useToast } from "../utils/ToastContext";
 
 const BankStatements = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext);
   const user = authCtx.user;
+  const { showToast } = useToast();
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+
+  const handleOpenDeleteModal = () => setOpenDeleteModal(true);
+  const handleCloseDeleteModal = () => setOpenDeleteModal(false);
 
   const { bank_id, bank_name, balance: oldBalance } = location.state || {};
 
@@ -67,6 +73,28 @@ const BankStatements = () => {
     link.href = `${process.env.PUBLIC_URL}/uplodeexcel2.xlsx`;
     link.download = "uplodeexcel2.xlsx";
     link.click();
+  };
+  const handleConfirmDelete = async () => {
+    try {
+      const payload = { bank_id: bank_id };
+      const { response, error } = await apiCall(
+        "post",
+        ApiEndpoints.DELETE_LAST_TXN,
+        payload
+      );
+
+      if (response) {
+        showToast(response.message || "Last transaction deleted", "success");
+        refreshStatements();
+      } else {
+        showToast(error || "Failed to delete last transaction", "error");
+      }
+    } catch (err) {
+      console.error("Error deleting last txn:", err);
+      showToast("Error deleting last transaction", "error");
+    } finally {
+      handleCloseDeleteModal();
+    }
   };
 
   const columns = [
@@ -183,9 +211,7 @@ const BankStatements = () => {
       name: "Status",
       selector: (row) => (
         <div style={{ textAlign: "right", fontSize: "11px", fontWeight: 600 }}>
-          <div>
-            <CommonStatus value={row.status} />{" "}
-          </div>
+          {row.status === 0 ? "UNCLAIMED" : "CLAIMED"}
         </div>
       ),
       center: true,
@@ -206,6 +232,24 @@ const BankStatements = () => {
             bankId={bank_id}
             balance={oldBalance}
           />
+          <Dialog open={openDeleteModal} onClose={handleCloseDeleteModal}>
+            <DialogTitle>Confirm Delete</DialogTitle>
+            <DialogContent>
+              Are you sure you want to delete the last bank statement?
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseDeleteModal} color="primary">
+                Cancel
+              </Button>
+              <Button
+                onClick={handleConfirmDelete}
+                color="error"
+                variant="contained"
+              >
+                Delete
+              </Button>
+            </DialogActions>
+          </Dialog>
 
           <CommonTable
             onFetchRef={handleFetchRef}
@@ -288,6 +332,15 @@ const BankStatements = () => {
                         alt="Excel"
                         style={{ width: 23, height: 23 }}
                       />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Delete Last Txn">
+                    <IconButton
+                      size="small"
+                      sx={{ color: "red" }}
+                      onClick={handleOpenDeleteModal} // open modal
+                    >
+                      <DeleteIcon />
                     </IconButton>
                   </Tooltip>
 

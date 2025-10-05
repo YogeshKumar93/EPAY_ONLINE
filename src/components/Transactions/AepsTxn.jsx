@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useContext, useState } from "react";
+import { useMemo, useCallback, useContext, useState, useEffect } from "react";
 import {
   Box,
   Tooltip,
@@ -48,12 +48,37 @@ const AepsTxn = ({ query }) => {
   const [openLeinModal, setOpenLeinModal] = useState(false);
   const [refundLoading, setRefundLoading] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [routes, setRoutes] = useState([]);
 
   const handleOpenLein = (row) => {
     setOpenLeinModal(true);
     setSelectedTrancation(row);
   };
+  useEffect(() => {
+    const fetchRoutes = async () => {
+      try {
+        const { error, response } = await apiCall(
+          "post",
+          ApiEndpoints.GET_ROUTES
+        );
+        if (response) {
+          console.log("response", response);
 
+          const routeOptions = response.data.map((r) => ({
+            label: r.name, // shown in dropdown
+            value: r.code, // sent in API calls
+          }));
+          setRoutes(routeOptions);
+        } else {
+          console.error("Failed to fetch routes", error);
+        }
+      } catch (err) {
+        console.error("Error fetching routes:", err);
+      }
+    };
+
+    fetchRoutes();
+  }, []);
   const handleCloseLein = () => setOpenLeinModal(false);
   const handleRefundClick = (row) => {
     setSelectedForRefund(row);
@@ -102,17 +127,20 @@ const AepsTxn = ({ query }) => {
         ],
         defaultValue: "pending",
       },
+      {
+        id: "route",
+        label: "Route",
+        type: "dropdown",
+        options: routes, // ✅ dynamic routes here
+        roles: ["adm"],
+      },
+
       // { id: "customer_mobile", label: "Customer Mobile", type: "textfield" },
       { id: "txn_id", label: "Txn ID", type: "textfield" },
-      { id: "route", label: "Route", type: "textfield", roles: ["admin"] },
-      {
-        id: "client_ref",
-        label: "Client Ref",
-        type: "textfield",
-        roles: ["admin"],
-      },
+      { id: "user_id", label: "User ID", type: "textfield" },
+      { id: "date_range", type: "daterange" },
     ],
-    []
+    [routes] // ✅ depends on routes, so dropdown updates automatically
   );
   const handleExportExcel = async () => {
     try {
@@ -591,21 +619,26 @@ const AepsTxn = ({ query }) => {
             >
               {selectedRows.length > 0 && (
                 <Tooltip title="View Selected Details">
-                 <Button
-                  variant="contained"
-                  size="small"
-                  color="primary"
-                  onClick={() => {
-                    // Save selected rows to sessionStorage
-                    sessionStorage.setItem("txnData", JSON.stringify(selectedRows));
-                
-                    // Open new tab/window
-                    window.open("/print-dmt2", "_blank");
-                  }}
-                >
-                <PrintIcon sx={{ fontSize: 20, color: '#e3e6e9ff', mr:1 }} />
-             AEPS
-                </Button>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    color="primary"
+                    onClick={() => {
+                      // Save selected rows to sessionStorage
+                      sessionStorage.setItem(
+                        "txnData",
+                        JSON.stringify(selectedRows)
+                      );
+
+                      // Open new tab/window
+                      window.open("/print-dmt2", "_blank");
+                    }}
+                  >
+                    <PrintIcon
+                      sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
+                    />
+                    AEPS
+                  </Button>
                 </Tooltip>
               )}
             </Box>

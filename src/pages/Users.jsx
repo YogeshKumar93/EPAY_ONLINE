@@ -51,6 +51,7 @@ const Users = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const fetchUsersRef = useRef(null);
   const userRole = authCtx?.user;
+  const user = authCtx?.user;
 
   const [selectedUser, setSelectedUser] = useState(null);
   const [openEditUser, setOpenEditUser] = useState(false);
@@ -244,8 +245,39 @@ const Users = ({ query }) => {
     );
   }
 
-  const filters = useMemo(
-    () => [
+  const filters = useMemo(() => {
+    const userRole = user?.role?.toLowerCase?.();
+
+    // ✅ Correct hierarchy order (Top → Bottom)
+    const hierarchy = [
+      "sadm",
+      "adm",
+      "zsm",
+      "asm",
+      "md",
+      "di",
+      "ret",
+      "dd",
+      "api",
+    ];
+
+    // ✅ Determine which roles to hide (current + above)
+    const hideRoles = (() => {
+      const index = hierarchy.indexOf(userRole);
+      if (index === -1) return [];
+      return hierarchy.slice(0, index + 1);
+    })();
+
+    // ✅ Filter dropdown options according to hierarchy
+    const roleOptions = Object.entries(roleLabels)
+      .filter(([key]) => !hideRoles.includes(key))
+      .sort((a, b) => hierarchy.indexOf(a[0]) - hierarchy.indexOf(b[0])) // ensure dropdown order
+      .map(([key, value]) => ({
+        label: value,
+        value: key,
+      }));
+
+    return [
       {
         id: "mobile",
         label: "Mobile Number",
@@ -253,10 +285,27 @@ const Users = ({ query }) => {
         textType: "number",
       },
       { id: "id", label: "User Id", type: "textfield" },
-      { id: "Parent", label: "Parent", type: "textfield", roles: ["adm"] },
-    ],
-    []
-  );
+      {
+        id: "parent_id",
+        label: "Parent Id",
+        type: "textfield",
+        roles: ["adm"],
+      },
+      {
+        id: "establishment",
+        label: "Establishment",
+        type: "textfield",
+        roles: ["adm"],
+      },
+      {
+        id: "role",
+        label: "Role",
+        type: "dropdown",
+        roles: ["adm", "md", "zsm", "asm"],
+        options: roleOptions,
+      },
+    ];
+  }, [user?.role]);
 
   const columns = useMemo(() => {
     const baseColumns = [

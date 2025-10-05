@@ -1,4 +1,11 @@
-import { useMemo, useCallback, useContext, useState, useRef } from "react";
+import {
+  useMemo,
+  useCallback,
+  useContext,
+  useState,
+  useRef,
+  useEffect,
+} from "react";
 import {
   Box,
   Tooltip,
@@ -65,6 +72,7 @@ const BbpxTxn = ({ query }) => {
   const [responseModalOpen, setResponseModalOpen] = useState(false);
   const [selectedApiResponse, setSelectedApiResponse] = useState("");
   const [selectedRows, setSelectedRows] = useState([]);
+  const [routes, setRoutes] = useState([]);
 
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -111,6 +119,31 @@ const BbpxTxn = ({ query }) => {
       alert("Failed to export Excel");
     }
   };
+  useEffect(() => {
+    const fetchRoutes = async () => {
+      try {
+        const { error, response } = await apiCall(
+          "post",
+          ApiEndpoints.GET_ROUTES
+        );
+        if (response) {
+          console.log("response", response);
+
+          const routeOptions = response.data.map((r) => ({
+            label: r.name, // shown in dropdown
+            value: r.code, // sent in API calls
+          }));
+          setRoutes(routeOptions);
+        } else {
+          console.error("Failed to fetch routes", error);
+        }
+      } catch (err) {
+        console.error("Error fetching routes:", err);
+      }
+    };
+
+    fetchRoutes();
+  }, []);
   const handleConfirmRefund = async () => {
     if (!selectedForRefund) return;
     setRefundLoading(true);
@@ -151,17 +184,19 @@ const BbpxTxn = ({ query }) => {
         ],
         defaultValue: "pending",
       },
-      { id: "customer_mobile", label: "Customer Mobile", type: "textfield" },
-      { id: "txn_id", label: "Txn ID", type: "textfield" },
-      { id: "route", label: "Route", type: "textfield", roles: ["adm"] },
       {
-        id: "client_ref",
-        label: "Client Ref",
-        type: "textfield",
+        id: "route",
+        label: "Route",
+        type: "dropdown",
+        options: routes, // ✅ dynamic routes here
         roles: ["adm"],
       },
+      { id: "consumer_number", label: "Consumer Number", type: "textfield" },
+      { id: "txn_id", label: "Txn ID", type: "textfield" },
+      { id: "user_id", label: "User ID", type: "textfield" },
+      { id: "date_range", type: "daterange" },
     ],
-    []
+    [routes] // ✅ depends on routes, so dropdown updates automatically
   );
   // const ActionColumn = ({ row, handleRefundClick, handleOpenLein }) => {
   //   const [anchorEl, setAnchorEl] = useState(null);

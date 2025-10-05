@@ -256,7 +256,9 @@ const ApiEndpoints = {
   CREATE_USER: "signup/createUser",
   GET_SIGNUP_SCHEMA: "signup/getSignupSchema",
   DMT1: "dmt1/remitterStatus",
-
+  GET_ROUTES: "admin/getRoutes",
+  DELETE_LAST_TXN: "bank/deleteLastTxn",
+  DELETE_ACCOUNT_LAST: "account/deleteLastTxn",
   CREATE_BASIC: "business/createBasic",
   CREATE_CONTACT: "business/createContact",
   CREATE_ADDRESS: "business/createAddress",

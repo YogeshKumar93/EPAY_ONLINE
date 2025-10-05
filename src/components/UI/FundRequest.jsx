@@ -1,5 +1,5 @@
 import React, { useState, useContext, useRef, useMemo } from "react";
-import { Box, Typography, Tabs, Tab, Button } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import CommonTable from "../common/CommonTable";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import CreateFundRequest from "../../pages/CreateFundRequest";
@@ -12,21 +12,24 @@ import { currencySetter } from "../../utils/Currencyutil";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
-import { Tooltip, Box as MuiBox } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
+import { Tooltip, Button, Box as MuiBox } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit"; // ✅ import icon from MUI
 import EditFundRequest from "./EditFundRequest";
 import { Delete } from "@mui/icons-material";
-import DeleteFundRequest from "./DelelteFundReques";
+import { IconButton } from "rsuite";
 import ReceiptButton from "../ReceiptButton";
+import DeleteFundRequestModal from "./DelelteFundReques";
+import DeleteFundRequest from "./DelelteFundReques";
 
 const FundRequest = () => {
   const authCtx = useContext(AuthContext);
   const user = authCtx.user;
+  const [activeTab, setActiveTab] = useState("pending"); // default
 
   const fetchUsersRef = useRef(null);
-  const [modal, setModal] = useState({ type: null, row: null, status: null });
 
-  const [activeTab, setActiveTab] = useState("pending"); // default
+  // ✅ Single modal state
+  const [modal, setModal] = useState({ type: null, row: null, status: null });
 
   const handleFetchRef = (fetchFn) => {
     fetchUsersRef.current = fetchFn;
@@ -43,22 +46,6 @@ const FundRequest = () => {
   const handleCloseModal = () => {
     setModal({ type: null, row: null, status: null });
   };
-
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-
-    // Call table fetch function with the status filter
-    if (fetchUsersRef.current) {
-      fetchUsersRef.current({ status: newValue }); // pass status in payload
-    }
-  };
-  // Watch activeTab and refresh table whenever it changes
-  React.useEffect(() => {
-    if (fetchUsersRef.current) {
-      fetchUsersRef.current(); // will automatically include queryParam={status: activeTab}
-    }
-  }, [activeTab]);
-
   // Simple number to words converter (for up to crores)
   const numberToWords = (num) => {
     if (!num || isNaN(num)) return "";
@@ -226,7 +213,6 @@ const FundRequest = () => {
         },
         width: "200px", // ✅ Increased width for better layout
       },
-
       {
         name: "Remark",
         selector: (row) => (
@@ -264,7 +250,9 @@ const FundRequest = () => {
             alignItems="center"
             justifyContent="center"
             gap={2}
+            width="150px"
           >
+            {/* ✅ Edit - only if pending */}
             {row.status === "pending" && (
               <Tooltip title="Edit">
                 <EditIcon
@@ -274,6 +262,8 @@ const FundRequest = () => {
                 />
               </Tooltip>
             )}
+
+            {/* ✅ Delete - only if pending */}
             {row.status === "pending" && (
               <Tooltip title="Delete">
                 <Delete
@@ -283,6 +273,7 @@ const FundRequest = () => {
                 />
               </Tooltip>
             )}
+
             {/* Admin actions */}
             {user?.role === "adm" && (
               <>
@@ -330,9 +321,22 @@ const FundRequest = () => {
     [user]
   );
 
+  // Filters
   const filters = useMemo(
     () => [
-      // { id: "status", label: "Status", type: "dropdown" },
+      {
+        id: "status",
+        label: "Status",
+        type: "dropdown",
+        options: [
+          { value: "success", label: "Success" },
+          { value: "refund", label: "Refund" },
+          { value: "pending", label: "Pending" },
+          { value: "approved", label: "Approved" },
+          { value: "rejected", label: "Rejected" },
+        ],
+        defaultValue: "pending",
+      },
       { id: "date_range", type: "daterange" },
     ],
     []
@@ -382,6 +386,8 @@ const FundRequest = () => {
         }
         extraFilters={{ status: activeTab }}
       />
+
+      {/* ✅ Centralised modal rendering */}
       {modal.type === "create" && (
         <CreateFundRequest
           open
@@ -389,6 +395,7 @@ const FundRequest = () => {
           handleSave={refreshUsers}
         />
       )}
+
       {modal.type === "edit" && (
         <EditFundRequest
           open
@@ -397,6 +404,7 @@ const FundRequest = () => {
           onFetchRef={refreshUsers}
         />
       )}
+
       {modal.type === "delete" && (
         <DeleteFundRequest
           open
@@ -405,6 +413,7 @@ const FundRequest = () => {
           onFetchRef={refreshUsers}
         />
       )}
+
       {modal.type === "status" && (
         <FundRequestModal
           open

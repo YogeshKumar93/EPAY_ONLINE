@@ -1,4 +1,11 @@
-import { useMemo, useCallback, useContext, useState, useRef } from "react";
+import {
+  useMemo,
+  useCallback,
+  useContext,
+  useState,
+  useRef,
+  useEffect,
+} from "react";
 import {
   Box,
   Tooltip,
@@ -66,6 +73,7 @@ const PayoutTxn = ({ query }) => {
   const [selectedTransaction, setSelectedTrancation] = useState("");
   const [openLeinModal, setOpenLeinModal] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [routes, setRoutes] = useState([]);
 
   const handleRefundClick = (row) => {
     setSelectedForRefund(row);
@@ -81,6 +89,31 @@ const PayoutTxn = ({ query }) => {
       fetchUsersRef.current();
     }
   };
+  useEffect(() => {
+    const fetchRoutes = async () => {
+      try {
+        const { error, response } = await apiCall(
+          "post",
+          ApiEndpoints.GET_ROUTES
+        );
+        if (response) {
+          console.log("response", response);
+
+          const routeOptions = response.data.map((r) => ({
+            label: r.name, // shown in dropdown
+            value: r.code, // sent in API calls
+          }));
+          setRoutes(routeOptions);
+        } else {
+          console.error("Failed to fetch routes", error);
+        }
+      } catch (err) {
+        console.error("Error fetching routes:", err);
+      }
+    };
+
+    fetchRoutes();
+  }, []);
   const handleConfirmRefund = async () => {
     if (!selectedForRefund) return;
     setRefundLoading(true);
@@ -146,37 +179,42 @@ const PayoutTxn = ({ query }) => {
         ],
         defaultValue: "pending",
       },
-      { id: "mobile_number", label: "Mobile Number", type: "textfield" },
-      { id: "txn_id", label: "Txn ID", type: "textfield" },
-      { id: "route", label: "Route", type: "textfield", roles: ["adm"] },
       {
-        id: "client_ref",
-        label: "Client Ref",
-        type: "textfield",
+        id: "route",
+        label: "Route",
+        type: "dropdown",
+        options: routes, // ✅ dynamic routes here
         roles: ["adm"],
       },
+      { id: "mobile_number", label: "Mobile Number", type: "textfield" },
+      { id: "txn_id", label: "Txn ID", type: "textfield" },
+      { id: "user_id", label: "User ID", type: "textfield" },
+      { id: "date_range", type: "daterange" },
     ],
-    []
+    [routes] // ✅ depends on routes, so dropdown updates automatically
   );
   const columns = useMemo(
     () => [
       {
         name: "Date",
         selector: (row) => (
-          <div style={{ display: "flex", flexDirection: "column" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <Tooltip title={`Created: ${ddmmyyWithTime(row.created_at)}`} arrow>
-              <span>
-                {ddmmyy(row.created_at)} {dateToTime1(row.created_at)}
-              </span>
+              <div style={{ display: "inline-flex", gap: 4 }}>
+                <span>{ddmmyy(row.created_at)}</span>
+                <span>{dateToTime1(row.created_at)}</span>
+              </div>
             </Tooltip>
-
-            <Tooltip title={`Updated: ${ddmmyyWithTime(row.updated_at)}`} arrow>
-              <span>
-                {ddmmyy(row.updated_at)} {dateToTime1(row.updated_at)}
+            <Tooltip title={`Updated: ${dateToTime(row.updated_at)}`} arrow>
+              <span style={{ marginTop: "8px" }}>
+                {ddmmyy(row.updated_at)}
+                {dateToTime1(row.updated_at)}
               </span>
             </Tooltip>
           </div>
         ),
+        wrap: true,
+        width: "80px",
       },
       // ...(user?.role === "adm" || user?.role === "sadm"
       //   ? [

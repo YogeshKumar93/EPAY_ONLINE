@@ -1,4 +1,4 @@
-import { useMemo, useContext, useState, useRef } from "react";
+import { useMemo, useContext, useState, useRef, useEffect } from "react";
 import {
   Box,
   Tooltip,
@@ -63,9 +63,32 @@ const DmtTxn = ({ query }) => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedTransaction, setSelectedTrancation] = useState("");
+  const [routes, setRoutes] = useState([]);
 
   const [openLeinModal, setOpenLeinModal] = useState(false);
+  useEffect(() => {
+    const fetchRoutes = async () => {
+      try {
+        const { response, error } = await apiCall(
+          "post",
+          ApiEndpoints.GET_ROUTES
+        );
+        if (response) {
+          const routeOptions = response.data.map((r) => ({
+            value: r.code, // send code when submitting/filtering
+            label: r.name, // show name in dropdown
+          }));
+          setRoutes(routeOptions);
+        } else {
+          console.error("Failed to fetch routes", error);
+        }
+      } catch (err) {
+        console.error("Error fetching routes:", err);
+      }
+    };
 
+    fetchRoutes();
+  }, []);
   const navigate = useNavigate();
   const handleRefundClick = (row) => {
     setSelectedForRefund(row);
@@ -143,22 +166,25 @@ const DmtTxn = ({ query }) => {
         options: [
           { value: "success", label: "Success" },
           { value: "failed", label: "Failed" },
-          { value: "refund", label: "Refund" },
+          { value: "refunded", label: "Refunded" },
           { value: "pending", label: "Pending" },
         ],
         defaultValue: "pending",
       },
-      { id: "sender_mobile", label: "Sender Mobile", type: "textfield" },
-      { id: "txn_id", label: "Txn ID", type: "textfield" },
-      { id: "route", label: "Route", type: "textfield", roles: ["adm"] },
       {
-        id: "client_ref",
-        label: "Client Ref",
-        type: "textfield",
+        id: "route",
+        label: "Route",
+        type: "dropdown",
+        options: routes, // ✅ dynamic routes here
         roles: ["adm"],
       },
+
+      { id: "sender_mobile", label: "Sender Mobile", type: "textfield" },
+      { id: "txn_id", label: "Txn ID", type: "textfield" },
+      { id: "user_id", label: "User ID", type: "textfield" },
+      { id: "date_range", type: "daterange" },
     ],
-    []
+    [routes] // ✅ depends on routes, so dropdown updates automatically
   );
 
   const columns = useMemo(() => {

@@ -4,16 +4,22 @@ import CommonModal from "../components/common/CommonModal";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 
-const DeleteConfirmationModal = ({ open, handleClose, onFetchRef, userId }) => {
+const DeleteConfirmationModal = ({
+  open,
+  handleClose,
+  onFetchRef,
+  userId,
+  account_id,
+}) => {
   const [loading, setLoading] = useState(false);
 
   const handleConfirmDelete = async () => {
     try {
       setLoading(true);
       const { error, response } = await apiCall(
-        "DELETE",
-        ApiEndpoints.DELETE_ACCOUNT_STATEMENT,
-        { user_id: userId } // backend deletes last transaction automatically
+        "post",
+        ApiEndpoints.DELETE_ACCOUNT_LAST,
+        { account_id: account_id } // backend deletes last transaction automatically
       );
 
       if (response) {
