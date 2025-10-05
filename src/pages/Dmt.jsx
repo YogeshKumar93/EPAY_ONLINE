@@ -19,7 +19,6 @@ import OutletDmt1 from "./OutletDnt1";
 import AuthContext from "../contexts/AuthContext";
 import Loader from "../components/common/Loader";
 import CommonLoader from "../components/common/CommonLoader";
-
 const Dmt = () => {
   const [mobile, setMobile] = useState("");
   const [account, setAccount] = useState("");
@@ -28,17 +27,18 @@ const Dmt = () => {
   const [showRegister, setShowRegister] = useState(false);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
   const [openRegisterModal, setOpenRegisterModal] = useState(false);
-  const [referenceKey, setRefrenceKey] = useState("");
+  const [referenceKey, setReferenceKey] = useState("");
   const [loading, setLoading] = useState(false);
+  const [aeps2faOpen, setAeps2faOpen] = useState(false);
   const { showToast } = useToast();
   const { user } = useContext(AuthContext);
   const [openDmt1Modal, setOpenDmt1Modal] = useState(false);
 
   const instId = user?.instId;
 
-  // Fetch sender details - same as before
+  // Fetch sender details
   const handleFetchSender = async (number = mobile) => {
-    if (!number ) return;
+    if (!number) return;
 
     setLoading(true);
     const { error, response } = await apiCall("post", ApiEndpoints.DMT1, {
@@ -55,19 +55,22 @@ const Dmt = () => {
         setSender(data);
         setBeneficiaries(data?.beneficiaries || []);
         setShowRegister(false);
+        setOpenRegisterModal(false); // Close register modal if open
         showToast(message, "success");
       } else if (message === "Remitter Not Found") {
         setSender(null);
         setOpenRegisterModal(true);
-        setRefrenceKey(response?.data?.referenceKey);
+        setReferenceKey(response?.data?.referenceKey);
         setBeneficiaries([]);
         setShowRegister(true);
+        setSelectedBeneficiary(null); // Clear selected beneficiary
       }
     } else if (error) {
       showToast(error?.message || "Something went wrong", "error");
       setSender(null);
       setBeneficiaries([]);
       setShowRegister(true);
+      setSelectedBeneficiary(null);
     }
   };
 
@@ -82,12 +85,17 @@ const Dmt = () => {
     const value = e.target.value.replace(/\D/g, "");
     if (value.length <= 10) {
       setMobile(value);
-      if (value.length === 10) handleFetchSender(value);
-      else {
+
+      if (value.length === 10) {
+        handleFetchSender(value);
+      } else {
+        // Clear all state if less than 10 digits
         setSender(null);
         setBeneficiaries([]);
-        setShowRegister(false);
         setSelectedBeneficiary(null);
+        setOpenRegisterModal(false);
+        setReferenceKey("");
+        setAeps2faOpen(false); // Reset 2FA state
       }
     }
   };
@@ -95,6 +103,21 @@ const Dmt = () => {
   const handleDeleteBeneficiary = (id) => {
     setBeneficiaries((prev) => prev.filter((b) => b.id !== id));
     if (selectedBeneficiary?.id === id) setSelectedBeneficiary(null);
+  };
+
+  // Reset everything when modal closes
+  const handleRegisterModalClose = () => {
+    setOpenRegisterModal(false);
+    setAeps2faOpen(false);
+  };
+
+  // Handle successful registration
+  const handleRegistrationSuccess = (senderData) => {
+    setSender(senderData);
+    setBeneficiaries(senderData?.beneficiaries || []);
+    setOpenRegisterModal(false);
+    setAeps2faOpen(false);
+    showToast("Registration successful", "success");
   };
 
   return (
@@ -183,48 +206,53 @@ const Dmt = () => {
           {openRegisterModal && (
             <RemitterRegister
               open={openRegisterModal}
-              onClose={() => setOpenRegisterModal(false)}
+              onClose={handleRegisterModalClose}
               referenceKey={referenceKey}
               mobile={mobile}
-              onSuccess={setSender}
+              onSuccess={handleRegistrationSuccess}
+              aeps2faOpen={aeps2faOpen}
+              setAeps2faOpen={setAeps2faOpen}
             />
           )}
 
-          {/* ✅ MODIFIED LAYOUT: When beneficiary is selected, it takes full width */}
-          {selectedBeneficiary ? (
-            // ✅ Selected Beneficiary takes full width
-            <Box>
-              <SelectedBeneficiary
-                beneficiary={selectedBeneficiary}
-                senderId={sender?.id}
-                sender={sender}
-                senderMobile={sender?.mobileNumber}
-                referenceKey={sender?.referenceKey}
-                amount={selectedBeneficiary.enteredAmount}
-                onBack={() => setSelectedBeneficiary(null)}
-              />
-            </Box>
-          ) : (
-            // ✅ Default layout when no beneficiary selected
-            <Box
-              display="flex"
-              flexDirection={{ xs: "column", md: "row" }}
-              gap={0.5}
-            >
-              <Box flex="0 0 30%" display="flex" flexDirection="column">
-                <RemitterDetails sender={sender} />
-              </Box>
+          {/* MAIN FIX: Hide everything when 2FA is open */}
+          {!aeps2faOpen && !openRegisterModal && (
+            <>
+              {selectedBeneficiary ? (
+                <Box>
+                  <SelectedBeneficiary
+                    beneficiary={selectedBeneficiary}
+                    senderId={sender?.id}
+                    sender={sender}
+                    senderMobile={sender?.mobileNumber}
+                    referenceKey={sender?.referenceKey}
+                    amount={selectedBeneficiary.enteredAmount}
+                    onBack={() => setSelectedBeneficiary(null)}
+                  />
+                </Box>
+              ) : (
+                // Only show when no 2FA and no register modal
+                <Box
+                  display="flex"
+                  flexDirection={{ xs: "column", md: "row" }}
+                  gap={0.5}
+                >
+                  <Box flex="0 0 30%" display="flex" flexDirection="column">
+                    <RemitterDetails sender={sender} />
+                  </Box>
 
-              <Box flex="0 0 70%">
-                <Beneficiaries
-                  sender={sender}
-                  onSuccess={handleFetchSender}
-                  beneficiaries={beneficiaries}
-                  onSelect={setSelectedBeneficiary}
-                  onDelete={handleDeleteBeneficiary}
-                />
-              </Box>
-            </Box>
+                  <Box flex="0 0 70%">
+                    <Beneficiaries
+                      sender={sender}
+                      onSuccess={handleFetchSender}
+                      beneficiaries={beneficiaries}
+                      onSelect={setSelectedBeneficiary}
+                      onDelete={handleDeleteBeneficiary}
+                    />
+                  </Box>
+                </Box>
+              )}
+            </>
           )}
         </>
       )}

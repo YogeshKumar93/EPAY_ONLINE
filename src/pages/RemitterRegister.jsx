@@ -1,5 +1,14 @@
+// import React, { useState, useEffect, useContext } from "react";
 import React, { useState, useEffect, useContext } from "react";
-import CommonModal from "../components/common/CommonModal";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  Box,
+} from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
@@ -7,7 +16,7 @@ import { useSchemaForm } from "../hooks/useSchemaForm";
 import { useToast } from "../utils/ToastContext";
 import OtpInput from "./OtpInput";
 import OTPInput from "react-otp-input";
-import { Box, Button, Typography } from "@mui/material";
+// import { Box, Button, Typography } from "@mui/material";
 import AEPS2FAModal from "../components/AEPS/AEPS2FAModal";
 import AuthContext from "../contexts/AuthContext";
 const RemitterRegister = ({
@@ -16,34 +25,66 @@ const RemitterRegister = ({
   mobile,
   onSuccess,
   referenceKey,
+  setAeps2faOpen,
+  aeps2faOpen,
 }) => {
-  const { schema, formData, handleChange, setErrors, setFormData } =
-    useSchemaForm(ApiEndpoints.DMT1_REGISTER_REMMITER_SCHEMA, open, {
-      mobile_number: mobile || "",
-    });
+  const { showToast } = useToast();
+  const authCtx = useContext(AuthContext);
+  const loc = authCtx?.location;
 
+  const [formData, setFormData] = useState({
+    mobile_number: mobile || "",
+    aadhaar_number: "",
+  });
+  const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [otpReferenceKey, setOtpReferenceKey] = useState(null);
   const [kycReferenceKey, setKycReferenceKey] = useState(null);
   const [otpModalOpen, setOtpModalOpen] = useState(false);
-
-  const [aeps2faOpen, setAeps2faOpen] = useState(false);
   const [otp, setOtp] = useState("");
   const [aadhaar, setAadhaar] = useState(null);
   const [fingerprintData, setFingerprintData] = useState("");
-  const { showToast } = useToast();
-  const authCtx = useContext(AuthContext);
-  const user = authCtx && authCtx.user;
-  const loc = authCtx.location && authCtx.location;
-  useEffect(() => {
-    if (mobile) setFormData((prev) => ({ ...prev, mobile_number: mobile }));
-  }, [mobile, setFormData]);
 
-  const disabledSchema = schema.map((field) =>
-    field.name === "mobile_number" ? { ...field, disabled: true } : field
-  );
+  useEffect(() => {
+    if (mobile) {
+      setFormData((prev) => ({ ...prev, mobile_number: mobile }));
+      // Reset all states when mobile changes
+      setOtp("");
+      setOtpReferenceKey(null);
+      setKycReferenceKey(null);
+      setOtpModalOpen(false);
+      setAeps2faOpen(false);
+      setErrors({});
+    }
+  }, [mobile, setAeps2faOpen]);
+
+  // Reset everything when modal closes
+  const handleClose = () => {
+    setOtpModalOpen(false);
+    setAeps2faOpen(false);
+    setOtpReferenceKey(null);
+    setKycReferenceKey(null);
+    setOtp("");
+    setErrors({});
+    onClose();
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear error when user types
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
 
   const handleRegisterSendOtp = async () => {
+    // Validation
+    if (!formData.aadhaar_number || formData.aadhaar_number.length !== 12) {
+      setErrors({ aadhaar_number: "Please enter valid 12-digit Aadhaar" });
+      return;
+    }
+
     setSubmitting(true);
     setErrors({});
     try {
@@ -54,14 +95,15 @@ const RemitterRegister = ({
       );
 
       if (response) {
-        // showToast(response.status);
         setOtpReferenceKey(response.data.referenceKey);
-
-        // setTimeout(() => {
         setOtpModalOpen(true);
-        // }, 1000);
+        showToast("OTP sent successfully", "success");
       } else {
-        showToast(error?.errors||error.message, "error");
+        showToast(
+          error?.errors || error?.message || "Failed to send OTP",
+          "error"
+        );
+        setErrors(error?.errors || {});
       }
     } catch (err) {
       showToast(err?.message || "Unexpected error", "error");
@@ -72,9 +114,14 @@ const RemitterRegister = ({
   };
 
   const handleValidateOtp = async (enteredOtp) => {
+    if (!enteredOtp || enteredOtp.length !== 6) {
+      showToast("Please enter valid 6-digit OTP", "error");
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const { response } = await apiCall(
+      const { response, error } = await apiCall(
         "post",
         ApiEndpoints.VALIDATE_REMITTER_DMT1,
         {
@@ -85,16 +132,15 @@ const RemitterRegister = ({
       );
 
       if (response) {
-        showToast("success", response?.message);
-
+        showToast(response?.message || "OTP validated successfully", "success");
         setKycReferenceKey(response?.data?.referenceKey);
-
         setOtpModalOpen(false);
-
         setAeps2faOpen(true);
+      } else {
+        showToast(error?.message || "OTP validation failed", "error");
       }
     } catch (err) {
-      showToast("error", "OTP validation failed");
+      showToast("OTP validation failed", "error");
     } finally {
       setSubmitting(false);
     }
@@ -135,13 +181,20 @@ const RemitterRegister = ({
         ApiEndpoints.DMT1_KYC_REMITTER,
         payload
       );
-      if (error) showToast(error?.message, "error");
-      else {
+
+      if (response?.data?.status) {
         showToast(
-          response?.data?.message || "Success",
-          response?.data?.status ? "success" : "error"
+          response?.data?.message || "Registration successful",
+          "success"
         );
         setAeps2faOpen(false);
+        onSuccess(response.data); // Pass success data to parent
+        handleClose(); // Close modal
+      } else {
+        showToast(
+          error?.message || response?.data?.message || "KYC failed",
+          "error"
+        );
       }
     } catch {
       showToast("Something went wrong", "error");
@@ -149,60 +202,76 @@ const RemitterRegister = ({
       setSubmitting(false);
     }
   };
-  console.log("The forn data is", formData);
+
   return aeps2faOpen ? (
     <AEPS2FAModal
       open={aeps2faOpen}
-      onClose={() => setAeps2faOpen(false)}
+      onClose={() => {
+        setAeps2faOpen(false);
+        handleClose();
+      }}
       aadhaar={formData.aadhaar_number}
       setAadhaar={setAadhaar}
       formData={formData}
       onFingerSuccess={handleAPICall}
       fingerData={setFingerprintData}
       setFormData={setFormData}
-      type="registeRemmitter"
-      title="Remmitter Kyc"
+      type="registerRemitter"
+      title="Remitter KYC"
     />
   ) : (
     <>
-      <CommonModal
-        open={open}
-        onClose={onClose}
-        title="Register Remitter"
-        iconType="info"
-        size="small"
-        dividers
-        fieldConfig={disabledSchema}
-        formData={formData}
-        handleChange={handleChange}
-        errors={{}}
-        loading={submitting}
-        footerButtons={[
-          {
-            text: "Cancel",
-            variant: "outlined",
-            onClick: onClose,
-            disabled: submitting,
-          },
-          {
-            text: submitting ? "Sending OTP..." : "Send OTP",
-            variant: "contained",
-            color: "primary",
-            onClick: handleRegisterSendOtp,
-            disabled: submitting,
-          },
-        ]}
+      <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
+        <DialogTitle>Register Remitter</DialogTitle>
+        <DialogContent>
+          <Box display="flex" flexDirection="column" gap={2} mt={1}>
+            <TextField
+              label="Mobile Number"
+              name="mobile_number"
+              value={formData.mobile_number}
+              onChange={handleChange}
+              fullWidth
+              disabled
+            />
+            <TextField
+              label="Aadhaar Number"
+              name="aadhaar_number"
+              value={formData.aadhaar_number}
+              onChange={handleChange}
+              fullWidth
+              error={!!errors.aadhaar_number}
+              helperText={errors.aadhaar_number}
+              inputProps={{ maxLength: 12 }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleClose}
+            disabled={submitting}
+            variant="outlined"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleRegisterSendOtp}
+            disabled={submitting || !formData.aadhaar_number}
+            variant="contained"
+            color="primary"
+          >
+            {submitting ? "Sending OTP..." : "Send OTP"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <OtpInput
+        open={otpModalOpen}
+        onClose={() => setOtpModalOpen(false)}
+        otp={otp}
+        setOtp={setOtp}
+        onSubmit={handleValidateOtp}
+        submitting={submitting}
       />
-      {otpModalOpen && (
-        <OtpInput
-          open={otpModalOpen}
-          onClose={() => setOtpModalOpen(false)}
-          otp={otp}
-          setOtp={setOtp}
-          onSubmit={handleValidateOtp}
-          submitting={submitting}
-        />
-      )}
     </>
   );
 };
