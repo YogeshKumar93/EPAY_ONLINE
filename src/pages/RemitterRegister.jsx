@@ -11,14 +11,13 @@ import {
 } from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
-import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
-import { useSchemaForm } from "../hooks/useSchemaForm";
 import { useToast } from "../utils/ToastContext";
 import OtpInput from "./OtpInput";
-import OTPInput from "react-otp-input";
+// import OTPInput from "react-otp-input";
 // import { Box, Button, Typography } from "@mui/material";
 import AEPS2FAModal from "../components/AEPS/AEPS2FAModal";
 import AuthContext from "../contexts/AuthContext";
+
 const RemitterRegister = ({
   open,
   onClose,
@@ -48,34 +47,18 @@ const RemitterRegister = ({
   useEffect(() => {
     if (mobile) {
       setFormData((prev) => ({ ...prev, mobile_number: mobile }));
-      // Reset all states when mobile changes
+      // Reset all OTP/AEPS states when mobile changes
       setOtp("");
       setOtpReferenceKey(null);
       setKycReferenceKey(null);
       setOtpModalOpen(false);
       setAeps2faOpen(false);
-      setErrors({});
     }
-  }, [mobile, setAeps2faOpen]);
-
-  // Reset everything when modal closes
-  const handleClose = () => {
-    setOtpModalOpen(false);
-    setAeps2faOpen(false);
-    setOtpReferenceKey(null);
-    setKycReferenceKey(null);
-    setOtp("");
-    setErrors({});
-    onClose();
-  };
+  }, [mobile]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user types
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
   };
 
   const handleRegisterSendOtp = async () => {
@@ -97,13 +80,8 @@ const RemitterRegister = ({
       if (response) {
         setOtpReferenceKey(response.data.referenceKey);
         setOtpModalOpen(true);
-        showToast("OTP sent successfully", "success");
       } else {
-        showToast(
-          error?.errors || error?.message || "Failed to send OTP",
-          "error"
-        );
-        setErrors(error?.errors || {});
+        showToast(error?.errors || error?.message, "error");
       }
     } catch (err) {
       showToast(err?.message || "Unexpected error", "error");
@@ -132,7 +110,7 @@ const RemitterRegister = ({
       );
 
       if (response) {
-        showToast(response?.message || "OTP validated successfully", "success");
+        showToast(response?.message || "OTP validated", "success");
         setKycReferenceKey(response?.data?.referenceKey);
         setOtpModalOpen(false);
         setAeps2faOpen(true);
@@ -189,7 +167,7 @@ const RemitterRegister = ({
         );
         setAeps2faOpen(false);
         onSuccess(response.data); // Pass success data to parent
-        handleClose(); // Close modal
+        onClose(); // Close modal
       } else {
         showToast(
           error?.message || response?.data?.message || "KYC failed",
@@ -208,7 +186,7 @@ const RemitterRegister = ({
       open={aeps2faOpen}
       onClose={() => {
         setAeps2faOpen(false);
-        handleClose();
+        onClose();
       }}
       aadhaar={formData.aadhaar_number}
       setAadhaar={setAadhaar}
@@ -221,7 +199,7 @@ const RemitterRegister = ({
     />
   ) : (
     <>
-      <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
+      <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
         <DialogTitle>Register Remitter</DialogTitle>
         <DialogContent>
           <Box display="flex" flexDirection="column" gap={2} mt={1}>
@@ -247,7 +225,7 @@ const RemitterRegister = ({
         </DialogContent>
         <DialogActions>
           <Button
-            onClick={handleClose}
+            onClick={onClose}
             disabled={submitting}
             variant="outlined"
           >

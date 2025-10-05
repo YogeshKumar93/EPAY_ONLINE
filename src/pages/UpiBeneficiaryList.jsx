@@ -15,18 +15,21 @@ import {
   Stack,
   Tooltip,
   TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  MenuItem,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CommonModal from "../components/common/CommonModal";
-import VerifyUpiBene from "./VerifyUpiBene"; // import modal
+import VerifyUpiBene from "./VerifyUpiBene";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
-import { useSchemaForm } from "../hooks/useSchemaForm";
 import {
   sbi2,
   idbi2,
@@ -52,12 +55,12 @@ import {
   jk2,
 } from "../utils/iconsImports";
 import UpiBeneficiaryDetails from "./UpiBeneficiaryDetails";
+import { useToast } from "../utils/ToastContext";
 
-const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
+const UpiBeneficiaryList = ({ sender, onSuccess }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [searchText, setSearchText] = useState("");
-
   const [openModal, setOpenModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [openList, setOpenList] = useState(true);
@@ -65,20 +68,24 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
   const [selectedBene, setSelectedBene] = useState(null);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedForDetails, setSelectedForDetails] = useState(null);
-
-  const { schema, formData, handleChange, errors, setErrors, loading } =
-    useSchemaForm(ApiEndpoints.GET_UPI_SCHEMA, openModal, {
-      sender_id: sender?.id,
-    });
+  const [vpaPrefix, setVpaPrefix] = useState("");
+  const [vpaSuffix, setVpaSuffix] = useState("");
+  const { showToast } = useToast();
+  // Hardcoded form fields
+  const [beneficiaryName, setBeneficiaryName] = useState("");
+  const [vpa, setVpa] = useState("");
 
   const handleAddBeneficiary = async () => {
+    // if (!beneficiaryName.trim() || !vpa.trim()) {
+    //   showToast("Please fill all fields", "error");
+    //   return;
+    // }
+
     setSubmitting(true);
-    setErrors({});
     try {
-      const accountNumber = `${formData.prefix || ""}@${formData.suffix || ""}`;
       const payload = {
-        ...formData,
-        account_number: accountNumber,
+        beneficiary_name: beneficiaryName.trim(),
+        account_number: `${vpaPrefix.trim()}@${vpaSuffix.trim()}`,
         sender_id: sender.id,
         type: "UPI",
         mobile_number: sender?.mobile_number,
@@ -93,13 +100,14 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
       if (response) {
         okSuccessToast(response?.message || "Beneficiary added successfully");
         setOpenModal(false);
+        setBeneficiaryName("");
+        setVpa("");
         onSuccess?.(sender.mobile_number);
       } else {
-        apiErrorToast(error?.message || "Failed to add beneficiary");
+        showToast(error?.message || "Failed to add beneficiary", "error");
       }
     } catch (err) {
-      apiErrorToast(err);
-      setErrors(err?.response?.data?.errors || {});
+      showToast(err?.message || "Something went wrong", "error");
     } finally {
       setSubmitting(false);
     }
@@ -119,7 +127,7 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
         apiErrorToast(res?.message || "Failed to delete beneficiary");
       }
     } catch (err) {
-      apiErrorToast(err);
+      apiErrorToast(err?.message || "Error deleting beneficiary");
     }
   };
 
@@ -161,6 +169,7 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
             bank_name: null,
           },
         ];
+
   const filteredBeneficiaries = beneficiaries.filter((b) =>
     b.beneficiary_name.toLowerCase().includes(searchText.toLowerCase())
   );
@@ -309,8 +318,8 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
                         size="small"
                         variant="contained"
                         onClick={() => {
-                          setSelectedForDetails(b); // set the selected beneficiary
-                          setDetailsModalOpen(true); // open modal
+                          setSelectedForDetails(b);
+                          setDetailsModalOpen(true);
                         }}
                         sx={{
                           color: "#fff",
@@ -347,12 +356,7 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
                   )
                 }
               >
-                <Box
-                  display="flex"
-                  alignItems="flex-start"
-                  gap={1.5}
-                  width="100%"
-                >
+                <Box display="flex" alignItems="flex-start" gap={1.5}>
                   {bankImageMapping[b.bank_name] ? (
                     <Box
                       component="img"
@@ -383,20 +387,18 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
                   )}
 
                   <Box flexGrow={1} minWidth={0}>
-                    <Box display="flex" alignItems="center" gap={1} mb={0.5}>
-                      <Typography
-                        variant="body1"
-                        fontWeight="500"
-                        noWrap
-                        sx={{
-                          fontSize: isMobile ? "0.9rem" : "1rem",
-                          color:
-                            b.id === "na" ? "text.secondary" : "text.primary",
-                        }}
-                      >
-                        {b.beneficiary_name}
-                      </Typography>
-                    </Box>
+                    <Typography
+                      variant="body1"
+                      fontWeight="500"
+                      noWrap
+                      sx={{
+                        fontSize: isMobile ? "0.9rem" : "1rem",
+                        color:
+                          b.id === "na" ? "text.secondary" : "text.primary",
+                      }}
+                    >
+                      {b.beneficiary_name}
+                    </Typography>
 
                     <Typography
                       variant="caption"
@@ -409,51 +411,102 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
                 </Box>
               </ListItem>
             ))}
-            {filteredBeneficiaries.length === 0 && (
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ mt: 1 }}
-              >
-                No beneficiaries found
-              </Typography>
-            )}
           </List>
         </CardContent>
       </Collapse>
 
-      {openModal && (
-        <CommonModal
-          open={openModal}
-          onClose={() => setOpenModal(false)}
-          title="Add New Beneficiary"
-          iconType="info"
-          size="small"
-          dividers
-          fieldConfig={schema}
-          formData={formData}
-          handleChange={handleChange}
-          errors={errors}
-          loading={loading || submitting}
-          footerButtons={[
-            {
-              text: "Cancel",
-              variant: "outlined",
-              onClick: () => setOpenModal(false),
-              disabled: submitting,
-              sx: { borderRadius: 1 },
-            },
-            {
-              text: submitting ? "Saving..." : "Save Beneficiary",
-              variant: "contained",
-              color: "primary",
-              onClick: handleAddBeneficiary,
-              disabled: submitting,
-              sx: { borderRadius: 1 },
-            },
-          ]}
-        />
-      )}
+      {/* Custom Add Beneficiary Modal (no CommonModal) */}
+      <Dialog
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        fullWidth
+        maxWidth="xs"
+      >
+        <DialogTitle sx={{ fontWeight: 600, fontSize: "1rem" }}>
+          Add UPI Beneficiary
+        </DialogTitle>
+        <DialogContent dividers>
+          <Box display="flex" flexDirection="column" gap={2} mt={1}>
+            <TextField
+              label="Beneficiary Name"
+              fullWidth
+              size="small"
+              value={beneficiaryName}
+              onChange={(e) => setBeneficiaryName(e.target.value)}
+              placeholder="Enter beneficiary name"
+            />
+            <Box display="flex" gap={1}>
+              <TextField
+                label="Prefix"
+                fullWidth
+                size="small"
+                value={vpaPrefix}
+                onChange={(e) => setVpaPrefix(e.target.value)}
+                placeholder="e.g. example"
+              />
+
+              <Typography
+                variant="h6"
+                sx={{
+                  alignSelf: "center",
+                  fontWeight: 600,
+                  color: "text.secondary",
+                }}
+              >
+                @
+              </Typography>
+
+              <TextField
+                select
+                label="Suffix"
+                fullWidth
+                size="small"
+                value={vpaSuffix}
+                onChange={(e) => setVpaSuffix(e.target.value)}
+              >
+                <MenuItem value="upi">upi</MenuItem>
+                <MenuItem value="ybl">ybl</MenuItem>
+                <MenuItem value="okicici">okicici</MenuItem>
+                <MenuItem value="okaxis">okaxis</MenuItem>
+                <MenuItem value="oksbi">oksbi</MenuItem>
+                <MenuItem value="okhdfcbank">okhdfcbank</MenuItem>
+                <MenuItem value="oksbi">oksbi</MenuItem>
+                <MenuItem value="paytm">paytm</MenuItem>
+                <MenuItem value="ibl">ibl</MenuItem>
+                <MenuItem value="axisbank">axisbank</MenuItem>
+                <MenuItem value="kotak">kotak</MenuItem>
+                <MenuItem value="sbi">sbi</MenuItem>
+              </TextField>
+            </Box>
+
+            {vpaPrefix || vpaSuffix ? (
+              <Typography
+                variant="body2"
+                sx={{ mt: 1, color: "text.secondary", fontWeight: 500 }}
+              >
+                Full UPI ID:{" "}
+                <strong>{`${vpaPrefix || ""}@${vpaSuffix || ""}`}</strong>
+              </Typography>
+            ) : null}
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button
+            variant="outlined"
+            onClick={() => setOpenModal(false)}
+            disabled={submitting}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleAddBeneficiary}
+            disabled={submitting}
+          >
+            {submitting ? "Saving..." : "Save Beneficiary"}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Verify UPI Beneficiary Modal */}
       {verifyModal && selectedBene && (
@@ -469,6 +522,7 @@ const UpiBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
           }}
         />
       )}
+
       {selectedForDetails && (
         <UpiBeneficiaryDetails
           open={detailsModalOpen}
