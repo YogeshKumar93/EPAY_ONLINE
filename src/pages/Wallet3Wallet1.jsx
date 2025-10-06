@@ -113,7 +113,7 @@ const Wallet3ToWallet1 = ({ filters = [] }) => {
         onClick={handleSendClick}
         disabled={creating}
         sx={{
-          backgroundColor: "#2275b7",
+          backgroundColor: "#6C4BC7",
         }}
       >
         {creating ? "Processing..." : "Transfer"}

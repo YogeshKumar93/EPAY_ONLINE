@@ -154,7 +154,7 @@ const ServiceWiseProfit = () => {
       <Box
         sx={{
           p: 1.9,
-          background: "linear-gradient(135deg, #2275B7, #1a67a8)",
+          background: "linear-gradient(135deg, #6C4BC7, #1a67a8)",
           color: "white",
           display: "flex",
           flexDirection: { xs: "column", sm: "row" },
@@ -216,7 +216,7 @@ const ServiceWiseProfit = () => {
                 fontSize: "0.6rem",
                 fontWeight: 600,
                 borderColor: "white",
-                color: activeFilter === filter ? "#2275B7" : "white",
+                color: activeFilter === filter ? "#6C4BC7" : "white",
                 bgcolor: activeFilter === filter ? "white" : "transparent",
                 "&:hover": {
                   bgcolor:

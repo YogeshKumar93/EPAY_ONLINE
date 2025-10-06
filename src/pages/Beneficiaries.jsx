@@ -316,7 +316,7 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
       {/* Header */}
       <Box
         sx={{
-          bgcolor: "#2275b7",
+          bgcolor: "#6C4BC7",
           color: "#fff",
           py: 1,
           px: 2,
@@ -341,7 +341,7 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
               sx={{
                 minWidth: "auto",
                 px: 1.5,
-                backgroundColor: "#2275b7",
+                backgroundColor: "#6C4BC7",
                 py: 0.5,
                 fontSize: "0.75rem",
                 borderRadius: 1,
@@ -460,7 +460,7 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
                         color="primary"
                         onClick={() => handleSendMoney(b)}
                         sx={{
-                          backgroundColor: "#2275b7",
+                          backgroundColor: "#6C4BC7",
                           borderRadius: 1,
                           textTransform: "none",
                           fontSize: isMobile ? "0.6rem" : "0.75rem",

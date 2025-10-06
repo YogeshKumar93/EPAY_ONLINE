@@ -456,7 +456,7 @@ const VerifyMpinLogin = ({
         minwidth: { xs: "90%", sm: "90%", md: "500px" }, // responsive width
         maxWidth: "100%",
         borderRadius: 3,
-        background: "#1E3A8A",
+        background: "#5210C1",
         color: "#fff",
         mx: "auto", // center horizontally
       }}

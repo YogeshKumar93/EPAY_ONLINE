@@ -148,17 +148,17 @@ const Dth = () => {
                             : "background.paper",
                         color:
                           selectedService?.id === service.id
-                            ? "#2275b7"
+                            ? "#6C4BC7"
                             : "text.secondary",
                         border: "1px solid",
                         borderColor:
                           selectedService?.id === service.id
-                            ? "#2275b7"
+                            ? "#6C4BC7"
                             : "divider",
                         "&:hover": {
                           backgroundColor: "#ebeef2",
-                          color: "#2275b7",
-                          borderColor: "#2275b7",
+                          color: "#6C4BC7",
+                          borderColor: "#6C4BC7",
                         },
                         "&::before":
                           selectedService?.id === service.id
@@ -169,7 +169,7 @@ const Dth = () => {
                                 top: 0,
                                 height: "100%",
                                 width: "4px",
-                                backgroundColor: "#2275b7",
+                                backgroundColor: "#6C4BC7",
                               }
                             : {},
                       }}
@@ -185,7 +185,7 @@ const Dth = () => {
                           fontSize: "15px",
                           color:
                             selectedService?.id === service.id
-                              ? "#2275b7"
+                              ? "#6C4BC7"
                               : "#6e82a5",
                         }}
                       >
@@ -358,7 +358,7 @@ const Dth = () => {
                 <Button
                   fullWidth
                   variant="contained"
-                  sx={{ backgroundColor: "#2275b7" }}
+                  sx={{ backgroundColor: "#6C4BC7" }}
                   onClick={handleRecharge}
                 >
                   Pay ₹{manualAmount || 0}
@@ -382,7 +382,7 @@ const Dth = () => {
             </Typography>
             <Button
               variant="contained"
-              sx={{ backgroundColor: "#2275b7" }}
+              sx={{ backgroundColor: "#6C4BC7" }}
               onClick={() => {
                 setSelectedService(services[0] || null); // default first service
                 setCustomerId("");

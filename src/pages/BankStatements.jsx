@@ -269,7 +269,7 @@ const BankStatements = () => {
                   size="small"
                   variant="contained"
                   sx={{
-                    backgroundColor: "#2275b7",
+                    backgroundColor: "#6C4BC7",
                     color: "#fff",
                     "&:hover": { backgroundColor: primaryColor() },
                   }}

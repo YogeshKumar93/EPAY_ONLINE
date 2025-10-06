@@ -163,7 +163,7 @@ const Prepaid = () => {
                         cursor: "pointer",
                         border:
                           selectedService?.id === service.id
-                            ? "2px solid #2275b7"
+                            ? "2px solid #6C4BC7"
                             : "1px solid #e0e0e0",
                         backgroundColor:
                           selectedService?.id === service.id
@@ -181,7 +181,7 @@ const Prepaid = () => {
                           mr: 2,
                           border:
                             selectedService?.id === service.id
-                              ? "2px solid #2275b7"
+                              ? "2px solid #6C4BC7"
                               : "none",
                         }}
                       />
@@ -189,7 +189,7 @@ const Prepaid = () => {
                         sx={{
                           color:
                             selectedService?.id === service.id
-                              ? "#2275b7"
+                              ? "#6C4BC7"
                               : "#333",
                           fontWeight:
                             selectedService?.id === service.id ? "600" : "500",
@@ -257,7 +257,7 @@ const Prepaid = () => {
                           fontWeight: "bold",
                           fontSize: { xs: "0.9rem", sm: "1rem" },
                           background: "#fff",
-                          color: "#2275b7",
+                          color: "#6C4BC7",
                         }}
                         onClick={() => {
                           if (!manualAmount)
@@ -304,7 +304,7 @@ const Prepaid = () => {
                                 : "1px solid",
                             borderColor:
                               selectedPlan?.id === plan.id
-                                ? "#2275b7"
+                                ? "#6C4BC7"
                                 : "divider",
                             textAlign: "center",
                           }}
@@ -371,7 +371,7 @@ const Prepaid = () => {
                         cursor: "pointer",
                         border:
                           selectedService?.id === service.id
-                            ? "2px solid #2275b7"
+                            ? "2px solid #6C4BC7"
                             : "1px solid #e0e0e0",
                         backgroundColor:
                           selectedService?.id === service.id
@@ -389,7 +389,7 @@ const Prepaid = () => {
                           mr: 2,
                           border:
                             selectedService?.id === service.id
-                              ? "2px solid #2275b7"
+                              ? "2px solid #6C4BC7"
                               : "none",
                         }}
                       />
@@ -397,7 +397,7 @@ const Prepaid = () => {
                         sx={{
                           color:
                             selectedService?.id === service.id
-                              ? "#2275b7"
+                              ? "#6C4BC7"
                               : "#333",
                           fontWeight:
                             selectedService?.id === service.id ? "600" : "500",
@@ -453,7 +453,7 @@ const Prepaid = () => {
                   </Typography>
                   <Box display="flex" justifyContent="space-between">
                     <Typography variant="h6">{selectedPlan?.name}</Typography>
-                    <Typography variant="h6" color="#2275b7">
+                    <Typography variant="h6" color="#6C4BC7">
                       ₹{selectedPlan?.price}
                     </Typography>
                   </Box>
@@ -573,7 +573,7 @@ const Prepaid = () => {
                       fontWeight: "bold",
                       fontSize: { xs: "0.9rem", sm: "1rem" },
                       background: "#fff",
-                      color: "#2275b7",
+                      color: "#6C4BC7",
                       "&:hover": {
                         background: "#1e3c72",
                         color: "#fff",
@@ -598,7 +598,7 @@ const Prepaid = () => {
                       fontWeight: "bold",
                       fontSize: { xs: "0.9rem", sm: "1rem" },
                       background: "#fff",
-                      color: "#2275b7",
+                      color: "#6C4BC7",
                       "&:hover": {
                         background: "#1e3c72",
                         color: "#fff",
@@ -657,4 +657,4 @@ const Prepaid = () => {
 };
 
 export default Prepaid;
-// sx={{ backgroundColor: "#2275b7" }}
+// sx={{ backgroundColor: "#6C4BC7" }}

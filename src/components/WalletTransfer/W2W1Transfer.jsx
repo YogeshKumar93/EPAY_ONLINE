@@ -104,7 +104,7 @@ const W2W1Transfer = ({ filters = [] }) => {
           onClick={handleSendClick}
           disabled={!amount || creating}
           sx={{
-            backgroundColor: "#2275b7",
+            backgroundColor: "#6C4BC7",
             color: "#fff",
             fontWeight: 600,
             px: 3,

@@ -72,7 +72,7 @@ const W3W1Transfer = ({ filters = [] }) => {
   return (
     <Box
       sx={{
-      width:"100%",
+        width: "100%",
         // bgcolor: "#f9f9f9",
         borderRadius: 2,
       }}
@@ -83,7 +83,6 @@ const W3W1Transfer = ({ filters = [] }) => {
       >
         Wallet3ToWallet1 Transfer
       </Typography> */}
-
 
       <Box sx={{ display: "flex", gap: 2, mb: 3, alignItems: "center" }}>
         <TextField
@@ -105,7 +104,7 @@ const W3W1Transfer = ({ filters = [] }) => {
           onClick={handleSendClick}
           disabled={!amount || creating}
           sx={{
-            backgroundColor: "#2275b7",
+            backgroundColor: "#6C4BC7",
             color: "#fff",
             fontWeight: 600,
             px: 3,

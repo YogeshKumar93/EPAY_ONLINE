@@ -307,10 +307,10 @@ const BbpsBillerDetails = ({
                   fontWeight: "bold",
                   fontSize: { xs: "0.9rem", sm: "1rem" },
                   background: "#fff",
-                  color: "#2275b7",
+                  color: "#6C4BC7",
                   boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
                   "&:hover": {
-                    background: "#2275b7",
+                    background: "#6C4BC7",
                     color: "#fff",
                   },
                 }}
@@ -445,10 +445,10 @@ const BbpsBillerDetails = ({
                   fontWeight: "bold",
                   fontSize: { xs: "0.9rem", sm: "1rem" },
                   background: "#fff",
-                  color: "#2275b7",
+                  color: "#6C4BC7",
                   boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
                   "&:hover": {
-                    background: " #2275b7",
+                    background: " #6C4BC7",
                     color: "#fff",
                   },
                 }}

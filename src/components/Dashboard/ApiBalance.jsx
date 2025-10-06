@@ -71,7 +71,7 @@ const ApiBalance = () => {
       <Box
         sx={{
           p: 1.5,
-          background: "linear-gradient(135deg, #2275B7, #1a67a8)",
+          background: "linear-gradient(135deg, #6C4BC7, #1a67a8)",
           mt: 0.3,
           color: "white",
           boxShadow: "0 2px 8px rgba(34, 117, 183, 0.1)",
@@ -108,7 +108,7 @@ const ApiBalance = () => {
             maxHeight: 360, // Match the Profit Summary height
           }}
         >
-          <CircularProgress sx={{ color: "#2275B7" }} />
+          <CircularProgress sx={{ color: "#6C4BC7" }} />
         </Box>
       ) : (
         <TableContainer
