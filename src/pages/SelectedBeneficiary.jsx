@@ -404,7 +404,7 @@ const SelectedBeneficiary = ({
       {/* Enhanced Header */}
       <Box
         sx={{
-          background: "linear-gradient(135deg, #2275b7 0%, #1a5f9a 100%)",
+          background: "linear-gradient(135deg, #6C4BC7 0%, #1a5f9a 100%)",
           color: "#fff",
           py: 1,
           px: 2,
@@ -625,7 +625,7 @@ const SelectedBeneficiary = ({
               p: { xs: 1.5, sm: 2 },
               mb: { xs: 1.5, sm: 2 },
               border: "2px solid",
-              borderColor: idx === currentRow ? "#2275b7" : "transparent",
+              borderColor: idx === currentRow ? "#6C4BC7" : "transparent",
               borderRadius: 3,
               background:
                 idx === currentRow
@@ -648,7 +648,7 @@ const SelectedBeneficiary = ({
                       width: 4,
                       height: "100%",
                       background:
-                        "linear-gradient(180deg, #2275b7 0%, #1a5f9a 100%)",
+                        "linear-gradient(180deg, #6C4BC7 0%, #1a5f9a 100%)",
                     }
                   : {},
               "&:hover": {
@@ -722,7 +722,7 @@ const SelectedBeneficiary = ({
                         fontSize: "1rem",
                         fontWeight: "600",
                         background:
-                          "linear-gradient(135deg, #2275b7 0%, #1a5f9a 100%)",
+                          "linear-gradient(135deg, #6C4BC7 0%, #1a5f9a 100%)",
                         boxShadow: "0 4px 15px rgba(34,117,183,0.3)",
                         "&:hover": {
                           background:
@@ -750,7 +750,7 @@ const SelectedBeneficiary = ({
                         height: 32,
                         borderRadius: "50%",
                         background:
-                          "linear-gradient(135deg, #2275b7 0%, #1a5f9a 100%)",
+                          "linear-gradient(135deg, #6C4BC7 0%, #1a5f9a 100%)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -802,7 +802,7 @@ const SelectedBeneficiary = ({
                               transition: "all 0.3s ease",
                               height: 50,
                               "&:focus-within": {
-                                borderColor: "#2275b7",
+                                borderColor: "#6C4BC7",
                                 boxShadow: "0 0 0 3px rgba(34,117,183,0.1)",
                               },
                             }}
@@ -843,7 +843,7 @@ const SelectedBeneficiary = ({
                                     }}
                                     onFocus={(e) => {
                                       e.target.style.borderBottomColor =
-                                        "#2275b7";
+                                        "#6C4BC7";
                                       e.target.style.background = "#f8fbff";
                                     }}
                                     onBlur={(e) => {
@@ -868,7 +868,7 @@ const SelectedBeneficiary = ({
                                 fontWeight: 700,
                                 whiteSpace: "nowrap",
                                 background: "transparent",
-                                color: row.resendLoading ? "#999" : "#2275b7",
+                                color: row.resendLoading ? "#999" : "#6C4BC7",
                                 border: "none",
                                 borderRadius: 0,
                                 "&:hover": {
@@ -915,7 +915,7 @@ const SelectedBeneficiary = ({
                               display: "flex",
                               alignItems: "center",
                               "&:focus-within": {
-                                borderColor: "#2275b7",
+                                borderColor: "#6C4BC7",
                                 boxShadow: "0 0 0 3px rgba(34,117,183,0.1)",
                               },
                             }}
@@ -950,7 +950,7 @@ const SelectedBeneficiary = ({
                                   }}
                                   onFocus={(e) => {
                                     e.target.style.borderBottomColor =
-                                      "#2275b7";
+                                      "#6C4BC7";
                                     e.target.style.background = "#f8fbff";
                                   }}
                                   onBlur={(e) => {

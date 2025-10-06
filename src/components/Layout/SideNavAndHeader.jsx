@@ -214,7 +214,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                     top: 0,
                     height: "100%",
                     width: "4px",
-                    backgroundColor: "#2275b7",
+                    backgroundColor: "#6C4BC7",
                     borderRadius: "2px",
                   }
                 : {},
@@ -233,7 +233,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
               primary={item.title} // ✅ Make sure title is not replaced
               sx={{
                 "& .MuiTypography-root": {
-                  color: isItemActive ? "#2275b7" : "#6e82a5",
+                  color: isItemActive ? "#6C4BC7" : "#6e82a5",
                   fontWeight: 550,
                   fontSize: "15px",
                 },
@@ -329,12 +329,12 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             px: 4,
             display: "flex",
             alignItems: "center",
-            color: "#2275b7",
+            color: "#6C4BC7",
             borderRadius: "4px",
             mb: 0,
             "&:hover": {
               backgroundColor: "#ebeef2",
-              color: "#2275b7",
+              color: "#6C4BC7",
             },
             gap: 4,
           }}
@@ -405,7 +405,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             variant="h5"
             noWrap
             component="div"
-            sx={{ flexGrow: 1, color: "#2275b7", fontWeight: 700 }}
+            sx={{ flexGrow: 1, color: "#6C4BC7", fontWeight: 700 }}
           >
             {title}
           </Typography>
@@ -427,7 +427,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
               )}
           </Box>
           <IconButton onClick={refreshUser}>
-            <RefreshIcon sx={{ color: "#2275b7" }} />
+            <RefreshIcon sx={{ color: "#6C4BC7" }} />
           </IconButton>
 
           {/* <IconButton onClick={colour}>
@@ -451,7 +451,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                 sx={{
                   width: 30,
                   height: 30,
-                  bgcolor: "#2275b7",
+                  bgcolor: "#6C4BC7",
                 }}
               >
                 <PersonOutlineIcon sx={{ color: "#FFF", fontSize: 20 }} />
@@ -472,7 +472,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                 variant="caption"
                 sx={{
                   fontWeight: 500,
-                  color: "#2275B7",
+                  color: "#6C4BC7",
                   fontSize: "11px",
                   lineHeight: 1,
                 }}
@@ -501,7 +501,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                   variant="subtitle1"
                   sx={{
                     fontWeight: 600,
-                    color: "#2275b7",
+                    color: "#6C4BC7",
                     fontSize: "12px",
                     lineHeight: "16px",
                   }}
@@ -513,7 +513,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                   onClick={handleUserMenuOpen}
                   sx={{ p: 0, ml: 1, width: 20, height: 20 }}
                 >
-                  <ExpandMoreIcon sx={{ fontSize: 20, color: "#2275B7" }} />
+                  <ExpandMoreIcon sx={{ fontSize: 20, color: "#6C4BC7" }} />
                 </IconButton>
               </Box>
             </Box>
@@ -546,7 +546,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                 gap: 2,
                 color: "#220ad7ff",
                 bgcolor: "#e6eef4ff",
-                borderTop: "3px solid #2275b7 ",
+                borderTop: "3px solid #6C4BC7 ",
               }}
             >
               <Avatar
@@ -715,7 +715,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             textAlign: "center",
             py: { xs: 2, sm: 1.5 },
             px: { xs: 1, sm: 2 },
-            backgroundColor: "#2275b7",
+            backgroundColor: "#6C4BC7",
             color: "#d4e8e8",
             borderRadius: "10px",
             mt: 4,

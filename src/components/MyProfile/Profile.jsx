@@ -335,12 +335,12 @@ const ProfilePage = () => {
                     </Typography>
                   )}
                   <Chip
-                    icon={<AccountCircle sx={{ color: "#2275b7" }} />}
+                    icon={<AccountCircle sx={{ color: "#6C4BC7" }} />}
                     label="Active User"
                     size="small"
                     sx={{
                       background: "rgba(255, 255, 255, 0.9)",
-                      color: "#2275b7",
+                      color: "#6C4BC7",
                       fontWeight: "bold",
                       fontFamily: '"DM Sans", sans-serif',
                       ml: 1,

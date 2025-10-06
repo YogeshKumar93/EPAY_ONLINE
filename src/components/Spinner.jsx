@@ -47,7 +47,7 @@ const SpinnerWrapper = styled.div`
   width: ${(props) => props.size || "40px"};
   height: ${(props) => props.size || "40px"};
   border: 4px solid rgba(0, 0, 0, 0.1);
-  border-top-color: ${(props) => props.color || "#2275b7"};
+  border-top-color: ${(props) => props.color || "#6C4BC7"};
   border-radius: 50%;
   animation: ${spin} 1s linear infinite;
 `;
