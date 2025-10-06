@@ -181,7 +181,7 @@ const Login = () => {
   sx={{
     position: "relative",
     display: { xs: "none", md: "block" },
-    width: "58%",
+    width: "60%",
     height: "100vh",
  
     overflow: "hidden",
@@ -216,7 +216,7 @@ const Login = () => {
 
           height: "100vh",
           boxSizing: "border-box",
-          width: { xs: "100%", md: "42%" },
+          width: { xs: "100%", md: "40%" },
         }}
       >
         <Box sx={{ width: "100%", maxWidth: 500 }}>
