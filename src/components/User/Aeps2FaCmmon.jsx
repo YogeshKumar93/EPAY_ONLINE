@@ -13,6 +13,7 @@ import {
   CircularProgress,
   MenuItem,
   Select,
+  Autocomplete,
 } from "@mui/material";
 import {
   Close as CloseIcon,
@@ -35,6 +36,7 @@ import { apiCall } from "../../api/apiClient";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import { useToast } from "../../utils/ToastContext";
 import { apiErrorToast } from "../../utils/ToastUtil";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const Aeps2FaCommon = ({
   open,
@@ -48,7 +50,10 @@ const Aeps2FaCommon = ({
   aadhaar,
   setAadhaar,
   onFingerSuccess,
+  activeTab,
+  bankStatement,
 }) => {
+  console.log("Th nak staen data is", bankStatement);
   const [rdDeviceList, setRdDeviceList] = useState([]);
   const [rdDevice, setRdDevice] = useState(null);
   const [status, setStatus] = useState("NOT READY");
@@ -57,7 +62,7 @@ const Aeps2FaCommon = ({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const { showToast } = useToast();
-
+  const navigate = useNavigate();
   const renderButtons = () => {
     return buttons.map((btn, index) => (
       <Button
@@ -68,13 +73,13 @@ const Aeps2FaCommon = ({
         startIcon={btn.icon}
         sx={{
           background:
-            btn.bgcolor || "linear-gradient(135deg, #9d72f0 0%, #7b4dff 100%)",
+            btn.bgcolor || "linear-gradient(135deg, #2275b7 0%, #1d63a0 100%)",
           color: btn.color || "white",
           "&:hover": {
             background:
               btn.hoverColor ||
-              "linear-gradient(135deg, #8c61e6 0%, #6b3dff 100%)",
-            boxShadow: "0 4px 10px rgba(157, 114, 240, 0.35)",
+              "linear-gradient(135deg, #2275b7 0%, #1d63a0 100%)",
+            boxShadow: "0 4px 10px rgba(34, 117, 183, 0.35)",
             transform: "translateY(-1px)",
           },
           borderRadius: "10px",
@@ -83,7 +88,7 @@ const Aeps2FaCommon = ({
           textTransform: "none",
           fontWeight: "600",
           fontSize: "0.85rem",
-          boxShadow: "0 2px 6px rgba(157, 114, 240, 0.25)",
+          boxShadow: "0 2px 6px rgba(34, 117, 183, 0.35)",
           transition: "all 0.2s ease",
           minWidth: "auto",
         }}
@@ -169,17 +174,6 @@ const Aeps2FaCommon = ({
     );
   };
 
-  const handleBankChange = (e) => {
-    const selectedIIN = e.target.value; // IIN aa gaya
-    const selectedBank = banks.find((b) => b.iin === selectedIIN);
-
-    setFormData((prev) => ({
-      ...prev,
-      bank_iin: selectedBank?.iin || "",
-      bank_name: selectedBank?.bank_name || selectedBank?.name || "",
-    }));
-  };
-
   // Status color logic
   const getStatusColor = () => {
     if (status === "CONNECTED") return "#4caf50";
@@ -208,410 +202,364 @@ const Aeps2FaCommon = ({
   };
 
   return (
- <Box
-  sx={{
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    minHeight: "100%",
-    fontFamily: '"DM Sans", sans-serif',
-    p: 2,
-    boxSizing: "border-box",
-  }}
->
-  <Box
-    sx={{
-      width: "100%",
-      maxWidth: "lg",
-      p: { xs: 2, sm: 3 },
-      borderRadius: 3,
-      background: "linear-gradient(135deg, #ffffff 0%, #f8f5ff 100%)",
-      boxShadow:
-        "0 15px 35px rgba(157, 114, 240, 0.2), 0 0 0 1px rgba(157, 114, 240, 0.1)",
-      border: "1px solid rgba(157, 114, 240, 0.15)",
-      position: "relative",
-      overflow: "hidden",
-      "&::before": {
-        content: '""',
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        height: "4px",
-        background: "linear-gradient(90deg, #9d72f0, #7b4dff, #9d72f0)",
-        backgroundSize: "200% 100%",
-        animation:
-          status !== "NOT READY" ? "shimmer 3s infinite linear" : "none",
-      },
-      "@keyframes shimmer": {
-        "0%": { backgroundPosition: "200% 0" },
-        "100%": { backgroundPosition: "-200% 0" },
-      },
-    }}
-  >
-    {/* Header with gradient */}
-    <Box
-      sx={{
-        background: "linear-gradient(135deg, #9d72f0 0%, #7b4dff 100%)",
-        color: "white",
-        p: 2,
-        borderRadius: "12px 12px 0 0",
-        mx: { xs: -2, sm: -3 },
-        mt: { xs: -2, sm: -3 },
-        mb: 3,
-        position: "relative",
-      }}
-    >
-      <Box sx={{}}>
-        <Typography
-          variant="h6"
-          sx={{
-            textAlign: "center",
-            fontWeight: 700,
-            fontSize: { xs: "1.1rem", sm: "1.3rem" },
-          }}
-        >
-          {title} 2FA
-        </Typography>
-
-        <Typography
-          variant="body2"
-          sx={{
-            textAlign: "center",
-            opacity: 0.9,
-            fontWeight: "500",
-            fontSize: { xs: "0.8rem", sm: "0.9rem" },
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexWrap: "wrap",
-          }}
-        >
-          <FingerprintIcon sx={{ fontSize: "18px", mr: 0.5 }} />
-          Secure biometric verification
-        </Typography>
-      </Box>
-    </Box>
-
-    {/* Buttons at top */}
-    <Stack
-      direction="row"
-      spacing={1}
-      justifyContent="center"
-      alignItems="center"
-      flexWrap="wrap"
-      sx={{ mb: 2 }}
-    >
-      {renderButtons()}
-    </Stack>
-
-    {/* Error/Success Alerts */}
-    {error && (
-      <Alert
-        severity="error"
+    <>
+      <Box
         sx={{
-          mb: 2,
-          borderRadius: 1,
+          // minHeight: "100vh",
+          width: "100%",
           fontFamily: '"DM Sans", sans-serif',
-          alignItems: "center",
-          py: 0.5,
-          fontSize: "0.85rem",
-        }}
-        icon={<ErrorOutlineIcon fontSize="small" />}
-      >
-        {error}
-      </Alert>
-    )}
-    {success && (
-      <Alert
-        severity="success"
-        sx={{
-          mb: 2,
-          borderRadius: 1,
-          fontFamily: '"DM Sans", sans-serif',
-          alignItems: "center",
-          py: 0.5,
-          fontSize: "0.85rem",
-        }}
-        icon={<CheckCircleOutlineIcon fontSize="small" />}
-      >
-        {success}
-      </Alert>
-    )}
-
-    <Grid
-      container
-      spacing={2}
-      sx={{
-        justifyContent: "center",
-        alignItems: "stretch",
-      }}
-    >
-      <Grid
-        item
-        xs={12}
-        md={6}
-        sx={{
+          background: "linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%)",
+          p: { xs: 1, sm: 2 },
           display: "flex",
+          // alignItems: "center",
           justifyContent: "center",
-          alignItems: "stretch",
         }}
       >
         <Box
           sx={{
             width: "100%",
-            maxWidth: 400,
-            bgcolor: "#faf8ff",
-            borderRadius: 2,
-            p: 2,
-            boxShadow: "0 4px 16px rgba(157, 114, 240, 0.12)",
-            border: "1px solid rgba(157, 114, 240, 0.12)",
-            position: "relative",
+            maxWidth: { xs: "100%", sm: "900px", lg: "1000px" },
+            // height: { xs: "auto", sm: "auto" },
             display: "flex",
-            flexDirection: "column",
+            flexDirection: { xs: "column", md: "row" },
+            gap: { xs: 2, sm: 3 },
+            alignItems: "stretch",
           }}
         >
           <Box
             sx={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              height: "3px",
-              background: getStatusColor(),
-              opacity: 0.3,
-            }}
-          />
-
-          <Typography
-            variant="subtitle2"
-            sx={{
-              textAlign: "center",
-              mb: 1.5,
-              color: "#5a4b81",
-              fontWeight: "600",
-              fontSize: "1rem",
+              flex: { xs: "0 0 auto", md: 0.4 },
+              minHeight: { xs: "auto", md: "320px" },
+              maxHeight: { xs: "280px", md: "350px" },
+              width: "100%",
+              bgcolor: "#f0f7ff",
+              borderRadius: 3,
+              p: { xs: 2, sm: 2.5 },
+              boxShadow: "0 8px 32px rgba(34, 117, 183, 0.35)",
+              border: "1px solid rgba(34, 117, 183, 0.35)",
               display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              flexDirection: "column",
+              position: "relative",
+              overflow: "hidden",
+              "&::before": {
+                content: '""',
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: "3px",
+                //  .. background: "linear-gradient(90deg, #9d72f0, #7b4dff, #9d72f0)",
+                backgroundSize: "200% 100%",
+                animation:
+                  status !== "NOT READY"
+                    ? "shimmer 3s infinite linear"
+                    : "none",
+              },
+              "@keyframes shimmer": {
+                "0%": { backgroundPosition: "200% 0" },
+                "100%": { backgroundPosition: "-200% 0" },
+              },
             }}
           >
-            <SettingsInputAntennaIcon sx={{ fontSize: "20px", mr: 1 }} />
-            Device Status
-          </Typography>
-
-          {/* Status Indicator */}
-          <Box sx={{ position: "relative", mb: 2 }}>
+            {/* Compact Header */}
             <Box
               sx={{
-                width: "100%",
-                height: 20,
-                bgcolor: "#eef2ff",
-                borderRadius: 12,
-                overflow: "hidden",
-                position: "relative",
+                background:
+                  "linear-gradient(135deg, #2275b7 100%, #f0f7ff 100%)",
+                color: "white",
+                p: 1,
+                borderRadius: 2,
+                mb: 2,
+                textAlign: "center",
               }}
             >
-              <Box
+              <Typography
+                variant="subtitle1"
                 sx={{
-                  width: `${statusPercentage(status)}%`,
-                  height: "100%",
-                  background: `linear-gradient(90deg, ${getStatusColor()}99, ${getStatusColor()})`,
-                  transition: "width 0.5s ease",
+                  fontWeight: 700,
+                  fontSize: { xs: "0.9rem", sm: "1rem" },
+                  mb: 0.25,
                 }}
-              />
+              >
+                DEVICE STATUS
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  opacity: 0.9,
+                  fontWeight: "500",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <FingerprintIcon sx={{ fontSize: "12px", mr: 0.5 }} />
+                Biometric Verification
+              </Typography>
             </Box>
 
-            {/* Status Indicators */}
+            {/* Status Indicator - Compact */}
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                mt: 1,
-                px: 0.5,
-              }}
-            >
-              {["NOT READY", "READY", "CONNECTED"].map((text, i) => (
-                <Typography
-                  key={i}
-                  variant="caption"
-                  sx={{
-                    color: status === text ? getStatusColor() : "#9e9e9e",
-                    fontWeight: status === text ? "700" : "500",
-                    fontSize: "0.7rem",
-                  }}
-                >
-                  {text}
-                </Typography>
-              ))}
-            </Box>
-          </Box>
-
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              mb: 1.5,
-            }}
-          >
-            <Box
-              sx={{
-                width: 12,
-                height: 12,
-                borderRadius: "50%",
-                bgcolor: getStatusColor(),
-                mr: 1,
-                boxShadow: `0 0 0 ${
-                  status !== "NOT READY" ? "4px" : "0"
-                } ${getStatusColor()}40`,
-              }}
-            />
-            <Typography
-              variant="body2"
-              sx={{
-                fontWeight: "700",
-                color: getStatusColor(),
-                fontSize: "0.9rem",
-              }}
-            >
-              {status}
-            </Typography>
-          </Box>
-
-          {scanQuality && (
-            <Box
-              sx={{
+                flex: 1,
                 display: "flex",
                 flexDirection: "column",
-                alignItems: "center",
-                mt: 2,
-                p: 1.5,
-                bgcolor: "rgba(157, 114, 240, 0.05)",
-                borderRadius: 1,
-                border: "1px solid rgba(157, 114, 240, 0.1)",
+                justifyContent: "space-between",
               }}
             >
-              <Typography
-                variant="caption"
-                sx={{
-                  color: "#5a4b81",
-                  fontWeight: "600",
-                  mb: 1,
-                }}
-              >
-                Scan Quality
-              </Typography>
-              <LinearProgress
-                variant="determinate"
-                value={parseInt(scanQuality) || 0}
-                sx={{
-                  height: 8,
-                  borderRadius: 3,
-                  width: "100%",
-                  mb: 1,
-                  bgcolor: "rgba(157, 114, 240, 0.2)",
-                  "& .MuiLinearProgress-bar": {
-                    background: "linear-gradient(90deg, #9d72f0, #7b4dff)",
-                    borderRadius: 3,
-                  },
-                }}
-              />
-              <Chip
-                label={`${scanQuality}%`}
-                sx={{
-                  bgcolor: "rgba(157, 114, 240, 0.1)",
-                  color: "#5a4b81",
-                  fontWeight: "600",
-                  height: 24,
-                  fontSize: "0.8rem",
-                }}
-                size="small"
-                icon={
-                  <GradeIcon
-                    sx={{ fontSize: "16px!important", color: "#ffc107" }}
+              {/* Current Status */}
+              <Box sx={{ textAlign: "center", mb: 2 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    mb: 1,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: "50%",
+                      bgcolor: getStatusColor(),
+                      mr: 1,
+                      boxShadow: `0 0 0 ${
+                        status !== "NOT READY" ? "3px" : "0"
+                      } ${getStatusColor()}40`,
+                    }}
                   />
-                }
-              />
-            </Box>
-          )}
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: "700",
+                      color: getStatusColor(),
+                      fontSize: "0.8rem",
+                    }}
+                  >
+                    {status}
+                  </Typography>
+                </Box>
 
-          {/* Device Connection Visualization */}
-          <Box sx={{ mt: 2.5, textAlign: "center" }}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Box
-                sx={{
-                  width: 14,
-                  height: 14,
-                  borderRadius: "50%",
-                  bgcolor: rdDevice ? "#4caf50" : "#9e9e9e",
-                  mr: 1,
-                  position: "relative",
-                  "&::after": rdDevice
-                    ? {
-                        content: '""',
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        width: 7,
-                        height: 7,
-                        borderRadius: "50%",
-                        bgcolor: "#fff",
-                      }
-                    : {},
-                }}
-              />
-              <Typography
-                variant="caption"
-                sx={{ color: "#5a4b81", fontWeight: "500" }}
-              >
-                {rdDevice ? "Connected" : "Not Connected"}
-              </Typography>
+                {/* Status Progress Bar */}
+                <Box sx={{ position: "relative", mb: 1 }}>
+                  <Box
+                    sx={{
+                      width: "100%",
+                      height: 12,
+                      bgcolor: "#f0f7ff",
+                      borderRadius: 6,
+                      overflow: "hidden",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: `${statusPercentage(status)}%`,
+                        height: "100%",
+                        background: `linear-gradient(90deg, ${getStatusColor()}99, ${getStatusColor()})`,
+                        transition: "width 0.5s ease",
+                      }}
+                    />
+                  </Box>
+
+                  {/* Status Labels */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mt: 0.5,
+                      px: 0.5,
+                    }}
+                  >
+                    {["NOT READY", "READY", "CONNECTED"].map((text, i) => (
+                      <Typography
+                        key={i}
+                        variant="caption"
+                        sx={{
+                          color: status === text ? getStatusColor() : "#9e9e9e",
+                          fontWeight: status === text ? "700" : "500",
+                          fontSize: "0.6rem",
+                        }}
+                      >
+                        {text}
+                      </Typography>
+                    ))}
+                  </Box>
+                </Box>
+              </Box>
+
+              {/* Scan Quality (if available) */}
+              {scanQuality && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    mb: 2,
+                    p: 1,
+                    bgcolor: "rgba(34, 117, 183, 0.35)",
+                    borderRadius: 1,
+                    border: "1px solid rgba(34, 117, 183, 0.35)",
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "#2275b7", fontWeight: "600", mb: 0.5 }}
+                  >
+                    Scan Quality
+                  </Typography>
+                  <LinearProgress
+                    variant="determinate"
+                    value={parseInt(scanQuality) || 0}
+                    sx={{
+                      height: 4,
+                      borderRadius: 2,
+                      width: "100%",
+                      mb: 0.5,
+                      bgcolor: "rgba(34, 117, 183, 0.35)",
+                      "& .MuiLinearProgress-bar": {
+                        background: "linear-gradient(90deg, #2275b7, #1d63a0)",
+                        borderRadius: 2,
+                      },
+                    }}
+                  />
+                  <Chip
+                    label={`${scanQuality}%`}
+                    sx={{
+                      bgcolor: "rgba(34, 117, 183, 0.35)",
+                      color: "#2275b7",
+                      fontWeight: "600",
+                      height: 20,
+                      fontSize: "0.7rem",
+                    }}
+                    size="small"
+                    icon={
+                      <GradeIcon sx={{ fontSize: "12px", color: "#ffc107" }} />
+                    }
+                  />
+                </Box>
+              )}
+
+              {/* Device Connection Status */}
+              <Box sx={{ textAlign: "center" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    mb: 0.5,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: "50%",
+                      bgcolor: rdDevice ? "#4caf50" : "#9e9e9e",
+                      mr: 0.5,
+                      position: "relative",
+                      "&::after": rdDevice
+                        ? {
+                            content: '""',
+                            position: "absolute",
+                            top: "50%",
+                            left: "50%",
+                            transform: "translate(-50%, -50%)",
+                            width: 3,
+                            height: 3,
+                            borderRadius: "50%",
+                            bgcolor: "#fff",
+                          }
+                        : {},
+                    }}
+                  />
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "#2275b7", fontWeight: "500" }}
+                  >
+                    Device: {rdDevice ? "Connected" : "Not Connected"}
+                  </Typography>
+                </Box>
+
+                {/* Quick Actions */}
+                <Stack
+                  direction="row"
+                  spacing={0.5}
+                  sx={{ justifyContent: "center", mt: 1 }}
+                >
+                  <Button
+                    variant="outlined"
+                    onClick={detectDevice}
+                    disabled={loading}
+                    size="small"
+                    sx={{
+                      borderRadius: 1,
+                      px: 1,
+                      py: 0.25,
+                      textTransform: "none",
+                      fontWeight: "600",
+                      color: "#2275b7",
+                      borderColor: "#1d63a0",
+                      fontSize: "0.7rem",
+                      minWidth: "auto",
+                    }}
+                  >
+                    Detect
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={startScan}
+                    disabled={!rdDevice || loading}
+                    size="small"
+                    sx={{
+                      borderRadius: 1,
+                      px: 1,
+                      py: 0.25,
+                      textTransform: "none",
+                      fontWeight: "600",
+                      background:
+                        "linear-gradient(135deg, #2275b7 0%, #1d63a0 100%)",
+                      fontSize: "0.7rem",
+                      minWidth: "auto",
+                    }}
+                  >
+                    Scan
+                  </Button>
+                </Stack>
+              </Box>
             </Box>
           </Box>
-        </Box>
-      </Grid>
 
-      {/* Right Side Form */}
-      <Grid item xs={12} md={6}>
-        <Box
-          sx={{
-            bgcolor: "#faf8ff",
-            borderRadius: 2,
-            p: 2,
-            boxShadow: "0 4px 16px rgba(157, 114, 240, 0.12)",
-            border: "1px solid rgba(157, 114, 240, 0.12)",
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <Typography
-            variant="subtitle2"
+          {/* Right Panel - Authentication Form */}
+          <Box
             sx={{
-              mb: 2,
-              color: "#5a4b81",
-              fontWeight: "600",
-              fontSize: "1rem",
+              flex: { xs: "0 0 auto", md: 0.6 },
+              minHeight: { xs: "auto", md: "320px" },
+              bgcolor: "#f0f7ff",
+              borderRadius: 3,
+              p: { xs: 2, sm: 3 },
+              boxShadow: "0 8px 32px rgba(34, 117, 183, 0.35)",
+              border: "1px solid rgba(34, 117, 183, 0.35)",
               display: "flex",
-              alignItems: "center",
+              flexDirection: "column",
             }}
           >
-            <BadgeIcon sx={{ fontSize: "20px", mr: 1 }} />
-            Authentication Details
-          </Typography>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                mb: 2,
+                color: "#2275b7",
+                fontWeight: "600",
+                fontSize: { xs: "0.9rem", sm: "1rem" },
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <BadgeIcon sx={{ fontSize: "18px", mr: 1 }} />
+              Authentication Details
+            </Typography>
 
-          <Stack spacing={2} sx={{ flex: 1 }}>
-            <Box>
+            <Stack spacing={2} sx={{ flex: 1 }}>
               <TextField
                 label="Aadhaar Number"
                 value={aadhaar}
@@ -630,198 +578,139 @@ const Aeps2FaCommon = ({
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     borderRadius: 1,
-                    fontFamily: '"DM Sans", sans-serif',
-                    fontSize: "0.95rem",
-                  },
-                  "& .MuiFormLabel-root": {
-                    fontFamily: '"DM Sans", sans-serif',
-                    fontSize: "0.95rem",
+                    fontSize: "0.9rem",
                   },
                   "& .MuiFormHelperText-root": {
-                    fontSize: "0.75rem",
-                    mx: 0,
-                    mt: 0.5,
+                    fontSize: "0.7rem",
                   },
                 }}
-                inputProps={{
-                  maxLength: 12,
-                  style: { fontFamily: '"DM Sans", sans-serif' },
-                }}
+                inputProps={{ maxLength: 12 }}
               />
-            </Box>
-            <TextField
-              select
-              label="Select Bank"
-              value={formData?.bank_iin || ""}
-              onChange={(e) => {
-                const selectedIIN = e.target.value;
-                const selectedBank = banks.find(
-                  (b) => b.bank_iin === selectedIIN
-                );
-
-                if (selectedBank) {
-                  setFormData((prev) => ({
-                    ...prev,
-                    bank: selectedBank.bank_name,
-                    bank_iin: selectedBank.bank_iin,
-                  }));
+              <Autocomplete
+                options={banks} // array of bank objects
+                getOptionLabel={(option) =>
+                  `${option.bank_name} (${option.bank_iin})`
                 }
-              }}
-              fullWidth
-              size="small"
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 1,
-                  fontFamily: '"DM Sans", sans-serif',
-                  fontSize: "0.95rem",
-                },
-                "& .MuiFormLabel-root": {
-                  fontFamily: '"DM Sans", sans-serif',
-                  fontSize: "0.95rem",
-                },
-              }}
-            >
-              {banks.map((bank) => (
-                <MenuItem key={bank.bank_iin} value={bank.bank_iin}>
-                  {bank.bank_name} ({bank.bank_iin})
-                </MenuItem>
-              ))}
-            </TextField>
+                value={
+                  banks.find((b) => b.bank_iin === formData?.bank_iin) || null
+                }
+                onChange={(event, newValue) => {
+                  if (newValue) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      bank: newValue.bank_name,
+                      bank_iin: newValue.bank_iin,
+                    }));
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Select Bank"
+                    size="small"
+                    fullWidth
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: 1,
+                        fontSize: "0.9rem",
+                      },
+                    }}
+                  />
+                )}
+              />
 
-            <TextField
-              label="Mobile"
-              value={formData?.mobile}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, mobile: e.target.value }))
-              }
-              fullWidth
-              size="small"
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 1,
-                  fontFamily: '"DM Sans", sans-serif',
-                  fontSize: "0.95rem",
-                },
-                "& .MuiFormLabel-root": {
-                  fontFamily: '"DM Sans", sans-serif',
-                  fontSize: "0.95rem",
-                },
-              }}
-            />
-            {/* Amount only for Cash Withdrawal */}
-            {formData?.activeTab === 0 && (
               <TextField
-                label="Amount"
-                value={formData.amount}
+                label="Mobile Number"
+                value={formData?.mobile}
                 onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    amount: e.target.value,
-                  }))
+                  setFormData((prev) => ({ ...prev, mobile: e.target.value }))
                 }
                 fullWidth
                 size="small"
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     borderRadius: 1,
-                    fontFamily: '"DM Sans", sans-serif',
-                    fontSize: "0.95rem",
-                  },
-                  "& .MuiFormLabel-root": {
-                    fontFamily: '"DM Sans", sans-serif',
-                    fontSize: "0.95rem",
+                    fontSize: "0.9rem",
                   },
                 }}
               />
-            )}
-            <Box>
-              <TextField
-                select
-                SelectProps={{ native: true }}
-                label="Select RD Device"
-                value={rdDevice ? rdDevice.info : ""}
-                onChange={(e) => {
-                  const selectedDevice = rdDeviceList.find(
-                    (d) => d.info === e.target.value
-                  );
-                  setRdDevice(selectedDevice);
-                  setStatus(
-                    selectedDevice ? selectedDevice.status : "NOT READY"
-                  );
-                }}
-                size="small"
-                fullWidth
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 1,
-                    fontFamily: '"DM Sans", sans-serif',
-                    fontSize: "0.95rem",
-                  },
-                  "& .MuiFormLabel-root": {
-                    fontFamily: '"DM Sans", sans-serif',
-                    fontSize: "0.95rem",
-                  },
-                }}
-              >
-                <option value="">-- Select Device --</option>
-                {rdDeviceList.map((d, i) => (
-                  <option key={i} value={d.info}>
-                    {d.info} ({d.status})
-                  </option>
-                ))}
-              </TextField>
-              <Typography
-                variant="caption"
-                sx={{ color: "#9e9e9e", mt: 0.5, display: "block" }}
-              >
-                {rdDeviceList.length} device(s) detected
-              </Typography>
-            </Box>
-            <Stack direction="row" spacing={1.5} sx={{ mt: 2 }}>
-              <Button
-                variant="outlined"
-                onClick={detectDevice}
-                disabled={loading}
-                startIcon={<SearchIcon sx={{ fontSize: "18px" }} />}
-                sx={{
-                  borderRadius: 1,
-                  py: 1,
-                  textTransform: "none",
-                  fontWeight: "600",
-                  color: "#9d72f0",
-                  borderColor: "#9d72f0",
-                  "&:hover": {
-                    borderColor: "#8c61e6",
-                    bgcolor: "#f5f2ff",
-                  },
-                  flex: 1,
-                  fontSize: "0.85rem",
-                }}
-              >
-                Detect
-              </Button>
+
+              {formData?.activeTab === 0 && (
+                <TextField
+                  label="Amount"
+                  value={formData.amount}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, amount: e.target.value }))
+                  }
+                  fullWidth
+                  size="small"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 1,
+                      fontSize: "0.9rem",
+                    },
+                  }}
+                />
+              )}
+
+              <Box>
+                <TextField
+                  select
+                  SelectProps={{ native: true }}
+                  label="Select RD Device"
+                  value={rdDevice ? rdDevice.info : ""}
+                  onChange={(e) => {
+                    const selectedDevice = rdDeviceList.find(
+                      (d) => d.info === e.target.value
+                    );
+                    setRdDevice(selectedDevice);
+                    setStatus(
+                      selectedDevice ? selectedDevice.status : "NOT READY"
+                    );
+                  }}
+                  size="small"
+                  fullWidth
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 1,
+                      fontSize: "0.9rem",
+                    },
+                  }}
+                >
+                  <option value="">-- Select Device --</option>
+                  {rdDeviceList.map((d, i) => (
+                    <option key={i} value={d.info}>
+                      {d.info} ({d.status})
+                    </option>
+                  ))}
+                </TextField>
+                <Typography
+                  variant="caption"
+                  sx={{ color: "#9e9e9e", mt: 0.5, display: "block" }}
+                >
+                  {rdDeviceList.length} device(s) detected
+                </Typography>
+              </Box>
+
               <Button
                 variant="contained"
                 onClick={startScan}
                 disabled={
                   !rdDevice || !aadhaar || aadhaar.length !== 12 || loading
                 }
-                startIcon={<FingerprintIcon sx={{ fontSize: "18px" }} />}
+                startIcon={<FingerprintIcon sx={{ fontSize: "16px" }} />}
                 sx={{
                   borderRadius: 1,
                   py: 1,
                   textTransform: "none",
                   fontWeight: "600",
                   background:
-                    "linear-gradient(135deg, #9d72f0 0%, #7b4dff 100%)",
+                    "linear-gradient(135deg, #2275B7 0%, #2272B3 100%)",
                   "&:hover": {
                     background:
-                      "linear-gradient(135deg, #8c61e6 0%, #6b3dff 100%)",
-                    boxShadow: "0 4px 12px rgba(157, 114, 240, 0.4)",
+                      "linear-gradient(135deg, #2275B7 0%, #2272B3 100%)",
                   },
-                  flex: 2,
-                  boxShadow: "0 3px 8px rgba(157, 114, 240, 0.3)",
-                  fontSize: "0.85rem",
+                  mt: "auto",
                 }}
               >
                 {loading ? (
@@ -830,48 +719,53 @@ const Aeps2FaCommon = ({
                     sx={{ color: "white", mr: 0.5 }}
                   />
                 ) : (
-                  "Start Scan"
+                  "Start Biometric Authentication"
                 )}
               </Button>
+              {activeTab === 2 && bankStatement?.length > 0 && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  sx={{ mt: 2 }}
+                  onClick={() =>
+                    navigate("/bank-statement", { state: { bankStatement } })
+                  }
+                >
+                  View Full Statement
+                </Button>
+              )}
             </Stack>
-          </Stack>
+          </Box>
         </Box>
-      </Grid>
-    </Grid>
-
-    {/* Note at bottom */}
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        mt: 3,
-        p: 1.5,
-        bgcolor: "rgba(157, 114, 240, 0.05)",
-        borderRadius: 1,
-        border: "1px solid rgba(157, 114, 240, 0.1)",
-      }}
-    >
-      <InfoOutlinedIcon
-        sx={{ fontSize: "18px", mr: 1, color: "#9d72f0" }}
-      />
-      <Typography
-        variant="caption"
+      </Box>
+      <Box
         sx={{
-          color: "#5a4b81",
-          fontFamily: '"DM Sans", sans-serif',
-          fontSize: "0.8rem",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          mt: 2,
+          p: 1,
+          bgcolor: "rgba(34, 117, 183, 0.15)",
+          borderRadius: 1,
+          border: "1px solid rgba(34, 117, 183, 0.35)",
         }}
       >
-        Connect scanner. Status turns{" "}
-        <span style={{ color: "#4caf50", fontWeight: "bold" }}>green</span>{" "}
-        when connected,{" "}
-        <span style={{ color: "#f44336", fontWeight: "bold" }}>red</span>{" "}
-        when not.
-      </Typography>
-    </Box>
-  </Box>
-</Box>
+        <InfoOutlinedIcon sx={{ fontSize: "16px", mr: 1, color: "#2275B7" }} />
+        <Typography
+          variant="caption"
+          sx={{
+            color: "#2275b7",
+            fontSize: "0.75rem",
+          }}
+        >
+          Connect scanner. Status turns{" "}
+          <span style={{ color: "#4caf50", fontWeight: "bold" }}>green</span>{" "}
+          when connected,{" "}
+          <span style={{ color: "#f44336", fontWeight: "bold" }}>red</span> when
+          not.
+        </Typography>
+      </Box>
+    </>
   );
 };
 

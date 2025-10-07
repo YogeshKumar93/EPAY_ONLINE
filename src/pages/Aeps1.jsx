@@ -25,7 +25,6 @@ const style = {
   borderRadius: 2,
   outline: "none",
 };
-
 const Aeps1 = () => {
   const [openAEPS2FA, setOpenAEPS2FA] = useState(false);
   const [openAepsMain, setOpenAepsMain] = useState(false);
@@ -40,7 +39,7 @@ const Aeps1 = () => {
   const instId = user?.instId; // Check if instId exists
 
   const checkAepsLoginStatus = async () => {
-     setLoading(true);
+    setLoading(true);
     try {
       const { error, response } = await apiCall(
         "post",
@@ -52,7 +51,7 @@ const Aeps1 = () => {
         return;
       }
 
-      if (response?.data?.message === "LOGINREQUIRED") {
+      if (response?.data?.data === "LOGINREQUIRED") {
         setTwoFAStatus("LOGINREQUIRED");
         setOpenAEPS2FA(true);
         setOpenAepsMain(false);
@@ -68,7 +67,7 @@ const Aeps1 = () => {
   };
 
   const AepsLogin = async (scanData = fingerScanData) => {
-      setLoading(true);
+    setLoading(true);
     try {
       if (!aadhaar || !scanData) {
         showToast("Please provide Aadhaar and Fingerprint data", "error");
@@ -113,13 +112,24 @@ const Aeps1 = () => {
         return;
       }
 
-      if (response?.data?.message === "LOGINREQUIRED") {
-        setTwoFAStatus("LOGINREQUIRED");
-        setOpenAEPS2FA(true);
-        setOpenAepsMain(false);
+      if (response) {
+        if (
+          response?.data?.message === "LOGINREQUIRED" ||
+          response?.message === "LOGINREQUIRED"
+        ) {
+          setTwoFAStatus("LOGINREQUIRED");
+          setOpenAEPS2FA(true);
+          setOpenAepsMain(false);
+        } else if (response.message === "LOGGEDIN") {
+          setOpenAEPS2FA(false);
+          setOpenAepsMain(true);
+        } else {
+          showToast(response?.message);
+          setOpenAEPS2FA(false);
+          setOpenAepsMain(false);
+        }
       } else {
-        setOpenAepsMain(true);
-        setOpenAEPS2FA(false);
+        showToast(error?.message);
       }
     } catch (err) {
       apiErrorToast(err);
@@ -132,10 +142,9 @@ const Aeps1 = () => {
     checkAepsLoginStatus();
   }, []);
 
-
   return (
     <>
-    <CommonLoader loading={loading} />
+      <CommonLoader loading={loading} />
       {!instId ? (
         <Box
           textAlign="center"
@@ -167,13 +176,12 @@ const Aeps1 = () => {
             handleClose={() => setOpenDmt1Modal(false)}
             onSuccess={() => {
               setOpenDmt1Modal(false);
-              window.location.reload(); // Or refresh instId via context if dynamic
+              // window.location.reload(); // Or refresh instId via context if dynamic
             }}
           />
         </Box>
       ) : (
         <div>
-          {/* ✅ 2FA Modal */}
           {!openAepsMain && (
             <AEPS2FAModal
               title="AEPS1"
@@ -192,15 +200,14 @@ const Aeps1 = () => {
                   label: "AEPS1",
                   variant: "outlined",
                   bgcolor: "white",
-                  color: "#9d72f0",
-                  hoverColor: "#f5f2ff",
+                  color: "#2275b7",
+                  hoverColor: "#f0f7ff",
                   onClick: () => console.log("AEPS1 Clicked"),
                 },
               ]}
             />
           )}
 
-          {/* ✅ Main AEPS Component */}
           {openAepsMain && <AepsMainComponent />}
         </div>
       )}

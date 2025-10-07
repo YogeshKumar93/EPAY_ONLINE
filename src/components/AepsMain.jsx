@@ -17,9 +17,10 @@ import ApiEndpoints from "../api/ApiEndpoints";
 import AuthContext from "../contexts/AuthContext";
 import { useToast } from "../utils/ToastContext";
 import Aeps2FaCommon from "./User/Aeps2FaCmmon";
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import ReceiptIcon from '@mui/icons-material/Receipt';
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import ReceiptIcon from "@mui/icons-material/Receipt";
+import { okSuccessToast } from "../utils/ToastUtil";
 const AepsMainComponent = () => {
   const [aadhaar, setAadhaar] = useState("");
   const [activeTab, setActiveTab] = useState(0);
@@ -28,7 +29,7 @@ const AepsMainComponent = () => {
   const [loading, setLoading] = useState(false);
   const [banks, setBanks] = useState([]);
   const [loadingBanks, setLoadingBanks] = useState(false);
-
+  const [bankStatement, setBankStatement] = useState("");
   useEffect(() => {
     fetchBanks();
   }, []);
@@ -79,59 +80,68 @@ const AepsMainComponent = () => {
 
   const handleAPICall = async (scanData) => {
     setLoading(true);
-    const payload = {
-      AadhaarNumber: aadhaar,
-      BankName: formData.bank,
-      bank_iin: formData.bank_iin,
-      number: formData.mobile,
-      pidData: scanData.pidData || scanData.pid,
-      pidDataType: scanData.pidDataType || scanData.type,
-      ci: scanData.ci || scanData.cI,
-      dc: scanData.dc || scanData.dC,
-      dpId: scanData.dpId || scanData.dpID,
-      fCount: scanData.fCount,
-      hmac: scanData.hmac || scanData.hMac,
-      mc: scanData.mc || scanData.mC,
-      errInfo: scanData.errInfo,
-      mi: scanData.mi || scanData.mI,
-      nmPoints: scanData.nmPoints,
-      qScore: scanData.qScore,
-      rdsId: scanData.rdsId,
-      rdsVer: scanData.rdsVer,
-      sessionKey: scanData.sessionKey,
-      srno: scanData.srno,
-      operator: activeTab === 0 ? 50 : 49,
-      latitude: location?.lat || 0,
-      longitude: location?.long || 0,
-      amount: formData.amount,
-      pf: "web",
-      type:
-        activeTab === 0
-          ? "CASH_WITHDRAWAL"
-          : activeTab === 1
-          ? "BALANCE_ENQUIRY"
-          : "MINI_STATEMENT",
-    };
-
-    let endpoint =
-      activeTab === 0
-        ? ApiEndpoints.AEPS_CASHWITHDRAWAL
-        : activeTab === 1
-        ? ApiEndpoints.AEPS_BALANCE_ENQUIRY
-        : ApiEndpoints.AEPS_MINI_STATEMENT;
 
     try {
+      const payload = {
+        AadhaarNumber: aadhaar,
+        BankName: formData.bank,
+        bank_iin: formData.bank_iin,
+        number: formData.mobile,
+        pidData: scanData.pidData || scanData.pid,
+        pidDataType: scanData.pidDataType || scanData.type,
+        ci: scanData.ci || scanData.cI,
+        dc: scanData.dc || scanData.dC,
+        dpId: scanData.dpId || scanData.dpID,
+        fCount: scanData.fCount,
+        hmac: scanData.hmac || scanData.hMac,
+        mc: scanData.mc || scanData.mC,
+        errInfo: scanData.errInfo,
+        mi: scanData.mi || scanData.mI,
+        nmPoints: scanData.nmPoints,
+        qScore: scanData.qScore,
+        rdsId: scanData.rdsId,
+        rdsVer: scanData.rdsVer,
+        sessionKey: scanData.sessionKey,
+        srno: scanData.srno,
+        operator: activeTab === 0 ? 50 : 49,
+        latitude: location?.lat || 0,
+        longitude: location?.long || 0,
+        amount: formData.amount,
+        pf: "web",
+        type:
+          activeTab === 0
+            ? "CASH_WITHDRAWAL"
+            : activeTab === 1
+            ? "BALANCE_ENQUIRY"
+            : "MINI_STATEMENT",
+      };
+
+      const endpoint =
+        activeTab === 0
+          ? ApiEndpoints.AEPS_CASHWITHDRAWAL
+          : activeTab === 1
+          ? ApiEndpoints.AEPS_BALANCE_ENQUIRY
+          : ApiEndpoints.AEPS_MINI_STATEMENT;
+
       const { error, response } = await apiCall("post", endpoint, payload);
-      if (error) showToast(error?.message, "error");
-      else {
-        const resp = response?.data;
-        showToast(
-          resp?.message || "Success",
-          resp?.status ? "success" : "error"
+
+      if (error) {
+        showToast(error?.message || "Something went wrong", "error");
+      } else {
+        okSuccessToast(
+          response?.message ||
+            // response?.operator_id ||
+            response?.message ||
+            "Success"
         );
+        const statement = response?.operator_id?.miniStatement;
+        setBankStatement(statement);
+
+        // console.log("THe bank st ia ", bankStatement);
       }
-    } catch {
-      showToast("Something went wrong", "error");
+    } catch (err) {
+      console.error("API call failed:", err);
+      showToast("API call failed", "error");
     } finally {
       setLoading(false);
     }
@@ -149,7 +159,7 @@ const AepsMainComponent = () => {
           "& .MuiTabs-indicator": {
             height: "3px",
             borderRadius: "3px 3px 0 0",
-            background: "linear-gradient(135deg, #9d72f0, #7b4dff)",
+            background: "#2275b7",
           },
           "& .MuiTab-root": {
             minHeight: "48px",
@@ -160,7 +170,7 @@ const AepsMainComponent = () => {
             color: "text.secondary",
             transition: "all 0.2s ease",
             "&.Mui-selected": {
-              color: "#7b4dff",
+              color: "#2275b7",
               fontWeight: "700",
             },
           },
@@ -182,6 +192,7 @@ const AepsMainComponent = () => {
           iconPosition="start"
         />
       </Tabs>
+
       <Aeps2FaCommon
         open={aeps2FAOpen}
         onClose={() => setAeps2FAOpen(false)}
@@ -193,6 +204,9 @@ const AepsMainComponent = () => {
         aadhaar={aadhaar}
         fingerData={setFingerprintData}
         setAadhaar={setAadhaar}
+        bankStatement={bankStatement}
+        setBankStatement={setBankStatement}
+        activeTab={activeTab}
       />
     </>
   );

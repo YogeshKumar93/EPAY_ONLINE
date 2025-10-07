@@ -1,5 +1,5 @@
 // Map status to background color
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Box,
   Card,
@@ -12,6 +12,7 @@ import { apiCall } from "../../api/apiClient";
 import ApiEndpoints from "../../api/ApiEndpoints";
 
 import { Refresh } from "@mui/icons-material";
+import AuthContext from "../../contexts/AuthContext";
 
 const statusColors = {
   success: "#2E8B57",
@@ -22,6 +23,8 @@ const statusColors = {
 };
 
 const TransactionDetail = () => {
+  const authCtx = useContext(AuthContext);
+  const user = authCtx?.user;
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({});
   const [bankBalance, setBankBalance] = useState(null);
@@ -150,71 +153,72 @@ const TransactionDetail = () => {
         );
       })}
 
-      {/* ✅ Bank Balance Card */}
-      <Card
-        sx={{
-          width: "100%",
-          maxWidth: 220,
-          minWidth: 180,
-          borderRadius: 3,
-          background: "linear-gradient(135deg, #4B0082 0%, #6A0DAD 100%)",
-          color: "#fff",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          "&:hover": {
-            transform: "scale(1.05)",
-            boxShadow: "0 8px 20px rgba(0,0,0,0.25)",
-          },
-        }}
-      >
-        <CardContent
+      {(user.role === "adm" || user.role === "sadm") && (
+        <Card
           sx={{
+            width: "100%",
+            maxWidth: 220,
+            minWidth: 180,
+            borderRadius: 3,
+            background: "linear-gradient(135deg, #4B0082 0%, #6A0DAD 100%)",
+            color: "#fff",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
             display: "flex",
             flexDirection: "column",
+            justifyContent: "center",
             alignItems: "center",
-            textAlign: "center",
-            gap: 1,
-            p: 2,
+            "&:hover": {
+              transform: "scale(1.05)",
+              boxShadow: "0 8px 20px rgba(0,0,0,0.25)",
+            },
           }}
         >
-          <Box
+          <CardContent
             sx={{
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
-              justifyContent: "center",
+              textAlign: "center",
               gap: 1,
-              mb: 1,
+              p: 2,
             }}
           >
-            <Typography sx={{ fontWeight: 600 }}>Bank Balance</Typography>
-            <IconButton
-              size="small"
-              onClick={fetchBankBalance}
-              disabled={loadingBank}
+            <Box
               sx={{
-                color: "#fff",
-                backgroundColor: "rgba(255,255,255,0.15)",
-                "&:hover": { backgroundColor: "rgba(255,255,255,0.25)" },
-                width: 25,
-                height: 25,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 1,
+                mb: 1,
               }}
             >
-              {loadingBank ? (
-                <CircularProgress size={16} sx={{ color: "#fff" }} />
-              ) : (
-                <Refresh sx={{ fontSize: 15 }} />
-              )}
-            </IconButton>
-          </Box>
+              <Typography sx={{ fontWeight: 600 }}>Bank Balance</Typography>
+              <IconButton
+                size="small"
+                onClick={fetchBankBalance}
+                disabled={loadingBank}
+                sx={{
+                  color: "#fff",
+                  backgroundColor: "rgba(255,255,255,0.15)",
+                  "&:hover": { backgroundColor: "rgba(255,255,255,0.25)" },
+                  width: 25,
+                  height: 25,
+                }}
+              >
+                {loadingBank ? (
+                  <CircularProgress size={16} sx={{ color: "#fff" }} />
+                ) : (
+                  <Refresh sx={{ fontSize: 15 }} />
+                )}
+              </IconButton>
+            </Box>
 
-          <Typography variant="h5" sx={{ fontWeight: 700 }}>
-            ₹{bankBalance !== null ? bankBalance : "--"}
-          </Typography>
-        </CardContent>
-      </Card>
+            <Typography variant="h5" sx={{ fontWeight: 700 }}>
+              ₹{bankBalance !== null ? bankBalance : "--"}
+            </Typography>
+          </CardContent>
+        </Card>
+      )}
     </Box>
   );
 };

@@ -35,11 +35,10 @@ import { apiCall } from "../../api/apiClient";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import { useToast } from "../../utils/ToastContext";
 import { apiErrorToast } from "../../utils/ToastUtil";
-
 const AEPS2FAModal = ({
   open,
   onClose,
-  title = "Title",
+  title,
   formData,
   setFormData,
   banks = [],
@@ -67,13 +66,12 @@ const AEPS2FAModal = ({
         disabled={btn.disabled}
         startIcon={btn.icon}
         sx={{
-          background:
-            btn.bgcolor || "linear-gradient(135deg, #9d72f0 0%, #7b4dff 100%)",
+          background: btn.bgcolor || "#2275b7",
           color: btn.color || "white",
           "&:hover": {
             background:
               btn.hoverColor ||
-              "linear-gradient(135deg, #8c61e6 0%, #6b3dff 100%)",
+              "linear-gradient(135deg, #2275b7 0%, #f0f7ff 100%)",
             boxShadow: "0 4px 10px rgba(157, 114, 240, 0.35)",
             transform: "translateY(-1px)",
           },
@@ -185,7 +183,7 @@ const AEPS2FAModal = ({
     if (status === "CONNECTED") return "#4caf50";
     if (status === "SCANNING...") return "#ff9800";
     if (status === "READY") return "#2196f3";
-    if (status === "DETECTING...") return "#9d72f0";
+    if (status === "DETECTING...") return "#2275b7";
     if (status === "ERROR") return "#f44336";
     return "#9e9e9e";
   };
@@ -227,7 +225,7 @@ const AEPS2FAModal = ({
           left: 0,
           right: 0,
           height: "4px",
-          background: "linear-gradient(90deg, #9d72f0, #7b4dff, #9d72f0)",
+          background: "linear-gradient(90deg, #2275b7, #7b4dff, #2275b7)",
           backgroundSize: "200% 100%",
           animation:
             status !== "NOT READY" ? "shimmer 3s infinite linear" : "none",
@@ -241,7 +239,7 @@ const AEPS2FAModal = ({
       {/* Header with gradient */}
       <Box
         sx={{
-          background: "linear-gradient(135deg, #9d72f0 0%, #7b4dff 100%)",
+          background: "linear-gradient(135deg, #2275b7 0%, #7b4dff 100%)",
           color: "white",
           p: 1,
           borderRadius: "12px 12px 0 0",
@@ -280,7 +278,7 @@ const AEPS2FAModal = ({
               mb: 0.5,
             }}
           >
-            {title} 2FA
+            {title}
           </Typography>
 
           <Typography
@@ -512,7 +510,7 @@ const AEPS2FAModal = ({
                     mb: 0.5,
                     bgcolor: "rgba(157, 114, 240, 0.2)",
                     "& .MuiLinearProgress-bar": {
-                      background: "linear-gradient(90deg, #9d72f0, #7b4dff)",
+                      background: "linear-gradient(90deg, #2275b7, #7b4dff)",
                       borderRadius: 3,
                     },
                   }}
@@ -702,8 +700,8 @@ const AEPS2FAModal = ({
                     py: 0.8,
                     textTransform: "none",
                     fontWeight: "600",
-                    color: "#9d72f0",
-                    borderColor: "#9d72f0",
+                    color: "#2275b7",
+                    borderColor: "#2275b7",
                     "&:hover": {
                       borderColor: "#8c61e6",
                       bgcolor: "#f5f2ff",
@@ -727,7 +725,7 @@ const AEPS2FAModal = ({
                     textTransform: "none",
                     fontWeight: "600",
                     background:
-                      "linear-gradient(135deg, #9d72f0 0%, #7b4dff 100%)",
+                      "linear-gradient(135deg, #2275b7 0%, #7b4dff 100%)",
                     "&:hover": {
                       background:
                         "linear-gradient(135deg, #8c61e6 0%, #6b3dff 100%)",
@@ -766,7 +764,7 @@ const AEPS2FAModal = ({
           border: "1px solid rgba(157, 114, 240, 0.08)",
         }}
       >
-        <InfoOutlinedIcon sx={{ fontSize: "16px", mr: 1, color: "#9d72f0" }} />
+        <InfoOutlinedIcon sx={{ fontSize: "16px", mr: 1, color: "#2275b7" }} />
         <Typography
           variant="caption"
           sx={{

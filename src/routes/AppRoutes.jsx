@@ -79,6 +79,7 @@ import { BbpsOffline } from "../pages/BbpsOffline";
 import PrintAeps from "../pages/PrintAeps";
 import OnBoarding from "../components/OnBoarding";
 import PrintCreditCard from "../pages/PrintCreditCard";
+import BankStatementDesign from "../components/AEPS/BankStatementDesign";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading, user } = useContext(AuthContext);
@@ -139,7 +140,7 @@ export default function AppRoutes() {
         <Route path="/print-payout" element={<PrintPayout />} />
         <Route path="/print-w2w" element={<PrintW2W />} />
         <Route path="/print-creditCard" element={<PrintCreditCard />} />
-
+        <Route path="/bank-statement" element={<BankStatementDesign />} />
         <Route path="/adminagreement" element={<AdminAgreement />} />
         <Route
           path="/admindistributoragreement"
