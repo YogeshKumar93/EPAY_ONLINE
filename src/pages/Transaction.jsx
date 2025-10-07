@@ -75,23 +75,7 @@ export const Transaction = () => {
       ),
       component: <AepsTxn />,
     },
-    {
-      label: (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            minWidth: "80px",
-            justifyContent: "flex-start",
-          }}
-        >
-          <CreditCardIcon fontSize="small" />
-          <span>Matm</span>
-        </div>
-      ),
-      component: <MatmTxn />,
-    },
+
     {
       label: (
         <div
@@ -126,23 +110,7 @@ export const Transaction = () => {
       ),
       component: <RechargeTxn />,
     },
-    {
-      label: (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            minWidth: "80px",
-            justifyContent: "flex-start",
-          }}
-        >
-          <TrainIcon fontSize="small" />
-          <span>Irctc</span>
-        </div>
-      ),
-      component: <IrctcTxn />,
-    },
+
     {
       label: (
         <div
