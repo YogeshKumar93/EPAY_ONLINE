@@ -1,4 +1,11 @@
-import { useMemo, useCallback, useContext, useState, useEffect } from "react";
+import {
+  useMemo,
+  useCallback,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
 import {
   Box,
   Tooltip,
@@ -107,7 +114,10 @@ const AepsTxn = ({ query }) => {
 
     setRefundLoading(false);
   };
-
+  const fetchUsersRef = useRef(null);
+  const handleFetchRef = (fetchFn) => {
+    fetchUsersRef.current = fetchFn;
+  };
   const refreshPlans = () => {
     if (fetchUsersRef.current) {
       fetchUsersRef.current();
@@ -599,6 +609,7 @@ const AepsTxn = ({ query }) => {
   return (
     <>
       <CommonTable
+        onFetchRef={handleFetchRef}
         columns={columnsWithSelection}
         endpoint={ApiEndpoints.GET_AEPS_TXN}
         filters={filters}

@@ -1,4 +1,4 @@
-import { useMemo, useContext, useState, useEffect } from "react";
+import { useMemo, useContext, useState, useEffect, useRef } from "react";
 import {
   Box,
   Tooltip,
@@ -174,6 +174,10 @@ const CreditCardTxn = ({ query }) => {
   const handleOpenLein = (row) => {
     setOpenLeinModal(true);
     setSelectedTrancation(row);
+  };
+  const fetchUsersRef = useRef(null);
+  const handleFetchRef = (fetchFn) => {
+    fetchUsersRef.current = fetchFn;
   };
   const refreshPlans = () => {
     if (fetchUsersRef.current) {
@@ -726,6 +730,7 @@ const CreditCardTxn = ({ query }) => {
     <>
       <Box sx={{}}>
         <CommonTable
+          onFetchRef={handleFetchRef}
           columns={columnsWithSelection}
           endpoint={ApiEndpoints.GET_CREDIT_CARD}
           filters={filters}

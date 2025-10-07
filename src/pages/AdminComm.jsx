@@ -17,6 +17,8 @@ import ReButton from "../components/common/ReButton";
 import { apiCall } from "../api/apiClient";
 import CreateAdminComm from "../components/AdminComm/CreateAdminComm";
 import EditAdminCommission from "../components/AdminComm/EditAdminCommission";
+import DeleteIcon from "@mui/icons-material/Delete";
+
 const AdminComm = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
@@ -180,6 +182,15 @@ const AdminComm = ({ query }) => {
                   onClick={() => handleEditClick(row)}
                 >
                   <Edit fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Delete">
+                <IconButton
+                  color="error"
+                  size="small"
+                  // onClick={() => handleDeleteClick(row)}
+                >
+                  <DeleteIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
             </Box>

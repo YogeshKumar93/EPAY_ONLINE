@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import {
+  Autocomplete,
   Box,
   Divider,
   TextField,
@@ -23,6 +24,7 @@ const SuperTransfer = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [mobile, setMobile] = useState("");
+  const [history, setHistory] = useState([]);
   const [sender, setSender] = useState(null);
   const [openRegisterModal, setOpenRegisterModal] = useState(false);
   const [openVerifyModal, setOpenVerifyModal] = useState(false);
@@ -30,6 +32,19 @@ const SuperTransfer = () => {
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem("mobileNumbers") || "[]");
+    setHistory(saved);
+  }, []);
+
+  // Save new number to history
+  const saveMobileToHistory = (number) => {
+    if (!history.includes(number)) {
+      const updated = [...history, number];
+      setHistory(updated);
+      localStorage.setItem("mobileNumbers", JSON.stringify(updated));
+    }
+  };
   // Fetch sender by mobile number
   const handleFetchSender = async (number = mobile) => {
     if (!number || number.length !== 10) return;
@@ -82,13 +97,14 @@ const SuperTransfer = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleChange = (e) => {
-    const value = e.target.value.replace(/\D/g, ""); // only digits allowed
+  const handleChange = (e, newValue) => {
+    const value = (newValue || "").replace(/\D/g, "");
 
     if (value.length <= 10) {
       setMobile(value);
 
       if (value.length === 10) {
+        saveMobileToHistory(value);
         handleFetchSender(value);
       } else {
         // clear data if input is not 10 digits
@@ -113,14 +129,21 @@ const SuperTransfer = () => {
         gap={1}
         mb={1}
       >
-        <TextField
-          label="Mobile Number"
-          variant="outlined"
+        <Autocomplete
+          freeSolo
+          options={history}
           value={mobile}
-          onChange={handleChange}
-          inputProps={{ maxLength: 10 }}
+          onInputChange={handleChange}
           sx={{ flex: 1 }}
-          fullWidth
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Mobile Number"
+              variant="outlined"
+              inputProps={{ ...params.inputProps, maxLength: 10 }}
+              fullWidth
+            />
+          )}
         />
 
         <Box
@@ -141,8 +164,6 @@ const SuperTransfer = () => {
         <TextField
           label="Account Number"
           variant="outlined"
-          // value={account}
-          // onChange={(e) => setAccount(e.target.value.replace(/\D/g, ""))}
           inputProps={{ maxLength: 18 }}
           sx={{ flex: 1 }}
           fullWidth
@@ -160,7 +181,6 @@ const SuperTransfer = () => {
           />
         )}
       </Box>
-
       <Box display="flex" flexDirection="column" gap={1}>
         {/* Sender Details */}
         <Box width="100%">

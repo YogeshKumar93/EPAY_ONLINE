@@ -1,4 +1,11 @@
-import { useMemo, useCallback, useContext, useState, useEffect } from "react";
+import {
+  useMemo,
+  useCallback,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
 import {
   Box,
   Tooltip,
@@ -105,6 +112,10 @@ const MatmTxn = ({ query }) => {
       console.error("Excel export failed:", error);
       alert("Failed to export Excel");
     }
+  };
+  const fetchUsersRef = useRef(null);
+  const handleFetchRef = (fetchFn) => {
+    fetchUsersRef.current = fetchFn;
   };
   const refreshPlans = () => {
     if (fetchUsersRef.current) {
@@ -369,6 +380,7 @@ const MatmTxn = ({ query }) => {
   return (
     <>
       <CommonTable
+        onFetchRef={handleFetchRef}
         columns={columnsWithSelection}
         endpoint={ApiEndpoints.GET_MATM_TXN}
         filters={filters}
