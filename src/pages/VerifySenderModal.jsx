@@ -49,7 +49,7 @@ const VerifySenderModal = ({ open, onClose, mobile, otpRef, otpData }) => {
   const handleVerify = async () => {
     const enteredOtp = otp.join("");
     if (enteredOtp.length < 6) {
-      apiErrorToast("Please enter full 6-digit OTP");
+      showToast("Please enter full 6-digit OTP", "error");
       return;
     }
 

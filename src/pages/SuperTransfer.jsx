@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   Box,
+  Divider,
   TextField,
   Typography,
   useMediaQuery,
@@ -28,7 +29,7 @@ const SuperTransfer = () => {
   const [otpData, setOtpData] = useState(null);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
   const [loading, setLoading] = useState(false);
- const {showToast} = useToast();
+  const { showToast } = useToast();
   // Fetch sender by mobile number
   const handleFetchSender = async (number = mobile) => {
     if (!number || number.length !== 10) return;
@@ -38,8 +39,8 @@ const SuperTransfer = () => {
     const { error, response } = await apiCall("post", ApiEndpoints.GET_SENDER, {
       mobile_number: number,
     });
-  // stop loader
-   setLoading(false);
+    // stop loader
+    setLoading(false);
     if (response) {
       // ✅ success path
       const data = response?.data || response?.response?.data;
@@ -71,7 +72,6 @@ const SuperTransfer = () => {
       } else {
         showToast(error?.message || "Something went wrong");
       }
-       
     }
   };
 
@@ -106,16 +106,46 @@ const SuperTransfer = () => {
   return (
     <Box>
       {/* Always show mobile input */}
-      <Box>
+      <Box
+        display="flex"
+        flexDirection={{ xs: "column", sm: "row" }}
+        alignItems="center"
+        gap={1}
+        mb={1}
+      >
         <TextField
           label="Mobile Number"
           variant="outlined"
-          fullWidth
           value={mobile}
-          autoComplete="on" // <-- enable autocomplete for phone numbers
           onChange={handleChange}
           inputProps={{ maxLength: 10 }}
-          sx={{ mb: 1 }}
+          sx={{ flex: 1 }}
+          fullWidth
+        />
+
+        <Box
+          sx={{
+            display: { xs: "flex", sm: "none" },
+            justifyContent: "center",
+            width: "100%",
+            my: 0.5,
+          }}
+        >
+          <Divider sx={{ width: "30%", textAlign: "center" }}>
+            <Typography variant="body2" color="text.secondary">
+              OR
+            </Typography>
+          </Divider>
+        </Box>
+
+        <TextField
+          label="Account Number"
+          variant="outlined"
+          // value={account}
+          // onChange={(e) => setAccount(e.target.value.replace(/\D/g, ""))}
+          inputProps={{ maxLength: 18 }}
+          sx={{ flex: 1 }}
+          fullWidth
         />
         {loading && (
           <CommonLoader
@@ -130,18 +160,19 @@ const SuperTransfer = () => {
           />
         )}
       </Box>
+
       <Box display="flex" flexDirection="column" gap={1}>
         {/* Sender Details */}
         <Box width="100%">
           <SenderDetails sender={sender} />
 
-           {selectedBeneficiary && (
-      <BeneficiaryDetails
-        beneficiary={selectedBeneficiary}
-        senderMobile={mobile}
-        sender={sender}
-      />
-    )} 
+          {selectedBeneficiary && (
+            <BeneficiaryDetails
+              beneficiary={selectedBeneficiary}
+              senderMobile={mobile}
+              sender={sender}
+            />
+          )}
         </Box>
 
         {/* Beneficiary List */}

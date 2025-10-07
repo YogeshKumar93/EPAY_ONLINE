@@ -35,6 +35,7 @@ export const navConfig = [
     icon2: "📊",
     to: {
       adm: "/admin/dashboard",
+      sadm: "/admin/dashboard",
       ret: "/customer/dashboard",
       dd: "/customer/dashboard",
       di: "/di/dashboard",
@@ -43,7 +44,7 @@ export const navConfig = [
       zsm: "/zsm/dashboard",
       api: "/api/dashboard",
     },
-    roles: ["adm", "ret", "di", "md", "asm", "zsm", "api", "dd"],
+    roles: ["sadm", "adm", "ret", "di", "md", "asm", "zsm", "api", "dd"],
   },
 
   // Manage Users
@@ -53,11 +54,12 @@ export const navConfig = [
     icon2: "👥",
     to: {
       adm: "/admin/users",
+      sadm: "/admin/users",
       asm: "/asm/users",
       zsm: "/zsm/users",
       md: "/md/users",
     },
-    roles: ["adm"],
+    roles: ["adm", "sadm", "asm", "zsm", "md"],
   },
 
   // Recharge & Bill Payments
@@ -171,13 +173,14 @@ export const navConfig = [
     icon2: "🛠️",
     to: {
       adm: "/admin/fund-request",
+      sadm: "/admin/fund-request",
       ret: "/customer/fund-request",
       dd: "/customer/fund-request",
       md: "/md/fund-request",
       api: "/api/fund-request",
-      di:"/di/fund-request",
+      di: "/di/fund-request",
     },
-    roles: ["adm", "ret", "md", "api", "dd","di"],
+    roles: ["sadm", "adm", "ret", "md", "api", "dd", "di"],
     permissionKey: "fund_req",
   },
 
@@ -188,6 +191,7 @@ export const navConfig = [
     icon2: "💳",
     to: {
       adm: "/admin/transactions",
+      sadm: "/admin/transactions",
       ret: "/customer/transactions",
       dd: "/customer/transactions",
       di: "/di/transactions",
@@ -196,7 +200,7 @@ export const navConfig = [
       api: "/api/transcations",
       md: "/md/transcations",
     },
-    roles: ["adm", "ret", "di", "asm", "zsm", "api", "md", "dd"],
+    roles: ["sadm", "adm", "ret", "di", "asm", "zsm", "api", "md", "dd"],
   },
 
   {
@@ -205,9 +209,10 @@ export const navConfig = [
     icon2: "🏦",
     to: {
       adm: "/admin/bankings",
+      sadm: "/admin/bankings",
     },
     permissionKey: "banking",
-    roles: ["adm"],
+    roles: ["adm", "sadm"],
   },
 
   // Services
@@ -217,10 +222,11 @@ export const navConfig = [
     icon2: "🛠️",
     to: {
       adm: "/admin/services",
+      sadm: "/admin/services",
       ret: "/customer/allServices",
       dd: "/customer/allServices",
     },
-    roles: ["adm", "ret", "dd"],
+    roles: ["adm", "ret", "dd", "sadm"],
   },
 
   // Wallet Ledger
@@ -230,6 +236,7 @@ export const navConfig = [
     icon2: "📒",
     to: {
       adm: "/admin/wallet-ledger",
+      sadm: "/admin/wallet-ledger",
       ret: "/customer/wallet-ledger",
       dd: "/customer/wallet-ledger",
       di: "/di/wallet-ledger",
@@ -237,7 +244,7 @@ export const navConfig = [
       zsm: "/zsm/wallet-ledger",
       md: "/md/wallet-ledger",
     },
-    roles: ["adm", "ret", "di", "asm", "zsm", "md", "dd"],
+    roles: ["sadm", "adm", "ret", "di", "asm", "zsm", "md", "dd"],
   },
 
   // Settings
@@ -247,9 +254,10 @@ export const navConfig = [
     icon2: "⚙️",
     to: {
       adm: "/admin/settings",
+      sadm: "/admin/settings",
     },
     permissionKey: "settings",
-    roles: ["adm"],
+    roles: ["adm", "sadm"],
   },
 
   // Complaint
@@ -259,11 +267,12 @@ export const navConfig = [
     icon2: "📝",
     to: {
       adm: "/admin/complaint",
+      sadm: "/admin/complaint",
       ret: "/customer/complaint",
       dd: "/customer/complaint",
       api: "/api/complaint",
     },
-    roles: ["adm", "ret", "api", "dd"],
+    roles: ["adm", "ret", "api", "dd", "sadm"],
   },
 
   // Risk
@@ -273,11 +282,12 @@ export const navConfig = [
     icon2: "⚠️",
     to: {
       adm: "/admin/risk",
+      sadm: "/admin/risk",
       ret: "/customer/risk",
       dd: "/customer/risk",
       di: "/di/risk",
     },
-    roles: ["adm", "ret", "di", "dd"],
+    roles: ["adm", "di", "sadm"],
   },
 
   // Login History
@@ -287,6 +297,7 @@ export const navConfig = [
     icon2: "📱",
     to: {
       adm: "/admin/login_history",
+      sadm: "/admin/login_history",
       ret: "/customer/login_history",
       dd: "/customer/login_history",
       di: "/di/login_history",
@@ -294,7 +305,7 @@ export const navConfig = [
       zsm: "/zsm/login_history",
       md: "/md/login_history",
     },
-    roles: ["adm", "ret", "di", "asm", "zsm", "md", "dd"],
+    roles: ["adm", "ret", "di", "asm", "zsm", "md", "dd", "sadm"],
   },
 
   {

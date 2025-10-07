@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   Box,
+  Divider,
   TextField,
   Typography,
   useMediaQuery,
@@ -117,16 +118,46 @@ const LevinFundTransfer = () => {
   return (
     <Box>
       {/* Always show mobile input */}
-      <Box>
+      <Box
+        display="flex"
+        flexDirection={{ xs: "column", sm: "row" }}
+        alignItems="center"
+        gap={1}
+        mb={1}
+      >
         <TextField
           label="Mobile Number"
           variant="outlined"
-          fullWidth
           value={mobile}
-          autoComplete="on" // <-- enable autocomplete for phone numbers
           onChange={handleChange}
           inputProps={{ maxLength: 10 }}
-          sx={{ mb: 1 }}
+          sx={{ flex: 1 }}
+          fullWidth
+        />
+
+        <Box
+          sx={{
+            display: { xs: "flex", sm: "none" },
+            justifyContent: "center",
+            width: "100%",
+            my: 0.5,
+          }}
+        >
+          <Divider sx={{ width: "30%", textAlign: "center" }}>
+            <Typography variant="body2" color="text.secondary">
+              OR
+            </Typography>
+          </Divider>
+        </Box>
+
+        <TextField
+          label="Account Number"
+          variant="outlined"
+          // value={account}
+          // onChange={(e) => setAccount(e.target.value.replace(/\D/g, ""))}
+          inputProps={{ maxLength: 18 }}
+          sx={{ flex: 1 }}
+          fullWidth
         />
         {loading && (
           <CommonLoader
@@ -183,6 +214,8 @@ const LevinFundTransfer = () => {
           mobile={otpData.mobile_number}
           otpRef={otpData.otp_ref}
           otpData={otpData}
+          onSuccess={handleFetchSender}
+          sender={sender}
         />
       )}
     </Box>

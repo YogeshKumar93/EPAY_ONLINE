@@ -74,10 +74,9 @@ const LevinRegisterRemitter = ({ open, onClose, mobile, onRegistered }) => {
           state, // Add the state to the onRegistered payload
           sender_id,
         });
-
         onClose();
       } else {
-        showToast(error?.message || "Failed to register sender", "error");
+        showToast(error?.message, "error");
       }
     } catch (err) {
       setErrors(err?.response?.data?.errors || {});

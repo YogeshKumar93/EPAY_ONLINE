@@ -117,7 +117,7 @@ const QrLoginPage = () => {
               break;
             case "ret":
             case "dd":
-              navigate("/customer/dashboard");
+              navigate("/customer/allServices");
               break;
             case "md":
               navigate("/md/dashboard");

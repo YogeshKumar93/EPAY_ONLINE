@@ -30,7 +30,7 @@ const FOOTER_STYLES = {
   textAlign: "center",
   py: { xs: 2, sm: 1.5 },
   px: { xs: 1, sm: 2 },
-  backgroundColor: "#2275b7",
+  backgroundColor: "#7a4dff",
   color: "#d4e8e8",
   borderRadius: "10px",
   mt: 4,
@@ -88,7 +88,7 @@ const AdminLayoutWrapper = ({ desktopOpen }) => {
         >
           © 2025{" "}
           <Box component="span" sx={{ fontWeight: 700 }}>
-            JITO FINTECH LLP.
+            PSPKA SERVICES PRIVATE LIMITED{" "}
           </Box>{" "}
           All Rights Reserved.
         </Typography>
