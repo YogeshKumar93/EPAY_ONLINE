@@ -1,12 +1,12 @@
 // api/apiClient.js
 import axios from "axios";
 import { BASE_URL } from "./ApiEndpoints";
-import { getToken, clearToken } from "../contexts/AuthContext"; 
+import { getToken, clearToken } from "../contexts/AuthContext";
 import { forceLogout } from "../utils/forceLogout";
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
-  timeout: 20000,
+  timeout: 180000,
   headers: {
     "Content-Type": "application/json",
   },
@@ -34,7 +34,7 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error),
+  (error) => Promise.reject(error)
 );
 
 apiClient.interceptors.response.use(
@@ -44,7 +44,7 @@ apiClient.interceptors.response.use(
       forceLogout();
     }
     return Promise.reject(error);
-  },
+  }
 );
 
 export const apiCall = async (method, url, data = null, params = null) => {
@@ -64,7 +64,11 @@ export const apiCall = async (method, url, data = null, params = null) => {
       data = { api_token: token || "", client_ref: clientRef };
     }
 
-    params = { ...(params || {}), api_token: token || "", client_ref: clientRef };
+    params = {
+      ...(params || {}),
+      api_token: token || "",
+      client_ref: clientRef,
+    };
 
     const key = JSON.stringify({ method, url, data, params });
 

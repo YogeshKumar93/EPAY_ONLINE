@@ -301,7 +301,7 @@ const FundRequest = () => {
                     </Tooltip>
                   </MuiBox>
                 )}
-                {row.status === "rejected" && (
+                {/* {row.status === "rejected" && (
                   <Tooltip title="Reopen">
                     <OpenInFullIcon
                       fontSize="small"
@@ -310,7 +310,7 @@ const FundRequest = () => {
                       style={{ cursor: "pointer" }}
                     />
                   </Tooltip>
-                )}
+                )} */}
               </>
             )}
           </MuiBox>
@@ -324,19 +324,19 @@ const FundRequest = () => {
   // Filters
   const filters = useMemo(
     () => [
-      {
-        id: "status",
-        label: "Status",
-        type: "dropdown",
-        options: [
-          { value: "success", label: "Success" },
-          { value: "refund", label: "Refund" },
-          { value: "pending", label: "Pending" },
-          { value: "approved", label: "Approved" },
-          { value: "rejected", label: "Rejected" },
-        ],
-        defaultValue: "pending",
-      },
+      // {
+      //   id: "status",
+      //   label: "Status",
+      //   type: "dropdown",
+      //   options: [
+      //     // { value: "success", label: "Success" },
+      //     // { value: "refund", label: "Refund" },
+      //     { value: "pending", label: "Pending" },
+      //     { value: "approved", label: "Approved" },
+      //     { value: "rejected", label: "Rejected" },
+      //   ],
+      //   defaultValue: "pending",
+      // },
       { id: "date_range", type: "daterange" },
     ],
     []

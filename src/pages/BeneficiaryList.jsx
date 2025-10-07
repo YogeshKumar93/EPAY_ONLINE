@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import {
   Box,
   Card,
@@ -55,6 +55,7 @@ import {
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import BeneficiaryDetails from "./BeneficiaryDetails";
 import { useToast } from "../utils/ToastContext";
+import AuthContext from "../contexts/AuthContext";
 
 const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
   const theme = useTheme();
@@ -66,6 +67,7 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
   const [openPayModal, setOpenPayModal] = useState(false);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
   const [searchText, setSearchText] = useState("");
+  const { location } = useContext(AuthContext);
 
   const handleOpenPay = (beneficiary) => {
     setSelectedBeneficiary(beneficiary);
@@ -87,7 +89,7 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
     setSubmitting(true);
     setErrors({});
     try {
-      const payload = { ...formData, sender_id: sender.id,type:"BANK" };
+      const payload = { ...formData, sender_id: sender.id, type: "BANK" };
       const { response, error } = await apiCall(
         "post",
         ApiEndpoints.CREATE_BENEFICIARY,
@@ -111,6 +113,72 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
       setSubmitting(false);
     }
   };
+  // const handleAddAndVerifyBeneficiary = async () => {
+  //   setSubmitting(true);
+  //   setErrors({});
+  //   try {
+  //     // Step 1: Call verify beneficiary API
+  //     const verifyPayload = {
+  //       ...formData,
+  //       sender_id: sender.id,
+  //       latitude: location?.lat || "",
+  //       longitude: location?.long || "",
+  //       operator: 18,
+  //       mobile_number: sender?.mobile_number,
+  //       ben_acc: formData.account_number,
+  //       ifsc: formData.ifsc_code,
+  //       ben_name: formData.beneficiary_name,
+  //       mpin: 856698,
+  //     };
+  //     const { response: verifyResponse, error: verifyError } = await apiCall(
+  //       "post",
+  //       ApiEndpoints.DMT1_VERIFY_BENEFICIARY,
+  //       verifyPayload
+  //     );
+
+  //     if (!verifyResponse) {
+  //       showToast(
+  //         verifyError?.errors || "Failed to verify beneficiary",
+  //         "error"
+  //       );
+  //       return;
+  //     }
+
+  //     // Get the beneficiary name from verify API response
+  //     const verifiedName =
+  //       verifyResponse?.beneficiary_name || formData.beneficiary_name;
+
+  //     // Step 2: Call create beneficiary API with verified name
+  //     const createPayload = {
+  //       sender_id: sender.id,
+  //       type: "BANK",
+  //       ben_acc: formData.account_number,
+  //       ifsc: formData.ifsc_code,
+  //       ben_name: verifiedName,
+  //     };
+
+  //     const { response: createResponse, error: createError } = await apiCall(
+  //       "post",
+  //       ApiEndpoints.CREATE_BENEFICIARY,
+  //       createPayload
+  //     );
+
+  //     if (createResponse) {
+  //       okSuccessToast(
+  //         createResponse?.message || "Beneficiary added successfully"
+  //       );
+  //       setOpenModal(false);
+  //       onSuccess?.(sender.mobile_number);
+  //     } else {
+  //       showToast(createError?.errors || "Failed to add beneficiary", "error");
+  //     }
+  //   } catch (error) {
+  //     showToast(error, "error");
+  //     setErrors(error?.response?.data?.errors || {});
+  //   } finally {
+  //     setSubmitting(false);
+  //   }
+  // };
 
   const handleDeleteBeneficiary = async (beneficiaryId) => {
     try {
@@ -459,6 +527,14 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
               disabled: submitting,
               sx: { borderRadius: 1 },
             },
+            // {
+            //   text: submitting ? "Saving..." : "Add & Verify Beneficiary",
+            //   variant: "contained",
+            //   color: "primary",
+            //   onClick: handleAddAndVerifyBeneficiary, // ✅ call new function
+            //   disabled: submitting,
+            //   sx: { borderRadius: 1 },
+            // },
           ]}
         />
       )}

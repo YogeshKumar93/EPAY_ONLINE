@@ -232,16 +232,12 @@ const Dmt = () => {
                 </Box>
               ) : (
                 // Only show when no 2FA and no register modal
-                <Box
-                  display="flex"
-                  flexDirection={{ xs: "column", md: "row" }}
-                  gap={0.5}
-                >
-                  <Box flex="0 0 30%" display="flex" flexDirection="column">
+                <Box display="flex" flexDirection="column" gap={2}>
+                  <Box width="100%">
                     <RemitterDetails sender={sender} />
                   </Box>
 
-                  <Box flex="0 0 70%">
+                  <Box width="100%">
                     <Beneficiaries
                       sender={sender}
                       onSuccess={handleFetchSender}

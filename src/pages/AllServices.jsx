@@ -647,6 +647,7 @@ export default function AllServices() {
     setActiveMenu(null); // 👈 forcefully null
   };
   const activeMenuData = menuData.find((m) => m.key === activeMenu) || null;
+  const isScrollable = currentView && currentView.component;
 
   return (
     <Box
@@ -655,7 +656,15 @@ export default function AllServices() {
         backgroundColor: "#F5F4FA",
       }}
     >
-      <Grid container spacing={3} sx={{ mb: 2 }}>
+      <Grid
+        container
+        spacing={3}
+        sx={{
+          mb: 2,
+          flexWrap: currentView?.component ? "nowrap" : "wrap", // only collapse to single row if component opened
+          overflowX: currentView?.component ? "auto" : "unset", // scrollable only if component opened
+        }}
+      >
         {menuData.map((menu) => (
           <Grid
             item
@@ -664,7 +673,11 @@ export default function AllServices() {
             sm={3}
             md={2.4}
             lg={2}
-            sx={{ display: "flex", justifyContent: "center" }}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              minWidth: currentView?.component ? "120px" : "auto", // optional, to prevent shrinking
+            }}
           >
             <MenuCard
               icon={menu.icon}
@@ -676,6 +689,7 @@ export default function AllServices() {
           </Grid>
         ))}
       </Grid>
+
       {!activeMenu && (
         <Box
           sx={{

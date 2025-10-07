@@ -997,6 +997,9 @@ const SelectedBeneficiary = ({
                               color="primary"
                               onClick={() => handleModeClick(row.id, "IMPS")}
                               size="small"
+                              disabled={
+                                row.otp.length !== 6 || row.mpin.length !== 6
+                              } // ✅ Disable if OTP or M-PIN not complete
                               sx={{
                                 flex: 1,
                                 height: 36,
@@ -1022,6 +1025,9 @@ const SelectedBeneficiary = ({
                               color="primary"
                               onClick={() => handleModeClick(row.id, "NEFT")}
                               size="small"
+                              disabled={
+                                row.otp.length !== 6 || row.mpin.length !== 6
+                              } // ✅ Disable if OTP or M-PIN not complete
                               sx={{
                                 flex: 1,
                                 height: 36,
