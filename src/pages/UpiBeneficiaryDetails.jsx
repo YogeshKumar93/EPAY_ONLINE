@@ -144,11 +144,18 @@ const UpiBeneficiaryDetails = ({
 
       <TextField
         label="Amount"
-        type="number"
+        type="text"
+         variant="outlined"
         size="small"
         fullWidth
         value={amount}
-        onChange={(e) => setAmount(e.target.value)}
+        onChange={(e) => {
+                          const val = e.target.value;
+                          if (/^\d*$/.test(val)) {
+                            // allow only numbers
+                            setAmount(val);
+                          }
+                        }}
       />
 
       <Box>

@@ -240,9 +240,15 @@ const Prepaid = () => {
                     >
                       <TextField
                         label="Amount"
-                        type="number"
+                        type="text"
                         value={manualAmount}
-                        onChange={(e) => setManualAmount(e.target.value)}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (/^\d*$/.test(val)) {
+                            // allow only numbers
+                            setManualAmount(val);
+                          }
+                        }}
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start">₹</InputAdornment>

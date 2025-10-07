@@ -87,9 +87,15 @@ const W2W1Transfer = ({ filters = [] }) => {
       <Box sx={{ display: "flex", gap: 2, mb: 3, alignItems: "center" }}>
         <TextField
           label="Amount"
-          type="number"
+          type="text"
           value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          onChange={(e) => {
+                          const val = e.target.value;
+                          if (/^\d*$/.test(val)) {
+                            // allow only numbers
+                            setAmount(val);
+                          }
+                        }}
           fullWidth
           sx={{
             "& .MuiOutlinedInput-root": {

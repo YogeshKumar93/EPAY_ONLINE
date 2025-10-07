@@ -125,9 +125,14 @@ const CreditCardBillPayment = ({
           />
           <TextField
             label="Amount"
-            type="number"
+            type="text"
             value={formValues.amount}
-            onChange={(e) => handleChange("amount", e.target.value)}
+onChange={(e) => {
+  const val = e.target.value;
+  if (/^\d*$/.test(val)) {
+    handleChange("amount", val);
+  }
+}}
             fullWidth
             error={!!formErrors.amount}
             helperText={formErrors.amount}

@@ -212,17 +212,20 @@ const BeneficiaryDetails = ({
       {/* Amount with OTP button */}
       <TextField
         label="Amount"
-        type="number"
+        type="text"
+        variant="outlined"
         size="small"
         fullWidth
         value={amount}
         onChange={(e) => {
           const value = e.target.value;
+            if (/^\d*$/.test(value)) {
           if (parseFloat(value) > parseFloat(sender?.rem_limit || 0)) {
             apiErrorToast("Exceeds Rem Limit");
             return;
           }
           setAmount(value);
+        }
         }}
         InputProps={
           {

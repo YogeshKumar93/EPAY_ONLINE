@@ -109,13 +109,37 @@ const CreateFundRequest = ({ open, handleClose, handleSave }) => {
   let visibleFields = schema.filter((field) =>
     requiredFields.includes(field.name)
   );
+
+ const amountField = {
+    name: "amount",
+    label: "Amount",
+    type: "text",
+    props: {
+      inputMode: "numeric",
+      pattern: "[0-9]*",
+    },
+  };
+
   const dateField = {
     name: "date",
     label: "Date",
     type: "datepicker",
     props: { disableFuture: true, format: "DD/MM/YYYY" },
   };
-  visibleFields = visibleFields.map((f) => (f.name === "date" ? dateField : f));
+
+    visibleFields = visibleFields.map((f) => {
+    if (f.name === "amount") return amountField;
+    if (f.name === "date") return dateField;
+    return f;
+  });
+
+    const isFormValidForSave = requiredFields.every((field) => {
+    const value = formData[field];
+    if (field === "amount") {
+      return value && /^\d+$/.test(value) && Number(value) > 0;
+    }
+    return value && value.toString().trim() !== "";
+  });
 
   return (
     <>

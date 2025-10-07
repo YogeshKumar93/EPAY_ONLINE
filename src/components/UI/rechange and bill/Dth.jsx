@@ -249,11 +249,13 @@ const Dth = () => {
                 <TextField
                   fullWidth
                   label="Amount"
-                  type="number"
+                  type="text"
                   value={manualAmount}
                   onChange={(e) => {
                     const val = e.target.value;
-                    if (/^\d*\.?\d*$/.test(val)) setManualAmount(val);
+                    if (/^\d*\.?\d*$/.test(val)) {
+                      setManualAmount(val);
+                    }
                   }}
                   InputProps={{
                     startAdornment: (
