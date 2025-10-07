@@ -16,7 +16,14 @@ import ApiEndpoints from "../api/ApiEndpoints";
 import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
 import { useToast } from "../utils/ToastContext";
 
-const LevinVerifySender = ({ open, onClose, mobile, otpData }) => {
+const LevinVerifySender = ({
+  open,
+  onClose,
+  mobile,
+  otpData,
+  onSuccess,
+  sender,
+}) => {
   const [otp, setOtp] = useState(["", "", "", ""]); // Changed to 4 digits
   const inputRefs = useRef([]);
   const { showToast } = useToast();
@@ -73,6 +80,7 @@ const LevinVerifySender = ({ open, onClose, mobile, otpData }) => {
       if (response) {
         okSuccessToast(response?.message || "Sender verified successfully");
         onClose();
+        onSuccess?.(mobile); // ✅ Always use the verified mobile number
       } else {
         showToast(error?.message || "Failed to verify sender", "error");
       }

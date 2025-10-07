@@ -18,14 +18,7 @@ import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { useToast } from "../utils/ToastContext";
 
-const LevinRegisterRemitter = ({
-  open,
-  onClose,
-  mobile,
-  onRegistered,
-  onSuccess,
-  sender,
-}) => {
+const LevinRegisterRemitter = ({ open, onClose, mobile, onRegistered }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const { showToast } = useToast();
@@ -81,11 +74,9 @@ const LevinRegisterRemitter = ({
           state, // Add the state to the onRegistered payload
           sender_id,
         });
-        onSuccess?.(sender.mobile);
-
         onClose();
       } else {
-        showToast(error?.message || "Failed to register sender", "error");
+        showToast(error?.message, "error");
       }
     } catch (err) {
       setErrors(err?.response?.data?.errors || {});
