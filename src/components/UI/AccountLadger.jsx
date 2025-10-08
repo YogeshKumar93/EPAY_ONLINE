@@ -11,6 +11,7 @@ import CommonLoader from "../common/CommonLoader";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { RemoveRedEye } from "@mui/icons-material";
 import WalletTxnData from "../WalletTxnData";
+import { apiCall } from "../../api/apiClient";
 
 const AccountLadger = ({ query }) => {
   const authCtx = useContext(AuthContext);
@@ -18,7 +19,8 @@ const AccountLadger = ({ query }) => {
   const [loading, setLoading] = useState(true); // initially true
   const [selectedRowId, setSelectedRowId] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
-  
+    const [services, setServices] = useState([]);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false); // stop loader after data is ready
@@ -27,12 +29,35 @@ const AccountLadger = ({ query }) => {
     return () => clearTimeout(timer);
   }, []);
 
+
+  
+   const fetchServices = async () => {
+      try {
+        const { response } = await apiCall("POST", ApiEndpoints.GET_SERVICES);
+        if (response?.data) {
+          setServices(
+            response?.data.map((service) => ({
+              value: service.name, // ✅ send name in payload
+              label: service.name || `Service ${service.name}`,
+            }))
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching services:", error);
+      }
+    };
+     useEffect(() => {
+   
+    fetchServices();
+  }, []);
+
   const filters = useMemo(
     () => [
       {
-        id: "user_id",
-        label: "User Name",
-        type: "textfield",
+        id: "service_name",
+        label: "Service Name",
+        type: "dropdown",
+        options: services,
       },
       {
         id: "date_range",
@@ -45,7 +70,7 @@ const AccountLadger = ({ query }) => {
         type: "textfield",
       },
     ],
-    []
+    [services]
   );
 
   const columns = useMemo(
