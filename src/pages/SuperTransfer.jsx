@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import {
   Autocomplete,
   Box,
+  Button,
   Divider,
   TextField,
   Typography,
@@ -31,13 +32,15 @@ const SuperTransfer = () => {
   const [otpData, setOtpData] = useState(null);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(""); // ✅ New state
   const { showToast } = useToast();
+  const [payoutResponse, setPayoutResponse] = useState(null); // store API response
+
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("mobileNumbers") || "[]");
     setHistory(saved);
   }, []);
 
-  // Save new number to history
   const saveMobileToHistory = (number) => {
     if (!history.includes(number)) {
       const updated = [...history, number];
@@ -45,37 +48,28 @@ const SuperTransfer = () => {
       localStorage.setItem("mobileNumbers", JSON.stringify(updated));
     }
   };
-  // Fetch sender by mobile number
+
   const handleFetchSender = async (number = mobile) => {
     if (!number || number.length !== 10) return;
 
-    setLoading(true); // start loader
-
+    setLoading(true);
     const { error, response } = await apiCall("post", ApiEndpoints.GET_SENDER, {
       mobile_number: number,
     });
-    // stop loader
     setLoading(false);
+
     if (response) {
-      // ✅ success path
       const data = response?.data || response?.response?.data;
 
-      if (response)
-        if (data && data?.is_active === 1) {
-          // okSuccessToast(response.message || "Sender fetched successfully");
-
-          setSender(data);
-          setOpenRegisterModal(false);
-        } else {
-          setSender(null);
-          setOpenRegisterModal(true);
-        }
+      if (data && data?.is_active === 1) {
+        setSender(data);
+        setOpenRegisterModal(false);
+      } else {
+        setSender(null);
+        setOpenRegisterModal(true);
+      }
     } else if (error) {
-      // ❌ error path
-      console.log("error from API:", error);
-
       if (error?.message === "The number is inactive") {
-        // 👉 open verify modal instead of register
         setSender(null);
         setOpenRegisterModal(false);
 
@@ -90,16 +84,8 @@ const SuperTransfer = () => {
     }
   };
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
   const handleChange = (e, newValue) => {
     const value = (newValue || "").replace(/\D/g, "");
-
     if (value.length <= 10) {
       setMobile(value);
 
@@ -107,7 +93,6 @@ const SuperTransfer = () => {
         saveMobileToHistory(value);
         handleFetchSender(value);
       } else {
-        // clear data if input is not 10 digits
         setSender(null);
         setSelectedBeneficiary(null);
       }
@@ -119,93 +104,144 @@ const SuperTransfer = () => {
     setOpenVerifyModal(true);
   };
 
+  const handlePayoutSuccess = (data) => {
+    console.log("Received in parent:", data);
+    setPayoutResponse(data);
+  };
+  useEffect(() => {
+    if (payoutResponse) {
+      console.log("Updated payoutResponse:", payoutResponse);
+    }
+  }, [payoutResponse]);
+
   return (
     <Box>
-      {/* Always show mobile input */}
-      <Box
-        display="flex"
-        flexDirection={{ xs: "column", sm: "row" }}
-        alignItems="center"
-        gap={1}
-        mb={1}
-      >
-        <Autocomplete
-          freeSolo
-          options={history}
-          value={mobile}
-          onInputChange={handleChange}
-          sx={{ flex: 1 }}
-          renderInput={(params) => (
+      {!payoutResponse ? (
+        <>
+          {/* Mobile Input + Account Number */}
+          <Box
+            display="flex"
+            flexDirection={{ xs: "column", sm: "row" }}
+            alignItems="center"
+            gap={1}
+            mb={1}
+          >
+            <Autocomplete
+              freeSolo
+              options={history}
+              value={mobile}
+              onInputChange={handleChange}
+              sx={{ flex: 1 }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Mobile Number"
+                  variant="outlined"
+                  inputProps={{ ...params.inputProps, maxLength: 10 }}
+                  fullWidth
+                />
+              )}
+            />
+
+            <Box
+              sx={{
+                display: { xs: "flex", sm: "none" },
+                justifyContent: "center",
+                width: "100%",
+                my: 0.5,
+              }}
+            >
+              <Divider sx={{ width: "30%", textAlign: "center" }}>
+                <Typography variant="body2" color="text.secondary">
+                  OR
+                </Typography>
+              </Divider>
+            </Box>
+
             <TextField
-              {...params}
-              label="Mobile Number"
+              label="Account Number"
               variant="outlined"
-              inputProps={{ ...params.inputProps, maxLength: 10 }}
+              inputProps={{ maxLength: 18 }}
+              sx={{ flex: 1 }}
               fullWidth
             />
-          )}
-        />
+            {loading && (
+              <CommonLoader
+                loading={loading}
+                size={24}
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  right: 16,
+                  transform: "translateY(-50%)",
+                }}
+              />
+            )}
+          </Box>
 
-        <Box
-          sx={{
-            display: { xs: "flex", sm: "none" },
-            justifyContent: "center",
-            width: "100%",
-            my: 0.5,
-          }}
-        >
-          <Divider sx={{ width: "30%", textAlign: "center" }}>
-            <Typography variant="body2" color="text.secondary">
-              OR
-            </Typography>
-          </Divider>
-        </Box>
-
-        <TextField
-          label="Account Number"
-          variant="outlined"
-          inputProps={{ maxLength: 18 }}
-          sx={{ flex: 1 }}
-          fullWidth
-        />
-        {loading && (
-          <CommonLoader
-            loading={loading}
-            size={24}
-            sx={{
-              position: "absolute",
-              top: "50%",
-              right: 16,
-              transform: "translateY(-50%)",
-            }}
-          />
-        )}
-      </Box>
-      <Box display="flex" flexDirection="column" gap={1}>
-        {/* Sender Details */}
-        <Box width="100%">
-          <SenderDetails sender={sender} />
-
-          {selectedBeneficiary && (
-            <BeneficiaryDetails
-              beneficiary={selectedBeneficiary}
-              senderMobile={mobile}
+          <Box display="flex" flexDirection="column" gap={1}>
+            <SenderDetails sender={sender} />
+            {/* {selectedBeneficiary && (
+              <BeneficiaryDetails
+                open={!!selectedBeneficiary}
+                beneficiary={selectedBeneficiary}
+                senderMobile={mobile}
+                sender={sender}
+                senderId={sender?.id}
+                onPayoutSuccess={handlePayoutSuccess} // pass callback
+              />
+            )} */}
+            <BeneficiaryList
               sender={sender}
+              onSuccess={() => handleFetchSender()}
+              onSelect={(b) => setSelectedBeneficiary(b)}
+              onPayoutSuccess={handlePayoutSuccess} // ✅ callback passed
             />
-          )}
-        </Box>
+          </Box>
+        </>
+      ) : (
+        <Box p={3} bgcolor="#e0ffe0" borderRadius={2}>
+          <Typography variant="h6" color="success.main" mb={1}>
+            {payoutResponse?.message || "Transaction Successful"}
+          </Typography>
+          <Typography variant="body2">
+            <strong>Sender Mobile:</strong> {payoutResponse?.data?.mobileNumber}
+          </Typography>
+          <Typography variant="body2">
+            <strong>Beneficiary Name:</strong>{" "}
+            {payoutResponse?.data?.beneficiaryName}
+          </Typography>
+          <Typography variant="body2">
+            <strong>Account Number:</strong>{" "}
+            {payoutResponse?.data?.beneficiaryAccount}
+          </Typography>
+          <Typography variant="body2">
+            <strong>IFSC:</strong> {payoutResponse?.data?.ifscCode}
+          </Typography>
+          <Typography variant="body2">
+            <strong>Amount:</strong> {payoutResponse?.data?.transferAmount}
+          </Typography>
+          <Typography variant="body2">
+            <strong>Transfer Mode:</strong> {payoutResponse?.data?.transferMode}
+          </Typography>
 
-        {/* Beneficiary List */}
-        <Box width="100%">
-          <BeneficiaryList
-            sender={sender}
-            onSuccess={() => handleFetchSender()}
-            onSelect={(b) => setSelectedBeneficiary(b)}
-          />
-        </Box>
-      </Box>
+          <Typography variant="body2">
+            <strong>Running Balance:</strong>{" "}
+            {payoutResponse?.data?.runningBalance}
+          </Typography>
 
-      {/* Register Modal */}
+          <Box mt={2}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => setPayoutResponse(null)} // reset to allow new transaction
+            >
+              Repeat Txn
+            </Button>
+          </Box>
+        </Box>
+      )}
+
       {openRegisterModal && (
         <SenderRegisterModal
           open={openRegisterModal}
@@ -215,7 +251,6 @@ const SuperTransfer = () => {
         />
       )}
 
-      {/* Verify Modal */}
       {openVerifyModal && otpData && (
         <VerifySenderModal
           open={openVerifyModal}
