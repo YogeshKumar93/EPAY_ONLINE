@@ -79,6 +79,8 @@ import AepsLayout2 from "./AepsLayout2";
 import ComingSoon from "./ComingSoon";
 import CreditCardBillPayment from "../components/CrediCardPayment/CreditCardBill";
 import LevinFundTransfer from "./LevinFundTransfer";
+import CreditCardBbps from "../components/CrediCardPayment/CreditCardBbps";
+import BbpsBillers from "./BbpsBillers";
 
 const MenuCard = ({ icon, label, onClick, isActive, user }) => {
   return (
@@ -484,7 +486,7 @@ export default function AllServices() {
         {
           key: "pipe2",
           label: "Credit Card Bill(BBPS)",
-          component: CreditCardBillPayment,
+          component: CreditCardBbps,
           icon: CreditCardIcon,
           type: "C15",
         },
