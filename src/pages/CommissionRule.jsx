@@ -38,7 +38,7 @@ const CommissionRule = ({ query }) => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [rowToDelete, setRowToDelete] = useState(null);
-
+ const [services, setServices] = useState([]);
   const [plans, setPlans] = useState([]);
 
   const fetchUsersRef = useRef(null);
@@ -119,9 +119,27 @@ const CommissionRule = ({ query }) => {
     }
   };
 
+  const fetchServices = async () => {
+    try {
+      const { response } = await apiCall("POST", ApiEndpoints.GET_SERVICES);
+      if (response?.data) {
+        setServices(
+          response?.data.map((service) => ({
+            value: service.name, // ✅ send name in payload
+            label: service.name || `Service ${service.name}`,
+          }))
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching services:", error);
+    }
+  };
+  
   useEffect(() => {
     fetchPlans();
+    fetchServices();
   }, []);
+  
 
   // ✅ Filters with lazy loaded dropdown & plan_id selection
   const filters = useMemo(
@@ -131,11 +149,29 @@ const CommissionRule = ({ query }) => {
         label: "Plan",
         type: "dropdown",
         options: plans,
+
       },
-      { id: "service_name", label: "Service Name", type: "textfield" },
-      { id: "rule_type", label: "Rule Type", type: "textfield" },
+       {
+        id: "service_name",
+        label: "Service Name",
+        type: "dropdown",
+        options: services,
+      },
+      // { id: "service_name", label: "Service Name", type: "textfield" },
+      // { id: "rule_type", label: "Rule Type", type: "textfield" },
+      {
+        id: "rule_type",
+        label: "Rule Type",
+        type: "dropdown",
+        options: [
+          { value: "charge", label: "Charge" },
+          { value: "commission", label: "Commission" },
+        ],
+      },
     ],
-    [plans]
+
+    [plans,services]
+    
   );
 
   const handleSaveCreate = () => {
