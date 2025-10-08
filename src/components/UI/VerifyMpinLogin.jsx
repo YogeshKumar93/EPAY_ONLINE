@@ -386,9 +386,8 @@ const VerifyMpinLogin = ({
           } else if (userData.role === "di") {
             navigate("/di/dashboard");
           } else if (userData.role === "ret" || userData.role === "dd") {
-            navigate("/customer/dashboard");
-          }
-           else if (userData.role === "md" ) {
+            navigate("/customer/allServices");
+          } else if (userData.role === "md") {
             navigate("/md/dashboard");
           } else {
             navigate("/other/dashboard");
