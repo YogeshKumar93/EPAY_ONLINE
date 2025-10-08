@@ -48,6 +48,7 @@ const ViewEditFundRequestModal = ({ open, handleClose, row, onFetchRef }) => {
         bank_name: row.bank_name || "",
         mode: row.mode || "",
         remarks: row.remarks || row.remark || "",
+          admin_remark: row.admin_remark || row.admin_remark || "",
         bank_ref_id: row.bank_ref_id || "",
         amount: row.amount || "",
         date: row.date || "",
@@ -77,6 +78,10 @@ const ViewEditFundRequestModal = ({ open, handleClose, row, onFetchRef }) => {
     if (formData.remarks && formData.remarks.length > 200) {
       newErrors.remarks = "Remarks cannot exceed 200 characters";
     }
+        if (formData.admin_remark && formData.admin_remark.length > 200) {
+      newErrors.admin_remark = "Admin remark cannot exceed 200 characters";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -92,7 +97,8 @@ const ViewEditFundRequestModal = ({ open, handleClose, row, onFetchRef }) => {
     formDataToSend.append("bank_name", formData.bank_name);
     formDataToSend.append("mode", formData.mode);
     formDataToSend.append("remarks", formData.remarks);
-    formDataToSend.append("bank_ref_id", formData.bank_ref_id);
+        formDataToSend.append("admin_remark", formData.admin_remark);
+   formDataToSend.append("bank_ref_id", formData.bank_ref_id);
     formDataToSend.append("amount", formData.amount);
     formDataToSend.append("date", formData.date);
 
@@ -129,6 +135,7 @@ const ViewEditFundRequestModal = ({ open, handleClose, row, onFetchRef }) => {
     "date",
     "amount",
     "remarks",
+     "admin_remark",
     "receipt",
   ];
 
@@ -140,9 +147,13 @@ const ViewEditFundRequestModal = ({ open, handleClose, row, onFetchRef }) => {
       const baseField = { ...field };
 
       // Make non-editable fields disabled based on status
-      if (row?.status !== "pending" && field.name !== "remarks") {
+           if (
+        row?.status !== "pending" &&
+        !["remarks", "admin_remark"].includes(field.name)
+      ) {
         baseField.props = { ...baseField.props, disabled: true };
       }
+
 
       // Customize date field
       if (field.name === "date") {
@@ -158,16 +169,13 @@ const ViewEditFundRequestModal = ({ open, handleClose, row, onFetchRef }) => {
       }
 
       // Customize remarks field (always editable)
-      if (field.name === "remarks") {
+           if (["remarks", "admin_remark"].includes(field.name)) {
         return {
           ...baseField,
-          props: {
-            ...baseField.props,
-            multiline: true,
-            rows: 3,
-          },
+          props: { ...baseField.props, multiline: true, rows: 1 },
         };
       }
+
 
       return baseField;
     });

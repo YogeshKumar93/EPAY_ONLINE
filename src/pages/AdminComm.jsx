@@ -34,7 +34,7 @@ const AdminComm = ({ query }) => {
   const [rowToDelete, setRowToDelete] = useState(null);
 
   const [plans, setPlans] = useState([]);
-
+  const [services, setServices] = useState([]);
   const fetchUsersRef = useRef(null);
 
   const handleFetchRef = (fetchFn) => {
@@ -88,6 +88,23 @@ const AdminComm = ({ query }) => {
       console.error("Error fetching plans:", error);
     }
   };
+
+  const fetchServices = async () => {
+    try {
+      const { response } = await apiCall("POST", ApiEndpoints.GET_SERVICES);
+      if (response?.data) {
+        setServices(
+          response?.data.map((service) => ({
+            value: service.name, // ✅ send name in payload
+            label: service.name || `Service ${service.name}`,
+          }))
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching services:", error);
+    }
+  };
+
   const handleDeleteClick = (row) => {
     setRowToDelete(row);
     setOpenDelete(true);
@@ -95,21 +112,35 @@ const AdminComm = ({ query }) => {
 
   useEffect(() => {
     fetchPlans();
+    fetchServices();
   }, []);
 
   // ✅ Filters with lazy loaded dropdown & plan_id selection
   const filters = useMemo(
     () => [
+      // {
+      //   id: "plan_id",
+      //   label: "Plan",
+      //   type: "dropdown",
+      //   options: plans,
+      // },
       {
-        id: "plan_id",
-        label: "Plan",
+        id: "service_name",
+        label: "Service Name",
         type: "dropdown",
-        options: plans,
+        options: services,
       },
-      { id: "service_name", label: "Service Name", type: "textfield" },
-      { id: "rule_type", label: "Rule Type", type: "textfield" },
+      {
+        id: "rule_type",
+        label: "Rule Type",
+        type: "dropdown",
+        options: [
+          { value: "charge", label: "Charge" },
+          { value: "commission", label: "Commission" },
+        ],
+      },
     ],
-    [plans]
+    [services]
   );
 
   const handleSaveCreate = () => {
