@@ -533,20 +533,18 @@ const Services = ({ query }) => {
           </Tooltip>
 
           {/* Create Service Button */}
-          {user?.role === "sadm" ||
-            (user?.role === "adm" && (
-              <Button
-                variant="contained"
-                onClick={() => setOpenCreate(true)}
-                sx={{
-                  backgroundColor: "#526484",
-                  // "&:hover": { backgroundColor: "#008a00" },
-                  fontFamily: "DM Sans, sans-serif",
-                }}
-              >
-                Create Service
-              </Button>
-            ))}
+          {["adm", "sadm"].includes(user?.role) && (
+            <Button
+              variant="contained"
+              onClick={() => setOpenCreate(true)}
+              sx={{
+                backgroundColor: "#526484",
+                fontFamily: "DM Sans, sans-serif",
+              }}
+            >
+              Create Service
+            </Button>
+          )}
         </Box>
       </Box>
 

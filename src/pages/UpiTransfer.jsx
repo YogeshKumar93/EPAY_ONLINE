@@ -134,16 +134,6 @@ const UpiTransfer = () => {
             onSelect={(b) => setSelectedBeneficiary(b)}
           />
         </Box>
-
-        {/* Right: Beneficiary Details - 30% */}
-        {/* {selectedBeneficiary && (
-      <Box flex={isMobile ? "1 1 100%" : "0 0 30%"}>
-        <UpiBeneficiaryDetails
-          beneficiary={selectedBeneficiary}
-          senderMobile={mobile}
-        />
-      </Box>
-    )} */}
       </Box>
 
       {/* Register Modal */}

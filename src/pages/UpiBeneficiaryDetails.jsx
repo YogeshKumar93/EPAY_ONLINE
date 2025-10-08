@@ -145,17 +145,17 @@ const UpiBeneficiaryDetails = ({
       <TextField
         label="Amount"
         type="text"
-         variant="outlined"
+        variant="outlined"
         size="small"
         fullWidth
         value={amount}
         onChange={(e) => {
-                          const val = e.target.value;
-                          if (/^\d*$/.test(val)) {
-                            // allow only numbers
-                            setAmount(val);
-                          }
-                        }}
+          const val = e.target.value;
+          if (/^\d*$/.test(val)) {
+            // allow only numbers
+            setAmount(val);
+          }
+        }}
       />
 
       <Box>
@@ -208,12 +208,6 @@ const UpiBeneficiaryDetails = ({
           },
         ]}
       />
-
-      {/* <ResetMpin
-        open={openResetModal}
-        onClose={() => setOpenResetModal(false)}
-        username={username}
-      /> */}
     </>
   );
 };

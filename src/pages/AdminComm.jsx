@@ -18,14 +18,20 @@ import { apiCall } from "../api/apiClient";
 import CreateAdminComm from "../components/AdminComm/CreateAdminComm";
 import EditAdminCommission from "../components/AdminComm/EditAdminCommission";
 import DeleteIcon from "@mui/icons-material/Delete";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { okSuccessToast } from "../utils/ToastUtil";
+import { useToast } from "../utils/ToastContext";
 
 const AdminComm = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
-
+  const { showToast } = useToast();
   const [openCreate, setOpenCreate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [rowToDelete, setRowToDelete] = useState(null);
 
   const [plans, setPlans] = useState([]);
 
@@ -39,7 +45,26 @@ const AdminComm = ({ query }) => {
       fetchUsersRef.current();
     }
   };
+  const handleToggleStatus = async (row) => {
+    const newStatus = row.status === 1 ? 0 : 1; // 0 = block, 1 = unblock
+    try {
+      const { error, response } = await apiCall(
+        "POST",
+        ApiEndpoints.BLOCK_UNBLOCK_ADMINCOMM,
+        { id: row.id, status: newStatus }
+      );
 
+      if (response) {
+        okSuccessToast(response?.message || "Admin comm updated successfully");
+        refreshUsers();
+      } else {
+        showToast(error?.message);
+      }
+    } catch (error) {
+      console.error("Error toggling status:", error);
+      alert("Something went wrong. Please try again.");
+    }
+  };
   // ✅ Fetch plans only once (lazy load)
   const fetchPlans = async () => {
     // if (plansLoaded) return;
@@ -62,6 +87,10 @@ const AdminComm = ({ query }) => {
     } catch (error) {
       console.error("Error fetching plans:", error);
     }
+  };
+  const handleDeleteClick = (row) => {
+    setRowToDelete(row);
+    setOpenDelete(true);
   };
 
   useEffect(() => {
@@ -164,6 +193,36 @@ const AdminComm = ({ query }) => {
         width: "150px",
       },
       {
+        name: "Status",
+        selector: (row) => (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {row.status === 1 ? (
+              <Tooltip title="Click to Block">
+                <IconButton
+                  size="small"
+                  onClick={() => handleToggleStatus(row)}
+                  sx={{ color: "success.main" }}
+                >
+                  <LockOpenIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Click to Unblock">
+                <IconButton
+                  size="small"
+                  onClick={() => handleToggleStatus(row)}
+                  sx={{ color: "error.main" }}
+                >
+                  <LockOutlinedIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
+        ),
+        width: "150px",
+      },
+
+      {
         name: "Actions",
         selector: (row) => (
           <Box
@@ -239,6 +298,78 @@ const AdminComm = ({ query }) => {
         onSuccess={handleEditSuccess}
         onFetchRef={refreshUsers}
       />
+      {openDelete && (
+        <Box
+          sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            bgcolor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <Box
+            sx={{
+              bgcolor: "background.paper",
+              p: 3,
+              borderRadius: 2,
+              minWidth: "300px",
+              textAlign: "center",
+            }}
+          >
+            <Typography variant="h6" mb={2}>
+              Are you sure you want to delete this rule?
+            </Typography>
+            <Box
+              sx={{ display: "flex", justifyContent: "space-around", mt: 2 }}
+            >
+              <Button
+                variant="contained"
+                color="error"
+                onClick={async () => {
+                  try {
+                    const { error, response } = await apiCall(
+                      "POST",
+                      ApiEndpoints.DELETE_ADMIN_RULE,
+                      { id: rowToDelete.id }
+                    );
+                    if (response) {
+                      okSuccessToast(
+                        response?.message || "Deleted successfully"
+                      );
+                      refreshUsers();
+                    } else {
+                      showToast(error?.message || "Failed to delete", "error");
+                    }
+                  } catch (err) {
+                    console.error(err);
+                    showToast("Something went wrong");
+                  } finally {
+                    setOpenDelete(false);
+                    setRowToDelete(null);
+                  }
+                }}
+              >
+                Yes, Delete
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  setOpenDelete(false);
+                  setRowToDelete(null);
+                }}
+              >
+                Cancel
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      )}
     </Box>
   );
 };

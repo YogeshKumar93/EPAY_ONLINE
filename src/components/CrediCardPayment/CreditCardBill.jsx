@@ -99,7 +99,7 @@ const CreditCardBillPayment = ({
 
         <Box display="flex" flexDirection="column" gap={2} mb={3}>
           <TextField
-            label="Customer Number"
+            label="Card Number"
             value={formValues.cnumber}
             onChange={(e) => handleChange("cnumber", e.target.value)}
             fullWidth
@@ -127,12 +127,12 @@ const CreditCardBillPayment = ({
             label="Amount"
             type="text"
             value={formValues.amount}
-onChange={(e) => {
-  const val = e.target.value;
-  if (/^\d*$/.test(val)) {
-    handleChange("amount", val);
-  }
-}}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (/^\d*$/.test(val)) {
+                handleChange("amount", val);
+              }
+            }}
             fullWidth
             error={!!formErrors.amount}
             helperText={formErrors.amount}

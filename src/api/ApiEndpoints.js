@@ -292,6 +292,11 @@ const ApiEndpoints = {
   DMT1_OUTLET_INITIATE_SCHEMA: "aeps/getInitiateSchema",
   VALIDATE_DMT1_OUTLET: "aeps/validateSignupAeps",
   GET_ADMIN_COMMISSIONS: "commission/getAdminCommissions",
+  BLOCK_UNBLOCK_COMM: "commission/enableDisableCommRule",
+  BLOCK_UNBLOCK_ADMINCOMM: "commission/enableDisableAdminCommRule",
+  DELETE_ADMIN_RULE: "commission/deleteAdminCommRule",
+  DELETE_COMM_RULE: "commission/deleteCommRule",
+
   CREATE_ADMIN_COMMISSIONS: "commission/createAdminCommissionRule",
   UPDATE_ADMIN_COMMISSIONS: "commission/updateAdminCommissionRule",
   GET_ADMIN_COMMISSIONS_SCHEMA: "commission/getAdminCommissionSchema",

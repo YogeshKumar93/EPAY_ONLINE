@@ -706,8 +706,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
         </Drawer>
       </Box>
 
-
- <AdminLayoutWrapper desktopOpen={true}>
+      <AdminLayoutWrapper desktopOpen={true}>
         <Outlet />
       </AdminLayoutWrapper>
       {/* Main Content */}

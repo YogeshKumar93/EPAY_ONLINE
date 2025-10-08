@@ -339,6 +339,22 @@ const roleHierarchy = {
     ],
     // 1: ["Services", "Transactions", "Wallet Ledger", "Risk"], // Layout 1
   },
+  sadm: {
+    default: [
+      "Dashboard",
+      "Manage Users",
+      "Fund Request",
+      "Transactions",
+      "Bankings",
+      "Services",
+      "Wallet Ledger",
+      "Settings",
+      "Complaint",
+      "Risk",
+      "Login History",
+    ],
+    // 1: ["Services", "Transactions", "Wallet Ledger", "Risk"], // Layout 1
+  },
   md: {
     default: [
       "Dashboard",

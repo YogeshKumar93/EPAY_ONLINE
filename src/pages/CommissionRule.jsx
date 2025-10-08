@@ -7,6 +7,10 @@ import {
   IconButton,
   Typography,
   Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { Edit } from "@mui/icons-material";
 import AuthContext from "../contexts/AuthContext";
@@ -20,13 +24,20 @@ import CreateCommissionRule from "./CreateCommissionRule";
 import EditCommissionModal from "../components/EditCommissionModal";
 import { apiCall } from "../api/apiClient";
 import DeleteIcon from "@mui/icons-material/Delete";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { okSuccessToast } from "../utils/ToastUtil";
+import { useToast } from "../utils/ToastContext";
+
 const CommissionRule = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
-
+  const { showToast } = useToast();
   const [openCreate, setOpenCreate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [rowToDelete, setRowToDelete] = useState(null);
 
   const [plans, setPlans] = useState([]);
 
@@ -40,7 +51,25 @@ const CommissionRule = ({ query }) => {
       fetchUsersRef.current();
     }
   };
+  const handleToggleStatus = async (row) => {
+    try {
+      const { error, response } = await apiCall(
+        "POST",
+        ApiEndpoints.BLOCK_UNBLOCK_COMM,
+        { id: row.id }
+      );
 
+      if (response) {
+        okSuccessToast(response?.message || "Admin comm updated successfully");
+        refreshUsers();
+      } else {
+        showToast(error?.message);
+      }
+    } catch (error) {
+      console.error("Error toggling status:", error);
+      alert("Something went wrong. Please try again.");
+    }
+  };
   // ✅ Fetch plans only once (lazy load)
   const fetchPlans = async () => {
     // if (plansLoaded) return;
@@ -62,6 +91,31 @@ const CommissionRule = ({ query }) => {
       }
     } catch (error) {
       console.error("Error fetching plans:", error);
+    }
+  };
+  const handleDeleteClick = (row) => {
+    setRowToDelete(row);
+    setOpenDelete(true);
+  };
+  const handleConfirmDelete = async () => {
+    if (!rowToDelete) return;
+    try {
+      const { error, response } = await apiCall(
+        "POST",
+        ApiEndpoints.DELETE_COMM_RULE,
+        { id: rowToDelete.id }
+      );
+      if (response) {
+        okSuccessToast(response?.message || "Rule deleted successfully");
+        refreshUsers();
+        setOpenDelete(false);
+        setRowToDelete(null);
+      } else {
+        showToast(error?.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong.");
     }
   };
 
@@ -208,6 +262,35 @@ const CommissionRule = ({ query }) => {
         width: "150px",
       },
       {
+        name: "Status",
+        selector: (row) => (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {row.status === 1 ? (
+              <Tooltip title="Click to Block">
+                <IconButton
+                  size="small"
+                  onClick={() => handleToggleStatus(row)}
+                  sx={{ color: "success.main" }}
+                >
+                  <LockOpenIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Click to Unblock">
+                <IconButton
+                  size="small"
+                  onClick={() => handleToggleStatus(row)}
+                  sx={{ color: "error.main" }}
+                >
+                  <LockOutlinedIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
+        ),
+        width: "150px",
+      },
+      {
         name: "Actions",
         selector: (row, { hoveredRow, enableActionsHover }) => {
           // const isHovered = hoveredRow === row.id || !enableActionsHover;
@@ -236,7 +319,7 @@ const CommissionRule = ({ query }) => {
                     <IconButton
                       color="error"
                       size="small"
-                      // onClick={() => handleDeleteClick(row)}
+                      onClick={() => handleDeleteClick(row)}
                     >
                       <DeleteIcon fontSize="small" />
                     </IconButton>
@@ -295,6 +378,20 @@ const CommissionRule = ({ query }) => {
         onSuccess={handleEditSuccess}
         onFetchRef={refreshUsers}
       />
+      <Dialog open={openDelete} onClose={() => setOpenDelete(false)}>
+        <DialogTitle>Delete Commission Rule</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete this commission rule?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
+          <Button color="error" onClick={handleConfirmDelete}>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
