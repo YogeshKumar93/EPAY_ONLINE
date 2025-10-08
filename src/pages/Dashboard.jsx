@@ -216,16 +216,18 @@ const Dashboard = () => {
         </Box>
 
         {/* Right: ApiBalance */}
-        <Box
-          sx={{
-            flex: "0 0 30%",
-            minWidth: { xs: "100%", md: "30%" },
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <ApiBalance />
-        </Box>
+        {!["dd", "ret"].includes(user?.role) && (
+          <Box
+            sx={{
+              flex: "0 0 30%",
+              minWidth: { xs: "100%", md: "30%" },
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <ApiBalance />
+          </Box>
+        )}
       </Box>
 
       {(user.role === "adm" || user.role === "sadm") && (

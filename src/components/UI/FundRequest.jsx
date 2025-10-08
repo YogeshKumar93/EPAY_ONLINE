@@ -301,16 +301,17 @@ const FundRequest = () => {
                     </Tooltip>
                   </MuiBox>
                 )}
-                {/* {row.status === "rejected" && (
-                  <Tooltip title="Reopen">
-                    <OpenInFullIcon
-                      fontSize="small"
-                      color="warning"
-                      onClick={() => handleOpenModal("status", row, "reopen")}
-                      style={{ cursor: "pointer" }}
-                    />
-                  </Tooltip>
-                )} */}
+                {row.status === "rejected" &&
+                  !["adm", "sadm"].includes(user?.role) && (
+                    <Tooltip title="Reopen">
+                      <OpenInFullIcon
+                        fontSize="small"
+                        color="warning"
+                        onClick={() => handleOpenModal("status", row, "reopen")}
+                        style={{ cursor: "pointer" }}
+                      />
+                    </Tooltip>
+                  )}
               </>
             )}
           </MuiBox>

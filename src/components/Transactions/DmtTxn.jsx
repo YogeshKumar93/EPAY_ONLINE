@@ -134,9 +134,13 @@ const DmtTxn = ({ query }) => {
     if (!selectedForRefund) return;
     setRefundLoading(true);
 
-    const { error, response } = await apiCall("post", ApiEndpoints.REFUND_TXN, {
-      txn_id: selectedForRefund.txn_id,
-    });
+    const { error, response } = await apiCall(
+      "post",
+      ApiEndpoints.REFUND_TXN_BYADMIN,
+      {
+        txn_id: selectedForRefund.txn_id,
+      }
+    );
 
     if (response) {
       showToast(
