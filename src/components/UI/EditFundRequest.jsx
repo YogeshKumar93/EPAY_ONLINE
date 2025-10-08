@@ -48,7 +48,7 @@ const ViewEditFundRequestModal = ({ open, handleClose, row, onFetchRef }) => {
         bank_name: row.bank_name || "",
         mode: row.mode || "",
         remarks: row.remarks || row.remark || "",
-          admin_remark: row.admin_remark || "",
+          admin_remark: row.admin_remark || row.admin_remark || "",
         bank_ref_id: row.bank_ref_id || "",
         amount: row.amount || "",
         date: row.date || "",
@@ -136,7 +136,6 @@ const ViewEditFundRequestModal = ({ open, handleClose, row, onFetchRef }) => {
     "amount",
     "remarks",
      "admin_remark",
-
     "receipt",
   ];
 
@@ -173,7 +172,7 @@ const ViewEditFundRequestModal = ({ open, handleClose, row, onFetchRef }) => {
            if (["remarks", "admin_remark"].includes(field.name)) {
         return {
           ...baseField,
-          props: { ...baseField.props, multiline: true, rows: 3 },
+          props: { ...baseField.props, multiline: true, rows: 1 },
         };
       }
 
