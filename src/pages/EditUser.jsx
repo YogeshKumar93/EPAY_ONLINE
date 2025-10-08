@@ -8,11 +8,7 @@ import { useToast } from "../utils/ToastContext";
 
 const TAB_CONFIG = [
   { key: "basic", label: "Basic" },
-  // { key: "contact", label: "Contact" },
   { key: "address", label: "Address" },
-  // { key: "identification", label: "Identification" },
-  // { key: "bank", label: "Bank" },
-  // { key: "documents", label: "Documents" },
   { key: "kyc", label: "KYC" },
 ];
 
@@ -139,8 +135,8 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
         <Box opacity={loading ? 0.5 : 1}>
           {fields.map((field) => {
             const value = formData[field.name] || "";
-            const isImage =
-              selectedTab === "kyc" &&
+            const isImageField = selectedTab === "kyc"; // For KYC tab only
+            const hasValue =
               typeof value === "string" &&
               (value.startsWith("http://") ||
                 value.startsWith("https://") ||
@@ -151,7 +147,7 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
                 key={field.name}
                 style={{
                   marginBottom: "15px",
-                  display: isImage ? "flex" : "block",
+                  display: isImageField ? "flex" : "block",
                   alignItems: "center",
                   gap: "20px",
                 }}
@@ -160,24 +156,26 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
                   {field.label}
                 </label>
 
-                {isImage ? (
+                {isImageField ? (
                   <>
-                    {/* Image preview */}
-                    <Box>
-                      <img
-                        src={value}
-                        alt={field.label}
-                        style={{
-                          maxWidth: "150px",
-                          maxHeight: "150px",
-                          border: "1px solid #ccc",
-                          borderRadius: "4px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </Box>
+                    {/* Show preview only if a value exists */}
+                    {hasValue && (
+                      <Box>
+                        <img
+                          src={value}
+                          alt={field.label}
+                          style={{
+                            maxWidth: "150px",
+                            maxHeight: "150px",
+                            border: "1px solid #ccc",
+                            borderRadius: "4px",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </Box>
+                    )}
 
-                    {/* Upload new image */}
+                    {/* Always show file input for KYC fields */}
                     <Box>
                       <input
                         type="file"
@@ -189,10 +187,10 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
                             reader.onload = () => {
                               setFormData((prev) => ({
                                 ...prev,
-                                [field.name]: reader.result, // reader.result is "data:image/png;base64,...."
+                                [field.name]: reader.result,
                               }));
                             };
-                            reader.readAsDataURL(file); // converts the file to Base64
+                            reader.readAsDataURL(file);
                           }
                         }}
                       />

@@ -180,56 +180,57 @@ const Users = ({ query }) => {
           anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
           transformOrigin={{ vertical: "top", horizontal: "left" }}
         >
-          {userRole.role === "adm" && [
-            <MenuItem
-              key="edit"
-              onClick={() => {
-                handleOpenEditUser(row);
-                handleMenuClose();
-              }}
-            >
-              {/* <ListItemIcon>
+          {userRole.role === "adm" ||
+            (userRole.role === "sadm" && [
+              <MenuItem
+                key="edit"
+                onClick={() => {
+                  handleOpenEditUser(row);
+                  handleMenuClose();
+                }}
+              >
+                {/* <ListItemIcon>
                 <EditIcon fontSize="small" />
               </ListItemIcon> */}
-              <ListItemText>Edit User</ListItemText>
-            </MenuItem>,
+                <ListItemText>Edit User</ListItemText>
+              </MenuItem>,
 
-            <MenuItem
-              key="permissions"
-              onClick={() => {
-                handleOpenPermissions(row);
-                handleMenuClose();
-              }}
-            >
-              {/* <ListItemIcon>
+              <MenuItem
+                key="permissions"
+                onClick={() => {
+                  handleOpenPermissions(row);
+                  handleMenuClose();
+                }}
+              >
+                {/* <ListItemIcon>
                 <SettingsIcon fontSize="small" />
               </ListItemIcon> */}
-              <ListItemText>Edit Permissions</ListItemText>
-            </MenuItem>,
+                <ListItemText>Edit Permissions</ListItemText>
+              </MenuItem>,
 
-            <MenuItem
-              key="documents"
-              onClick={() => {
-                handleOpenViewDocuments(row);
-                handleMenuClose();
-              }}
-            >
-              {/* <ListItemIcon>
+              <MenuItem
+                key="documents"
+                onClick={() => {
+                  handleOpenViewDocuments(row);
+                  handleMenuClose();
+                }}
+              >
+                {/* <ListItemIcon>
                 <VisibilityIcon fontSize="small" />
               </ListItemIcon> */}
-              <ListItemText>View Documents</ListItemText>
-            </MenuItem>,
+                <ListItemText>View Documents</ListItemText>
+              </MenuItem>,
 
-            <MenuItem
-              key="assign_plan"
-              onClick={() => {
-                handleOpenAssignPlans(row);
-                handleMenuClose();
-              }}
-            >
-              <ListItemText>Assign Plan</ListItemText>
-            </MenuItem>,
-          ]}
+              <MenuItem
+                key="assign_plan"
+                onClick={() => {
+                  handleOpenAssignPlans(row);
+                  handleMenuClose();
+                }}
+              >
+                <ListItemText>Assign Plan</ListItemText>
+              </MenuItem>,
+            ])}
 
           <MenuItem
             key="lein"
@@ -465,7 +466,7 @@ const Users = ({ query }) => {
     });
 
     // Actions column
-    if (["adm", "di", "md"].includes(userRole?.role)) {
+    if (["adm", "di", "md", "sadm"].includes(userRole?.role)) {
       baseColumns.push({
         name: "Actions",
         selector: (row) => (
