@@ -157,6 +157,13 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
     }
   };
 
+ const handleLogoClick = () => {
+  if (user?.role === "ret" || user?.role === "dd") {
+    navigate("/customer/allServices");
+  }
+};
+
+
   const handleUserMenuOpen = (event) => {
     setUserMenuAnchor(event.currentTarget);
   };
@@ -287,9 +294,12 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             component="img"
             src={logo}
             alt="App Logo"
+            onClick={handleLogoClick} // ✅ correct camelCase
             sx={{
-              height: 35, // adjust as needed
-              width: "120",
+              height: 35,
+              width: 120, // ✅ numeric value
+              cursor: "pointer",
+              display: "block",
             }}
           />
         )}
