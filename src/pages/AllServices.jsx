@@ -456,14 +456,14 @@ export default function AllServices() {
           type: "mobile",
           title: "Prepaid",
         },
-        {
-          key: "postpaid",
-          label: "Postpaid",
-          icon: postpaid_1,
-          component: Prepaid,
-          type: "mobile",
-          title: "Postpaid",
-        },
+        // {
+        //   key: "postpaid",
+        //   label: "Postpaid",
+        //   icon: postpaid_1,
+        //   component: Prepaid,
+        //   type: "mobile",
+        //   title: "Postpaid",
+        // },
         {
           key: "dth",
           label: "DTH",
