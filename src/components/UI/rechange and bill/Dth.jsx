@@ -81,12 +81,12 @@ const Dth = () => {
       return apiErrorToast("Location not available, please enable GPS.");
     setLoading(true);
     const payload = {
-      customer_id: customerId,
+      number: customerId,
       // mobile_number: mobileNumber,
       operator: selectedService?.id,
       amount: parseFloat(manualAmount),
-      latitude: location?.lat,
-      longitude: location?.long,
+      latitude: location?.lat || "",
+      longitude: location?.long || "",
       mpin: Number(MpinCallBackVal),
     };
 

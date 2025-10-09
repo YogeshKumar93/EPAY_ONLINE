@@ -193,7 +193,7 @@ const PayoutTxn = ({ query }) => {
       { id: "mobile_number", label: "Mobile Number", type: "textfield" },
       { id: "txn_id", label: "Txn ID", type: "textfield" },
       { id: "user_id", label: "User ID", type: "textfield" },
-      { id: "date_range", type: "daterange" },
+      // { id: "date_range", type: "daterange" },
     ],
     [routes] // ✅ depends on routes, so dropdown updates automatically
   );

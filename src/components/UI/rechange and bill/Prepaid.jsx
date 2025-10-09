@@ -113,7 +113,7 @@ const Prepaid = () => {
     setLoading(true);
 
     const payload = {
-      mobile_number: mobileNumber,
+      number: mobileNumber,
       operator: selectedService?.id,
       amount: selectedPlan.price,
       latitude: location?.lat || "",

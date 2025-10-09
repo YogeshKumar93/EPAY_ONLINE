@@ -43,36 +43,29 @@ const BeneficiaryDetails = ({
 
   if (!beneficiary) return null;
 
-  // --- API Calls ---
-  // const handleGetOtp = async () => {
-  //   if (!amount || parseFloat(amount) <= 0) {
-  //     apiErrorToast("Please enter a valid amount");
-  //     return;
-  //   }
-  //   setLoading(true);
-  //   try {
-  //     const payload = {
-  //       mobile_number: senderMobile,
-  //       beneficiary_id: beneficiary.id,
-  //       amount,
-  //     };
-  //     const { error, response } = await apiCall(
-  //       "post",
-  //       ApiEndpoints.PAYOUT_OTP,
-  //       payload
-  //     );
-  //     if (error) apiErrorToast(error);
-  //     else {
-  //       showToast("OTP sent successfully!", "success");
-  //       setOtpRef(response?.data?.otp_ref || null);
-  //     }
-  //   } catch (err) {
-  //     apiErrorToast(err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  useEffect(() => {
+    const fetchPurposes = async () => {
+      setLoadingPurposes(true);
+      try {
+        const { error, response } = await apiCall(
+          "post",
+          ApiEndpoints.GET_PURPOSES
+        );
+        if (response) {
+          const purposesData = response?.data || [];
+          console.log("purposesData", purposesData);
 
+          setPurposes(purposesData);
+          if (purposesData.length > 0) setSelectedPurpose(purposesData[0].id);
+        } else apiErrorToast(error);
+      } catch (err) {
+        apiErrorToast(err);
+      } finally {
+        setLoadingPurposes(false);
+      }
+    };
+    fetchPurposes();
+  }, []);
   const handleProceed = async () => {
     // if (!otp || otp.length !== 6)
     //   return apiErrorToast("Please enter the 6-digit OTP");
@@ -82,6 +75,11 @@ const BeneficiaryDetails = ({
 
     setLoading(true);
     try {
+      const selectedPurposeType =
+        purposes.find((p) => p.id === Number(selectedPurpose))?.type || "N/A";
+
+      console.log("Selected Purpose Type:", selectedPurposeType);
+
       const payload = {
         sender_id: senderId,
         beneficiary_id: beneficiary.id,
@@ -98,7 +96,7 @@ const BeneficiaryDetails = ({
         // otp_ref: otpRef,
         mop: transferMode,
         mpin,
-        purpose_id: selectedPurpose,
+        purpose: selectedPurposeType, // ✅ send type here
       };
 
       const { error, response } = await apiCall(
@@ -107,12 +105,21 @@ const BeneficiaryDetails = ({
         payload
       );
       console.log("PAYOUT RESPONSE:", response);
-
       if (response) {
         showToast(response?.message || "Payout successful!", "success");
-        const payoutData = response?.data?.response || response?.data || {};
+
+        const purposeType =
+          purposes.find((p) => p.id === selectedPurpose)?.type || "N/A";
+
+        const payoutData = {
+          ...(response?.data || {}),
+          purpose: selectedPurposeType, // ✅ send type to parent
+        };
+
+        console.log("Purpose being sent to parent:", purposeType); // ✅ log purpose
         console.log("DATA SENT TO PARENT:", payoutData);
-        onPayoutSuccess(payoutData);
+
+        onPayoutSuccess(payoutData); // send to parent
         setAmount("");
         setOtp("");
         setMpin("");
@@ -127,28 +134,6 @@ const BeneficiaryDetails = ({
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    const fetchPurposes = async () => {
-      setLoadingPurposes(true);
-      try {
-        const { error, response } = await apiCall(
-          "post",
-          ApiEndpoints.GET_PURPOSES
-        );
-        if (response) {
-          const purposesData = response?.data || [];
-          setPurposes(purposesData);
-          if (purposesData.length > 0) setSelectedPurpose(purposesData[0].id);
-        } else apiErrorToast(error);
-      } catch (err) {
-        apiErrorToast(err);
-      } finally {
-        setLoadingPurposes(false);
-      }
-    };
-    fetchPurposes();
-  }, []);
 
   // --- Custom Content ---
   const customContent = (
@@ -198,7 +183,7 @@ const BeneficiaryDetails = ({
             select
             size="small"
             value={selectedPurpose}
-            onChange={(e) => setSelectedPurpose(e.target.value)}
+            onChange={(e) => setSelectedPurpose(Number(e.target.value))}
             sx={{ minWidth: "180px" }}
             SelectProps={{ native: true }}
           >

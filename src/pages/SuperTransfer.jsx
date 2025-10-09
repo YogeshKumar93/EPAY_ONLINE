@@ -200,43 +200,111 @@ const SuperTransfer = () => {
           </Box>
         </>
       ) : (
-        <Box p={3} bgcolor="#e0ffe0" borderRadius={2}>
-          <Typography variant="h6" color="success.main" mb={1}>
-            {payoutResponse?.message || "Transaction Successful"}
-          </Typography>
-          <Typography variant="body2">
-            <strong>Sender Mobile:</strong> {payoutResponse?.data?.mobileNumber}
-          </Typography>
-          <Typography variant="body2">
-            <strong>Beneficiary Name:</strong>{" "}
-            {payoutResponse?.data?.beneficiaryName}
-          </Typography>
-          <Typography variant="body2">
-            <strong>Account Number:</strong>{" "}
-            {payoutResponse?.data?.beneficiaryAccount}
-          </Typography>
-          <Typography variant="body2">
-            <strong>IFSC:</strong> {payoutResponse?.data?.ifscCode}
-          </Typography>
-          <Typography variant="body2">
-            <strong>Amount:</strong> {payoutResponse?.data?.transferAmount}
-          </Typography>
-          <Typography variant="body2">
-            <strong>Transfer Mode:</strong> {payoutResponse?.data?.transferMode}
+        <Box p={3} bgcolor="#e0ffe0" borderRadius={2} maxWidth={500} mx="auto">
+          <Typography
+            variant="h5"
+            color="success.main"
+            mb={2}
+            textAlign="center"
+            fontWeight="bold"
+          >
+            Payment Receipt
           </Typography>
 
-          <Typography variant="body2">
-            <strong>Running Balance:</strong>{" "}
-            {payoutResponse?.data?.runningBalance}
+          {/* Date */}
+          <Typography variant="body2" mb={1}>
+            <strong>Date:</strong> {new Date().toLocaleDateString()}
           </Typography>
 
-          <Box mt={2}>
+          {/* Message */}
+          <Typography variant="body2" color="success.main" mb={2}>
+            {payoutResponse?.response?.message || "Transaction Successful"}
+          </Typography>
+
+          {/* Details */}
+          <Box
+            sx={{ bgcolor: "#f7fff7", p: 2, borderRadius: 2 }}
+            id="receiptContent"
+          >
+            <Typography variant="body2" mb={0.5}>
+              <strong>Sender Mobile:</strong>{" "}
+              {payoutResponse?.response?.data?.mobileNumber || "---"}
+            </Typography>
+            <Typography variant="body2" mb={0.5}>
+              <strong>Beneficiary Name:</strong>{" "}
+              {payoutResponse?.response?.data?.beneficiaryName || "---"}
+            </Typography>
+            <Typography variant="body2" mb={0.5}>
+              <strong>Account Number:</strong>{" "}
+              {payoutResponse?.response?.data?.beneficiaryAccount || "---"}
+            </Typography>
+
+            <Typography variant="body2" mb={0.5}>
+              <strong>Amount:</strong>{" "}
+              {payoutResponse?.response?.data?.transferAmount || "---"}
+            </Typography>
+            <Typography variant="body2" mb={0.5}>
+              <strong>Transfer Mode:</strong>{" "}
+              {payoutResponse?.response?.data?.transferMode || "---"}
+            </Typography>
+            <Typography variant="body2" mb={0.5}>
+              <strong>Purpose:</strong>
+              {payoutResponse?.purpose || "N/A"}{" "}
+            </Typography>
+            <Typography variant="body2" mb={0.5}>
+              <strong>UTR:</strong> {payoutResponse?.operator_id || "---"}
+            </Typography>
+          </Box>
+
+          {/* Buttons */}
+          <Box mt={3} display="flex" justifyContent="center" gap={2}>
             <Button
               variant="contained"
               color="primary"
-              onClick={() => setPayoutResponse(null)} // reset to allow new transaction
+              onClick={() => setPayoutResponse(null)}
             >
               Repeat Txn
+            </Button>
+
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => {
+                const printContent = document.getElementById("receiptContent");
+                if (!printContent) return;
+
+                const newWin = window.open("", "_blank");
+                const styles = Array.from(
+                  document.querySelectorAll("style, link[rel='stylesheet']")
+                )
+                  .map((node) => node.outerHTML)
+                  .join("\n");
+
+                newWin.document.write(`
+      <html>
+        <head>
+          <title>Receipt</title>
+          ${styles} 
+          <style>
+            body { font-family: Roboto, sans-serif; padding: 20px; background-color: #fff; }
+            #receiptContent { background-color: #f7fff7; padding: 16px; border-radius: 8px; }
+            h5 { color: #388e3c; text-align: center; }
+            p, strong { font-size: 14px; margin: 4px 0; }
+          </style>
+        </head>
+        <body>
+          <h5>Payment Receipt</h5>
+          ${printContent.innerHTML}
+        </body>
+      </html>
+    `);
+                newWin.document.close();
+                newWin.focus();
+                newWin.print();
+                newWin.close();
+              }}
+            >
+              Print Receipt
             </Button>
           </Box>
         </Box>

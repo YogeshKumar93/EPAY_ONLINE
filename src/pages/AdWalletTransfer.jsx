@@ -8,6 +8,7 @@ import {
   Grid,
   Button,
   Box,
+  MenuItem,
 } from "@mui/material";
 import { AccountBalanceWallet } from "@mui/icons-material";
 import CommonModal from "../components/common/CommonModal";
@@ -20,15 +21,16 @@ import debounce from "lodash.debounce";
 }
 import { CurrencyRupee } from "@mui/icons-material";
 import CommonLoader from "../components/common/CommonLoader";
-import AuthContext from "../contexts/AuthContext";
 import { useToast } from "../utils/ToastContext";
+import AuthContext from "../contexts/AuthContext";
 
 const AdWalletTransfer = ({ row, open, onClose }) => {
   const [mpinModalOpen, setMpinModalOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [receiver, setReceiver] = useState(null);
+  const [transferType, setTransferType] = useState("credit"); // "credit" or "debit"
   const authCtx = useContext(AuthContext);
-
+  const user = authCtx?.user;
   const loadUserProfile = authCtx.loadUserProfile;
 
   const [amount, setAmount] = useState("");
@@ -37,6 +39,7 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
+
   // Fetch receiver details from mobile number
   const fetchReceiver = async () => {
     setLoading(true);
@@ -46,14 +49,14 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
         "post",
         ApiEndpoints.WALLET_GET_RECEIVER,
         {
-          user_id: `P2PAE${row.id}`,
+          user_id: `TRANS${row.id}`,
         }
       );
 
       if (response && response.data) {
         setReceiver(response.data);
       } else {
-        setError("Receiver not found");
+        showToast("Receiver not found", "error");
       }
     } catch (err) {
       setError("Something went wrong while fetching receiver");
@@ -61,6 +64,7 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     if (open) {
       fetchReceiver();
@@ -87,14 +91,16 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
         amount: parseFloat(amount),
         remark,
         mpin,
-        operator: 17,
+        operator: transferType === "debit" ? 82 : 17, // 82 for debit, 17 for credit
       };
 
-      const { response, error } = await apiCall(
-        "post",
-        ApiEndpoints.WALLET_CREATE,
-        payload
-      );
+      // Choose API endpoint based on transfer type
+      const apiEndpoint =
+        transferType === "debit"
+          ? ApiEndpoints.WALLET2WALLET_DEBIT
+          : ApiEndpoints.WALLET_CREATE;
+
+      const { response, error } = await apiCall("post", apiEndpoint, payload);
 
       if (response) {
         showToast(response?.message || "Transfer successful", "success");
@@ -108,7 +114,7 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
         setError(error?.message || "Transfer failed");
       }
     } catch (err) {
-      setError("Something went wrong during transfer");
+      showToast("Something went wrong during transfer", "error");
     } finally {
       setCreating(false);
       setMpinModalOpen(false);
@@ -126,19 +132,18 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
           alignItems: "center",
           justifyContent: "center",
           border: "1px solid",
-          borderColor: "primary.main", // border color
+          borderColor: "primary.main",
         }}
       >
         <IconButton
           onClick={fetchReceiver}
           size="small"
-          sx={{ p: 0, color: "primary.main" }} // icon color matches border
+          sx={{ p: 0, color: "primary.main" }}
         >
           <CurrencyRupee fontSize="small" />
         </IconButton>
       </Box>
 
-      {/* {loading && <CircularProgress size={24} />} */}
       <CommonModal
         open={open}
         onClose={onClose}
@@ -149,6 +154,8 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
           <CommonLoader loading={loading} />
         ) : receiver ? (
           <>
+            {/* Transfer Type Selection - Filtered Version */}
+
             {/* Receiver Details */}
             <Card
               elevation={4}
@@ -214,8 +221,24 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
                 </Grid>
               </Grid>
             </Card>
-
-            {/* Amount & Remark */}
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                Transfer Type
+              </Typography>
+              <TextField
+                select
+                fullWidth
+                value={transferType}
+                onChange={(e) => setTransferType(e.target.value)}
+                variant="outlined"
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
+              >
+                <MenuItem value="credit">Credit</MenuItem>
+                {user.role === "adm" && (
+                  <MenuItem value="debit">Debit</MenuItem>
+                )}
+              </TextField>
+            </Box>
             <TextField
               label="Enter Amount"
               variant="outlined"
@@ -260,10 +283,15 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
                 fontSize: "1rem",
                 borderRadius: 3,
                 textTransform: "none",
-                background: "linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)",
+                background:
+                  transferType === "debit"
+                    ? "linear-gradient(90deg, #d32f2f 0%, #f44336 100%)"
+                    : "linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)",
                 "&:hover": {
                   background:
-                    "linear-gradient(90deg, #1565c0 0%, #1e88e5 100%)",
+                    transferType === "debit"
+                      ? "linear-gradient(90deg, #c62828 0%, #e53935 100%)"
+                      : "linear-gradient(90deg, #1565c0 0%, #1e88e5 100%)",
                 },
               }}
               onClick={handleSendClick}
@@ -271,8 +299,10 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
             >
               {creating ? (
                 <CircularProgress size={24} sx={{ color: "#fff" }} />
+              ) : transferType === "debit" ? (
+                "Debit Amount"
               ) : (
-                "Send Amount"
+                "Credit Amount"
               )}
             </Button>
           </>
@@ -286,7 +316,9 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
       <CommonMpinModal
         open={mpinModalOpen}
         setOpen={setMpinModalOpen}
-        title="Enter MPIN to Confirm Transfer"
+        title={`Enter MPIN to Confirm ${
+          transferType === "debit" ? "Debit" : "Credit"
+        } Transfer`}
         mPinCallBack={handleCreateTransfer}
       />
     </Box>
