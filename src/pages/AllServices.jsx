@@ -279,12 +279,12 @@ export default function AllServices() {
     //   icon: mt,
     //   component: Dmt,
     // },
-    hasPermission("dmt1") && {
+  {
       key: "monettransfer",
       label: "Money Transfer",
       icon: sendmoney,
       subMenu: [
-        {
+        hasPermission("dmt1") &&   {
           key: "dmt1",
           label: " Airtel Dmt",
           icon: AIR1,
@@ -292,7 +292,7 @@ export default function AllServices() {
           type: "mobile",
           title: "Dmt1",
         },
-        {
+          hasPermission("dmt2") && {
           key: "dmt2",
           label: "Fino Dmt",
           icon: FINO,
@@ -456,14 +456,14 @@ export default function AllServices() {
           type: "mobile",
           title: "Prepaid",
         },
-        {
-          key: "postpaid",
-          label: "Postpaid",
-          icon: postpaid_1,
-          component: Prepaid,
-          type: "mobile",
-          title: "Postpaid",
-        },
+        // {
+        //   key: "postpaid",
+        //   label: "Postpaid",
+        //   icon: postpaid_1,
+        //   component: Prepaid,
+        //   type: "mobile",
+        //   title: "Postpaid",
+        // },
         {
           key: "dth",
           label: "DTH",
