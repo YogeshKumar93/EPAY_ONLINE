@@ -263,7 +263,6 @@ const FundRequest = () => {
               </Tooltip>
             )}
 
-            {/* ✅ Delete - only if pending */}
             {row.status === "pending" && (
               <Tooltip title="Delete">
                 <Delete
@@ -275,34 +274,29 @@ const FundRequest = () => {
             )}
 
             {/* Admin actions */}
-            {user?.role === "adm" && (
-              <>
-                {row.status !== "approved" && row.status !== "rejected" && (
-                  <MuiBox display="flex" gap={2}>
-                    <Tooltip title="Approve">
-                      <CheckCircleIcon
-                        fontSize="small"
-                        color="success"
-                        onClick={() =>
-                          handleOpenModal("status", row, "approved")
-                        }
-                        style={{ cursor: "pointer" }}
-                      />
-                    </Tooltip>
-                    <Tooltip title="Reject">
-                      <CancelIcon
-                        fontSize="small"
-                        color="error"
-                        onClick={() =>
-                          handleOpenModal("status", row, "rejected")
-                        }
-                        style={{ cursor: "pointer" }}
-                      />
-                    </Tooltip>
-                  </MuiBox>
-                )}
-              </>
-            )}
+            {(user?.role === "adm" || user?.role === "sadm") &&
+              row.status !== "approved" &&
+              row.status !== "rejected" && (
+                <MuiBox display="flex" gap={2}>
+                  <Tooltip title="Approve">
+                    <CheckCircleIcon
+                      fontSize="small"
+                      color="success"
+                      onClick={() => handleOpenModal("status", row, "approved")}
+                      style={{ cursor: "pointer" }}
+                    />
+                  </Tooltip>
+                  <Tooltip title="Reject">
+                    <CancelIcon
+                      fontSize="small"
+                      color="error"
+                      onClick={() => handleOpenModal("status", row, "rejected")}
+                      style={{ cursor: "pointer" }}
+                    />
+                  </Tooltip>
+                </MuiBox>
+              )}
+
             {row.status === "rejected" &&
               !["adm", "sadm"].includes(user?.role) && (
                 <Tooltip title="Reopen">

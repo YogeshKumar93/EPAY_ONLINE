@@ -115,7 +115,8 @@ const Login = () => {
         await authCtx.login(token);
 
         if (user?.role === "adm") navigate("/admin/dashboard");
-        else if (user?.role === "ret") navigate("/customer/dashboard");
+        else if (user?.role === "ret") navigate("/customer/allServices");
+        else if (user?.role === "dd") navigate("/customer/allServices");
         else if (user?.role === "user") navigate("/user/home");
         else if (user?.role === "md") navigate("/md/dashboard");
         else navigate("/");
@@ -174,33 +175,33 @@ const Login = () => {
       }}
     >
       {/* Left Side - Background Image */}
-         <Grid
-  item
-  xs={false}
-  md={7}
-  sx={{
-    position: "relative",
-    display: { xs: "none", md: "block" },
-    width: "60%",
-    height: "100vh",
- 
-    overflow: "hidden",
-  }}
->
-  <Box
-    component="img"
-    src={backImg}
-    alt="Background"
-    sx={{
-      width: "100%",
-      height: "100%",
-     
-      position: "absolute",
-      top: 0,
-      left: 0,
-    }}
-  />
-</Grid>
+      <Grid
+        item
+        xs={false}
+        md={7}
+        sx={{
+          position: "relative",
+          display: { xs: "none", md: "block" },
+          width: "60%",
+          height: "100vh",
+
+          overflow: "hidden",
+        }}
+      >
+        <Box
+          component="img"
+          src={backImg}
+          alt="Background"
+          sx={{
+            width: "100%",
+            height: "100%",
+
+            position: "absolute",
+            top: 0,
+            left: 0,
+          }}
+        />
+      </Grid>
 
       {/* Right Side - Login Form */}
       <Grid
@@ -366,9 +367,8 @@ const Login = () => {
                 fontWeight: 600,
                 background: "linear-gradient(90deg,#731cdd)",
                 "&:hover": {
-  background: "#5210c1",
-}
-
+                  background: "#5210c1",
+                },
               }}
               disabled={loading}
             >

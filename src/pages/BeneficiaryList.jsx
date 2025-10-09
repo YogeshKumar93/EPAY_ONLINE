@@ -57,7 +57,7 @@ import BeneficiaryDetails from "./BeneficiaryDetails";
 import { useToast } from "../utils/ToastContext";
 import AuthContext from "../contexts/AuthContext";
 
-const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
+const BeneficiaryList = ({ sender, onSuccess, onSelect, onPayoutSuccess }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { showToast } = useToast();
@@ -546,6 +546,7 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
           sender={sender}
           senderId={sender?.id}
           senderMobile={sender?.mobile_number}
+          onPayoutSuccess={onPayoutSuccess} // ✅ pass the callback
         />
       )}
     </Card>

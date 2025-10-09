@@ -25,6 +25,7 @@ const BeneficiaryDetails = ({
   senderMobile,
   senderId,
   sender,
+  onPayoutSuccess,
 }) => {
   const [transferMode, setTransferMode] = useState("IMPS");
   const [amount, setAmount] = useState("");
@@ -105,8 +106,13 @@ const BeneficiaryDetails = ({
         ApiEndpoints.PAYOUT,
         payload
       );
+      console.log("PAYOUT RESPONSE:", response);
+
       if (response) {
         showToast(response?.message || "Payout successful!", "success");
+        const payoutData = response?.data?.response || response?.data || {};
+        console.log("DATA SENT TO PARENT:", payoutData);
+        onPayoutSuccess(payoutData);
         setAmount("");
         setOtp("");
         setMpin("");
@@ -219,13 +225,13 @@ const BeneficiaryDetails = ({
         value={amount}
         onChange={(e) => {
           const value = e.target.value;
-            if (/^\d*$/.test(value)) {
-          if (parseFloat(value) > parseFloat(sender?.rem_limit || 0)) {
-            apiErrorToast("Exceeds Rem Limit");
-            return;
+          if (/^\d*$/.test(value)) {
+            if (parseFloat(value) > parseFloat(sender?.rem_limit || 0)) {
+              apiErrorToast("Exceeds Rem Limit");
+              return;
+            }
+            setAmount(value);
           }
-          setAmount(value);
-        }
         }}
         InputProps={
           {
