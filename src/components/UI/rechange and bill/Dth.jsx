@@ -71,8 +71,8 @@ const Dth = () => {
 
   const handleRecharge = async () => {
     if (!customerId) return apiErrorToast("Please enter Customer ID");
-    if (!mobileNumber || mobileNumber.length !== 10)
-      return apiErrorToast("Please enter valid 10-digit Mobile Number");
+    // if (!mobileNumber || mobileNumber.length !== 10)
+    //   return apiErrorToast("Please enter valid 10-digit Mobile Number");
     if (!manualAmount || parseFloat(manualAmount) <= 0)
       return apiErrorToast("Please enter a valid amount");
     if (!MpinCallBackVal || MpinCallBackVal.length !== 6)
@@ -82,7 +82,7 @@ const Dth = () => {
     setLoading(true);
     const payload = {
       customer_id: customerId,
-      mobile_number: mobileNumber,
+      // mobile_number: mobileNumber,
       operator: selectedService?.id,
       amount: parseFloat(manualAmount),
       latitude: location?.lat,
@@ -230,7 +230,7 @@ const Dth = () => {
                   onChange={(e) => setCustomerId(e.target.value)}
                   sx={{ mb: 2 }}
                 />
-                <TextField
+                {/* <TextField
                   fullWidth
                   label="Mobile Number"
                   value={mobileNumber}
@@ -245,7 +245,7 @@ const Dth = () => {
                       <InputAdornment position="start">📱</InputAdornment>
                     ),
                   }}
-                />
+                /> */}
                 <TextField
                   fullWidth
                   label="Amount"
@@ -265,77 +265,76 @@ const Dth = () => {
                   }}
                   sx={{ mb: 3 }}
                 />
-                {mobileNumber.length === 10 && (
-                  <Box sx={{ textAlign: "center", mb: 2 }}>
-                    {/* Instruction text */}
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 1, fontWeight: 500, color: "gray" }}
-                    >
-                      Enter 6-digit MPIN
-                    </Typography>
+                <Box sx={{ textAlign: "center", mb: 2 }}>
+                  {/* Instruction text */}
+                  <Typography
+                    variant="body2"
+                    sx={{ mb: 1, fontWeight: 500, color: "gray" }}
+                  >
+                    Enter 6-digit MPIN
+                  </Typography>
 
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        gap: 1,
-                        mb: 1.5,
-                      }}
-                    >
-                      {Array.from({ length: 6 }).map((_, index) => (
-                        <TextField
-                          key={index}
-                          type="password"
-                          inputProps={{
-                            maxLength: 1,
-                            style: {
-                              textAlign: "center",
-                              fontSize: 24,
-                              width: 35,
-                              padding: 8,
-                            },
-                          }}
-                          value={MpinCallBackVal[index] || ""}
-                          onChange={(e) => {
-                            const val = e.target.value.replace(/[^0-9]/g, "");
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      gap: 1,
+                      mb: 1.5,
+                    }}
+                  >
+                    {Array.from({ length: 6 }).map((_, index) => (
+                      <TextField
+                        key={index}
+                        type="password"
+                        inputProps={{
+                          maxLength: 1,
+                          style: {
+                            textAlign: "center",
+                            fontSize: 24,
+                            width: 35,
+                            padding: 8,
+                          },
+                        }}
+                        value={MpinCallBackVal[index] || ""}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/[^0-9]/g, "");
 
-                            let newMpin = MpinCallBackVal.split("");
-                            newMpin[index] = val; // allow "" too
-                            setMpinCallBackVal(newMpin.join(""));
+                          let newMpin = MpinCallBackVal.split("");
+                          newMpin[index] = val; // allow "" too
+                          setMpinCallBackVal(newMpin.join(""));
 
-                            if (val && index < 5) {
-                              // move to next if digit entered
-                              const next = document.getElementById(
-                                `mpin-${index + 1}`
-                              );
-                              if (next) next.focus();
-                            } else if (!val && index > 0) {
-                              // move back if deleted
-                              const prev = document.getElementById(
-                                `mpin-${index - 1}`
-                              );
-                              if (prev) prev.focus();
-                            }
-                          }}
-                          onKeyDown={(e) => {
-                            if (
-                              e.key === "Backspace" &&
-                              !MpinCallBackVal[index] &&
-                              index > 0
-                            ) {
-                              // move back if empty and backspace pressed
-                              const prev = document.getElementById(
-                                `mpin-${index - 1}`
-                              );
-                              if (prev) prev.focus();
-                            }
-                          }}
-                          id={`mpin-${index}`}
-                        />
-                      ))}
-                    </Box>
-                    {/* <Box
+                          if (val && index < 5) {
+                            // move to next if digit entered
+                            const next = document.getElementById(
+                              `mpin-${index + 1}`
+                            );
+                            if (next) next.focus();
+                          } else if (!val && index > 0) {
+                            // move back if deleted
+                            const prev = document.getElementById(
+                              `mpin-${index - 1}`
+                            );
+                            if (prev) prev.focus();
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (
+                            e.key === "Backspace" &&
+                            !MpinCallBackVal[index] &&
+                            index > 0
+                          ) {
+                            // move back if empty and backspace pressed
+                            const prev = document.getElementById(
+                              `mpin-${index - 1}`
+                            );
+                            if (prev) prev.focus();
+                          }
+                        }}
+                        id={`mpin-${index}`}
+                      />
+                    ))}
+                  </Box>
+                  {/* <Box
                       sx={{ display: "flex", justifyContent: "center", ml: 32 }}
                     >
                       <Button
@@ -354,8 +353,7 @@ const Dth = () => {
                         username={username}
                       />
                     )} */}
-                  </Box>
-                )}
+                </Box>
 
                 <Button
                   fullWidth
