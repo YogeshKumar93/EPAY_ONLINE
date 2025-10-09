@@ -25,6 +25,7 @@ const LevinBeneficiaryDetails = ({
   senderMobile,
   senderId,
   sender,
+  onLevinSuccess,
 }) => {
   const [transferMode, setTransferMode] = useState("IMPS");
   const [amount, setAmount] = useState("");
@@ -39,6 +40,7 @@ const LevinBeneficiaryDetails = ({
   const [selectedPurpose, setSelectedPurpose] = useState("");
   const [loadingPurposes, setLoadingPurposes] = useState(false);
   const [resetMpinModalOpen, setResetMpinModalOpen] = useState(false);
+  console.log("location", location);
 
   if (!beneficiary) return null;
 
@@ -107,6 +109,15 @@ const LevinBeneficiaryDetails = ({
       );
       if (response) {
         showToast(response?.message || "Payout successful!", "success");
+        const payoutData = {
+          ...(response || {}),
+          beneficiary,
+          senderMobile,
+          transferMode,
+        };
+        console.log("DATA SENT TO PARENT:", payoutData);
+
+        onLevinSuccess(payoutData); // send to parent
         setAmount("");
         setOtp("");
         setMpin("");

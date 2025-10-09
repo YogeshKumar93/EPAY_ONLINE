@@ -49,7 +49,7 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
         "post",
         ApiEndpoints.WALLET_GET_RECEIVER,
         {
-          user_id: `TRANS${row.id}`,
+          user_id: `P2PAE${row.id}`,
         }
       );
 
@@ -234,7 +234,7 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
                 sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
               >
                 <MenuItem value="credit">Credit</MenuItem>
-                {user.role === "adm" && (
+                {(user.role === "adm" || user.role === "sadm") && (
                   <MenuItem value="debit">Debit</MenuItem>
                 )}
               </TextField>

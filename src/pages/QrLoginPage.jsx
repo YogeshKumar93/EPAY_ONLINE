@@ -177,7 +177,9 @@ const QrLoginPage = () => {
     const fetchLocation = getGeoLocation(
       (lat, long) => {
         console.log("✅ Got location:", lat, long);
-        authCtx.setLocation(lat, long);
+        localStorage.setItem("location", JSON.stringify({ lat, long }));
+
+        // authCtx.setLocation(lat, long);
       },
       (err) => console.error(" Location error:", err)
     );

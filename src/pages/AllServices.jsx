@@ -279,20 +279,20 @@ export default function AllServices() {
     //   icon: mt,
     //   component: Dmt,
     // },
-  {
-      key: "monettransfer",
+    {
+      key: "money",
       label: "Money Transfer",
       icon: sendmoney,
       subMenu: [
-        hasPermission("dmt1") &&   {
+        hasPermission("dmt1") && {
           key: "dmt1",
-          label: " Airtel Dmt",
+          label: "Airtel Dmt",
           icon: AIR1,
           component: Dmt,
           type: "mobile",
           title: "Dmt1",
         },
-          hasPermission("dmt2") && {
+        hasPermission("dmt2") && {
           key: "dmt2",
           label: "Fino Dmt",
           icon: FINO,
@@ -300,7 +300,7 @@ export default function AllServices() {
           type: "mobile",
           title: "Dmt2",
         },
-      ],
+      ].filter(Boolean),
     },
     {
       key: "ppiWallet",
@@ -339,13 +339,13 @@ export default function AllServices() {
         },
       ],
     },
-   {
+    {
       key: "aeps",
       label: "AEPS",
       icon: thumbPrint,
       // component: Aeps,
       subMenu: [
-         hasPermission("aeps1") && {
+        hasPermission("aeps1") && {
           key: "aeps1",
           label: "Aeps 1",
           icon: AccountBalanceWalletIcon,
@@ -473,7 +473,7 @@ export default function AllServices() {
         },
       ],
     },
-     hasPermission("credit_card") && {
+    hasPermission("credit_card") && {
       key: "credit",
       label: "Credit Card Bill",
       icon: credit_card1,
@@ -522,7 +522,7 @@ export default function AllServices() {
         },
       ],
     },
-     hasPermission("travel") && {
+    hasPermission("travel") && {
       key: "travel",
       label: "Travel",
       icon: plane_1,
@@ -548,21 +548,21 @@ export default function AllServices() {
         },
       ],
     },
-      hasPermission("w_txn") && {
+    hasPermission("w_txn") && {
       key: "w2w",
       label: "W 2 W",
       icon: wallet1,
       subMenu: [
         {
           key: "w1w1",
-          label: "W1 TO W1",
+          label: "Wallet to Wallet",
           icon: wallet1,
           type: "dth",
           component: Wallet2WalletTransfer,
         },
         {
           key: "w2w1",
-          label: "W2 TO W1",
+          label: "Aeps Wallet to Main Wallet",
           icon: wallet1,
           component: Wallet2Wallet1,
         },

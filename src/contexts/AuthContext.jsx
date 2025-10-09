@@ -35,6 +35,11 @@ export const AuthProvider = ({ children }) => {
   const [location, setLocation] = useState(
     JSON.parse(localStorage.getItem("location"))
   );
+  console.log("location in auth", location);
+  console.log(
+    "location in new auth",
+    JSON.parse(localStorage.getItem("location"))
+  );
   const [theame, setTheame] = useState();
   const [colours, setColours] = useState(() => {
     const stored = localStorage.getItem("colours");
@@ -294,7 +299,7 @@ export const AuthProvider = ({ children }) => {
     theame: theame,
     iconColor: iconColor,
     saveNepalUser: nepalUserHandler,
-    setLocation: latLongHandler,
+    setLocation: setLocation,
     setDocsInLocal,
     ifDocsUploaded,
     setValue: setValue,

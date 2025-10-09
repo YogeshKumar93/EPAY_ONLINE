@@ -57,7 +57,12 @@ import BeneficiaryDetails from "./BeneficiaryDetails";
 import { useToast } from "../utils/ToastContext";
 import LevinBeneficiaryDetails from "./LevinBeneficiaryDetails";
 
-const LevinBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
+const LevinBeneficiaryList = ({
+  sender,
+  onSuccess,
+  onSelect,
+  onLevinSuccess,
+}) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { showToast } = useToast();
@@ -475,6 +480,7 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onSelect }) => {
           sender={sender}
           senderId={sender?.id}
           senderMobile={sender?.mobile_number}
+          onLevinSuccess={onLevinSuccess}
         />
       )}
     </Card>
