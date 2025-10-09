@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   Box,
+  Button,
   Divider,
   TextField,
   Typography,
@@ -34,6 +35,8 @@ const LevinFundTransfer = () => {
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
+  const [levinResponse, setLevinResponse] = useState(null); // store API response
+
   // Fetch sender by mobile number
   const handleFetchSender = async (number = mobile) => {
     if (!number || number.length !== 10) return;
@@ -106,6 +109,15 @@ const LevinFundTransfer = () => {
     }
   };
 
+  const handleLevinSuccess = (data) => {
+    console.log("Received in parent:", data);
+    setLevinResponse(data);
+  };
+  useEffect(() => {
+    if (levinResponse) {
+      console.log("Updated levinResponse:", levinResponse);
+    }
+  }, [levinResponse]);
   const handleSenderRegistered = ({ number, state, sender_id }) => {
     setOtpData({
       mobile_number: number,
@@ -117,85 +129,200 @@ const LevinFundTransfer = () => {
 
   return (
     <Box>
-      {/* Always show mobile input */}
-      <Box
-        display="flex"
-        flexDirection={{ xs: "column", sm: "row" }}
-        alignItems="center"
-        gap={1}
-        mb={1}
-      >
-        <TextField
-          label="Mobile Number"
-          variant="outlined"
-          value={mobile}
-          onChange={handleChange}
-          inputProps={{ maxLength: 10 }}
-          sx={{ flex: 1 }}
-          fullWidth
-        />
-
-        <Box
-          sx={{
-            display: { xs: "flex", sm: "none" },
-            justifyContent: "center",
-            width: "100%",
-            my: 0.5,
-          }}
-        >
-          <Divider sx={{ width: "30%", textAlign: "center" }}>
-            <Typography variant="body2" color="text.secondary">
-              OR
-            </Typography>
-          </Divider>
-        </Box>
-
-        <TextField
-          label="Account Number"
-          variant="outlined"
-          // value={account}
-          // onChange={(e) => setAccount(e.target.value.replace(/\D/g, ""))}
-          inputProps={{ maxLength: 18 }}
-          sx={{ flex: 1 }}
-          fullWidth
-        />
-        {loading && (
-          <CommonLoader
-            loading={loading}
-            size={24}
-            sx={{
-              position: "absolute",
-              top: "50%",
-              right: 16,
-              transform: "translateY(-50%)",
-            }}
-          />
-        )}
-      </Box>
-      <Box display="flex" flexDirection="column" gap={1}>
-        {/* Sender Details */}
-        <Box width="100%">
-          <SenderDetails sender={sender} />
-
-          {selectedBeneficiary && (
-            <LevinBeneficiaryDetails
-              beneficiary={selectedBeneficiary}
-              senderMobile={mobile}
-              sender={sender}
+      {!levinResponse ? (
+        <>
+          <Box
+            display="flex"
+            flexDirection={{ xs: "column", sm: "row" }}
+            alignItems="center"
+            gap={1}
+            mb={1}
+          >
+            <TextField
+              label="Mobile Number"
+              variant="outlined"
+              value={mobile}
+              onChange={handleChange}
+              inputProps={{ maxLength: 10 }}
+              sx={{ flex: 1 }}
+              fullWidth
             />
-          )}
-        </Box>
 
-        {/* Beneficiary List */}
-        <Box width="100%">
-          <LevinBeneficiaryList
-            sender={sender}
-            onSuccess={() => handleFetchSender()}
-            onSelect={(b) => setSelectedBeneficiary(b)}
-          />
-        </Box>
-      </Box>
+            <Box
+              sx={{
+                display: { xs: "flex", sm: "none" },
+                justifyContent: "center",
+                width: "100%",
+                my: 0.5,
+              }}
+            >
+              <Divider sx={{ width: "30%", textAlign: "center" }}>
+                <Typography variant="body2" color="text.secondary">
+                  OR
+                </Typography>
+              </Divider>
+            </Box>
 
+            <TextField
+              label="Account Number"
+              variant="outlined"
+              // value={account}
+              // onChange={(e) => setAccount(e.target.value.replace(/\D/g, ""))}
+              inputProps={{ maxLength: 18 }}
+              sx={{ flex: 1 }}
+              fullWidth
+            />
+            {loading && (
+              <CommonLoader
+                loading={loading}
+                size={24}
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  right: 16,
+                  transform: "translateY(-50%)",
+                }}
+              />
+            )}
+          </Box>
+          <Box display="flex" flexDirection="column" gap={1}>
+            {/* Sender Details */}
+            <Box width="100%">
+              <SenderDetails sender={sender} />
+            </Box>
+
+            {/* Beneficiary List */}
+            <Box width="100%">
+              <LevinBeneficiaryList
+                sender={sender}
+                onSuccess={() => handleFetchSender()}
+                onSelect={(b) => setSelectedBeneficiary(b)}
+                onLevinSuccess={handleLevinSuccess} // ✅ callback passed
+              />
+            </Box>
+          </Box>
+        </>
+      ) : (
+        <Box p={3} bgcolor="#e0ffe0" borderRadius={2} maxWidth={500} mx="auto">
+          <Typography
+            variant="h5"
+            color="success.main"
+            mb={2}
+            textAlign="center"
+            fontWeight="bold"
+          >
+            Payment Receipt
+          </Typography>
+
+          {/* Date */}
+          <Typography variant="body2" mb={1}>
+            <strong>Date:</strong> {new Date().toLocaleDateString()}
+          </Typography>
+
+          {/* Message */}
+          <Typography variant="body2" color="success.main" mb={2}>
+            {levinResponse?.message || "Transaction Successful"}
+          </Typography>
+
+          {/* Details */}
+          <Box
+            sx={{ bgcolor: "#f7fff7", p: 2, borderRadius: 2 }}
+            id="receiptContent"
+          >
+            <Typography variant="body2" mb={0.5}>
+              <strong>Sender Mobile:</strong>{" "}
+              {levinResponse?.senderMobile || "---"}
+            </Typography>
+            <Typography variant="body2" mb={0.5}>
+              <strong>Txn Id:</strong> {levinResponse?.data?.TxnID || "---"}
+            </Typography>
+            <Typography variant="body2" mb={0.5}>
+              <strong>Beneficiary Name:</strong>{" "}
+              {levinResponse?.data?.BeneName ||
+                levinResponse?.beneficiary?.beneficiary_name ||
+                "---"}
+            </Typography>
+            <Typography variant="body2" mb={0.5}>
+              <strong>Beneficiary Account:</strong>{" "}
+              {levinResponse?.beneficiary?.account_number || "---"}
+            </Typography>
+            {/* <Typography variant="body2" mb={0.5}>
+              <strong>Account Number:</strong>{" "}
+              {levinResponse?.response?.data?.beneficiaryAccount || "---"}
+            </Typography>
+
+         
+        
+            <Typography variant="body2" mb={0.5}>
+              <strong>Purpose:</strong>
+              {levinResponse?.purpose || "N/A"}{" "}
+            </Typography> */}
+            <Typography variant="body2" mb={0.5}>
+              <strong>Transfer Mode:</strong>{" "}
+              {levinResponse?.transferMode || "---"}
+            </Typography>
+            <Typography variant="body2" mb={0.5}>
+              <strong>Amount:</strong>{" "}
+              {levinResponse?.data?.AmountRequested || "---"}
+            </Typography>
+            <Typography variant="body2" mb={0.5}>
+              <strong>UTR:</strong> {levinResponse?.data?.utr || "---"}
+            </Typography>
+          </Box>
+
+          {/* Buttons */}
+          <Box mt={3} display="flex" justifyContent="center" gap={2}>
+            <Button
+              variant="contained"
+              sx={{ mt: 2 }}
+              onClick={() => setLevinResponse(null)} // Reset for new transfer
+            >
+              New Transfer
+            </Button>
+
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => {
+                const printContent = document.getElementById("receiptContent");
+                if (!printContent) return;
+
+                const newWin = window.open("", "_blank");
+                const styles = Array.from(
+                  document.querySelectorAll("style, link[rel='stylesheet']")
+                )
+                  .map((node) => node.outerHTML)
+                  .join("\n");
+
+                newWin.document.write(`
+      <html>
+        <head>
+          <title>Receipt</title>
+          ${styles} 
+          <style>
+            body { font-family: Roboto, sans-serif; padding: 20px; background-color: #fff; }
+            #receiptContent { background-color: #f7fff7; padding: 16px; border-radius: 8px; }
+            h5 { color: #388e3c; text-align: center; }
+            p, strong { font-size: 14px; margin: 4px 0; }
+          </style>
+        </head>
+        <body>
+          <h5>Payment Receipt</h5>
+          ${printContent.innerHTML}
+        </body>
+      </html>
+    `);
+                newWin.document.close();
+                newWin.focus();
+                newWin.print();
+                newWin.close();
+              }}
+            >
+              Print Receipt
+            </Button>
+          </Box>
+        </Box>
+      )}
       {/* Register Modal */}
       {openRegisterModal && (
         <LevinRegisterRemitter

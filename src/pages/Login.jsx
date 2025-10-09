@@ -77,7 +77,8 @@ const Login = () => {
       (lat, long) => {
         console.log("✅ User Location fetched:", { lat, long });
         setLocation({ lat, long });
-        authCtx.setLocation(lat, long);
+        localStorage.setItem("location", JSON.stringify({ lat, long }));
+        // authCtx.setLocation(lat, long);
       },
       (err) => {
         console.error("❌ Location Error:", err);
