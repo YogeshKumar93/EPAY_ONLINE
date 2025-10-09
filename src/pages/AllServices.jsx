@@ -279,7 +279,7 @@ export default function AllServices() {
     //   icon: mt,
     //   component: Dmt,
     // },
-    hasPermission("monettransfer") && {
+    hasPermission("dmt1") && {
       key: "monettransfer",
       label: "Money Transfer",
       icon: sendmoney,
@@ -339,19 +339,19 @@ export default function AllServices() {
         },
       ],
     },
-    hasPermission("aeps") && {
+   {
       key: "aeps",
       label: "AEPS",
       icon: thumbPrint,
       // component: Aeps,
       subMenu: [
-        {
+         hasPermission("aeps1") && {
           key: "aeps1",
           label: "Aeps 1",
           icon: AccountBalanceWalletIcon,
           component: AepsLayout2,
         },
-        {
+        hasPermission("aeps2") && {
           key: "aeps2",
           label: "Aeps 2",
           icon: AccountBalanceWalletIcon,
@@ -359,7 +359,7 @@ export default function AllServices() {
         },
       ],
     },
-    hasPermission("billpay") && {
+    hasPermission("bbps") && {
       key: "billPayments",
       label: "BBPS(OFFLINE)",
       icon: BBPS,
@@ -443,7 +443,7 @@ export default function AllServices() {
       component: Bbps,
     },
 
-    hasPermission("mt") && {
+    hasPermission("recharge") && {
       key: "recharge",
       label: "Recharge",
       icon: mobileRechargeNew,
@@ -473,7 +473,7 @@ export default function AllServices() {
         },
       ],
     },
-    {
+     hasPermission("credit_card") && {
       key: "credit",
       label: "Credit Card Bill",
       icon: credit_card1,
@@ -522,7 +522,7 @@ export default function AllServices() {
         },
       ],
     },
-    {
+     hasPermission("travel") && {
       key: "travel",
       label: "Travel",
       icon: plane_1,
@@ -548,7 +548,7 @@ export default function AllServices() {
         },
       ],
     },
-    {
+      hasPermission("w_txn") && {
       key: "w2w",
       label: "W 2 W",
       icon: wallet1,
