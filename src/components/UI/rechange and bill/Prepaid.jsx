@@ -52,6 +52,7 @@ const Prepaid = () => {
   const authCtx = useContext(AuthContext);
   const username = `TRANS${authCtx?.user?.id}`;
   const loadUserProfile = authCtx.loadUserProfile;
+  const [rechargeResponse, setRechargeResponse] = useState(null);
 
   // Fetch services and auto-select first operator
   useEffect(() => {
@@ -132,6 +133,7 @@ const Prepaid = () => {
         [error?.message, error?.errors?.response?.data],
         "error"
       );
+    setRechargeResponse(response?.data); // ← store the response
     loadUserProfile();
     okSuccessToast(response?.message);
     setStep(4); // Success step
@@ -632,7 +634,8 @@ const Prepaid = () => {
           <Box textAlign="center" maxWidth={500} mx="auto" py={4}>
             <CheckCircle sx={{ fontSize: 80, color: "success.main", mb: 2 }} />
             <Typography variant="h4" color="success.main" gutterBottom>
-              Recharge Successful!
+              {/* Recharge Successful! */}
+              {rechargeResponse?.message || "Recharge Successful!"}
             </Typography>
             <Typography variant="h6">
               ₹{selectedPlan?.price} recharge for {mobileNumber}
