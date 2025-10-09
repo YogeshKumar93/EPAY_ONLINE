@@ -54,6 +54,7 @@ const ApiEndpoints = {
   GET_TRANSACTIONS: "admin/getTransactions",
   GET_ACC_TRANSACTIONS: "",
   // GET_TRANSACTIONS: "admin/getTransactions",
+  CREATE_SERVICES:"admin/getRoutes",
   CRED_REQ: "admin/getCrRequests",
   CRED_REQ_APPROVE: "admin/crActions",
   GET_OPERATOR: "admin/getOperators",
