@@ -263,8 +263,8 @@ export default function AllServices() {
   const [currentView, setCurrentView] = useState("");
 
   const hasPermission = (permissionKey) => {
-    if (!user) return false;
-    return user[permissionKey] !== 1; // Show menu if permission is NOT 1
+    if (!user || !user.permissions) return false;
+    return user.permissions[permissionKey] === 1; // Show menu only if permission is 1
   };
 
   const hasNonZeroPermission = (permissionKey) => {
@@ -302,26 +302,28 @@ export default function AllServices() {
         },
       ],
     },
-    hasNonZeroPermission("dmt4") && {
+    {
       key: "ppiWallet",
       label: "Fund Transfer",
       icon: vapy_1,
       subMenu: [
-        {
+        // Fund Transfer1 → requires vendor permission
+        hasPermission("vendor") && {
           key: "walletSuper",
           label: "Fund Transfer1",
           icon: AccountBalanceWalletIcon,
           component: SuperTransfer,
           type: "super",
         },
-        {
+        // Fund Transfer2 → requires levin permission
+        hasPermission("levin") && {
           key: "fundtransfer2",
           label: "Fund Transfer2",
           icon: AccountBalanceWalletIcon,
           component: LevinFundTransfer,
           type: "super",
         },
-      ],
+      ].filter(Boolean), // remove null items
     },
     hasPermission("upi") && {
       key: "qrUpi",
