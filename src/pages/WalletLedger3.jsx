@@ -19,6 +19,7 @@ import { capitalize1 } from "../utils/TextUtil";
 import TransactionDetailsCard from "../components/common/TransactionDetailsCard";
 import ComplaintForm from "../components/ComplaintForm";
 import companylogo from "../assets/Images/PPALogor.png";
+import { apiCall } from "../api/apiClient";
 
 const WalletLedger3 = ({ query }) => {
   const authCtx = useContext(AuthContext);
@@ -27,6 +28,7 @@ const WalletLedger3 = ({ query }) => {
    const [selectedRow, setSelectedRow] = useState(null);
     const [openCreate, setOpenCreate] = useState(false);
     const [drawerOpen, setDrawerOpen] = useState(false);
+      const [services, setServices] = useState([]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -36,12 +38,34 @@ const WalletLedger3 = ({ query }) => {
     return () => clearTimeout(timer);
   }, []);
 
+  
+     const fetchServices = async () => {
+        try {
+          const { response } = await apiCall("POST", ApiEndpoints.GET_SERVICES);
+          if (response?.data) {
+            setServices(
+              response?.data.map((service) => ({
+                value: service.name, // ✅ send name in payload
+                label: service.name || `Service ${service.name}`,
+              }))
+            );
+          }
+        } catch (error) {
+          console.error("Error fetching services:", error);
+        }
+      };
+       useEffect(() => {
+     
+      fetchServices();
+    }, []);
+
   const filters = useMemo(
     () => [
-      {
-        id: "user_id",
-        label: "User Name",
-        type: "textfield",
+       {
+        id: "service_name",
+        label: "Service Name",
+        type: "dropdown",
+        options: services,
       },
       {
         id: "date_range",

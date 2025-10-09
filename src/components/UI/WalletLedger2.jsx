@@ -9,11 +9,13 @@ import AuthContext from "../../contexts/AuthContext";
 import CommonStatus from "../common/CommonStatus";
 import CommonLoader from "../common/CommonLoader";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { apiCall } from "../../api/apiClient";
 
 const WalletLedger2 = ({ query }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const [loading, setLoading] = useState(true); // initially true
+   const [services, setServices] = useState([]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -23,12 +25,35 @@ const WalletLedger2 = ({ query }) => {
     return () => clearTimeout(timer);
   }, []);
 
+
+
+     const fetchServices = async () => {
+        try {
+          const { response } = await apiCall("POST", ApiEndpoints.GET_SERVICES);
+          if (response?.data) {
+            setServices(
+              response?.data.map((service) => ({
+                value: service.name, // ✅ send name in payload
+                label: service.name || `Service ${service.name}`,
+              }))
+            );
+          }
+        } catch (error) {
+          console.error("Error fetching services:", error);
+        }
+      };
+       useEffect(() => {
+     
+      fetchServices();
+    }, []);
+
   const filters = useMemo(
     () => [
-      {
-        id: "user_id",
-        label: "User Name",
-        type: "textfield",
+       {
+        id: "service_name",
+        label: "Service Name",
+        type: "dropdown",
+        options: services,
       },
       {
         id: "date_range",
