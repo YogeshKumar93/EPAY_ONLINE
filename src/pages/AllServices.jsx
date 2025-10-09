@@ -359,7 +359,7 @@ export default function AllServices() {
         },
       ],
     },
-    hasPermission("bbps") && {
+    hasPermission("bbps_offline") && {
       key: "billPayments",
       label: "BBPS(OFFLINE)",
       icon: BBPS,
