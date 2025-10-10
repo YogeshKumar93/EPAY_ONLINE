@@ -169,7 +169,7 @@ const PrintRecharge = () => {
                 "&:hover": { borderColor: "#ff9a3c", color: "#ff9a3c" },
               }}
             >
-              Recharge Transaction Receipt
+              Transaction Summary
             </Button>
           </Box>
 

@@ -186,7 +186,7 @@ const PrintDmt2 = () => {
                 "&:hover": { borderColor: "#ff9a3c", color: "#ff9a3c" },
               }}
             >
-              DMT Transaction Summary
+               Transaction Summary
             </Button>
           </Box>
 

@@ -145,7 +145,7 @@ const PrintCreditCard = () => {
         {/* Title */}
         <Box display="flex" justifyContent="center" mt={2}>
           <Typography variant="h6" sx={{ fontWeight: 700, border: "2px solid #2b9bd7", px: 2, py: 0.5, borderRadius: 1 }}>
-            Credit Card Transaction Receipt
+         Transaction Summary
           </Typography>
         </Box>
 

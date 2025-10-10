@@ -39,7 +39,7 @@ const PrintPayout = () => {
 
   const headers = [
     "Date/Time",
-    "Service",
+    "Purpose",
     "Mobile",
     "Beneficiary Details",
     "Amount",
@@ -120,7 +120,7 @@ const PrintPayout = () => {
                 "&:hover": { borderColor: "#ff9a3c", color: "#ff9a3c" },
               }}
             >
-              Payout Transaction Summary
+               Transaction Summary
             </Button>
           </Box>
 
@@ -134,8 +134,7 @@ const PrintPayout = () => {
               </Box>
               {data.map((txn, idx) => {
                 const amount = parseFloat(txn.amount || 0);
-                const ccf = parseFloat(txn.ccf || 0);
-                const totalAmount = amount + ccf;
+           
 
                 const beneficiaryDetails = (
                   <Box className="beneficiary-box">
@@ -147,12 +146,11 @@ const PrintPayout = () => {
 
                 const values = [
                   txn.created_at ? ddmmyyWithTime(txn.created_at) : "",
-                  txn.operator || "",
+                  txn.purpose || "",
                   txn.mobile_number || "",
                   beneficiaryDetails,
                   `₹ ${amount.toFixed(2)}`,
-                  `₹ ${ccf.toFixed(2)}`,
-                  `₹ ${totalAmount.toFixed(2)}`,
+                 
                 ];
 
                 return (
@@ -176,19 +174,17 @@ const PrintPayout = () => {
             <Box mt={2} sx={{ border: "1px solid #e0e0e0", borderRadius: 2, overflow: "hidden" }}>
               {data.map((txn, idx) => {
                 const amount = parseFloat(txn.amount || 0);
-                const ccf = parseFloat(txn.ccf || 0);
-                const totalAmount = amount + ccf;
+               
 
                 const values = [
                   txn.created_at ? ddmmyyWithTime(txn.created_at) : "",
-                  txn.operator || "",
+                  txn.purpose || "",
                   txn.mobile_number || "",
                   `${txn.beneficiary_name || ""}, 
                   A/C: ${txn.account_number || ""}, 
                   IFSC: ${txn.ifsc_code || ""}`,
                   `₹ ${amount.toFixed(2)}`,
-                  `₹ ${ccf.toFixed(2)}`,
-                  `₹ ${totalAmount.toFixed(2)}`,
+              
                 ];
 
                 return (

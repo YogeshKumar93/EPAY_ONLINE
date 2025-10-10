@@ -138,7 +138,7 @@ const PrintBbps = () => {
                 "&:hover": { borderColor: "#ff9a3c", color: "#ff9a3c" },
               }}
             >
-              BBPS Transaction Summary
+               Transaction Summary
             </Button>
           </Box>
 
