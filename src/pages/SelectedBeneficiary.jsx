@@ -93,7 +93,7 @@ const SelectedBeneficiary = ({
   const [successfulTransactions, setSuccessfulTransactions] = useState([]);
   const [showSuccessSummary, setShowSuccessSummary] = useState(false);
 
-  const maxLimit = 100;
+  const maxLimit = 5000;
 
   const [amountRows, setAmountRows] = useState([]);
   const amountInWords = amount
