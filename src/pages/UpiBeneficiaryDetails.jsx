@@ -9,6 +9,8 @@ import { useToast } from "../utils/ToastContext";
 import ResetMpin from "../components/common/ResetMpin";
 import CommonModal from "../components/common/CommonModal";
 
+import { convertNumberToWordsIndian } from "../utils/NumberUtil";
+
 const UpiBeneficiaryDetails = ({
   open,
   onClose,
@@ -31,6 +33,13 @@ const UpiBeneficiaryDetails = ({
   const user = authCtx?.user;
   const { location } = useContext(AuthContext);
   const { showToast } = useToast();
+
+ const amountInWords = amount
+  ? `${convertNumberToWordsIndian(amount)
+      .replace(/\b\w/g, (char) => char.toUpperCase())} Only`
+  : "";
+
+
 
   if (!beneficiary) return null;
   const username = `GURU1${user?.id}`;
@@ -157,6 +166,20 @@ const UpiBeneficiaryDetails = ({
           }
         }}
       />
+        {amount && (
+  <Typography
+    variant="body2"
+    sx={{
+    
+      color: "#555",
+      fontWeight: 500,
+      
+    }}
+  >
+    {amountInWords}
+  </Typography>
+)}
+
 
       <Box>
         <Typography variant="body2" mb={0.5}>

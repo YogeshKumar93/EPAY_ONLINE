@@ -17,7 +17,7 @@ import OTPInput from "react-otp-input";
 import { useToast } from "../utils/ToastContext";
 import CommonModal from "../components/common/CommonModal";
 import ResetMpin from "../components/common/ResetMpin";
-import { toWords } from "number-to-words";
+import { convertNumberToWordsIndian } from "../utils/NumberUtil";
 
 const BeneficiaryDetails = ({
   open,
@@ -148,7 +148,10 @@ const BeneficiaryDetails = ({
     }
   };
 
-  const amountInWords = amount ? `${toWords(parseInt(amount))} Rupees` : "";
+  const amountInWords = amount
+  ? `${convertNumberToWordsIndian(amount)
+      .replace(/\b\w/g, (char) => char.toUpperCase())} Only`
+  : "";
 
 
   // --- Custom Content ---
@@ -227,11 +230,19 @@ const BeneficiaryDetails = ({
         value={amount}
         onChange={handleChange}
       />
-      {amount && (
-        <Typography variant="body2" sx={{ mt: 1, color: "#555" }}>
-          {amountInWords.charAt(0).toUpperCase() + amountInWords.slice(1) } Only
-        </Typography>
-      )}
+           {amount && (
+  <Typography
+    variant="body2"
+    sx={{
+    
+      color: "#555",
+      fontWeight: 500,
+      
+    }}
+  >
+    {amountInWords}
+  </Typography>
+)}
   
 
       <Box>
