@@ -39,7 +39,7 @@ import ResetMpin from "../components/common/ResetMpin";
 import { showSuccessToast } from "../components/common/ShowSuccessToast";
 import { useNavigate } from "react-router-dom";
 import CommonModal from "../components/common/CommonModal";
-import { toWords } from "number-to-words";
+import { convertNumberToWordsIndian } from "../utils/NumberUtil";
 import {
   abhy2,
   airtel2,
@@ -90,7 +90,10 @@ const SelectedBeneficiary = ({
   const maxLimit = 5000;
 
   const [amountRows, setAmountRows] = useState([]);
-  const amountInWords = amount ? `${toWords(parseInt(amount))} Rupees` : "";
+ const amountInWords = amount
+  ? `${convertNumberToWordsIndian(amount)
+      .replace(/\b\w/g, (char) => char.toUpperCase())} Only`
+  : "";
 
   useEffect(() => {
     if (amount && parseFloat(amount) > 0) {
@@ -616,11 +619,19 @@ const SelectedBeneficiary = ({
                     ),
                   }}
                 />
-                  {amount && (
-        <Typography variant="body2" sx={{ mt: 1, color: "#555" }}>
-          {amountInWords.charAt(0).toUpperCase() + amountInWords.slice(1) } Only
-        </Typography>
-      )}
+             {amount && (
+  <Typography
+    variant="body2"
+    sx={{
+    
+      color: "#555",
+      fontWeight: 500,
+      
+    }}
+  >
+    {amountInWords}
+  </Typography>
+)}
               </Box>
             </Box>
           </Box>
