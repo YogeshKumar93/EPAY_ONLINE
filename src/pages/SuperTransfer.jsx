@@ -362,6 +362,12 @@ const SuperTransfer = () => {
         <SuperTransferReceipt
           payoutResponse={payoutResponse}
           onRepeat={() => setPayoutResponse(null)}
+          onNewTxn={() => {
+            setPayoutResponse(null);
+            setMobile(""); // reset sender number
+            setSender(null); // reset sender
+            setSelectedBeneficiary(null); // reset selected beneficiary
+          }}
         />
       )}
 

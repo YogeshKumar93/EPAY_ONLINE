@@ -58,7 +58,7 @@ import BeneficiaryDetails from "./BeneficiaryDetails";
 import { useToast } from "../utils/ToastContext";
 import AuthContext from "../contexts/AuthContext";
 
-const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
+const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
   const theme = useTheme();
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -70,6 +70,8 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
   const [verifyOpen, setVerifyOpen] = useState(false); // 🔑 verify modal state
   const [mpinDigits, setMpinDigits] = useState(Array(6).fill(""));
   const [pendingPayload, setPendingPayload] = useState(null);
+  const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
+  const [openPayModal, setOpenPayModal] = useState(false);
   const [tupResponse, setTupResponse] = useState(null); // 🔑 TUP response state
   const [verifyingBeneficiary, setVerifyingBeneficiary] = useState(null); // 🔑 Track which beneficiary is being verified
   const { schema, formData, handleChange, errors, setErrors, loading } =
@@ -114,7 +116,10 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
       return true; // not required field
     });
   }, [formData, schema]);
-
+  const handleOpenPay = (beneficiary) => {
+    setSelectedBeneficiary(beneficiary);
+    setOpenPayModal(true);
+  };
   // 🔑 New function to handle verification of existing beneficiary
   const handleVerifyExistingBeneficiary = (beneficiary) => {
     setVerifyingBeneficiary(beneficiary);
@@ -500,7 +505,8 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
                       <Button
                         size="small"
                         variant="contained"
-                        onClick={() => onSelect?.(b)}
+                        // color="primary"
+                        onClick={() => handleOpenPay(b)} // ✅ open modal with this beneficiary
                         sx={{
                           backgroundColor: "#5c3ac8",
                           borderRadius: 1,
@@ -756,6 +762,17 @@ const BeneficiaryList = ({ sender, onSuccess, onSelect }) => {
             </Box>
           </Box>
         </CommonModal>
+      )}
+      {openPayModal && (
+        <BeneficiaryDetails
+          open={openPayModal}
+          onClose={() => setOpenPayModal(false)}
+          beneficiary={selectedBeneficiary}
+          sender={sender}
+          senderId={sender?.id}
+          senderMobile={sender?.mobile_number}
+          onPayoutSuccess={onPayoutSuccess} // ✅ pass the callback
+        />
       )}
     </Card>
   );

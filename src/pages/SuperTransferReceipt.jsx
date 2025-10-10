@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Paper, Typography, Button } from "@mui/material";
 import { Logo } from "../iconsImports";
 
-const SuperTransferReceipt = ({ payoutResponse, onRepeat }) => {
+const SuperTransferReceipt = ({ payoutResponse, onRepeat, onNewTxn }) => {
   if (!payoutResponse) return null;
 
   const fields = [
@@ -238,6 +238,15 @@ const SuperTransferReceipt = ({ payoutResponse, onRepeat }) => {
       {/* Buttons */}
       <Box mt={2} display="flex" justifyContent="center" gap={1}>
         <Button
+          variant="outlined"
+          color="success"
+          size="small"
+          onClick={onNewTxn}
+        >
+          New Txn
+        </Button>
+
+        <Button
           variant="contained"
           color="primary"
           size="small"
@@ -254,6 +263,7 @@ const SuperTransferReceipt = ({ payoutResponse, onRepeat }) => {
         >
           Print Receipt
         </Button>
+
         <Typography
           variant="caption"
           color="text.secondary"

@@ -329,50 +329,70 @@ const PayoutTxn = ({ query }) => {
               width: "70px",
             },
           ]),
-      {
-        name: "Service",
-        selector: (row) => (
-          <div
-            style={{ textAlign: "left", fontWeight: "500", fontSize: "13px" }}
-          >
-            {row.operator} <br />
-            {["adm", "sadm"].includes(user?.role) && (
-              <>
-                <span
+      ...(user?.role === "ret" || user?.role === "dd"
+        ? [] // ❌ hide for ret and dd
+        : [
+            {
+              name: "Service",
+              selector: (row) => (
+                <div
                   style={{
-                    fontWeight: "normal",
-                    fontSize: "8px",
-                    color: "blue",
+                    textAlign: "left",
+                    fontWeight: "500",
+                    fontSize: "13px",
                   }}
                 >
-                  STATUS
-                </span>
-                <span
-                  style={{
-                    fontWeight: "normal",
-                    fontSize: "8px",
-                    color: "blue",
-                    cursor: "pointer",
-                    textDecoration: "underline",
-                    marginLeft: "6px",
-                  }}
-                  onClick={() => {
-                    setSelectedApiResponse(
-                      row.api_response || "No response available"
-                    );
-                    setResponseModalOpen(true);
-                  }}
-                >
-                  RESPONSE
-                </span>
-              </>
-            )}
-          </div>
-        ),
-        wrap: true,
-        width: "80px",
-      },
-
+                  {row.operator} <br />
+                  {["adm", "sadm"].includes(user?.role) && (
+                    <>
+                      <span
+                        style={{
+                          fontWeight: "normal",
+                          fontSize: "8px",
+                          color: "blue",
+                        }}
+                      >
+                        STATUS
+                      </span>
+                      <span
+                        style={{
+                          fontWeight: "normal",
+                          fontSize: "8px",
+                          color: "blue",
+                          cursor: "pointer",
+                          textDecoration: "underline",
+                          marginLeft: "6px",
+                        }}
+                        onClick={() => {
+                          setSelectedApiResponse(
+                            row.api_response || "No response available"
+                          );
+                          setResponseModalOpen(true);
+                        }}
+                      >
+                        RESPONSE
+                      </span>
+                    </>
+                  )}
+                </div>
+              ),
+              wrap: true,
+              width: "80px",
+            },
+          ]),
+      ...(user?.role === "ret" || user?.role === "dd"
+        ? [
+            {
+              name: "Purpose",
+              selector: (row) => (
+                <div style={{ textAlign: "left", fontWeight: 500 }}>
+                  {row?.purpose || "N/A"}
+                </div>
+              ),
+              wrap: true,
+            },
+          ]
+        : []),
       ...(user?.role === "ret" || user?.role === "dd"
         ? [] // ❌ hide for ret and dd
         : [
@@ -407,15 +427,7 @@ const PayoutTxn = ({ query }) => {
         ),
         wrap: true,
       },
-      // {
-      //   name: "Purpose",
-      //   selector: (row) => (
-      //     <div style={{ textAlign: "left", fontWeight: 500 }}>
-      //       {row?.purpose || "N/A"}
-      //     </div>
-      //   ),
-      //   wrap: true,
-      // },
+
       {
         name: "Beneficiary",
         selector: (row) => (
