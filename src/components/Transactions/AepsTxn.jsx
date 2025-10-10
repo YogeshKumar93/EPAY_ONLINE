@@ -684,7 +684,7 @@ const AepsTxn = ({ query }) => {
               }}
             >
               {selectedRows.length > 0 && (
-                <Tooltip title="View Selected Details">
+                <Tooltip title="PRINT">
                   <Button
                     variant="contained"
                     size="small"
@@ -697,13 +697,13 @@ const AepsTxn = ({ query }) => {
                       );
 
                       // Open new tab/window
-                      window.open("/print-dmt2", "_blank");
+                      window.open("/print-aeps", "_blank");
                     }}
                   >
                     <PrintIcon
                       sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
                     />
-                    AEPS
+                  
                   </Button>
                 </Tooltip>
               )}

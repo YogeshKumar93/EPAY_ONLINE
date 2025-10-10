@@ -806,7 +806,7 @@ const CreditCardTxn = ({ query }) => {
                 }}
               >
                 {selectedRows.length > 0 && (
-                  <Tooltip title="PRINT CREDIT CARD">
+                  <Tooltip title="PRINT ">
                     <Button
                       variant="contained"
                       size="small"
@@ -825,7 +825,7 @@ const CreditCardTxn = ({ query }) => {
                       <PrintIcon
                         sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
                       />
-                      Credit Card
+                     
                     </Button>
                   </Tooltip>
                 )}

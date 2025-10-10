@@ -826,7 +826,7 @@ const BbpxTxn = ({ query }) => {
                     <PrintIcon
                       sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
                     />
-                    BBPS
+                  
                   </Button>
                 </Tooltip>
               )}

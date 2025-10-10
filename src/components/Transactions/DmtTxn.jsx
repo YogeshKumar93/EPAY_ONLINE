@@ -783,7 +783,7 @@ const DmtTxn = ({ query }) => {
                 }}
               >
                 {selectedRows.length > 0 && (
-                  <Tooltip title="View Selected Details">
+                  <Tooltip title="PRINT">
                     <Button
                       variant="contained"
                       size="small"
