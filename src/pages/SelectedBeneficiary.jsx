@@ -39,6 +39,7 @@ import ResetMpin from "../components/common/ResetMpin";
 import { showSuccessToast } from "../components/common/ShowSuccessToast";
 import { useNavigate } from "react-router-dom";
 import CommonModal from "../components/common/CommonModal";
+import { toWords } from "number-to-words";
 import {
   abhy2,
   airtel2,
@@ -89,6 +90,7 @@ const SelectedBeneficiary = ({
   const maxLimit = 5000;
 
   const [amountRows, setAmountRows] = useState([]);
+  const amountInWords = amount ? `${toWords(parseInt(amount))} Rupees` : "";
 
   useEffect(() => {
     if (amount && parseFloat(amount) > 0) {
@@ -589,6 +591,7 @@ const SelectedBeneficiary = ({
                   size="small"
                   value={totalAmount}
                   onChange={(e) => handleAmountChange(e.target.value)}
+                  
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       borderRadius: 2,
@@ -613,6 +616,11 @@ const SelectedBeneficiary = ({
                     ),
                   }}
                 />
+                  {amount && (
+        <Typography variant="body2" sx={{ mt: 1, color: "#555" }}>
+          {amountInWords.charAt(0).toUpperCase() + amountInWords.slice(1) } Only
+        </Typography>
+      )}
               </Box>
             </Box>
           </Box>
