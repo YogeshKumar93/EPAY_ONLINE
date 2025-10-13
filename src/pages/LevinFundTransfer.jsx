@@ -30,6 +30,7 @@ const LevinFundTransfer = () => {
 
   const [mobile, setMobile] = useState("");
   const [sender, setSender] = useState(null);
+    const [accountNumber, setAccountNumber] = useState(""); 
   const [openRegisterModal, setOpenRegisterModal] = useState(false);
   const [openVerifyModal, setOpenVerifyModal] = useState(false);
   const [otpData, setOtpData] = useState(null);
@@ -37,6 +38,10 @@ const LevinFundTransfer = () => {
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
   const [levinResponse, setLevinResponse] = useState(null); // store API response
+    const [mobileListOpen, setMobileListOpen] = useState(false);
+    const [mobileList, setMobileList] = useState([]);
+
+     
 
   // Fetch sender by mobile number
   const handleFetchSender = async (number = mobile) => {
@@ -127,6 +132,46 @@ const LevinFundTransfer = () => {
     });
     setOpenVerifyModal(true); // Open the verify modal
   };
+  const handleFetchSenderByAccount = async (accNumber) => {
+    if (!accNumber || accNumber.length < 9) return;
+    setLoading(true);
+
+    const { error, response } = await apiCall(
+      "post",
+      ApiEndpoints.GET_SENDER_BY_ACC,
+      {
+        account_number: accNumber,
+      }
+    );
+
+    setLoading(false);
+
+    if (response) {
+      const data = response?.data || response?.response?.data;
+      if (Array.isArray(data) && data.length > 0) {
+        setMobileList(data);
+        setMobileListOpen(true); // 👈 open modal
+      } else {
+        showToast("No mobile numbers found for this account", "warning");
+      }
+    } else if (error) {
+      showToast(
+        error?.message || "Failed to fetch sender by account number",
+        "error"
+      );
+    }
+  };
+  const handleAccountChange = (e) => {
+    const value = e.target.value.replace(/\D/g, ""); // digits only
+    setAccountNumber(value);
+
+    if (value.length >= 9 && value.length <= 18) {
+      handleFetchSenderByAccount(value);
+    } else {
+      setSender(null);
+    }
+  };
+   
 
   return (
     <Box>
@@ -167,9 +212,11 @@ const LevinFundTransfer = () => {
             <TextField
               label="Account Number"
               variant="outlined"
+                value={accountNumber}
               // value={account}
               // onChange={(e) => setAccount(e.target.value.replace(/\D/g, ""))}
               inputProps={{ maxLength: 18 }}
+                 onChange={handleAccountChange} 
               sx={{ flex: 1 }}
               fullWidth
             />
@@ -335,6 +382,17 @@ const LevinFundTransfer = () => {
           onRegistered={handleSenderRegistered}
         />
       )}
+        {mobileListOpen && (
+              <MobileNumberList
+                open={mobileListOpen}
+                onClose={() => setMobileListOpen(false)}
+                numbers={mobileList}
+                onSelect={(selectedMobile) => {
+                  setMobile(selectedMobile);
+                  handleFetchSender(selectedMobile);
+                }}
+              />
+            )}
 
       {/* Verify Modal */}
       {openVerifyModal && otpData && (
