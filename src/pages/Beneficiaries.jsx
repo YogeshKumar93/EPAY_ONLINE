@@ -82,31 +82,30 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
       sender_id: sender?.id,
     });
 
-const handleAmountChange = (beneficiaryId, value) => {
-  // Allow only numbers and decimal
-  const numericValue = value.replace(/[^\d.]/g, "");
+  const handleAmountChange = (beneficiaryId, value) => {
+    // Allow only numbers and decimal
+    const numericValue = value.replace(/[^\d.]/g, "");
 
-  setAmountInputs((prev) => ({
-    ...prev,
-    [beneficiaryId]: numericValue,
-  }));
-
-  // ✅ Convert to words
-  if (numericValue && !isNaN(numericValue)) {
-    const words = convertNumberToWordsIndian(numericValue);
-    setAmountInWords((prev) => ({
+    setAmountInputs((prev) => ({
       ...prev,
-      [beneficiaryId]:
-        words.charAt(0).toUpperCase() + words.slice(1) + " Only",
+      [beneficiaryId]: numericValue,
     }));
-  } else {
-    setAmountInWords((prev) => ({
-      ...prev,
-      [beneficiaryId]: "",
-    }));
-  }
-};
 
+    // ✅ Convert to words
+    if (numericValue && !isNaN(numericValue)) {
+      const words = convertNumberToWordsIndian(numericValue);
+      setAmountInWords((prev) => ({
+        ...prev,
+        [beneficiaryId]:
+          words.charAt(0).toUpperCase() + words.slice(1) + " Only",
+      }));
+    } else {
+      setAmountInWords((prev) => ({
+        ...prev,
+        [beneficiaryId]: "",
+      }));
+    }
+  };
 
   // ✅ Handle Send Money with amount
   const handleSendMoney = (beneficiary) => {
@@ -450,7 +449,6 @@ const handleAmountChange = (beneficiaryId, value) => {
                           Verify
                         </Button>
                       )}
-                  
 
                       <TextField
                         size="small"
@@ -472,7 +470,6 @@ const handleAmountChange = (beneficiaryId, value) => {
                           },
                         }}
                       />
-
 
                       {/* ✅ Send Money Button */}
                       <Button

@@ -655,7 +655,7 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
           loading={loading || submitting}
           footerButtons={[
             {
-              text: submitting ? "Saving..." : " Verify and Add Beneficiary",
+              text: submitting ? "Saving..." : "Verify and Add Beneficiary",
               variant: "contained",
               color: "primary",
               onClick: handleAddAndVerifyBeneficiary,

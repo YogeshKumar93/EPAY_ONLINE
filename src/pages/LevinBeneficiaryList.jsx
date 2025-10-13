@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import {
   Box,
   Card,
@@ -8,21 +8,20 @@ import {
   ListItem,
   Button,
   IconButton,
-  Divider,
   Collapse,
   useTheme,
   useMediaQuery,
-  Chip,
   Avatar,
   Stack,
   Tooltip,
   TextField,
+  Grid,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CommonModal from "../components/common/CommonModal";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
@@ -52,83 +51,175 @@ import {
   union2,
   yes2,
 } from "../utils/iconsImports";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import BeneficiaryDetails from "./BeneficiaryDetails";
 import { useToast } from "../utils/ToastContext";
 import LevinBeneficiaryDetails from "./LevinBeneficiaryDetails";
+import AuthContext from "../contexts/AuthContext";
 
-const LevinBeneficiaryList = ({
-  sender,
-  onSuccess,
-  onSelect,
-  onLevinSuccess,
-}) => {
+const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { showToast } = useToast();
+  const { location } = useContext(AuthContext);
+
   const [openModal, setOpenModal] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [openList, setOpenList] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [verifyOpen, setVerifyOpen] = useState(false);
+  const [mpinDigits, setMpinDigits] = useState(Array(6).fill(""));
+  const [tupResponse, setTupResponse] = useState(null);
+  const [pendingPayload, setPendingPayload] = useState(null);
+  const [verifyingBeneficiary, setVerifyingBeneficiary] = useState(null);
   const [openPayModal, setOpenPayModal] = useState(false);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
-  const [searchText, setSearchText] = useState("");
 
-  const handleOpenPay = (beneficiary) => {
-    setSelectedBeneficiary(beneficiary);
-    setOpenPayModal(true);
-  };
-
-  const handleClosePay = () => {
-    setOpenPayModal(false);
-    setSelectedBeneficiary(null);
-  };
-
-  // load schema
+  // schema for add form
   const { schema, formData, handleChange, errors, setErrors, loading } =
     useSchemaForm(ApiEndpoints.ADD_BENEFICIARY_SCHEMA, openModal, {
       sender_id: sender?.id,
     });
 
-  const handleAddBeneficiary = async () => {
-    setSubmitting(true);
+  // ✅ Step 1: Verify + Add new beneficiary
+  const handleAddAndVerifyBeneficiary = () => {
     setErrors({});
+    const payload = {
+      ...formData,
+      sender_id: sender?.id,
+      mobile_number: sender?.mobile_number,
+      rem_mobile: sender?.mobileNumber,
+      ben_name: formData.beneficiary_name,
+      ben_acc: formData.account_number,
+      ifsc: formData.ifsc_code,
+      operator: 18, // ✅ for Levin route
+      latitude: location?.lat || "",
+      longitude: location?.long || "",
+      pf: "WEB",
+    };
+    setPendingPayload(payload);
+    setVerifyOpen(true);
+  };
+
+  const handleVerify = async () => {
+    if (mpinDigits.some((d) => !d)) {
+      apiErrorToast("Please enter all 6 digits of MPIN");
+      return;
+    }
+
+    const mpin = mpinDigits.join("");
     try {
-      const payload = {
-        ...formData,
-        sender_id: sender.id,
-        type: "LEVIN",
-      };
-      const { response, error } = await apiCall(
+      setSubmitting(true);
+      const verifyPayload = { ...pendingPayload, mpin };
+      const { error, response } = await apiCall(
         "post",
-        ApiEndpoints.CREATE_BENEFICIARY,
-        payload
+        ApiEndpoints.DMT1_VERIFY_BENEFICIARY,
+        verifyPayload
       );
 
-      if (response) {
-        okSuccessToast(response?.message || "Beneficiary added successfully");
+      if (!response) {
+        showToast(error?.message || "Failed to verify beneficiary", "error");
+        setSubmitting(false);
+        setVerifyOpen(false);
+        setMpinDigits(Array(6).fill(""));
+        return;
+      }
+
+      if (
+        response?.data?.statuscode === "TUP" ||
+        response?.message?.includes("Transaction Under Process")
+      ) {
+        // TUP - verification pending
+        setTupResponse(response);
+        setVerifyOpen(false);
+        setSubmitting(false);
+        setMpinDigits(Array(6).fill(""));
+        return;
+      }
+
+      // ✅ Verification successful — Add beneficiary
+      const verifiedName = response?.data || formData.beneficiary_name;
+      const addPayload = {
+        ...formData,
+        sender_id: sender?.id,
+        type: "LEVIN",
+        beneficiary_name: verifiedName,
+        mobile_number: sender?.mobile_number,
+        is_verified: 1,
+      };
+
+      const { response: addRes, error: addErr } = await apiCall(
+        "post",
+        ApiEndpoints.CREATE_BENEFICIARY,
+        addPayload
+      );
+
+      if (addRes) {
+        showToast(
+          addRes?.message || "Beneficiary verified & added successfully",
+          "success"
+        );
+        setVerifyOpen(false);
         setOpenModal(false);
+        setMpinDigits(Array(6).fill(""));
         onSuccess?.(sender.mobile_number);
       } else {
-        showToast(
-          error?.errors || errors?.message || "Failed to add beneficiary",
-          "error"
-        );
+        apiErrorToast(addErr?.message || "Failed to add beneficiary");
       }
-    } catch (error) {
-      showToast(error, "error");
-      setErrors(error?.response?.data?.errors || {});
+    } catch (err) {
+      apiErrorToast(err);
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleDeleteBeneficiary = async (beneficiaryId) => {
+  const handleTUPConfirmation = async () => {
+    try {
+      setSubmitting(true);
+      const addPayload = {
+        ...formData,
+        sender_id: sender?.id,
+        type: "LEVIN",
+        beneficiary_name: formData.beneficiary_name,
+        mobile_number: sender?.mobile_number,
+        tup_reference: tupResponse?.data?.txnReferenceId,
+        is_verified: 0,
+      };
+
+      const { error, response } = await apiCall(
+        "post",
+        ApiEndpoints.CREATE_BENEFICIARY,
+        addPayload
+      );
+
+      if (response) {
+        okSuccessToast(
+          response?.message ||
+            "Beneficiary added successfully (Verification Pending)"
+        );
+        setTupResponse(null);
+        setOpenModal(false);
+        onSuccess?.(sender.mobile_number);
+      } else {
+        apiErrorToast(error?.message || "Failed to add beneficiary");
+      }
+    } catch (err) {
+      apiErrorToast(err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleTUPClose = () => {
+    setTupResponse(null);
+    setMpinDigits(Array(6).fill(""));
+  };
+
+  // Delete beneficiary
+  const handleDeleteBeneficiary = async (id) => {
     try {
       const res = await apiCall("post", ApiEndpoints.DELETE_BENEFICIARY, {
         sender_id: sender.id,
-        id: beneficiaryId,
+        id,
       });
-
       if (res) {
         okSuccessToast(res?.message || "Beneficiary deleted successfully");
         onSuccess?.(sender.mobile_number);
@@ -140,6 +231,7 @@ const LevinBeneficiaryList = ({
     }
   };
 
+  // Bank image mapping
   const bankImageMapping = {
     SBI: sbi2,
     IBKL: idbi2,
@@ -165,288 +257,175 @@ const LevinBeneficiaryList = ({
     JAKA: jk2,
   };
 
-  // show actual list or placeholder N/A
-  const beneficiaries =
-    sender?.beneficiary?.length > 0
-      ? sender.beneficiary
-      : [
-          {
-            id: "na",
-            beneficiary_name: "No beneficiaries added",
-            ifsc_code: "N/A",
-            account_number: "N/A",
-            is_verified: 0,
-            bank_name: null,
-          },
-        ];
   const filteredBeneficiaries = useMemo(() => {
-    if (!searchText) return beneficiaries;
-    return beneficiaries.filter((b) =>
+    if (!searchText) return sender?.beneficiary || [];
+    return sender?.beneficiary?.filter((b) =>
       b.beneficiary_name.toLowerCase().includes(searchText.toLowerCase())
     );
-  }, [searchText, beneficiaries]);
+  }, [searchText, sender?.beneficiary]);
+
+  const handleMpinChange = (index, value) => {
+    if (/^[0-9]?$/.test(value)) {
+      const newDigits = [...mpinDigits];
+      newDigits[index] = value;
+      setMpinDigits(newDigits);
+      if (value && index < 5)
+        document.getElementById(`mpin-${index + 1}`).focus();
+    }
+  };
 
   return (
-    <Card
-      sx={{
-        borderRadius: 2,
-        width: "100%",
-        boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
-        border: "1px solid",
-        borderColor: "divider",
-        overflow: "hidden",
-      }}
-    >
+    <Card sx={{ borderRadius: 2, border: "1px solid", borderColor: "divider" }}>
       {/* Header */}
       <Box
         display="flex"
-        justifyContent={isMobile ? "flex-start" : "space-between"}
+        justifyContent="space-between"
         alignItems="center"
-        sx={{
-          py: 1,
-          px: 2,
-          background: "#9d72ff",
-          borderBottom: openList ? "1px solid" : "none",
-          borderColor: "divider",
-        }}
+        sx={{ py: 1, px: 2, background: "#2275B7" }}
       >
-        <Box display="flex" alignItems="center" gap={1} flexGrow={1}>
-          <Typography variant="subtitle2" fontWeight="600" color="#fff">
-            Beneficiary List
-            {sender && <>({beneficiaries?.length || 0})</>}
-          </Typography>
-
-          <Box ml={isMobile ? 1 : "auto"}>
-            {sender && (
-              <Button
-                variant="contained"
-                size="small"
-                onClick={() => setOpenModal(true)}
-                startIcon={<PersonAddIcon sx={{ fontSize: 14 }} />}
-                sx={{
-                  minWidth: "auto", // shrink width
-                  px: 0.8, // smaller horizontal padding
-                  py: 0.3, // smaller vertical padding
-                  fontSize: "0.65rem", // smaller text
-                  borderRadius: 1,
-                  textTransform: "none",
-                  fontWeight: 500,
-                  boxShadow: "none",
-                  backgroundColor: "#7a4dff",
-                }}
-              >
-                Add Beneficiary
-              </Button>
-            )}
-          </Box>
-        </Box>
-
-        {isMobile && (
-          <IconButton
-            onClick={() => setOpenList((prev) => !prev)}
-            size="small"
-            sx={{
-              transform: openList ? "rotate(180deg)" : "rotate(0deg)",
-              transition: "transform 0.3s",
-              color: "text.secondary",
-              ml: 1,
-            }}
-          >
-            <ExpandMoreIcon />
-          </IconButton>
-        )}
+        <Typography variant="subtitle2" color="#fff" fontWeight="600">
+          Beneficiary List ({sender?.beneficiary?.length || 0})
+        </Typography>
+        <Button
+          size="small"
+          variant="contained"
+          startIcon={<PersonAddIcon sx={{ fontSize: 14 }} />}
+          onClick={() => setOpenModal(true)}
+          sx={{
+            color: "#000",
+            backgroundColor: "#fff",
+            textTransform: "none",
+            fontSize: "0.7rem",
+          }}
+        >
+          Add Beneficiary
+        </Button>
       </Box>
 
+      {/* List */}
       <Collapse in={openList}>
         <CardContent sx={{ p: 2 }}>
-          {beneficiaries.length > 1 && (
-            <Box mb={2}>
-              <TextField
-                fullWidth
-                size="small"
-                placeholder="Search beneficiary by name"
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-              />
-            </Box>
-          )}
-          <List dense sx={{ py: 0, maxHeight: 300, overflowY: "auto" }}>
-            {filteredBeneficiaries.map((b) => (
-              <ListItem
-                key={b.id}
-                sx={{
-                  py: 1.5,
-                  px: 1.5,
-                  mb: 1,
-                  borderRadius: 2,
-                  border: "1px solid",
-                  borderColor: b.id === "na" ? "transparent" : "divider",
-                  backgroundColor:
-                    b.id === "na" ? "transparent" : "background.paper",
-                  boxShadow:
-                    b.id !== "na" ? "0 2px 6px rgba(0,0,0,0.04)" : "none",
-                  opacity: b.id === "na" ? 0.7 : 1,
-                }}
-                secondaryAction={
-                  b.id !== "na" && (
-                    <Stack direction="row" spacing={4} alignItems="center">
-                      {/* Verified text with tick */}
-                      {b.is_verified === 1 && (
-                        <Box display="flex" alignItems="center" gap={0.3}>
-                          <CheckCircleIcon
-                            sx={{ fontSize: 16, color: "success.main" }}
-                          />
-                          <Typography
-                            variant="caption"
-                            color="success.main"
-                            fontWeight="500"
-                            sx={{ fontSize: "0.75rem" }}
-                          >
-                            Verified
-                          </Typography>
-                        </Box>
+          <TextField
+            fullWidth
+            size="small"
+            placeholder="Search beneficiary by name"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+
+          <List dense sx={{ maxHeight: 300, overflowY: "auto" }}>
+            {filteredBeneficiaries.length === 0 ? (
+              <Typography variant="body2" color="text.secondary">
+                No beneficiaries found
+              </Typography>
+            ) : (
+              filteredBeneficiaries.map((b) => (
+                <ListItem
+                  key={b.id}
+                  sx={{
+                    mb: 1,
+                    borderRadius: 2,
+                    border: "1px solid",
+                    borderColor: "divider",
+                    boxShadow: "0 2px 4px rgba(0,0,0,0.04)",
+                  }}
+                  secondaryAction={
+                    <Stack direction="row" spacing={1}>
+                      {b.is_verified === 1 ? (
+                        <CheckCircleIcon
+                          sx={{ fontSize: 18, color: "success.main" }}
+                        />
+                      ) : (
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          color="warning"
+                          sx={{ textTransform: "none", fontSize: "0.7rem" }}
+                          onClick={() => {
+                            setPendingPayload({
+                              sender_id: sender?.id,
+                              ben_name: b.beneficiary_name,
+                              ben_acc: b.account_number,
+                              ifsc: b.ifsc_code,
+                              operator: 19,
+                              latitude: location?.lat || "",
+                              longitude: location?.long || "",
+                              pf: "WEB",
+                            });
+                            setVerifyOpen(true);
+                            setVerifyingBeneficiary(b);
+                          }}
+                        >
+                          Verify
+                        </Button>
                       )}
 
-                      {/* Pay button */}
                       <Button
-                        size="small"
                         variant="contained"
-                        // color="primary"
-                        onClick={() => handleOpenPay(b)} // ✅ open modal with this beneficiary
+                        size="small"
                         sx={{
-                          backgroundColor: "#5c3ac8",
-                          borderRadius: 1,
                           textTransform: "none",
-                          fontSize: "0.75rem",
-                          px: 1,
-                          py: 0.2,
+                          fontSize: "0.7rem",
+                          backgroundColor: "#5c3ac8",
+                        }}
+                        onClick={() => {
+                          setSelectedBeneficiary(b);
+                          setOpenPayModal(true);
                         }}
                       >
-                        Send Money
+                        Send
                       </Button>
 
-                      {/* Delete button */}
                       <IconButton
-                        edge="end"
                         size="small"
                         color="error"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteBeneficiary(b.id);
-                        }}
-                        sx={{
-                          backgroundColor: "error.light",
-                          "&:hover": { backgroundColor: "error.main" },
-                          color: "white",
-                        }}
+                        onClick={() => handleDeleteBeneficiary(b.id)}
                       >
                         <Tooltip title="Delete Beneficiary">
                           <DeleteIcon fontSize="small" />
                         </Tooltip>
                       </IconButton>
                     </Stack>
-                  )
-                }
-              >
-                <Box
-                  display="flex"
-                  alignItems="flex-start"
-                  gap={1.5}
-                  width="100%"
+                  }
                 >
-                  {/* Bank logo */}
-                  {bankImageMapping[b.bank_name] ? (
-                    <Box
-                      component="img"
-                      src={bankImageMapping[b.bank_name]}
-                      alt={b.bank_name}
-                      sx={{
-                        width: 36,
-                        height: 36,
-                        objectFit: "contain",
-                        borderRadius: 1,
-                        border: "1px solid",
-                        borderColor: "divider",
-                        p: 0.5,
-                        backgroundColor: "white",
-                      }}
-                    />
-                  ) : (
-                    <Avatar
-                      sx={{
-                        width: 36,
-                        height: 36,
-                        bgcolor: "primary.light",
-                        fontSize: 16,
-                      }}
-                    >
-                      <AccountBalanceIcon sx={{ fontSize: 20 }} />
-                    </Avatar>
-                  )}
-
-                  {/* Details */}
-                  <Box flexGrow={1} minWidth={0}>
-                    <Box display="flex" alignItems="center" gap={1} mb={0.5}>
-                      <Typography
-                        variant="body1"
-                        fontWeight="500"
-                        noWrap
+                  <Box display="flex" alignItems="center" gap={1.5}>
+                    {bankImageMapping[b.bank_name] ? (
+                      <Box
+                        component="img"
+                        src={bankImageMapping[b.bank_name]}
+                        alt={b.bank_name}
                         sx={{
-                          fontSize: isMobile ? "0.9rem" : "1rem",
-                          color:
-                            b.id === "na" ? "text.secondary" : "text.primary",
+                          width: 36,
+                          height: 36,
+                          borderRadius: 1,
+                          border: "1px solid",
+                          borderColor: "divider",
+                          p: 0.5,
                         }}
-                      >
+                      />
+                    ) : (
+                      <Avatar sx={{ width: 36, height: 36 }}>
+                        <AccountBalanceIcon sx={{ fontSize: 20 }} />
+                      </Avatar>
+                    )}
+                    <Box>
+                      <Typography fontWeight="500">
                         {b.beneficiary_name}
                       </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        IFSC: {b.ifsc_code} | A/C: {b.account_number}
+                      </Typography>
                     </Box>
-
-                    <Stack
-                      direction={isMobile ? "column" : "row"}
-                      spacing={isMobile ? 0.5 : 2}
-                    >
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        display="flex"
-                        alignItems="center"
-                        sx={{ fontSize: "0.75rem" }}
-                      >
-                        <Box component="span" fontWeight="500" mr={0.5}>
-                          IFSC:
-                        </Box>
-                        {b.ifsc_code}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        display="flex"
-                        alignItems="center"
-                        sx={{ fontSize: "0.75rem" }}
-                      >
-                        <Box component="span" fontWeight="500" mr={0.5}>
-                          A/C:
-                        </Box>
-                        {b.account_number}
-                      </Typography>
-                    </Stack>
                   </Box>
-                </Box>
-              </ListItem>
-            ))}
-            {filteredBeneficiaries.length === 0 && (
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ mt: 1 }}
-              >
-                No beneficiaries found
-              </Typography>
+                </ListItem>
+              ))
             )}
           </List>
         </CardContent>
       </Collapse>
 
+      {/* Add Beneficiary Modal */}
       {openModal && (
         <CommonModal
           open={openModal}
@@ -462,24 +441,95 @@ const LevinBeneficiaryList = ({
           loading={loading || submitting}
           footerButtons={[
             {
-              text: submitting ? "Saving..." : "Add Beneficiary",
+              text: submitting ? "Saving..." : "Verify and Add Beneficiary",
               variant: "contained",
               color: "primary",
-              onClick: handleAddBeneficiary,
+              onClick: handleAddAndVerifyBeneficiary,
               disabled: submitting,
-              sx: { borderRadius: 1 },
             },
           ]}
         />
       )}
+
+      {/* MPIN Verification Modal */}
+      {verifyOpen && (
+        <CommonModal
+          open={verifyOpen}
+          onClose={() => setVerifyOpen(false)}
+          title="Enter 6-digit MPIN"
+          iconType="info"
+          size="small"
+          dividers
+          footerButtons={[
+            {
+              text: "Cancel",
+              variant: "outlined",
+              onClick: () => setVerifyOpen(false),
+            },
+            {
+              text: submitting ? "Verifying..." : "Verify",
+              variant: "contained",
+              color: "primary",
+              onClick: handleVerify,
+            },
+          ]}
+        >
+          <Grid container spacing={1} justifyContent="center" sx={{ mt: 1 }}>
+            {mpinDigits.map((digit, idx) => (
+              <Grid item key={idx}>
+                <TextField
+                  id={`mpin-${idx}`}
+                  value={digit}
+                  type="password"
+                  onChange={(e) => handleMpinChange(idx, e.target.value)}
+                  inputProps={{
+                    maxLength: 1,
+                    style: { textAlign: "center", fontSize: "1.2rem" },
+                  }}
+                  sx={{ width: 45 }}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        </CommonModal>
+      )}
+
+      {/* TUP Confirmation Modal */}
+      {tupResponse && (
+        <CommonModal
+          open={!!tupResponse}
+          onClose={handleTUPClose}
+          title="Verification in Progress"
+          iconType="info"
+          size="small"
+          dividers
+          footerButtons={[
+            { text: "Cancel", variant: "outlined", onClick: handleTUPClose },
+            {
+              text: submitting ? "Adding..." : "Add Beneficiary Anyway",
+              variant: "contained",
+              color: "primary",
+              onClick: handleTUPConfirmation,
+            },
+          ]}
+        >
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            Verification is under process. You can add the beneficiary now, but
+            it will be marked as unverified until verification completes.
+          </Typography>
+          <Typography variant="caption">
+            Transaction Reference: {tupResponse?.data?.txnReferenceId || "N/A"}
+          </Typography>
+        </CommonModal>
+      )}
+
+      {/* Send Money Modal */}
       {openPayModal && (
         <LevinBeneficiaryDetails
           open={openPayModal}
           onClose={() => setOpenPayModal(false)}
           beneficiary={selectedBeneficiary}
           sender={sender}
-          senderId={sender?.id}
-          senderMobile={sender?.mobile_number}
           onLevinSuccess={onLevinSuccess}
         />
       )}
