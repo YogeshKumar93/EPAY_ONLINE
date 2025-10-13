@@ -137,27 +137,26 @@ const RechargeTxn = ({ query }) => {
     setRefundLoading(false);
   };
 
-  
-     const handleRefundTxn = async (row) => {
-        try {
-          const payload = { txn_id: row.txn_id }; // use actual transaction ID field
-          const { response } = await apiCall(
-            "post",
-            ApiEndpoints.REFUND_TXN,
-            payload
-          );
-    
-          if (response?.status) {
-            showToast(response.message || "Transaction refunded successfully!");
-          } else {
-            showToast(response?.error || "Refund failed. Please try again.");
-          }
-        } catch (error) {
-          showToast("Error processing refund transaction.");
-          console.error(error);
-        }
-      };
-      
+  const handleRefundTxn = async (row) => {
+    try {
+      const payload = { txn_id: row.txn_id }; // use actual transaction ID field
+      const { response } = await apiCall(
+        "post",
+        ApiEndpoints.REFUND_TXN,
+        payload
+      );
+
+      if (response?.status) {
+        showToast(response.message || "Transaction refunded successfully!");
+      } else {
+        showToast(response?.error || "Refund failed. Please try again.");
+      }
+    } catch (error) {
+      showToast("Error processing refund transaction.");
+      console.error(error);
+    }
+  };
+
   const handleExportExcel = async () => {
     try {
       // Fetch all users (without pagination/filters) from API
@@ -207,7 +206,12 @@ const RechargeTxn = ({ query }) => {
       },
       { id: "mobile_number", label: "Mobile Number", type: "textfield" },
       { id: "txn_id", label: "Txn ID", type: "textfield" },
-      { id: "user_id", label: "User ID", type: "textfield" },
+      {
+        id: "user_id",
+        label: "User ID",
+        type: "textfield",
+        roles: ["adm", "sadm"],
+      },
       { id: "date_range", type: "daterange" },
     ],
     [routes]
@@ -628,41 +632,41 @@ const RechargeTxn = ({ query }) => {
         width: "100px",
         center: true,
       },
-       ...(user?.role === "ret" || user?.role === "dd"
-                    ? [
-                        {
-                          name: "Actions",
-                          selector: (row) => (
-                            <div
-                              style={{
-                                fontSize: "10px",
-                                fontWeight: "600",
-                                display: "flex",
-                                gap: "4px",
-                                justifyContent: "center",
-                                alignItems: "center",
-                              }}
-                            >
-                              {/* FAILED or REFUND: Refresh */}
-                              {row?.status === "REFUNDPENDING"  && (
-                                <Tooltip title="REFUND TXN">
-                                  <ReplayIcon
-                                    sx={{
-                                      color: "orange",
-                                      fontSize: 25,
-                                      cursor: "pointer",
-                                    }}
-                                    onClick={() => handleRefundTxn(row)}
-                                  />
-                                </Tooltip>
-                              )}
-                            </div>
-                          ),
-                          center: true,
-                          width: "70px",
-                        },
-                      ]
-                    : []),
+      ...(user?.role === "ret" || user?.role === "dd"
+        ? [
+            {
+              name: "Actions",
+              selector: (row) => (
+                <div
+                  style={{
+                    fontSize: "10px",
+                    fontWeight: "600",
+                    display: "flex",
+                    gap: "4px",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {/* FAILED or REFUND: Refresh */}
+                  {row?.status === "REFUNDPENDING" && (
+                    <Tooltip title="REFUND TXN">
+                      <ReplayIcon
+                        sx={{
+                          color: "orange",
+                          fontSize: 25,
+                          cursor: "pointer",
+                        }}
+                        onClick={() => handleRefundTxn(row)}
+                      />
+                    </Tooltip>
+                  )}
+                </div>
+              ),
+              center: true,
+              width: "70px",
+            },
+          ]
+        : []),
     ],
     []
   );
@@ -739,7 +743,6 @@ const RechargeTxn = ({ query }) => {
                       <PrintIcon
                         sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
                       />
-                    
                     </Button>
                   </Tooltip>
                 )}

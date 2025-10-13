@@ -20,12 +20,14 @@ import BeneficiaryList from "./BeneficiaryList";
 import SenderRegisterModal from "./SenderRegisterModal";
 import VerifySenderModal from "./VerifySenderModal";
 import SuperTransferReceipt from "./SuperTransferReceipt";
+import MobileNumberList from "./MobileNumberList";
 
 const SuperTransfer = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [mobile, setMobile] = useState("");
+  const [accountNumber, setAccountNumber] = useState(""); // 👈 new state
   const [history, setHistory] = useState([]);
   const [sender, setSender] = useState(null);
   const [openRegisterModal, setOpenRegisterModal] = useState(false);
@@ -35,6 +37,8 @@ const SuperTransfer = () => {
   const [loading, setLoading] = useState(false);
   const [payoutResponse, setPayoutResponse] = useState(null);
   const { showToast } = useToast();
+  const [mobileListOpen, setMobileListOpen] = useState(false);
+  const [mobileList, setMobileList] = useState([]);
 
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("mobileNumbers") || "[]");
@@ -81,7 +85,46 @@ const SuperTransfer = () => {
       }
     }
   };
+  const handleFetchSenderByAccount = async (accNumber) => {
+    if (!accNumber || accNumber.length < 9) return;
+    setLoading(true);
 
+    const { error, response } = await apiCall(
+      "post",
+      ApiEndpoints.GET_SENDER_BY_ACC,
+      {
+        account_number: accNumber,
+      }
+    );
+
+    setLoading(false);
+
+    if (response) {
+      const data = response?.data || response?.response?.data;
+      if (Array.isArray(data) && data.length > 0) {
+        setMobileList(data);
+        setMobileListOpen(true); // 👈 open modal
+      } else {
+        showToast("No mobile numbers found for this account", "warning");
+      }
+    } else if (error) {
+      showToast(
+        error?.message || "Failed to fetch sender by account number",
+        "error"
+      );
+    }
+  };
+  // 👇 When user types account number
+  const handleAccountChange = (e) => {
+    const value = e.target.value.replace(/\D/g, ""); // digits only
+    setAccountNumber(value);
+
+    if (value.length >= 9 && value.length <= 18) {
+      handleFetchSenderByAccount(value);
+    } else {
+      setSender(null);
+    }
+  };
   const handleChange = (e, newValue) => {
     const value = (newValue || "").replace(/\D/g, "");
     if (value.length <= 10) {
@@ -136,10 +179,13 @@ const SuperTransfer = () => {
             <TextField
               label="Account Number"
               variant="outlined"
+              value={accountNumber}
+              onChange={handleAccountChange} // 👈 new handler
               inputProps={{ maxLength: 18 }}
               sx={{ flex: 1 }}
               fullWidth
             />
+
             {loading && (
               <CommonLoader
                 loading={loading}
@@ -387,6 +433,17 @@ const SuperTransfer = () => {
           mobile={otpData.mobile_number}
           otpRef={otpData.otp_ref}
           otpData={otpData}
+        />
+      )}
+      {mobileListOpen && (
+        <MobileNumberList
+          open={mobileListOpen}
+          onClose={() => setMobileListOpen(false)}
+          numbers={mobileList}
+          onSelect={(selectedMobile) => {
+            setMobile(selectedMobile);
+            handleFetchSender(selectedMobile);
+          }}
         />
       )}
     </Box>
