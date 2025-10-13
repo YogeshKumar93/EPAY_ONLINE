@@ -269,7 +269,10 @@ const Prepaid = () => {
         variant="body2"
         sx={{
           color: "#555",
+          fontSize:"12px",
           fontWeight: 500,
+           width: 180,
+           textAlign:"left",
         }}
       >
         {amountInWords}

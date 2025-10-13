@@ -7,6 +7,8 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+    IconButton,
+    InputAdornment,
 } from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
@@ -24,6 +26,7 @@ import LevinBeneficiaryList from "./LevinBeneficiaryList";
 import LevinBeneficiaryDetails from "./LevinBeneficiaryDetails";
 import LevinTransferReceipt from "./LevinTransferReceipt";
 import MobileNumberList from "./MobileNumberList";
+import SearchIcon from "@mui/icons-material/Search";
 
 const LevinFundTransfer = () => {
   const theme = useTheme();
@@ -172,7 +175,9 @@ const LevinFundTransfer = () => {
       setSender(null);
     }
   };
-   
+  
+
+  
 
   return (
     <Box>
@@ -210,17 +215,31 @@ const LevinFundTransfer = () => {
               </Divider>
             </Box>
 
-            <TextField
-              label="Account Number"
-              variant="outlined"
-                value={accountNumber}
-              // value={account}
-              // onChange={(e) => setAccount(e.target.value.replace(/\D/g, ""))}
-              inputProps={{ maxLength: 18 }}
-                 onChange={handleAccountChange} 
-              sx={{ flex: 1 }}
-              fullWidth
-            />
+           <TextField
+                       label="Account Number"
+                       variant="outlined"
+                       value={accountNumber}
+                       onChange={(e) => {
+                         const value = e.target.value.replace(/\D/g, ""); // allow only digits
+                         setAccountNumber(value);
+                       }}
+                       inputProps={{ maxLength: 18 }}
+                       sx={{ flex: 1 }}
+                       fullWidth
+                       InputProps={{
+                         endAdornment: (
+                           <InputAdornment position="end">
+                             <IconButton
+                               color="primary"
+                               onClick={() => handleFetchSenderByAccount(accountNumber)}
+                               disabled={!accountNumber || accountNumber.length < 9}
+                             >
+                               <SearchIcon />
+                             </IconButton>
+                           </InputAdornment>
+                         ),
+                       }}
+                     />
             {loading && (
               <CommonLoader
                 loading={loading}
