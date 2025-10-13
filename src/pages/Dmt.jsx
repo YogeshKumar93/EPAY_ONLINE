@@ -5,6 +5,8 @@ import {
   Divider,
   Typography,
   CircularProgress,
+    IconButton,
+    InputAdornment,
 } from "@mui/material";
 import { useContext } from "react";
 import { apiCall } from "../api/apiClient";
@@ -19,6 +21,9 @@ import OutletDmt1 from "./OutletDnt1";
 import AuthContext from "../contexts/AuthContext";
 import Loader from "../components/common/Loader";
 import CommonLoader from "../components/common/CommonLoader";
+import MobileNumberList from "./MobileNumberList";
+import SearchIcon from "@mui/icons-material/Search";
+
 const Dmt = () => {
   const [mobile, setMobile] = useState("");
   const [account, setAccount] = useState("");
@@ -33,6 +38,9 @@ const Dmt = () => {
   const { showToast } = useToast();
   const { user } = useContext(AuthContext);
   const [openDmt1Modal, setOpenDmt1Modal] = useState(false);
+    const [accountNumber, setAccountNumber] = useState("");
+   const [mobileListOpen, setMobileListOpen] = useState(false);
+    const [mobileList, setMobileList] = useState([]);
 
   const instId = user?.instId;
 
@@ -73,6 +81,36 @@ const Dmt = () => {
       setSelectedBeneficiary(null);
     }
   };
+
+   const handleFetchSenderByAccount = async (accNumber) => {
+      if (!accNumber || accNumber.length < 9) return;
+      setLoading(true);
+  
+      const { error, response } = await apiCall(
+        "post",
+        ApiEndpoints.GET_SENDER_BY_ACC,
+        {
+          account_number: accNumber,
+        }
+      );
+  
+      setLoading(false);
+  
+      if (response) {
+        const data = response?.data || response?.response?.data;
+        if (Array.isArray(data) && data.length > 0) {
+          setMobileList(data);
+          setMobileListOpen(true); // 👈 open modal
+        } else {
+          showToast("No mobile numbers found for this account", "warning");
+        }
+      } else if (error) {
+        showToast(
+          error?.message || "Failed to fetch sender by account number",
+          "error"
+        );
+      }
+    };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -191,15 +229,30 @@ const Dmt = () => {
                 </Typography>
               </Divider>
             </Box>
-
-            <TextField
+  <TextField
               label="Account Number"
               variant="outlined"
-              value={account}
-              onChange={(e) => setAccount(e.target.value.replace(/\D/g, ""))}
+              value={accountNumber}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, ""); // allow only digits
+                setAccountNumber(value);
+              }}
               inputProps={{ maxLength: 18 }}
               sx={{ flex: 1 }}
               fullWidth
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleFetchSenderByAccount(accountNumber)}
+                      disabled={!accountNumber || accountNumber.length < 9}
+                    >
+                      <SearchIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
           </Box>
 
@@ -214,6 +267,17 @@ const Dmt = () => {
               setAeps2faOpen={setAeps2faOpen}
             />
           )}
+            {mobileListOpen && (
+                  <MobileNumberList
+                    open={mobileListOpen}
+                    onClose={() => setMobileListOpen(false)}
+                    numbers={mobileList}
+                    onSelect={(selectedMobile) => {
+                      setMobile(selectedMobile);
+                      handleFetchSender(selectedMobile);
+                    }}
+                  />
+                )}
 
           {/* MAIN FIX: Hide everything when 2FA is open */}
           {!aeps2faOpen && !openRegisterModal && (

@@ -80,8 +80,9 @@ const ForgotPassword = ({ open, onClose, initialUsername = "" }) => {
         <TextField
           fullWidth
           variant="outlined"
-          label="Registered Mobile Number / Username"
+          label="Registered User Id "
           type="text"
+          disabled
           value={username}
           onChange={(e) => {
             const value = e.target.value.trim();
