@@ -399,8 +399,12 @@ const DmtTxn = ({ query }) => {
             style={{ textAlign: "left", fontSize: "11px", fontWeight: "500" }}
           >
             {row.beneficiary_name?.toUpperCase()} <br />
-            {/* {row.account_number} <br />
-            {row.ifsc_code} */}
+            {(user?.role === "ret" || user?.role === "dd") && (
+              <>
+                {row.account_number} <br />
+                {/* {row.ifsc_code} */}
+              </>
+            )}
           </div>
         ),
         wrap: true,
