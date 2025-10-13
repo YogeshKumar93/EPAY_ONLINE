@@ -110,7 +110,7 @@ const CreateFundRequest = ({ open, handleClose, handleSave }) => {
     requiredFields.includes(field.name)
   );
 
- const amountField = {
+  const amountField = {
     name: "amount",
     label: "Amount",
     type: "text",
@@ -127,13 +127,13 @@ const CreateFundRequest = ({ open, handleClose, handleSave }) => {
     props: { disableFuture: true, format: "DD/MM/YYYY" },
   };
 
-    visibleFields = visibleFields.map((f) => {
+  visibleFields = visibleFields.map((f) => {
     if (f.name === "amount") return amountField;
     if (f.name === "date") return dateField;
     return f;
   });
 
-    const isFormValidForSave = requiredFields.every((field) => {
+  const isFormValidForSave = requiredFields.every((field) => {
     const value = formData[field];
     if (field === "amount") {
       return value && /^\d+$/.test(value) && Number(value) > 0;

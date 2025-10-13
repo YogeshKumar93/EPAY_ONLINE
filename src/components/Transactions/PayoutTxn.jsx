@@ -209,11 +209,21 @@ const PayoutTxn = ({ query }) => {
         label: "Route",
         type: "dropdown",
         options: routes, // ✅ dynamic routes here
-        roles: ["adm"],
+        roles: ["adm", "sadm"],
       },
       { id: "mobile_number", label: "Mobile Number", type: "textfield" },
-      { id: "txn_id", label: "Txn ID", type: "textfield" },
-      { id: "user_id", label: "User ID", type: "textfield" },
+      {
+        id: "txn_id",
+        label: "Txn ID",
+        type: "textfield",
+        roles: ["adm", "sadm"],
+      },
+      {
+        id: "user_id",
+        label: "User ID",
+        type: "textfield",
+        roles: ["adm", "sadm"],
+      },
       // { id: "date_range", type: "daterange" },
     ],
     [routes] // ✅ depends on routes, so dropdown updates automatically
@@ -705,7 +715,7 @@ const PayoutTxn = ({ query }) => {
                   }}
                 >
                   {/* FAILED or REFUND: Refresh */}
-                  {row?.status === "REFUNDPENDING"  && (
+                  {row?.status === "REFUNDPENDING" && (
                     <Tooltip title="REFUND TXN">
                       <ReplayIcon
                         sx={{
@@ -800,7 +810,6 @@ const PayoutTxn = ({ query }) => {
                     <PrintIcon
                       sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
                     />
-                 
                   </Button>
                 </Tooltip>
               )}

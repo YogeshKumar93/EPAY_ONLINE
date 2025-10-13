@@ -54,7 +54,7 @@ const ApiEndpoints = {
   GET_TRANSACTIONS: "admin/getTransactions",
   GET_ACC_TRANSACTIONS: "",
   // GET_TRANSACTIONS: "admin/getTransactions",
-  CREATE_SERVICES:"admin/getRoutes",
+  CREATE_SERVICES: "admin/getRoutes",
   CRED_REQ: "admin/getCrRequests",
   CRED_REQ_APPROVE: "admin/crActions",
   GET_OPERATOR: "admin/getOperators",
@@ -356,6 +356,8 @@ const ApiEndpoints = {
   CHECK_STAUS: "",
   BUSINESS_DETAILS: "business/getAllByUser",
   REFUND_TXN: "refund/refundTxn",
+  GET_SENDER_BY_ACC: "payout/getSenderByAcc",
+
   // wallet
   GET_BANK_CREDIT_REQ: "wallet/getBanksForCrRequest",
   CREDIT_REQ: "wallet/createCrRequest",
