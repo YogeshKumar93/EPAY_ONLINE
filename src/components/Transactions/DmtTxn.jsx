@@ -483,6 +483,7 @@ const DmtTxn = ({ query }) => {
       },
       ...(user?.role === "adm" ||
       user?.role === "di" ||
+      user?.role === "sadm" ||
       user?.role === "md" ||
       user?.role === "asm" ||
       user?.role === "zsm"
@@ -512,6 +513,7 @@ const DmtTxn = ({ query }) => {
         : []),
       ...(user?.role === "adm" ||
       user?.role === "md" ||
+      user?.role === "sadm" ||
       user?.role === "asm" ||
       user?.role === "zsm"
         ? [

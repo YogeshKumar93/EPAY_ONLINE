@@ -19,7 +19,7 @@ const AccountLadger = ({ query }) => {
   const [loading, setLoading] = useState(true); // initially true
   const [selectedRowId, setSelectedRowId] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
-    const [services, setServices] = useState([]);
+  const [services, setServices] = useState([]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -29,25 +29,22 @@ const AccountLadger = ({ query }) => {
     return () => clearTimeout(timer);
   }, []);
 
-
-  
-   const fetchServices = async () => {
-      try {
-        const { response } = await apiCall("POST", ApiEndpoints.GET_SERVICES);
-        if (response?.data) {
-          setServices(
-            response?.data.map((service) => ({
-              value: service.name, // ✅ send name in payload
-              label: service.name || `Service ${service.name}`,
-            }))
-          );
-        }
-      } catch (error) {
-        console.error("Error fetching services:", error);
+  const fetchServices = async () => {
+    try {
+      const { response } = await apiCall("POST", ApiEndpoints.GET_SERVICES);
+      if (response?.data) {
+        setServices(
+          response?.data.map((service) => ({
+            value: service.name, // ✅ send name in payload
+            label: service.name || `Service ${service.name}`,
+          }))
+        );
       }
-    };
-     useEffect(() => {
-   
+    } catch (error) {
+      console.error("Error fetching services:", error);
+    }
+  };
+  useEffect(() => {
     fetchServices();
   }, []);
 
@@ -63,11 +60,6 @@ const AccountLadger = ({ query }) => {
         id: "date_range",
         // label: "Date Range",
         type: "daterange",
-      },
-      {
-        id: "mobile",
-        label: "Mobile",
-        type: "textfield",
       },
     ],
     [services]
@@ -237,7 +229,7 @@ const AccountLadger = ({ query }) => {
           refresh={true}
         />
       )}
- <WalletTxnData
+      <WalletTxnData
         open={detailOpen}
         onClose={() => setDetailOpen(false)}
         rowId={selectedRowId}

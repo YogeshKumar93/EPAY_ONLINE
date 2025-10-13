@@ -433,8 +433,8 @@ const PayoutTxn = ({ query }) => {
                 <>
                   <div style={{ textAlign: "left", fontSize: "13px" }}>
                     {row.txn_id}
-                    <br />
-                    {row.client_ref}
+                    {/* <br />
+                    {row.client_ref} */}
                   </div>
                 </>
               ),
@@ -492,10 +492,34 @@ const PayoutTxn = ({ query }) => {
         wrap: true,
         right: true,
       },
+      ...(user?.role === "ret" ||
+      user?.role === "dd" ||
+      user?.role === "di" ||
+      user?.role === "md"
+        ? [] // ❌ hide for ret and dd
+        : [
+            {
+              name: "GST",
+              selector: (row) => (
+                <div
+                  style={{
+                    color: "red",
+                    fontWeight: "600",
+                    textAlign: "right",
+                  }}
+                >
+                  ₹{parseFloat(row.gst).toFixed(2)}
+                </div>
+              ),
+              wrap: true,
+              width: "100px",
+            },
+          ]),
       ...(user?.role === "adm" ||
       user?.role === "di" ||
       user?.role === "md" ||
       user?.role === "asm" ||
+      user?.role === "sadm" ||
       user?.role === "zsm"
         ? [
             {
@@ -523,6 +547,7 @@ const PayoutTxn = ({ query }) => {
         : []),
       ...(user?.role === "adm" ||
       user?.role === "md" ||
+      user?.role === "sadm" ||
       user?.role === "asm" ||
       user?.role === "zsm"
         ? [
@@ -549,29 +574,6 @@ const PayoutTxn = ({ query }) => {
             },
           ]
         : []),
-      ...(user?.role === "ret" ||
-      user?.role === "dd" ||
-      user?.role === "di" ||
-      user?.role === "md"
-        ? [] // ❌ hide for ret and dd
-        : [
-            {
-              name: "GST",
-              selector: (row) => (
-                <div
-                  style={{
-                    color: "red",
-                    fontWeight: "600",
-                    textAlign: "right",
-                  }}
-                >
-                  ₹{parseFloat(row.gst).toFixed(2)}
-                </div>
-              ),
-              wrap: true,
-              width: "100px",
-            },
-          ]),
 
       {
         name: "Status",
@@ -660,7 +662,6 @@ const PayoutTxn = ({ query }) => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              minWidth: "80px",
               gap: 1, // spacing between icons
             }}
           >
@@ -668,11 +669,11 @@ const PayoutTxn = ({ query }) => {
             <Tooltip title="View Transaction">
               <IconButton
                 color="info"
+                size="small"
                 onClick={() => {
                   setSelectedRow(row);
                   setDrawerOpen(true);
                 }}
-                size="small"
                 sx={{ backgroundColor: "transparent" }}
               >
                 <VisibilityIcon />
