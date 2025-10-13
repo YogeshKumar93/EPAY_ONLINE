@@ -352,7 +352,7 @@ const PayoutTxn = ({ query }) => {
             {
               name: "Est.",
               selector: (row) => (
-                <div style={{ fontSize: "10px", fontWeight: "600" }}>
+                <div style={{ fontSize: "13px", fontWeight: "600" }}>
                   {row.establishment}
                 </div>
               ),
@@ -369,8 +369,8 @@ const PayoutTxn = ({ query }) => {
                 <div
                   style={{
                     textAlign: "left",
-                    fontWeight: "500",
-                    fontSize: "13px",
+                    fontWeight: "600",
+                    fontSize: "15px",
                   }}
                 >
                   {row.operator} <br />

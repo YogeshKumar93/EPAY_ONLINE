@@ -305,7 +305,7 @@ const DmtTxn = ({ query }) => {
             {
               name: "Est.",
               selector: (row) => (
-                <div style={{ fontSize: "10px", fontWeight: "600" }}>
+                <div style={{ fontSize: "15px", fontWeight: "600" }}>
                   {row.establishment}
                 </div>
               ),
@@ -317,7 +317,7 @@ const DmtTxn = ({ query }) => {
         name: "Service",
         selector: (row) => (
           <div
-            style={{ textAlign: "left", fontWeight: "400", fontSize: "13px" }}
+            style={{ textAlign: "left", fontWeight: "600", fontSize: "14px" }}
           >
             {row.operator} <br />
             {["adm", "sadm"].includes(user?.role) && (
@@ -396,7 +396,7 @@ const DmtTxn = ({ query }) => {
         name: "Beneficiary",
         selector: (row) => (
           <div
-            style={{ textAlign: "left", fontSize: "10px", fontWeight: "500" }}
+            style={{ textAlign: "left", fontSize: "11px", fontWeight: "500" }}
           >
             {row.beneficiary_name?.toUpperCase()} <br />
             {/* {row.account_number} <br />

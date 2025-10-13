@@ -63,6 +63,7 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
         ApiEndpoints.UPDATE_BY_TYPE,
         {
           id: user.id,
+          user_id: user.id,
           type: selectedTab,
           ...formData,
         }
@@ -88,13 +89,25 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
   const NON_EDITABLE_FIELDS = ["id", "user_id", "created_at", "updated_at"];
 
   // Dynamically generate fields from API response but skip non-editable ones
-  const fields = Object.keys(formData || {})
-    .filter((key) => !NON_EDITABLE_FIELDS.includes(key)) // ⬅️ filter out unwanted fields
+  let fields = Object.keys(formData || {})
+    .filter((key) => !NON_EDITABLE_FIELDS.includes(key))
     .map((key) => ({
       name: key,
       label: formatLabel(key),
       type: key.toLowerCase().includes("date") ? "date" : "text",
     }));
+
+  // If KYC tab and no data received, create placeholder fields for upload
+  if (selectedTab === "kyc" && fields.length === 0) {
+    fields = [
+      { name: "aadhaar_front", label: "Aadhaar Front", type: "file" },
+      { name: "aadhaar_back", label: "Aadhaar Back", type: "file" },
+      { name: "pan_card", label: "PAN Card", type: "file" },
+      { name: "shop_image", label: "Shop Image", type: "file" },
+      { name: "photo", label: "Photo", type: "file" },
+    ];
+  }
+
   return (
     <CommonModal
       open={open}

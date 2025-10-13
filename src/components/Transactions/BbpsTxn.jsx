@@ -372,7 +372,7 @@ const BbpxTxn = ({ query }) => {
             {
               name: "Est.",
               selector: (row) => (
-                <div style={{ fontSize: "10px", fontWeight: "600" }}>
+                <div style={{ fontSize: "14px", fontWeight: "600" }}>
                   {row.establishment}
                 </div>
               ),
@@ -425,7 +425,7 @@ const BbpxTxn = ({ query }) => {
       {
         name: "Service",
         selector: (row) => (
-          <div style={{ textAlign: "left", fontSize: "12px" }}>
+          <div style={{ textAlign: "left", fontSize: "14px" }}>
             <strong>{row.biller_name}</strong> <br />
             {["adm", "sadm"].includes(user?.role) && (
               <>
@@ -577,28 +577,29 @@ const BbpxTxn = ({ query }) => {
         name: "Status",
         selector: (row) => (
           <div
-            style={{
-              textAlign: "right",
-              fontSize: "11px",
-              fontWeight: 600,
-            }}
+            style={{ textAlign: "right", fontSize: "11px", fontWeight: 600 }}
           >
             <div>
               <CommonStatus value={row.status} />
             </div>
-            <div
-              style={{
-                whiteSpace: "normal", // allow wrapping
-                wordBreak: "break-word", // break long values
-                textAlign: "right",
-              }}
-            >
-              {row.operator_id}
-            </div>
+            <Tooltip title={row.operator_id || ""} arrow>
+              <div
+                style={{
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  maxWidth: "100px", // fixed width
+                  textAlign: "right",
+                  cursor: "pointer",
+                }}
+              >
+                {row.operator_id}
+              </div>
+            </Tooltip>
           </div>
         ),
         center: true,
-        width: "70px",
+        width: "120px", // adjust as needed
       },
       ...(user?.role === "adm" || user?.role === "sadm"
         ? [
