@@ -10,6 +10,8 @@ import {
   useTheme,
   Paper,
   Grid,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
@@ -21,6 +23,7 @@ import SenderRegisterModal from "./SenderRegisterModal";
 import VerifySenderModal from "./VerifySenderModal";
 import SuperTransferReceipt from "./SuperTransferReceipt";
 import MobileNumberList from "./MobileNumberList";
+import SearchIcon from "@mui/icons-material/Search";
 
 const SuperTransfer = () => {
   const theme = useTheme();
@@ -180,10 +183,26 @@ const SuperTransfer = () => {
               label="Account Number"
               variant="outlined"
               value={accountNumber}
-              onChange={handleAccountChange} // 👈 new handler
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, ""); // allow only digits
+                setAccountNumber(value);
+              }}
               inputProps={{ maxLength: 18 }}
               sx={{ flex: 1 }}
               fullWidth
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleFetchSenderByAccount(accountNumber)}
+                      disabled={!accountNumber || accountNumber.length < 9}
+                    >
+                      <SearchIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
 
             {loading && (
