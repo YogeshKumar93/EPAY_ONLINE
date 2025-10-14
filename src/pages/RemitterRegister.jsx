@@ -224,11 +224,7 @@ const RemitterRegister = ({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={onClose}
-            disabled={submitting}
-            variant="outlined"
-          >
+          <Button onClick={onClose} disabled={submitting} variant="outlined">
             Cancel
           </Button>
           <Button

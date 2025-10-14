@@ -49,7 +49,7 @@ const AEPS2FAModal = ({
   aadhaar,
   setAadhaar,
   onFingerSuccess,
-  type
+  type,
 }) => {
   const [rdDeviceList, setRdDeviceList] = useState([]);
   const [rdDevice, setRdDevice] = useState(null);
@@ -59,7 +59,7 @@ const AEPS2FAModal = ({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const { showToast } = useToast();
-
+  console.log("The type in aeps2fa modal", type);
   const renderButtons = () => {
     return buttons.map((btn, index) => (
       <Button
@@ -132,7 +132,7 @@ const AEPS2FAModal = ({
     );
   };
 
-   const startScan = () => {
+  const startScan = () => {
     if (!rdDevice) {
       setError("Please select a device first");
       return;
@@ -147,11 +147,11 @@ const AEPS2FAModal = ({
     setError("");
     setSuccess("");
     setStatus("SCANNING...");
-    type === "registeRemmitter"
+    type === "registerRemitter"
       ? CaptureFingerPrintDmt3(
           rdDevice.rdport,
           (qualityMessage, data) => {
-            console.log("THe data in dtm2ginger",data)
+            console.log("THe data in dtm2ginger", data);
             setLoading(false);
             setStatus("CONNECTED");
             setScanQuality(data.qScore);
