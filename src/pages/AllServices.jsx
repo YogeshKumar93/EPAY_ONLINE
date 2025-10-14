@@ -92,8 +92,8 @@ const MenuCard = ({ icon, label, onClick, isActive, user }) => {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          height: 120,
-          width: 120,
+          height: 140,
+          width: 140,
           borderRadius: 3,
           background: isActive
             ? "linear-gradient(135deg, #2563EB 0%, #1E40AF 100%)"
@@ -111,7 +111,7 @@ const MenuCard = ({ icon, label, onClick, isActive, user }) => {
               ? "linear-gradient(135deg, #2563EB 0%, #1E40AF 100%)"
               : "linear-gradient(135deg, #EFF6FF 0%, #FFFFFF 100%)",
           },
-          p: 1.5,
+          p: 2,
           position: "relative",
           overflow: "hidden",
         }}
@@ -122,17 +122,17 @@ const MenuCard = ({ icon, label, onClick, isActive, user }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            width: 67,
-            height: 67,
-            mb: 1,
+            width: 80,
+            height: 80,
+            mb: 1.5,
             borderRadius: "12px",
             backgroundColor: isActive
               ? "rgba(255,255,255,0.25)"
               : "rgba(37, 99, 235, 0.08)",
             transition: "all 0.3s ease",
             "& img": {
-              width: "55%",
-              height: "55%",
+              width: "75%",
+              height: "75%",
               objectFit: "contain",
             },
           }}
@@ -152,8 +152,8 @@ const MenuCard = ({ icon, label, onClick, isActive, user }) => {
         {/* Label */}
         <Typography
           sx={{
-            fontWeight: 500,
-            fontSize: "0.70rem",
+            fontWeight: 600,
+            fontSize: "0.85rem",
             textAlign: "center",
             lineHeight: 1,
             letterSpacing: "0.3px",
@@ -162,7 +162,7 @@ const MenuCard = ({ icon, label, onClick, isActive, user }) => {
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-            maxWidth: "90px",
+            maxWidth: "130px",
           }}
         >
           {label}
