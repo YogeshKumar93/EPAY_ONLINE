@@ -33,14 +33,19 @@ const PrintAeps = () => {
       setData(Array.isArray(txnData) ? txnData : [txnData]);
     }
   }, [location.state]);
-  
-     const totalAmountValue = data
-  .filter(txn => txn.status?.toLowerCase() === "success")
-  .reduce((acc, txn) => acc + parseFloat(txn.amount || 0), 0);
+
+  const totalAmountValue = data
+    .filter((txn) => txn.status?.toLowerCase() === "success")
+    .reduce((acc, txn) => acc + parseFloat(txn.amount || 0), 0);
 
   if (!data || data.length === 0) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
         <Typography color="error" variant="h6">
           No Transaction Data Available
         </Typography>
@@ -48,7 +53,7 @@ const PrintAeps = () => {
     );
   }
 
-  const headers = ["Date", "Txn ID", "Aadhaar No", "Txn Type", "RRN", "Status", "Amount"];
+  const headers = ["Date", "Txn ID", "Aadhaar No", "Service", "RRN", "Amount"];
 
   return (
     <>
@@ -67,7 +72,13 @@ const PrintAeps = () => {
         .amount-red { font-weight: 700; color: #d32f2f; }
       `}</style>
 
-      <Box display="flex" flexDirection="column" alignItems="center" minHeight="100vh" pt={4}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        minHeight="100vh"
+        pt={4}
+      >
         {/* Controls */}
         <Box display="flex" justifyContent="center" mb={2} className="no-print">
           <RadioGroup
@@ -75,8 +86,16 @@ const PrintAeps = () => {
             value={receiptType}
             onChange={(e) => setReceiptType(e.target.value)}
           >
-            <FormControlLabel value="large" control={<Radio />} label="Large Receipt" />
-            <FormControlLabel value="small" control={<Radio />} label="Small Receipt" />
+            <FormControlLabel
+              value="large"
+              control={<Radio />}
+              label="Large Receipt"
+            />
+            <FormControlLabel
+              value="small"
+              control={<Radio />}
+              label="Small Receipt"
+            />
           </RadioGroup>
         </Box>
 
@@ -95,9 +114,27 @@ const PrintAeps = () => {
           }}
         >
           {/* Header */}
-          <Box display="flex" justifyContent="space-between" alignItems="center" borderBottom="2px solid #e0e0e0" pb={1}>
-            <Box sx={{ width: 140, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Box component="img" src={biggpayLogo} alt="Logo" sx={{ width: 130, height: 60, objectFit: "contain" }} />
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            borderBottom="2px solid #e0e0e0"
+            pb={1}
+          >
+            <Box
+              sx={{
+                width: 140,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "cent    er",
+              }}
+            >
+              <Box
+                component="img"
+                src={biggpayLogo}
+                alt="Logo"
+                sx={{ width: 130, height: 60, objectFit: "contain" }}
+              />
             </Box>
             <Box textAlign="right">
               <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
@@ -122,7 +159,7 @@ const PrintAeps = () => {
                 "&:hover": { borderColor: "#ff9a3c", color: "#ff9a3c" },
               }}
             >
-               Transaction Summary
+              Transaction Summary
             </Button>
           </Box>
 
@@ -131,18 +168,24 @@ const PrintAeps = () => {
             <Box className="table-container" mt={2}>
               <Box className="table-row">
                 {headers.map((h, i) => (
-                  <Box key={i} className="table-cell header-cell">{h}</Box>
+                  <Box key={i} className="table-cell header-cell">
+                    {h}
+                  </Box>
                 ))}
               </Box>
               {data.map((txn, idx) => {
                 const amount = parseFloat(txn.amount || 0);
                 const values = [
-                  txn.created_at ? new Date(txn.created_at).toLocaleString() : "",
-                  txn.txn_id || "",
-                  txn.aadhaar_number ? `**** **** ${txn.aadhaar_number.slice(-4)}` : "",
-                  txn.txn_type || "",
-                  txn.rrn || "",
-                  txn.status || "",
+                  txn.created_at
+                    ? new Date(txn.created_at).toLocaleString()
+                    : "",
+                  txn.txn_id || "N/A",
+                  txn.aadhaar_number
+                    ? `**** **** ${txn.aadhaar_number.slice(-4)}`
+                    : "N/A",
+                  txn.operator || "N/A",
+                  txn.rrn || "N/A",
+                
                   `₹ ${amount.toFixed(2)}`,
                 ];
 
@@ -151,7 +194,9 @@ const PrintAeps = () => {
                     {values.map((v, i) => (
                       <Box
                         key={i}
-                        className={`table-cell ${i === values.length - 1 ? "amount-red" : ""}`}
+                        className={`table-cell ${
+                          i === values.length - 1 ? "amount-red" : ""
+                        }`}
                       >
                         {v}
                       </Box>
@@ -166,17 +211,28 @@ const PrintAeps = () => {
               {data.map((txn, idx) => {
                 const amount = parseFloat(txn.amount || 0);
                 const values = [
-                  txn.created_at ? new Date(txn.created_at).toLocaleString() : "",
-                  txn.txn_id || "",
-                  txn.aadhaar_number ? `**** **** ${txn.aadhaar_number.slice(-4)}` : "",
-                  txn.txn_type || "",
-                  txn.rrn || "",
-                  txn.status || "",
+                  txn.created_at
+                    ? new Date(txn.created_at).toLocaleString()
+                    : "N/A",
+                  txn.txn_id || "N/A",
+                  txn.aadhaar_number
+                    ? `**** **** ${txn.aadhaar_number.slice(-4)}`
+                    : "N/A",
+                  txn.operator || "N/A",
+                  txn.rrn || "N/A",
+                
                   `₹ ${amount.toFixed(2)}`,
                 ];
 
                 return (
-                  <Box key={idx} sx={{ mb: 2, borderBottom: idx !== data.length - 1 ? "1px solid #f0f0f0" : "none" }}>
+                  <Box
+                    key={idx}
+                    sx={{
+                      mb: 2,
+                      borderBottom:
+                        idx !== data.length - 1 ? "1px solid #f0f0f0" : "none",
+                    }}
+                  >
                     {headers.map((label, i) => (
                       <Box
                         key={i}
@@ -184,10 +240,16 @@ const PrintAeps = () => {
                         justifyContent="space-between"
                         sx={{ px: 1, py: 1.3 }}
                       >
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>{label}:</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          {label}:
+                        </Typography>
                         <Typography
                           variant="body2"
-                          sx={i === headers.length - 1 ? { color: "#d32f2f", fontWeight: 600 } : {}}
+                          sx={
+                            i === headers.length - 1
+                              ? { color: "#d32f2f", fontWeight: 600 }
+                              : {}
+                          }
                         >
                           {values[i]}
                         </Typography>
@@ -198,14 +260,20 @@ const PrintAeps = () => {
               })}
             </Box>
           )}
-             <Box display="flex" justifyContent="flex-end" mt={1} sx={{ pr: 2 }}>
-                    <Typography variant="body1" sx={{ fontWeight: 700 }}>
-                      Total Amount: ₹ {totalAmountValue.toFixed(2)}
-                    </Typography>
-                  </Box>
+
+          <Box display="flex" justifyContent="flex-end" mt={1} sx={{ pr: 2 }}>
+            <Typography variant="body1" sx={{ fontWeight: 700 }}>
+              Total Amount: ₹ {totalAmountValue.toFixed(2)}
+            </Typography>
+          </Box>
 
           {/* Print Button */}
-          <Box display="flex" justifyContent="flex-end" mt={2} className="no-print">
+          <Box
+            display="flex"
+            justifyContent="flex-end"
+            mt={2}
+            className="no-print"
+          >
             <Button
               onClick={() => window.print()}
               variant="contained"
@@ -222,9 +290,19 @@ const PrintAeps = () => {
           </Box>
 
           {/* Footer */}
-          <Box display="flex" justifyContent="space-between" alignItems="center" mt={3}>
-            <Typography variant="caption" fontWeight={500}>© 2025 All Rights Reserved</Typography>
-            <Typography variant="caption" sx={{ display: "block", textAlign: "right" }}>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mt={3}
+          >
+            <Typography variant="caption" fontWeight={500}>
+              © 2025 All Rights Reserved
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{ display: "block", textAlign: "right" }}
+            >
               System-generated receipt. No signature required.
             </Typography>
           </Box>

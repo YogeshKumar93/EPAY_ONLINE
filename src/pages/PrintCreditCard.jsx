@@ -31,7 +31,7 @@ const PrintCreditCard = () => {
   }, [data]);
 
   // --- Fields to print (same as CreditCardTxn) ---
-  const headers = ["Date", "Txn ID", "Mobile", "Service", "Amount", "Status"];
+  const headers = ["Date", "Txn ID", "Mobile", "Beneficiary Details", "Service", "Amount", ];
 
   if (!data || data.length === 0) {
     return (
@@ -47,13 +47,22 @@ const PrintCreditCard = () => {
         {headers.map((h, i) => <Box key={i} className="table-cell header-cell">{h}</Box>)}
       </Box>
       {data.map((txn, idx) => {
+           const beneficiaryDetails = (
+                          <Box>
+                            <div>{txn.beneficiary_name || "N/A"}</div>
+                            <div>A/C: {txn.account_number || "N/A"}</div>
+                            <div>IFSC: {txn.ifsc_code || "N/A"}</div>
+                          </Box>
+                        );
         const values = [
           txn.created_at ? `${ddmmyy(txn.created_at)} ${dateToTime(txn.created_at)}` : "",
-          txn.txn_id || "",
-          txn.number || "",
-          txn.operator || "",
+           txn.operator || "N/A",
+          txn.txn_id || "N/A",
+          txn.number || "N/A",
+         
+              beneficiaryDetails,
           `₹ ${parseFloat(txn.amount || 0).toFixed(2)}`,
-          txn.status || ""
+        
         ];
         return (
           <Box key={idx} className="table-row">
@@ -69,13 +78,22 @@ const PrintCreditCard = () => {
   const renderSmallView = () => (
     <Box mt={2} sx={{ border: "1px solid #e0e0e0", borderRadius: 2 }}>
       {data.map((txn, idx) => {
+          const beneficiaryDetails = (
+                          <Box>
+                            <div>{txn.beneficiary_name || "N/A"}</div>
+                            <div>A/C: {txn.account_number || "N/A"}</div>
+                            <div>IFSC: {txn.ifsc_code || "N/A"}</div>
+                          </Box>
+                        );
         const values = [
           txn.created_at ? `${ddmmyy(txn.created_at)} ${dateToTime(txn.created_at)}` : "",
-          txn.txn_id || "",
-          txn.number || "",
-          txn.operator || "",
+           txn.operator || "N/A",
+          txn.txn_id || "N/A",
+          txn.number || "N/A",
+          txn.operator || "N/A",
+          beneficiaryDetails,
           `₹ ${parseFloat(txn.amount || 0).toFixed(2)}`,
-          txn.status || ""
+        
         ];
         return (
           <Box key={idx} sx={{ mb: 2, borderBottom: idx !== data.length - 1 ? "1px solid #f0f0f0" : "none" }}>

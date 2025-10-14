@@ -186,11 +186,11 @@ const PrintRecharge = () => {
               {data.map((txn, idx) => {
                 const values = [
                   txn.created_at ? ddmmyyWithTime(txn.created_at) : "",
-                  txn.txn_id || "",
-                  txn.number || "",
-                  txn.operator || "",
-                  txn.client_ref || "",
-                  txn.status || "",
+                  txn.txn_id || "N/A",
+                  txn.number || "N/A",
+                  txn.operator || "N/A",
+                  txn.client_ref || "N/A",
+                  txn.status || "N/A",
                   `₹ ${parseFloat(txn.amount || 0).toFixed(2)}`,
                 ];
 
@@ -215,11 +215,11 @@ const PrintRecharge = () => {
               {data.map((txn, idx) => {
                 const values = [
                   txn.created_at ? ddmmyyWithTime(txn.created_at) : "",
-                  txn.txn_id || "",
-                  txn.number || "",
-                  txn.operator || "",
-                  txn.client_ref || "",
-                  txn.status || "",
+                  txn.txn_id || "N/A",
+                  txn.number || "N/A",
+                  txn.operator || "N/A",
+                  txn.client_ref || "N/A",
+                  txn.status || "N/A",
                   `₹ ${parseFloat(txn.amount || 0).toFixed(2)}`,
                 ];
 
