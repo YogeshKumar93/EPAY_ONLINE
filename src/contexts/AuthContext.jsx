@@ -262,9 +262,7 @@ export const AuthProvider = ({ children }) => {
 
   const latLongHandler = (lat, long) => {
     setLocation({ lat, long });
-    localStorage.setItem("location", JSON.stringify({ lat, long }));
   };
-
   const setDocsInLocal = (options) => {
     localStorage.setItem("docs", JSON.stringify(options));
     setIfDocsUploaded(options);
@@ -290,6 +288,7 @@ export const AuthProvider = ({ children }) => {
     nepalToken: nepalToken,
     nepalUser: nepalUser,
     location: location,
+    latLongHandler,
     isLoggedIn: userIsLoggedIn,
     currentView: currentView,
     setCurrentView: setCurrentView,

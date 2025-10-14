@@ -13,9 +13,6 @@ import {
 } from "@mui/material";
 import { Lock, FiberManualRecord, InfoOutlined } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { set, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
 import AuthContext from "../contexts/AuthContext";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { apiCall } from "../api/apiClient";
@@ -23,7 +20,6 @@ import { ReTextField } from "../components/common/ReTextField";
 import backImg from "../assets/Images/BackgroundLogin2.png";
 import VerifyMpinLogin from "../components/UI/VerifyMpinLogin";
 import { getGeoLocation } from "../utils/GeoLocationUtil";
-import { okErrorToast } from "../utils/ToastUtil";
 import ForgotPassword from "../components/common/ForgotPassword";
 import biggpayLogo from "../assets/Images/PPALogor.png";
 import QRCode from "react-qr-code";
@@ -177,15 +173,20 @@ const QrLoginPage = () => {
     const fetchLocation = getGeoLocation(
       (lat, long) => {
         console.log("✅ Got location:", lat, long);
+        // Update AuthContext
+        authCtx.latLongHandler(lat, long);
+        // Also store in localStorage
         localStorage.setItem("location", JSON.stringify({ lat, long }));
-
-        // authCtx.setLocation(lat, long);
       },
-      (err) => console.error(" Location error:", err)
+      (err) => console.error("❌ Location error:", err)
     );
 
     fetchLocation();
   }, []);
+
+  useEffect(() => {
+    console.log("📍 AuthContext location updated:", authCtx.location);
+  }, [authCtx.location]);
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);

@@ -190,6 +190,8 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
         ...pendingPayload,
         ben_name: verifiedName, // ✅ Verified name
         rem_mobile: sender?.mobileNumber, // ✅ Sender mobile
+        name: verifiedName,
+        s_verified: new Date().toISOString(),
         encrypted_data: encryptedData, // 🔐 If backend needs it
       };
 

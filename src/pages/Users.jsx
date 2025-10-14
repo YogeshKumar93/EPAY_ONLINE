@@ -69,6 +69,8 @@ const Users = ({ query }) => {
   const [openAssignPlans, setOpenAssignPlans] = useState(false);
   const [userSearch, setUserSearch] = useState("");
   const [userOptions, setUserOptions] = useState([]);
+  const [selectedUserFilter, setSelectedUserFilter] = useState(null); // selected option
+  const [appliedFilters, setAppliedFilters] = useState({}); // applied filter payload
 
   const handleOpenAssignPlans = (user) => {
     setSelectedUser(user);
@@ -146,15 +148,18 @@ const Users = ({ query }) => {
   };
 
   useEffect(() => {
-    // if (!userSearch) return; // no API call if empty
+    if (userSearch.length <= 4) {
+      setUserOptions([]); // Clear options if less than or equal to 4 chars
+      return;
+    }
 
-    const fetchUsersById = async (searchTerm) => {
+    const fetchUsersByEstablishment = async (searchTerm) => {
       try {
         const { error, response } = await apiCall(
           "post",
           ApiEndpoints.GET_USER_DEBOUNCE,
           {
-            user: searchTerm, // API expects partial search
+            establishment: searchTerm, // send under establishment key
           }
         );
         if (!error && response?.data) {
@@ -170,10 +175,10 @@ const Users = ({ query }) => {
       }
     };
 
-    const debouncedFetch = debounce(fetchUsersById, 500); // 500ms delay
+    const debouncedFetch = debounce(fetchUsersByEstablishment, 500); // 500ms delay
     debouncedFetch(userSearch);
 
-    return () => debouncedFetch.cancel(); // cleanup
+    return () => debouncedFetch.cancel(); // cleanup on unmount or change
   }, [userSearch]);
 
   // Fetch user map
@@ -312,11 +317,13 @@ const Users = ({ query }) => {
       {
         id: "user",
         label: "User",
-        type: "dropdown",
+        type: "autocomplete",
         options: userOptions,
         onSearch: (val) => setUserSearch(val),
+        onChange: (option) => setSelectedUserFilter(option), // store selected object
         getOptionLabel: (option) => option.label,
         valueKey: "value",
+        freeSolo: true,
       },
       {
         id: "parent_id",
@@ -339,6 +346,16 @@ const Users = ({ query }) => {
       },
     ];
   }, [user?.role, userOptions]);
+  const handleApplyFilters = () => {
+    const payload = {
+      ...query,
+      id: selectedUserFilter?.value || undefined, // <-- only send id
+    };
+
+    if (fetchUsersRef.current) {
+      fetchUsersRef.current(payload); // fetch with applied filters
+    }
+  };
 
   const columns = useMemo(() => {
     const baseColumns = [
@@ -527,7 +544,7 @@ const Users = ({ query }) => {
         columns={columns}
         endpoint={ApiEndpoints.GET_USERS}
         filters={filters}
-        queryParam={query}
+        queryParam={appliedFilters} // only updates when Apply is clicked
         transformData={filterRows}
         onFetchRef={handleFetchRef}
         enableActionsHover={true}

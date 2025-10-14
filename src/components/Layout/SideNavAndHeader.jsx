@@ -157,12 +157,11 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
     }
   };
 
- const handleLogoClick = () => {
-  if (user?.role === "ret" || user?.role === "dd") {
-    navigate("/customer/allServices");
-  }
-};
-
+  const handleLogoClick = () => {
+    if (user?.role === "ret" || user?.role === "dd") {
+      navigate("/customer/allServices");
+    }
+  };
 
   const handleUserMenuOpen = (event) => {
     setUserMenuAnchor(event.currentTarget);
@@ -195,6 +194,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
   const handleLogout = () => {
     handleUserMenuClose();
     authCtx.logout();
+    window.location.href = "/qrLogin";
   };
   const getResolvedPath = (item) =>
     item.to?.[user?.role] || item.to?.default || "/";
@@ -294,10 +294,10 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             component="img"
             src={logo}
             alt="App Logo"
-            onClick={handleLogoClick} 
+            onClick={handleLogoClick}
             sx={{
               height: 35,
-              width: 120, // 
+              width: 120, //
               cursor: "pointer",
               display: "block",
             }}

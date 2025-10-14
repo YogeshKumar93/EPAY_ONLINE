@@ -26,6 +26,7 @@ import {
   DialogActions,
   useMediaQuery,
   useTheme,
+  Autocomplete,
 } from "@mui/material";
 import {
   Refresh as RefreshIcon,
@@ -595,14 +596,22 @@ const CommonTable = ({
     () =>
       visibleFilters.map((filter) => (
         <Box key={filter.id} sx={{ minWidth: 120 }}>
-          {filter.type === "dropdown" ? (
-            <FormControl
-              size="small"
-              sx={{ minWidth: 120 }}
-              className="textFieldCustom"
-            >
+          {filter.type === "autocomplete" ? (
+            <Autocomplete
+              options={filter.options || []}
+              getOptionLabel={filter.getOptionLabel || ((opt) => opt.label)}
+              onInputChange={(event, value) => {
+                if (filter.onSearch) filter.onSearch(value);
+              }}
+              value={filterValues[filter.id] || null}
+              onChange={(event, value) => handleFilterChange(filter.id, value)}
+              renderInput={(params) => (
+                <TextField {...params} label={filter.label} size="small" />
+              )}
+            />
+          ) : filter.type === "dropdown" ? (
+            <FormControl>
               <TextField
-                className="textFieldCustom"
                 select
                 label={filter.label}
                 value={filterValues[filter.id] || "All"}

@@ -7,8 +7,9 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
-    IconButton,
-    InputAdornment,
+  IconButton,
+  InputAdornment,
+  Autocomplete,
 } from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
@@ -34,7 +35,7 @@ const LevinFundTransfer = () => {
 
   const [mobile, setMobile] = useState("");
   const [sender, setSender] = useState(null);
-    const [accountNumber, setAccountNumber] = useState(""); 
+  const [accountNumber, setAccountNumber] = useState("");
   const [openRegisterModal, setOpenRegisterModal] = useState(false);
   const [openVerifyModal, setOpenVerifyModal] = useState(false);
   const [otpData, setOtpData] = useState(null);
@@ -42,10 +43,9 @@ const LevinFundTransfer = () => {
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
   const [levinResponse, setLevinResponse] = useState(null); // store API response
-    const [mobileListOpen, setMobileListOpen] = useState(false);
-    const [mobileList, setMobileList] = useState([]);
-
-     
+  const [mobileListOpen, setMobileListOpen] = useState(false);
+  const [mobileList, setMobileList] = useState([]);
+  const [history, setHistory] = useState([]);
 
   // Fetch sender by mobile number
   const handleFetchSender = async (number = mobile) => {
@@ -95,6 +95,17 @@ const LevinFundTransfer = () => {
       }
     }
   };
+  const saveMobileToHistory = (number) => {
+    if (!history.includes(number)) {
+      const updated = [...history, number];
+      setHistory(updated);
+      localStorage.setItem("mobileNumbers", JSON.stringify(updated));
+    }
+  };
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem("mobileNumbers") || "[]");
+    setHistory(saved);
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -103,16 +114,14 @@ const LevinFundTransfer = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleChange = (e) => {
-    const value = e.target.value.replace(/\D/g, ""); // only digits allowed
-
+  const handleChange = (e, newValue) => {
+    const value = (newValue || "").replace(/\D/g, "");
     if (value.length <= 10) {
       setMobile(value);
-
       if (value.length === 10) {
+        saveMobileToHistory(value);
         handleFetchSender(value);
       } else {
-        // clear data if input is not 10 digits
         setSender(null);
         setSelectedBeneficiary(null);
       }
@@ -175,9 +184,6 @@ const LevinFundTransfer = () => {
       setSender(null);
     }
   };
-  
-
-  
 
   return (
     <Box>
@@ -190,16 +196,22 @@ const LevinFundTransfer = () => {
             gap={1}
             mb={1}
           >
-            <TextField
-              label="Mobile Number"
-              variant="outlined"
+            <Autocomplete
+              freeSolo
+              options={history}
               value={mobile}
-              onChange={handleChange}
-              inputProps={{ maxLength: 10 }}
+              onInputChange={handleChange}
               sx={{ flex: 1 }}
-              fullWidth
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Mobile Number"
+                  variant="outlined"
+                  inputProps={{ ...params.inputProps, maxLength: 10 }}
+                  fullWidth
+                />
+              )}
             />
-
             <Box
               sx={{
                 display: { xs: "flex", sm: "none" },
@@ -215,31 +227,31 @@ const LevinFundTransfer = () => {
               </Divider>
             </Box>
 
-           <TextField
-                       label="Account Number"
-                       variant="outlined"
-                       value={accountNumber}
-                       onChange={(e) => {
-                         const value = e.target.value.replace(/\D/g, ""); // allow only digits
-                         setAccountNumber(value);
-                       }}
-                       inputProps={{ maxLength: 18 }}
-                       sx={{ flex: 1 }}
-                       fullWidth
-                       InputProps={{
-                         endAdornment: (
-                           <InputAdornment position="end">
-                             <IconButton
-                               color="primary"
-                               onClick={() => handleFetchSenderByAccount(accountNumber)}
-                               disabled={!accountNumber || accountNumber.length < 9}
-                             >
-                               <SearchIcon />
-                             </IconButton>
-                           </InputAdornment>
-                         ),
-                       }}
-                     />
+            <TextField
+              label="Account Number"
+              variant="outlined"
+              value={accountNumber}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, ""); // allow only digits
+                setAccountNumber(value);
+              }}
+              inputProps={{ maxLength: 18 }}
+              sx={{ flex: 1 }}
+              fullWidth
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleFetchSenderByAccount(accountNumber)}
+                      disabled={!accountNumber || accountNumber.length < 9}
+                    >
+                      <SearchIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
             {loading && (
               <CommonLoader
                 loading={loading}
@@ -402,17 +414,17 @@ const LevinFundTransfer = () => {
           onRegistered={handleSenderRegistered}
         />
       )}
-        {mobileListOpen && (
-              <MobileNumberList
-                open={mobileListOpen}
-                onClose={() => setMobileListOpen(false)}
-                numbers={mobileList}
-                onSelect={(selectedMobile) => {
-                  setMobile(selectedMobile);
-                  handleFetchSender(selectedMobile);
-                }}
-              />
-            )}
+      {mobileListOpen && (
+        <MobileNumberList
+          open={mobileListOpen}
+          onClose={() => setMobileListOpen(false)}
+          numbers={mobileList}
+          onSelect={(selectedMobile) => {
+            setMobile(selectedMobile);
+            handleFetchSender(selectedMobile);
+          }}
+        />
+      )}
 
       {/* Verify Modal */}
       {openVerifyModal && otpData && (
