@@ -47,14 +47,15 @@ const RemitterRegister = ({
   useEffect(() => {
     if (mobile) {
       setFormData((prev) => ({ ...prev, mobile_number: mobile }));
-      // Reset all OTP/AEPS states when mobile changes
+      // Reset all states when mobile changes
       setOtp("");
       setOtpReferenceKey(null);
       setKycReferenceKey(null);
       setOtpModalOpen(false);
       setAeps2faOpen(false);
+      setErrors({});
     }
-  }, [mobile]);
+  }, [mobile, setAeps2faOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
