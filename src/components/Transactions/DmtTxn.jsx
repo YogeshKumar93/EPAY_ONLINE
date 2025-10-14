@@ -809,7 +809,7 @@ const DmtTxn = ({ query }) => {
                       <PrintIcon
                         sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
                       />
-                      DMT
+                      Print
                     </Button>
                   </Tooltip>
                 )}

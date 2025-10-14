@@ -56,6 +56,7 @@ const PrintDmt2 = () => {
   const headers = [
     "Date",
     "Service",
+    "UTR",
     "Sender Mobile",
     "Beneficiary Details", // Combined
     "Amount",
@@ -186,7 +187,7 @@ const PrintDmt2 = () => {
                 "&:hover": { borderColor: "#ff9a3c", color: "#ff9a3c" },
               }}
             >
-               Transaction Summary
+              Transaction Summary
             </Button>
           </Box>
 
@@ -207,9 +208,9 @@ const PrintDmt2 = () => {
 
                 const beneficiaryDetails = (
                   <Box>
-                    <div>{txn.beneficiary_name || ""}</div>
-                    <div>A/C: {txn.account_number || ""}</div>
-                    <div>IFSC: {txn.ifsc_code || ""}</div>
+                    <div>{txn.beneficiary_name || "N/A"}</div>
+                    <div>A/C: {txn.account_number || "N/A"}</div>
+                    <div>IFSC: {txn.ifsc_code || "N/A"}</div>
                   </Box>
                 );
 
@@ -223,8 +224,9 @@ const PrintDmt2 = () => {
                       ? new Date(txn.created_at).toLocaleTimeString()
                       : ""
                   }`,
-                  txn.operator || "",
-                  txn.sender_mobile || "",
+                  txn.operator || "N/A",
+                  txn.operator_id || "N/A",
+                  txn.sender_mobile || "N/A",
                   beneficiaryDetails,
                   `₹ ${amount.toFixed(2)}`,
                   `₹ ${ccf.toFixed(2)}`,
@@ -267,9 +269,9 @@ const PrintDmt2 = () => {
                 const totalAmount = amount + ccf;
                 const beneficiaryDetails = (
                   <Box>
-                    <div>{txn.beneficiary_name || ""}</div>
-                    <div>A/C: {txn.account_number || ""}</div>
-                    <div>IFSC: {txn.ifsc_code || ""}</div>
+                    <div>{txn.beneficiary_name || "N/A"}</div>
+                    <div>A/C: {txn.account_number || "N/A"}</div>
+                    <div>IFSC: {txn.ifsc_code || "N/A"}</div>
                   </Box>
                 );
 
@@ -283,8 +285,9 @@ const PrintDmt2 = () => {
                       ? new Date(txn.created_at).toLocaleTimeString()
                       : ""
                   }`,
-                  txn.operator || "",
-                  txn.sender_mobile || "",
+                  txn.operator || "N/A",
+                  txn.operator_id || "N/A",
+                  txn.sender_mobile || "N/A",
                   beneficiaryDetails,
                   `₹ ${amount.toFixed(2)}`,
                   `₹ ${ccf.toFixed(2)}`,

@@ -813,8 +813,9 @@ const PayoutTxn = ({ query }) => {
                     }}
                   >
                     <PrintIcon
-                      sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
+                      sx={{ fontSize: 25, color: "#e3e6e9ff", mr: 1 }}
                     />
+                    Print
                   </Button>
                 </Tooltip>
               )}
