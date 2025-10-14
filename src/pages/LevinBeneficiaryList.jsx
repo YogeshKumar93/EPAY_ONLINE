@@ -281,7 +281,7 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
         display="flex"
         justifyContent="space-between"
         alignItems="center"
-        sx={{ py: 1, px: 2, background: "#2275B7" }}
+        sx={{ py: 1, px: 2, background: "#6C4BC7" }}
       >
         <Typography variant="subtitle2" color="#fff" fontWeight="600">
           Beneficiary List ({sender?.beneficiary?.length || 0})
