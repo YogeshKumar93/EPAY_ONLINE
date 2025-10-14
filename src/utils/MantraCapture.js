@@ -628,6 +628,7 @@ export function CaptureFingerPrintDmt3(rdport, onSuccess, onFailed) {
     CaptureFingerDmt3(
       rdport,
       (res) => {
+        console.log("manthra response dmt3 CaptureFingerPrintDmt3");
         if (res.httpStaus) {
           var $doc = $.parseXML(res.data);
           console.log("second data=> ", res);
@@ -849,4 +850,3 @@ export function CaptureFingerPrintTest(rdport, onSuccess, onFailed) {
     );
   }, 100);
 }
-

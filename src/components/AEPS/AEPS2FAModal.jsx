@@ -28,6 +28,7 @@ import {
 } from "@mui/icons-material";
 import {
   CaptureFingerPrintAeps2,
+  CaptureFingerPrintDmt3,
   GetMFS100InfoLoad,
 } from "../../utils/MantraCapture";
 
@@ -35,6 +36,7 @@ import { apiCall } from "../../api/apiClient";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import { useToast } from "../../utils/ToastContext";
 import { apiErrorToast } from "../../utils/ToastUtil";
+
 const AEPS2FAModal = ({
   open,
   onClose,
@@ -47,6 +49,7 @@ const AEPS2FAModal = ({
   aadhaar,
   setAadhaar,
   onFingerSuccess,
+  type,
 }) => {
   const [rdDeviceList, setRdDeviceList] = useState([]);
   const [rdDevice, setRdDevice] = useState(null);
@@ -56,7 +59,7 @@ const AEPS2FAModal = ({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const { showToast } = useToast();
-
+  console.log("The type in aeps2fa modal", type);
   const renderButtons = () => {
     return buttons.map((btn, index) => (
       <Button
@@ -109,7 +112,6 @@ const AEPS2FAModal = ({
         if (devices && devices.length > 0) {
           setRdDeviceList(devices);
 
-          // Auto-select the first READY device if available
           const readyDevice = devices.find((d) => d.status === "READY");
           if (readyDevice) {
             setRdDevice(readyDevice);
@@ -145,26 +147,46 @@ const AEPS2FAModal = ({
     setError("");
     setSuccess("");
     setStatus("SCANNING...");
+    type === "registerRemitter"
+      ? CaptureFingerPrintDmt3(
+          rdDevice.rdport,
+          (qualityMessage, data) => {
+            console.log("THe data in dtm2ginger", data);
+            setLoading(false);
+            setStatus("CONNECTED");
+            setScanQuality(data.qScore);
+            setSuccess(`Fingerprint captured successfully! ${qualityMessage}`);
 
-    CaptureFingerPrintAeps2(
-      rdDevice.rdport,
-      (qualityMessage, data) => {
-        setLoading(false);
-        setStatus("CONNECTED");
-        setScanQuality(data.qScore);
-        setSuccess(`Fingerprint captured successfully! ${qualityMessage}`);
+            fingerData(data);
+            if (onFingerSuccess) {
+              onFingerSuccess(data);
+            }
+          },
+          (error) => {
+            setLoading(false);
+            setStatus("ERROR");
+            setError("Scan failed: " + error);
+          }
+        )
+      : CaptureFingerPrintAeps2(
+          rdDevice.rdport,
+          (qualityMessage, data) => {
+            setLoading(false);
+            setStatus("CONNECTED");
+            setScanQuality(data.qScore);
+            setSuccess(`Fingerprint captured successfully! ${qualityMessage}`);
 
-        fingerData(data);
-        if (onFingerSuccess) {
-          onFingerSuccess(data);
-        }
-      },
-      (error) => {
-        setLoading(false);
-        setStatus("ERROR");
-        setError("Scan failed: " + error);
-      }
-    );
+            fingerData(data);
+            if (onFingerSuccess) {
+              onFingerSuccess(data);
+            }
+          },
+          (error) => {
+            setLoading(false);
+            setStatus("ERROR");
+            setError("Scan failed: " + error);
+          }
+        );
   };
 
   const handleBankChange = (e) => {
@@ -182,7 +204,7 @@ const AEPS2FAModal = ({
   const getStatusColor = () => {
     if (status === "CONNECTED") return "#4caf50";
     if (status === "SCANNING...") return "#ff9800";
-    if (status === "READY") return "#2196f3";
+    if (status === "READY") return "#7b4dff";
     if (status === "DETECTING...") return "#2275b7";
     if (status === "ERROR") return "#f44336";
     return "#9e9e9e";
@@ -225,7 +247,7 @@ const AEPS2FAModal = ({
           left: 0,
           right: 0,
           height: "4px",
-          background: "linear-gradient(90deg, #2275b7, #7b4dff, #2275b7)",
+          background: "linear-gradient(90deg, #8c61e6, #7b4dff, #8c61e6)",
           backgroundSize: "200% 100%",
           animation:
             status !== "NOT READY" ? "shimmer 3s infinite linear" : "none",
@@ -239,7 +261,7 @@ const AEPS2FAModal = ({
       {/* Header with gradient */}
       <Box
         sx={{
-          background: "linear-gradient(135deg, #2275b7 0%, #7b4dff 100%)",
+          background: "linear-gradient(135deg, #8c61e6 0%, #7b4dff 100%)",
           color: "white",
           p: 1,
           borderRadius: "12px 12px 0 0",
@@ -510,7 +532,7 @@ const AEPS2FAModal = ({
                     mb: 0.5,
                     bgcolor: "rgba(157, 114, 240, 0.2)",
                     "& .MuiLinearProgress-bar": {
-                      background: "linear-gradient(90deg, #2275b7, #7b4dff)",
+                      background: "linear-gradient(90deg, #8c61e6, #7b4dff)",
                       borderRadius: 3,
                     },
                   }}
@@ -700,8 +722,8 @@ const AEPS2FAModal = ({
                     py: 0.8,
                     textTransform: "none",
                     fontWeight: "600",
-                    color: "#2275b7",
-                    borderColor: "#2275b7",
+                    color: "#8c61e6",
+                    borderColor: "#8c61e6",
                     "&:hover": {
                       borderColor: "#8c61e6",
                       bgcolor: "#f5f2ff",
@@ -725,7 +747,7 @@ const AEPS2FAModal = ({
                     textTransform: "none",
                     fontWeight: "600",
                     background:
-                      "linear-gradient(135deg, #2275b7 0%, #7b4dff 100%)",
+                      "linear-gradient(135deg, #8c61e6 0%, #7b4dff 100%)",
                     "&:hover": {
                       background:
                         "linear-gradient(135deg, #8c61e6 0%, #6b3dff 100%)",
@@ -764,7 +786,7 @@ const AEPS2FAModal = ({
           border: "1px solid rgba(157, 114, 240, 0.08)",
         }}
       >
-        <InfoOutlinedIcon sx={{ fontSize: "16px", mr: 1, color: "#2275b7" }} />
+        <InfoOutlinedIcon sx={{ fontSize: "16px", mr: 1, color: "#6b3dff" }} />
         <Typography
           variant="caption"
           sx={{
