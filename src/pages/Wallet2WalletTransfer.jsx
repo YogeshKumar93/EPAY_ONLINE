@@ -95,7 +95,8 @@ const Wallet2WalletTransfer = ({}) => {
         defaultValue: "pending",
         roles: ["adm", "sadm"],
       },
-      // { id: "sender_mobile", label: "Sender Mobile", type: "textfield" },
+      { id: "sender_est", label: "Sender Est", type: "textfield" },
+      { id: "receiver_est", label: "Receiver Est", type: "textfield" },
       {
         id: "txn_id",
         label: "Txn ID",
