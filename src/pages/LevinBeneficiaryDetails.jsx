@@ -112,7 +112,7 @@ const LevinBeneficiaryDetails = ({
 
     setLoading(true);
     try {
-         const selectedPurposeType =
+      const selectedPurposeType =
         purposes.find((p) => p.id === Number(selectedPurpose))?.type || "N/A";
 
       console.log("Selected Purpose Type:", selectedPurposeType);
@@ -143,13 +143,18 @@ const LevinBeneficiaryDetails = ({
       );
       if (response) {
         showToast(response?.message || "Payout successful!", "success");
+        const purposeType =
+          purposes.find((p) => p.id === selectedPurpose)?.type || "N/A";
+
         const payoutData = {
           ...(response || {}),
           beneficiary,
           senderMobile,
+          purpose: selectedPurposeType,
           transferMode,
         };
         console.log("DATA SENT TO PARENT:", payoutData);
+        console.log("Purpose being sent to parent:", purposeType); // ✅ log purpose
 
         onLevinSuccess(payoutData); // send to parent
         setAmount("");

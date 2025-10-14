@@ -130,7 +130,7 @@ const PrintPayout = () => {
             onChange={(e) => setOrientation(e.target.value)}
             sx={{ ml: 3 }}
           >
-            <FormControlLabel
+            {/* <FormControlLabel
               value="portrait"
               control={<Radio />}
               label="Portrait"
@@ -139,7 +139,7 @@ const PrintPayout = () => {
               value="landscape"
               control={<Radio />}
               label="Landscape"
-            />
+            /> */}
           </RadioGroup>
         </Box>
 
@@ -228,17 +228,17 @@ const PrintPayout = () => {
 
                 const beneficiaryDetails = (
                   <Box className="beneficiary-box">
-                    <div>{txn.beneficiary_name || ""}</div>
-                    <div>A/C: {txn.account_number || ""}</div>
-                    <div>IFSC: {txn.ifsc_code || ""}</div>
+                    <div>{txn.beneficiary_name || "N/A"}</div>
+                    <div>A/C: {txn.account_number || "N/A"}</div>
+                    <div>IFSC: {txn.ifsc_code || "N/A"}</div>
                   </Box>
                 );
 
                 const values = [
                   txn.created_at ? ddmmyyWithTime(txn.created_at) : "",
-                  txn.purpose || "",
-                     txn.operator_id || "",
-                  txn.mobile_number || "",
+                  txn.purpose || "N/A",
+                  txn.operator_id || "N/A",
+                  txn.mobile_number || "N/A",
                   beneficiaryDetails,
                   `₹ ${amount.toFixed(2)}`,
                 ];
@@ -262,9 +262,8 @@ const PrintPayout = () => {
                 border: "1px solid #e0e0e0",
                 borderRadius: 2,
                 overflow: "hidden",
-                display:"flex",
-                justifyContent:"space-between",
-
+                display: "flex",
+                justifyContent: "space-between",
               }}
             >
               {data.map((txn, idx) => {
@@ -272,13 +271,11 @@ const PrintPayout = () => {
 
                 const values = [
                   txn.created_at ? ddmmyyWithTime(txn.created_at) : "",
-                  txn.purpose || "",
-                   txn.operator_id || "",
-                  txn.mobile_number || "",
+                  txn.purpose || "N/A",
+                  txn.operator_id || "N/A",
+                  txn.mobile_number || "N/A",
                   `${txn.beneficiary_name || ""},
-                   A/C: ${
-                    txn.account_number || ""
-                  },
+                   A/C: ${txn.account_number || ""},
                    IFSC: ${txn.ifsc_code || ""}`,
                   `₹ ${amount.toFixed(2)}`,
                 ];
@@ -321,7 +318,12 @@ const PrintPayout = () => {
           </Box>
 
           {/* Print Button */}
-          <Box display="flex" justifyContent="flex-end" mt={1} className="no-print">
+          <Box
+            display="flex"
+            justifyContent="flex-end"
+            mt={1}
+            className="no-print"
+          >
             <Button
               onClick={() => {
                 window.print();

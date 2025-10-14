@@ -2,12 +2,13 @@ import React from "react";
 import { Box, Paper, Typography, Button } from "@mui/material";
 import { Logo } from "../iconsImports";
 
-const LevinTransferReceipt = ({ levinResponse, onRepeat }) => {
+const LevinTransferReceipt = ({ levinResponse, onRepeat, sender }) => {
   if (!levinResponse) return null;
+  console.log("levinResponse", levinResponse);
 
   const fields = [
-    ["Sender Mobile", levinResponse?.senderMobile || "N/A"],
-    ["Sender Name", levinResponse?.sender_name || "N/A"],
+    ["Sender Mobile", sender?.mobile_number || "N/A"],
+    ["Sender Name", sender?.sender_name || "N/A"],
     [
       "Beneficiary Name",
       levinResponse?.data?.BeneName ||

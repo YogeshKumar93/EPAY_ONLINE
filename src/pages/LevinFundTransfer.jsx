@@ -403,6 +403,7 @@ const LevinFundTransfer = () => {
         <LevinTransferReceipt
           levinResponse={levinResponse}
           onRepeat={() => setLevinResponse(null)}
+          sender={sender}
         />
       )}
       {/* Register Modal */}
