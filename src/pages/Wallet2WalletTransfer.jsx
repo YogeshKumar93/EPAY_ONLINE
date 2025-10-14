@@ -30,12 +30,13 @@ import { android2, linux2, macintosh2, windows2 } from "../iconsImports";
 import { apiCall } from "../api/apiClient";
 import { useToast } from "../utils/ToastContext";
 import ReplayIcon from "@mui/icons-material/Replay";
+import { okhttp, postman } from "../utils/iconsImports";
 
 const Wallet2WalletTransfer = ({}) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const navigate = useNavigate();
- const { showToast } = useToast();
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
   const fetchUsersRef = useRef(null);
   const handleFetchRef = (fetchFn) => {
@@ -54,25 +55,25 @@ const Wallet2WalletTransfer = ({}) => {
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
-   const handleRefundTxn = async (row) => {
-          try {
-            const payload = { txn_id: row.txn_id }; // use actual transaction ID field
-            const { response } = await apiCall(
-              "post",
-              ApiEndpoints.REFUND_TXN,
-              payload
-            );
-      
-            if (response?.status) {
-              showToast(response.message || "Transaction refunded successfully!");
-            } else {
-              showToast(response?.error || "Refund failed. Please try again.");
-            }
-          } catch (error) {
-            showToast("Error processing refund transaction.");
-            console.error(error);
-          }
-        };
+  const handleRefundTxn = async (row) => {
+    try {
+      const payload = { txn_id: row.txn_id }; // use actual transaction ID field
+      const { response } = await apiCall(
+        "post",
+        ApiEndpoints.REFUND_TXN,
+        payload
+      );
+
+      if (response?.status) {
+        showToast(response.message || "Transaction refunded successfully!");
+      } else {
+        showToast(response?.error || "Refund failed. Please try again.");
+      }
+    } catch (error) {
+      showToast("Error processing refund transaction.");
+      console.error(error);
+    }
+  };
 
   const tableEndpoint =
     user?.role === "adm" || user?.role === "sadm"
@@ -92,10 +93,15 @@ const Wallet2WalletTransfer = ({}) => {
           { value: "pending", label: "Pending" },
         ],
         defaultValue: "pending",
-        roles: ["adm"],
+        roles: ["adm", "sadm"],
       },
       // { id: "sender_mobile", label: "Sender Mobile", type: "textfield" },
-      { id: "txn_id", label: "Txn ID", type: "textfield", roles: ["adm"] },
+      {
+        id: "txn_id",
+        label: "Txn ID",
+        type: "textfield",
+        roles: ["adm", "sadm"],
+      },
     ],
     []
   );
@@ -201,7 +207,7 @@ const Wallet2WalletTransfer = ({}) => {
         name: "Sender",
         selector: (row) => (
           <div
-            style={{ textAlign: "left", fontSize: "10px", fontWeight: "600" }}
+            style={{ textAlign: "left", fontSize: "14px", fontWeight: "600" }}
           >
             {row.sender_est || "N/A"}
           </div>
@@ -213,7 +219,7 @@ const Wallet2WalletTransfer = ({}) => {
         name: "Reciever",
         selector: (row) => (
           <div
-            style={{ textAlign: "left", fontSize: "10px", fontWeight: "600" }}
+            style={{ textAlign: "left", fontSize: "14px", fontWeight: "600" }}
           >
             {row.receiver_est || "N/A"}
           </div>
@@ -225,7 +231,7 @@ const Wallet2WalletTransfer = ({}) => {
         name: "Service",
         selector: (row) => (
           <div
-            style={{ textAlign: "left", fontSize: "10px", fontWeight: "600" }}
+            style={{ textAlign: "left", fontSize: "14px", fontWeight: "600" }}
           >
             {row.operator || "N/A"}
           </div>
@@ -264,7 +270,7 @@ const Wallet2WalletTransfer = ({}) => {
               width: "100px",
             },
           ]),
-      ...(user?.role === "adm"
+      ...(user?.role === "adm" || user?.role === "sadm"
         ? [] // ❌ hide for ret and dd
         : [
             {
@@ -380,41 +386,41 @@ const Wallet2WalletTransfer = ({}) => {
             },
           ]
         : []),
-         ...(user?.role === "ret" || user?.role === "dd"
-                            ? [
-                                {
-                                  name: "Actions",
-                                  selector: (row) => (
-                                    <div
-                                      style={{
-                                        fontSize: "10px",
-                                        fontWeight: "600",
-                                        display: "flex",
-                                        gap: "4px",
-                                        justifyContent: "center",
-                                        alignItems: "center",
-                                      }}
-                                    >
-                                      {/* FAILED or REFUND: Refresh */}
-                                      {row?.status === "REFUNDPENDING"  && (
-                                        <Tooltip title="REFUND TXN">
-                                          <ReplayIcon
-                                            sx={{
-                                              color: "orange",
-                                              fontSize: 25,
-                                              cursor: "pointer",
-                                            }}
-                                            onClick={() => handleRefundTxn(row)}
-                                          />
-                                        </Tooltip>
-                                      )}
-                                    </div>
-                                  ),
-                                  center: true,
-                                  width: "70px",
-                                },
-                              ]
-                            : []),
+      ...(user?.role === "ret" || user?.role === "dd"
+        ? [
+            {
+              name: "Actions",
+              selector: (row) => (
+                <div
+                  style={{
+                    fontSize: "10px",
+                    fontWeight: "600",
+                    display: "flex",
+                    gap: "4px",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {/* FAILED or REFUND: Refresh */}
+                  {row?.status === "REFUNDPENDING" && (
+                    <Tooltip title="REFUND TXN">
+                      <ReplayIcon
+                        sx={{
+                          color: "orange",
+                          fontSize: 25,
+                          cursor: "pointer",
+                        }}
+                        onClick={() => handleRefundTxn(row)}
+                      />
+                    </Tooltip>
+                  )}
+                </div>
+              ),
+              center: true,
+              width: "70px",
+            },
+          ]
+        : []),
     ],
     []
   );

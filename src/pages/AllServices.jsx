@@ -152,8 +152,7 @@ const MenuCard = ({ icon, label, onClick, isActive, user }) => {
         {/* Label */}
         <Typography
           sx={{
-            fontWeight: 600,
-            fontSize: "0.85rem",
+            fontWeight: 900, // max bold
             textAlign: "center",
             lineHeight: 1,
             letterSpacing: "0.3px",
@@ -163,6 +162,7 @@ const MenuCard = ({ icon, label, onClick, isActive, user }) => {
             overflow: "hidden",
             textOverflow: "ellipsis",
             maxWidth: "130px",
+            textShadow: "1px 1px 0 rgba(0,0,0,0.2)", // makes it visually thicker
           }}
         >
           {label}
@@ -183,7 +183,7 @@ const SubMenuCard = ({ icon, label, onClick, isActive, user }) => {
           alignItems: "center",
           justifyContent: "center",
           height: { xs: 80, sm: 90 },
-          width: { xs: 80, sm: 90 },
+          width: { xs: 80, sm: 150 },
           borderRadius: 2.5,
           background: isActive
             ? "linear-gradient(135deg, #5210c1 0%, #7b3fe3 100%)"
@@ -212,8 +212,8 @@ const SubMenuCard = ({ icon, label, onClick, isActive, user }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            width: 40,
-            height: 40,
+            width: 60,
+            height: 60,
             mb: 0.8,
             borderRadius: "50%",
             backgroundColor: isActive
@@ -241,8 +241,8 @@ const SubMenuCard = ({ icon, label, onClick, isActive, user }) => {
         <Typography
           variant="caption"
           sx={{
-            fontWeight: 500,
-            fontSize: "0.65rem",
+            fontWeight: 900,
+            fontSize: "1rem",
             textAlign: "center",
             lineHeight: 1.2,
           }}
@@ -693,7 +693,7 @@ export default function AllServices() {
           </Grid>
         ))}
       </Grid>
-
+      {/* 
       {!activeMenu && (
         <Box
           sx={{
@@ -711,7 +711,7 @@ export default function AllServices() {
             Select a service to proceed
           </Typography>
         </Box>
-      )}
+      )} */}
       {/* ✅ Neeche wala section */}
       {activeMenuData && (
         <Box

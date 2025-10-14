@@ -113,6 +113,7 @@ const ProfilePage = () => {
   };
   const allowedRolesForLayout = ["dd", "ret"];
   const userRole = authCtx.user.role; // assuming you have access to user role
+  const allowedRolesForNewNumber = ["adm", "sadm"];
 
   const actionButtons = [
     {
@@ -133,20 +134,21 @@ const ProfilePage = () => {
     },
     {
       id: 3,
+      label: "New Number",
+      icon: <Phone sx={{ fontSize: { xs: 18, sm: 20 } }} />,
+      onClick: handleNewNumber,
+      gradient: "#fff",
+      hoverGradient: "linear-gradient(135deg, #43e97b, #38f9d7)",
+      roles: ["adm", "sadm"], // allowed roles
+    },
+    {
+      id: 4,
       label: "Change MPIN",
       icon: <VerifiedUser sx={{ fontSize: { xs: 18, sm: 20 } }} />,
       onClick: handleChangeMpin,
       gradient: "#fff",
       hoverGradient: "linear-gradient(135deg, #ff758c, #ff7eb3)",
     },
-    // {
-    //   id: 4,
-    //   label: "Change Layout",
-    //   icon: <Dashboard sx={{ fontSize: { xs: 18, sm: 20 } }} />,
-    //   onClick: handleChangeLayout,
-    //   gradient: "#fff",
-    //   hoverGradient: "linear-gradient(135deg, #c9ffbf, #7bed9f)",
-    // },
     {
       id: 5,
       label: "View Information",
@@ -156,8 +158,7 @@ const ProfilePage = () => {
       hoverGradient: "linear-gradient(135deg, #c9ffbf, #7bed9f)",
     },
   ].filter(
-    (btn) =>
-      btn.label !== "Change Layout" || allowedRolesForLayout.includes(userRole)
+    (btn) => !btn.roles || btn.roles.includes(userRole) // filter buttons by role
   );
 
   return (

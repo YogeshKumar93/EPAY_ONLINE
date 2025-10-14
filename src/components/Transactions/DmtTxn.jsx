@@ -317,7 +317,7 @@ const DmtTxn = ({ query }) => {
         name: "Service",
         selector: (row) => (
           <div
-            style={{ textAlign: "left", fontWeight: "600", fontSize: "14px" }}
+            style={{ textAlign: "left", fontWeight: "600", fontSize: "15px" }}
           >
             {row.operator} <br />
             {["adm", "sadm"].includes(user?.role) && (

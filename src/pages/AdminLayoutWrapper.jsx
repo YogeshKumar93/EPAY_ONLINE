@@ -28,15 +28,14 @@ const THEME_SETTINGS = {
 
 const FOOTER_STYLES = {
   textAlign: "center",
-  py: { xs: 2, sm: 1.5 },
-  px: { xs: 1, sm: 2 },
+  py: { xs: 1, sm: 1 }, // reduced vertical padding
+  px: { xs: 1, sm: 1.5 }, // reduced horizontal padding
   backgroundColor: "#7a4dff",
   color: "#d4e8e8",
-  borderRadius: "10px",
-  mt: 4,
+  borderRadius: "8px", // slightly smaller radius
+  mt: 2, // reduced margin top
   flexShrink: 0,
 };
-
 const LINK_STYLES = {
   color: "#d4e8e8",
   textDecoration: "underline",

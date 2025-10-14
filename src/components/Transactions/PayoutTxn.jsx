@@ -416,7 +416,13 @@ const PayoutTxn = ({ query }) => {
             {
               name: "Purpose",
               selector: (row) => (
-                <div style={{ textAlign: "left", fontWeight: 500 }}>
+                <div
+                  style={{
+                    textAlign: "left",
+                    fontWeight: 600,
+                    fontSize: "15px",
+                  }}
+                >
                   {row?.purpose || "N/A"}
                 </div>
               ),
@@ -450,7 +456,7 @@ const PayoutTxn = ({ query }) => {
             style={{
               display: "flex",
               flexDirection: "column",
-              fontSize: "13px",
+              fontSize: "14px",
             }}
           >
             {row.mobile_number}

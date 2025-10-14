@@ -23,6 +23,7 @@ import Loader from "../components/common/Loader";
 import MobileNumberList from "./MobileNumberList";
 import SearchIcon from "@mui/icons-material/Search";
 import Dmt2RemitterRegister from "./Dmt2RemitterRegister";
+import OtpModal from "./OtpModal";
 
 const Dmt2 = () => {
   const [mobile, setMobile] = useState("");
@@ -38,6 +39,7 @@ const Dmt2 = () => {
   const [mobileListOpen, setMobileListOpen] = useState(false);
   const [mobileList, setMobileList] = useState([]);
   const [aeps2faOpen, setAeps2faOpen] = useState(false);
+  const [otpRemitterRef, setOtpRemitterRef] = useState(null); // new state
 
   const handleFetchSender = async (number = mobile) => {
     if (!number || number.length !== 10) return;
@@ -68,6 +70,17 @@ const Dmt2 = () => {
       } else {
         apiErrorToast(message || "Unexpected response");
       }
+    } else if (error?.message === "Kindly Register the remitter.") {
+      setSender(null);
+      setBeneficiaries([]);
+      setShowRegister(true);
+      console.log("eroorsss", error?.errors);
+
+      setOtpRemitterRef({
+        mobile: number,
+        stateresp: error?.errors?.stateresp, // if available
+        ekyc_id: error?.errors?.ekyc_id, // if available
+      });
     } else if (error) {
       apiErrorToast(error?.message || "Something went wrong");
       setSender(null);
@@ -227,6 +240,16 @@ const Dmt2 = () => {
           onSelect={(selectedMobile) => {
             setMobile(selectedMobile);
             handleFetchSender(selectedMobile);
+          }}
+        />
+      )}
+      {otpRemitterRef && (
+        <OtpModal
+          open={!!otpRemitterRef}
+          remitterRef={otpRemitterRef}
+          onClose={(success) => {
+            if (success) setSender({ mobile: otpRemitterRef.mobile });
+            setOtpRemitterRef(null);
           }}
         />
       )}

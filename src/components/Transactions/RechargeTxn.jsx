@@ -349,7 +349,7 @@ const RechargeTxn = ({ query }) => {
       {
         name: "Service",
         selector: (row) => (
-          <div style={{ textAlign: "left", fontWeight: 500, fontSize: "14px" }}>
+          <div style={{ textAlign: "left", fontWeight: 900, fontSize: "15px" }}>
             {row.operator}
             <br />
             {["adm", "sadm"].includes(user?.role) && (
