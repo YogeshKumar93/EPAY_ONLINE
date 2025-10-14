@@ -700,12 +700,18 @@ const BbpxTxn = ({ query }) => {
 
             {/* Print Bbps visible only to ret and dd */}
             {(user?.role === "ret" || user?.role === "dd") && (
-              <Tooltip title="Print Bbps">
+              <Tooltip title="Print ">
                 <Box
                   component="span"
-                  onClick={() =>
-                    navigate("/print-bbps", { state: { txnData: row } })
-                  }
+                 onClick={() => {
+      // Save individual transaction data
+      sessionStorage.setItem("txnData", JSON.stringify(row));
+
+      // Open receipt page in a new tab
+      window.open("/print-bbps", "_blank");
+    }}
+  
+ 
                   sx={{
                     cursor: "pointer",
                     display: "inline-flex",
@@ -815,25 +821,28 @@ const BbpxTxn = ({ query }) => {
               }}
             >
               {selectedRows.length > 0 && (
-                <Tooltip title="View Selected Details">
+                <Tooltip title="Print">
                   <Button
                     variant="contained"
                     size="small"
                     color="primary"
-                    onClick={() => {
-                      // Save selected rows to sessionStorage
-                      sessionStorage.setItem(
-                        "txnData",
-                        JSON.stringify(selectedRows)
-                      );
+                  onClick={() => {
+      if (!selectedRows || selectedRows.length === 0) {
+        alert("Please select at least one transaction to print.");
+        return;
+      }
 
-                      // Open new tab/window
-                      window.open("/print-bbps", "_blank");
-                    }}
-                  >
+      // Save all selected rows
+      sessionStorage.setItem("txnData", JSON.stringify(selectedRows));
+
+      // Open receipt page in a new tab
+      window.open("/print-bbps", "_blank");
+    }}
+    sx={{ ml: 1 }}
+  >
                     <PrintIcon
                       sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
-                    />
+                    />Print
                   </Button>
                 </Tooltip>
               )}

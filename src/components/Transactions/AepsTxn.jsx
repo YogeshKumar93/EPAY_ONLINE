@@ -583,9 +583,13 @@ const AepsTxn = ({ query }) => {
                 <IconButton
                   color="secondary"
                   size="small"
-                  onClick={() =>
-                    navigate("/print-aeps", { state: { txnData: row } })
-                  }
+                  onClick={() => {
+                    // Save individual transaction data
+                    sessionStorage.setItem("txnData", JSON.stringify(row));
+
+                    // Open receipt page in a new tab
+                    window.open("/print-aeps", "_blank");
+                  }}
                   sx={{ backgroundColor: "transparent" }}
                 >
                   <PrintIcon />
@@ -695,15 +699,23 @@ const AepsTxn = ({ query }) => {
                     size="small"
                     color="primary"
                     onClick={() => {
-                      // Save selected rows to sessionStorage
+                      if (!selectedRows || selectedRows.length === 0) {
+                        alert(
+                          "Please select at least one transaction to print."
+                        );
+                        return;
+                      }
+
+                      // Save all selected rows
                       sessionStorage.setItem(
                         "txnData",
                         JSON.stringify(selectedRows)
                       );
 
-                      // Open new tab/window
+                      // Open receipt page in a new tab
                       window.open("/print-aeps", "_blank");
                     }}
+                    sx={{ ml: 1 }}
                   >
                     <PrintIcon
                       sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
