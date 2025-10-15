@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  Autocomplete,
   Box,
   TextField,
   Typography,
@@ -32,7 +33,21 @@ const UpiTransfer = () => {
   const [otpData, setOtpData] = useState(null);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [history, setHistory] = useState([]);
 
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem("mobileNumbers") || "[]");
+    setHistory(saved);
+  }, []);
+
+  // Save number to shared history
+  const saveMobileToHistory = (number) => {
+    if (!history.includes(number)) {
+      const updated = [...history, number];
+      setHistory(updated);
+      localStorage.setItem("mobileNumbers", JSON.stringify(updated));
+    }
+  };
   // Fetch sender by mobile number
   const handleFetchSender = async (number = mobile) => {
     if (!number || number.length !== 10) return;
@@ -68,22 +83,44 @@ const UpiTransfer = () => {
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
-
-  const handleChange = (e) => {
-    const value = e.target.value.replace(/\D/g, ""); // only digits allowed
-
+  // Handle typing / autocomplete change
+  const handleMobileChange = (e, newValue) => {
+    const value = (newValue || e.target.value).replace(/\D/g, ""); // digits only
     if (value.length <= 10) {
       setMobile(value);
 
       if (value.length === 10) {
+        saveMobileToHistory(value);
         handleFetchSender(value);
       } else {
-        // clear data if input is not 10 digits
         setSender(null);
         setSelectedBeneficiary(null);
       }
     }
   };
+  // // ✅ Handle selection from dropdown
+  // const handleMobileSelect = (event, newValue) => {
+  //   if (newValue && newValue.length === 10) {
+  //     setMobile(newValue);
+  //     saveMobileToHistory(newValue);
+  //     handleFetchSender(newValue);
+  //   }
+  // };
+  // const handleChange = (e) => {
+  //   const value = e.target.value.replace(/\D/g, ""); // only digits allowed
+
+  //   if (value.length <= 10) {
+  //     setMobile(value);
+
+  //     if (value.length === 10) {
+  //       handleFetchSender(value);
+  //     } else {
+  //       // clear data if input is not 10 digits
+  //       setSender(null);
+  //       setSelectedBeneficiary(null);
+  //     }
+  //   }
+  // };
 
   const handleSenderRegistered = ({ mobile_number, otp_ref, sender_id }) => {
     setOtpData({ mobile_number, otp_ref, sender_id });
@@ -94,15 +131,21 @@ const UpiTransfer = () => {
     <Box p={0}>
       {/* Always show mobile input */}
       <Box position="relative">
-        <TextField
-          label="Mobile Number"
-          variant="outlined"
-          fullWidth
+        <Autocomplete
+          freeSolo
+          options={history}
           value={mobile}
-          onChange={handleChange}
-          inputProps={{ maxLength: 10 }}
-          sx={{ mb: 1 }}
-          autoComplete="tel" // ✅ enables browser autocomplete
+          onInputChange={handleMobileChange}
+          onChange={handleMobileChange}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Mobile Number"
+              variant="outlined"
+              fullWidth
+              inputProps={{ ...params.inputProps, maxLength: 10 }}
+            />
+          )}
         />
         {loading && (
           <CommonLoader
