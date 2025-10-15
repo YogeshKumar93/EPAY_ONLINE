@@ -154,19 +154,14 @@ const Wallet2WalletTransfer = ({}) => {
 
   useEffect(() => {
     debouncedSenderSearch(senderSearch);
-  }, [senderSearch, debouncedSenderSearch]);
+  }, [senderSearch, ]);
 
   useEffect(() => {
     debouncedReceiverSearch(receiverSearch);
-  }, [receiverSearch, debouncedReceiverSearch]);
+  }, [receiverSearch,]);
 
   // Cleanup debounce on unmount
-  useEffect(() => {
-    return () => {
-      debouncedSenderSearch.cancel();
-      debouncedReceiverSearch.cancel();
-    };
-  }, [debouncedSenderSearch, debouncedReceiverSearch]);
+ 
 
   const filterRows = (rows) => {
     if (!searchTerm) return rows;
