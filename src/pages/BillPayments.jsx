@@ -20,8 +20,9 @@ import AuthContext from "../contexts/AuthContext";
 import { useToast } from "../utils/ToastContext";
 import OutletDmt1 from "./OutletDnt1";
 import CommonLoader from "../components/common/CommonLoader";
+import BillPaymentsBillers from "./BillPaymentsBillers";
 
-const Bbps = () => {
+const BillPayments = () => {
   const [categories, setCategories] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
@@ -40,7 +41,7 @@ const Bbps = () => {
     setLoading(true);
     const { error, response } = await apiCall(
       "post",
-      ApiEndpoints.BBPS_GET_CATEGORIES
+      ApiEndpoints.BILL_PAYMENTS_CATEGORIES
     );
 
     if (response) {
@@ -118,14 +119,6 @@ const Bbps = () => {
                 justifyContent="space-between"
                 sx={{ mb: 2 }}
               >
-                <Typography
-                  variant="h6"
-                  fontWeight="700"
-                  sx={{ color: "#2B1A4C", flexShrink: 0 }}
-                >
-                  BBPS Categories
-                </Typography>
-
                 <TextField
                   placeholder="Search categories..."
                   variant="outlined"
@@ -370,7 +363,7 @@ const Bbps = () => {
             </>
           ) : (
             <BbpsBillers
-              type="bbps"
+              type="billpayments"
               category={selectedCategory}
               onBack={() => setSelectedCategory(null)}
             />
@@ -381,4 +374,4 @@ const Bbps = () => {
   );
 };
 
-export default Bbps;
+export default BillPayments;

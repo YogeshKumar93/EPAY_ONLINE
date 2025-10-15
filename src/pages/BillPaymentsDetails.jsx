@@ -19,7 +19,7 @@ import Loader from "../components/common/Loader";
 import CommonMpinModal from "../components/common/CommonMpinModal";
 import { useToast } from "../utils/ToastContext";
 
-const BbpsBillerDetails = ({
+const BillPaymentsDetails = ({
   billerId,
   onBack,
   selectedBillerIdImage,
@@ -142,7 +142,7 @@ const BbpsBillerDetails = ({
     try {
       const { response, error } = await apiCall(
         "post",
-        ApiEndpoints.BBPS_PAY_BILL,
+        ApiEndpoints.BILL_PAYMENTS,
         payload
       );
       if (response) {
@@ -489,4 +489,4 @@ const BbpsBillerDetails = ({
   );
 };
 
-export default BbpsBillerDetails;
+export default BillPaymentsDetails;

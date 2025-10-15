@@ -21,9 +21,8 @@ import { apiErrorToast } from "../utils/ToastUtil";
 
 import BbpsBillerDetails from "./BbpsBillerDetails";
 import AuthContext from "../contexts/AuthContext";
-import BillPaymentsDetails from "./BillPaymentsDetails";
 
-const BbpsBillers = ({ category, onBack, type }) => {
+const BillPaymentsBillers = ({ category, onBack }) => {
   const [billers, setBillers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
@@ -124,24 +123,15 @@ const BbpsBillers = ({ category, onBack, type }) => {
         </Box>
       )}
 
-      {!loading && selectedBillerId ? (
-        type === "bbps" ? (
-          <BbpsBillerDetails
-            billerId={selectedBillerId}
-            selectedBillerIdImage={selectedBillerIdImage}
-            onBack={() => setSelectedBillerId(null)}
-            category={category}
-            biller={selectedBiller}
-          />
-        ) : (
-          <BillPaymentsDetails
-            billerId={selectedBillerId}
-            selectedBillerIdImage={selectedBillerIdImage}
-            onBack={() => setSelectedBillerId(null)}
-            category={category}
-            biller={selectedBiller}
-          />
-        )
+      {/* Selected biller details */}
+      {selectedBillerId && !loading ? (
+        <BbpsBillerDetails
+          billerId={selectedBillerId}
+          selectedBillerIdImage={selectedBillerIdImage}
+          onBack={() => setSelectedBillerId(null)}
+          category={category}
+          biller={selectedBiller}
+        />
       ) : null}
 
       {/* Billers list */}
@@ -272,4 +262,4 @@ const BbpsBillers = ({ category, onBack, type }) => {
   );
 };
 
-export default BbpsBillers;
+export default BillPaymentsBillers;

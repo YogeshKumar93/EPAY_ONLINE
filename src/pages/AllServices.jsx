@@ -81,6 +81,7 @@ import CreditCardBillPayment from "../components/CrediCardPayment/CreditCardBill
 import LevinFundTransfer from "./LevinFundTransfer";
 import CreditCardBbps from "../components/CrediCardPayment/CreditCardBbps";
 import BbpsBillers from "./BbpsBillers";
+import BillPayments from "./BillPayments";
 
 const MenuCard = ({ icon, label, onClick, isActive, user }) => {
   return (
@@ -361,80 +362,9 @@ export default function AllServices() {
     },
     hasPermission("bbps_offline") && {
       key: "billPayments",
-      label: "BBPS(OFFLINE)",
+      label: "Bill Payments",
       icon: BBPS,
-      subMenu: [
-        {
-          key: "Bbps1",
-          label: "Bbps 1",
-          icon: electricity1,
-          component: ComingSoon,
-          type: "C04",
-        },
-        {
-          key: "Bbps2",
-          label: "Bbps 2",
-          icon: electricity1,
-          component: ComingSoon,
-          type: "C04",
-        },
-        {
-          key: "Bbps3",
-          label: "Bbps 3",
-          icon: electricity1,
-          component: ComingSoon,
-          type: "C04",
-        },
-        {
-          key: "Bbps4",
-          label: "Bbps 4",
-          icon: electricity1,
-          component: ComingSoon,
-          type: "C04",
-        },
-        // {
-        //   key: "electricity",
-        //   label: "Electricity",
-        //   icon: electricity1,
-        //   component: BBPS,
-        //   type: "C04",
-        // },
-        // {
-        //   key: "broadband",
-        //   label: "Broadband",
-        //   icon: broadband_1,
-        //   component: BBPS,
-        //   type: "C05",
-        // },
-        // {
-        //   key: "gas",
-        //   label: "Gas Bill",
-        //   icon: gas_1,
-        //   component: BBPS,
-        //   type: "C07",
-        // },
-        // {
-        //   key: "water",
-        //   label: "Water Bill",
-        //   icon: water_1,
-        //   component: BBPS,
-        //   type: "C08",
-        // },
-        // {
-        //   key: "insurance",
-        //   label: "Insurance",
-        //   icon: insurance_1,
-        //   component: BBPS,
-        //   type: "C11",
-        // },
-        // {
-        //   key: "landline",
-        //   label: "Landline Bill",
-        //   icon: landline_1,
-        //   component: BBPS,
-        //   type: "C02",
-        // },
-      ],
+      component: BillPayments,
     },
     hasPermission("bbps") && {
       key: "bbps",

@@ -146,7 +146,8 @@ const ApiEndpoints = {
 
   QR_LOGIN: "auth/generateQr",
   QR_STATUS: "auth/qrStatus",
-
+  BILL_PAYMENTS_CATEGORIES: "bbps/getCategoriesBillPayment",
+  BILL_PAYMENTS: "bbps/billPayment",
   GET_COMPLAINS: "complains/getComplains",
   CREATE_COMPLAINTS: "complains/createComplains",
   UPDATE_COMPLAINTS: "complains/updateComplains",
