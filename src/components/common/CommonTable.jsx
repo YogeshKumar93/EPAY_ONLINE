@@ -209,26 +209,28 @@ const CommonTable = ({
       const currentPage = pageRef.current;
       const currentRowsPerPage = rowsPerPageRef.current;
 
-      // Prepare params for API call
-      const params = {
+      // Prepare params for API call - this will go in the request body
+      const requestBody = {
         ...currentAppliedFilters,
         page: currentPage + 1,
         paginate: currentRowsPerPage,
       };
 
       // Clean up params
-      Object.keys(params).forEach((key) => {
+      Object.keys(requestBody).forEach((key) => {
         if (
-          params[key] === "All" ||
-          params[key] === "" ||
-          params[key] == null
+          requestBody[key] === "All" ||
+          requestBody[key] === "" ||
+          requestBody[key] == null
         ) {
-          delete params[key];
+          delete requestBody[key];
         }
       });
 
-      // Add queryParam if provided
+      // Handle queryParam - if it's an object, merge into requestBody
       let finalEndpoint = endpoint;
+      let finalRequestBody = requestBody;
+
       if (typeof queryParam === "string" && queryParam.trim() !== "") {
         // queryParam is a query string → append to URL
         finalEndpoint = `${endpoint}?${queryParam}`;
@@ -237,8 +239,11 @@ const CommonTable = ({
         queryParam !== null &&
         Object.keys(queryParam).length > 0
       ) {
-        // queryParam is an object → merge into params
-        Object.assign(params, queryParam);
+        // queryParam is an object → merge into request body
+        finalRequestBody = {
+          ...requestBody,
+          ...queryParam,
+        };
       }
 
       try {
@@ -246,40 +251,31 @@ const CommonTable = ({
           "POST",
           finalEndpoint,
           null,
-          params
+          finalRequestBody // This sends the data in the request body
         );
 
         if (apiError) {
           setError(apiError.message || "Failed to fetch data");
         } else {
           if (response) {
-            if (apiError) {
-              setError(apiError.message || "Failed to fetch data");
-            } else if (response) {
-              // ✅ Normalize data structure
-              let normalizedData =
-                response?.data?.data || // case: response.data.data
-                response?.data || // case: response.data
-                response || // case: direct response
-                [];
+            // ✅ Normalize data structure
+            let normalizedData =
+              response?.data?.data || // case: response.data.data
+              response?.data || // case: response.data
+              response || // case: direct response
+              [];
 
-              // ✅ Handle total count safely
-              let total =
-                response?.data?.total ||
-                response?.total ||
-                normalizedData?.length ||
-                0;
+            // ✅ Handle total count safely
+            let total =
+              response?.data?.total ||
+              response?.total ||
+              normalizedData?.length ||
+              0;
 
-              setData(
-                Array.isArray(normalizedData)
-                  ? normalizedData
-                  : [normalizedData]
-              );
-              setTotalCount(total);
-            } else {
-              setData([]);
-              setTotalCount(0);
-            }
+            setData(
+              Array.isArray(normalizedData) ? normalizedData : [normalizedData]
+            );
+            setTotalCount(total);
           } else if (Array.isArray(response)) {
             setData(response);
             setTotalCount(response.length);
@@ -341,6 +337,12 @@ const CommonTable = ({
     Object.keys(formattedFilters).forEach((key) => {
       const filterConfig = availableFilters.find((f) => f.id === key);
 
+      // Handle autocomplete values (extract value from object)
+      if (filterConfig?.type === "autocomplete" && formattedFilters[key]) {
+        formattedFilters[key] =
+          formattedFilters[key].value || formattedFilters[key];
+      }
+
       if (filterConfig?.type === "date" && formattedFilters[key]) {
         // Format single date to YYYY-MM-DD
         formattedFilters[key] = new Date(formattedFilters[key])
@@ -376,8 +378,7 @@ const CommonTable = ({
 
     // Fetch data with new filters
     fetchData();
-  }, [filterValues, fetchData, availableFilters]);
-
+  }, [filterValues, fetchData, availableFilters, isSmallScreen]);
   const resetFilters = useCallback(() => {
     setFilterValues(initialFilterValues);
     setAppliedFilters(initialFilterValues);

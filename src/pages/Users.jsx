@@ -312,39 +312,14 @@ const Users = ({ query }) => {
         textType: "number",
       },
       {
-        id: "id", // This will be sent as "id" in the API call
+        id: "id",
         label: "User",
         type: "autocomplete",
         options: userOptions,
         onSearch: (val) => setUserSearch(val),
-        onChange: (option) => {
-          // Set only the value, not the whole object
-          setSelectedUserFilter(option?.value || null);
-
-          const newFilters = {
-            ...appliedFilters,
-            id: option?.value || undefined, // send just the value
-          };
-
-          // Remove undefined or empty keys
-          Object.keys(newFilters).forEach((key) => {
-            if (newFilters[key] === undefined || newFilters[key] === "") {
-              delete newFilters[key];
-            }
-          });
-
-          setAppliedFilters(newFilters);
-
-          // Trigger fetch with new filters
-          if (fetchUsersRef.current) {
-            fetchUsersRef.current(newFilters);
-          }
-        },
         getOptionLabel: (option) => option.label,
-        valueKey: "value",
-        freeSolo: true,
+        // Remove valueKey and handle the value extraction in handleFilterChange
       },
-
       {
         id: "parent_id",
         label: "Parent Id",
