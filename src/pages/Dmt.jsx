@@ -5,8 +5,9 @@ import {
   Divider,
   Typography,
   CircularProgress,
-    IconButton,
-    InputAdornment,
+  IconButton,
+  InputAdornment,
+  Autocomplete,
 } from "@mui/material";
 import { useContext } from "react";
 import { apiCall } from "../api/apiClient";
@@ -38,12 +39,26 @@ const Dmt = () => {
   const { showToast } = useToast();
   const { user } = useContext(AuthContext);
   const [openDmt1Modal, setOpenDmt1Modal] = useState(false);
-    const [accountNumber, setAccountNumber] = useState("");
-   const [mobileListOpen, setMobileListOpen] = useState(false);
-    const [mobileList, setMobileList] = useState([]);
+  const [accountNumber, setAccountNumber] = useState("");
+  const [mobileListOpen, setMobileListOpen] = useState(false);
+  const [mobileList, setMobileList] = useState([]);
+  const [history, setHistory] = useState([]);
 
   const instId = user?.instId;
+  // 🧠 Load saved mobile numbers on mount
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem("mobileNumbers") || "[]");
+    setHistory(saved);
+  }, []);
 
+  // 🧩 Save a number to history if new
+  const saveMobileToHistory = (number) => {
+    if (!history.includes(number)) {
+      const updated = [...history, number];
+      setHistory(updated);
+      localStorage.setItem("mobileNumbers", JSON.stringify(updated));
+    }
+  };
   // Fetch sender details
   const handleFetchSender = async (number = mobile) => {
     if (!number) return;
@@ -82,35 +97,35 @@ const Dmt = () => {
     }
   };
 
-   const handleFetchSenderByAccount = async (accNumber) => {
-      if (!accNumber || accNumber.length < 9) return;
-      setLoading(true);
-  
-      const { error, response } = await apiCall(
-        "post",
-        ApiEndpoints.GET_SENDER_BY_ACC,
-        {
-          account_number: accNumber,
-        }
-      );
-  
-      setLoading(false);
-  
-      if (response) {
-        const data = response?.data || response?.response?.data;
-        if (Array.isArray(data) && data.length > 0) {
-          setMobileList(data);
-          setMobileListOpen(true); // 👈 open modal
-        } else {
-          showToast("No mobile numbers found for this account", "warning");
-        }
-      } else if (error) {
-        showToast(
-          error?.message || "Failed to fetch sender by account number",
-          "error"
-        );
+  const handleFetchSenderByAccount = async (accNumber) => {
+    if (!accNumber || accNumber.length < 9) return;
+    setLoading(true);
+
+    const { error, response } = await apiCall(
+      "post",
+      ApiEndpoints.GET_SENDER_BY_ACC,
+      {
+        account_number: accNumber,
       }
-    };
+    );
+
+    setLoading(false);
+
+    if (response) {
+      const data = response?.data || response?.response?.data;
+      if (Array.isArray(data) && data.length > 0) {
+        setMobileList(data);
+        setMobileListOpen(true); // 👈 open modal
+      } else {
+        showToast("No mobile numbers found for this account", "warning");
+      }
+    } else if (error) {
+      showToast(
+        error?.message || "Failed to fetch sender by account number",
+        "error"
+      );
+    }
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -119,25 +134,30 @@ const Dmt = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleMobileChange = (e) => {
-    const value = e.target.value.replace(/\D/g, "");
+  const handleMobileInputChange = (event, newValue) => {
+    const value = (newValue || "").replace(/\D/g, "");
     if (value.length <= 10) {
       setMobile(value);
-
       if (value.length === 10) {
+        saveMobileToHistory(value);
         handleFetchSender(value);
       } else {
-        // Clear all state if less than 10 digits
         setSender(null);
         setBeneficiaries([]);
         setSelectedBeneficiary(null);
         setOpenRegisterModal(false);
         setReferenceKey("");
-        setAeps2faOpen(false); // Reset 2FA state
+        setAeps2faOpen(false);
       }
     }
   };
-
+  const handleMobileSelect = (event, newValue) => {
+    if (newValue && newValue.length === 10) {
+      setMobile(newValue);
+      saveMobileToHistory(newValue);
+      handleFetchSender(newValue);
+    }
+  };
   const handleDeleteBeneficiary = (id) => {
     setBeneficiaries((prev) => prev.filter((b) => b.id !== id));
     if (selectedBeneficiary?.id === id) setSelectedBeneficiary(null);
@@ -205,14 +225,22 @@ const Dmt = () => {
             gap={1}
             mb={1}
           >
-            <TextField
-              label="Mobile Number"
-              variant="outlined"
+            <Autocomplete
+              freeSolo
+              options={history}
               value={mobile}
-              onChange={handleMobileChange}
-              inputProps={{ maxLength: 10 }}
+              onInputChange={handleMobileInputChange}
+              onChange={handleMobileSelect}
               sx={{ flex: 1 }}
-              fullWidth
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Mobile Number"
+                  variant="outlined"
+                  inputProps={{ ...params.inputProps, maxLength: 10 }}
+                  fullWidth
+                />
+              )}
             />
 
             <Box
@@ -229,7 +257,7 @@ const Dmt = () => {
                 </Typography>
               </Divider>
             </Box>
-  <TextField
+            <TextField
               label="Account Number"
               variant="outlined"
               value={accountNumber}
@@ -267,17 +295,17 @@ const Dmt = () => {
               setAeps2faOpen={setAeps2faOpen}
             />
           )}
-            {mobileListOpen && (
-                  <MobileNumberList
-                    open={mobileListOpen}
-                    onClose={() => setMobileListOpen(false)}
-                    numbers={mobileList}
-                    onSelect={(selectedMobile) => {
-                      setMobile(selectedMobile);
-                      handleFetchSender(selectedMobile);
-                    }}
-                  />
-                )}
+          {mobileListOpen && (
+            <MobileNumberList
+              open={mobileListOpen}
+              onClose={() => setMobileListOpen(false)}
+              numbers={mobileList}
+              onSelect={(selectedMobile) => {
+                setMobile(selectedMobile);
+                handleFetchSender(selectedMobile);
+              }}
+            />
+          )}
 
           {/* MAIN FIX: Hide everything when 2FA is open */}
           {!aeps2faOpen && !openRegisterModal && (
