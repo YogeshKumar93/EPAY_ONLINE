@@ -18,6 +18,7 @@ import AuthContext from "../contexts/AuthContext";
 import Loader from "../components/common/Loader";
 import CommonMpinModal from "../components/common/CommonMpinModal";
 import { useToast } from "../utils/ToastContext";
+import BillPaymentReceipt from "./BillPaymentReceipt";
 
 const BillPaymentsDetails = ({
   billerId,
@@ -37,6 +38,8 @@ const BillPaymentsDetails = ({
   const { location, ip } = useContext(AuthContext);
   const authCtx = useContext(AuthContext);
   const loadUserProfile = authCtx.loadUserProfile;
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [receiptData, setReceiptData] = useState(null);
 
   console.log("locations", location);
 
@@ -148,6 +151,9 @@ const BillPaymentsDetails = ({
       if (response) {
         okSuccessToast(response.data.message);
         loadUserProfile();
+        // Store receipt data and show receipt
+        setReceiptData(response.data);
+        setShowReceipt(true);
       } else {
         apiErrorToast(error?.message || "Payment failed");
       }
@@ -200,291 +206,316 @@ const BillPaymentsDetails = ({
 
   return (
     <>
-      <Loader loading={payingBill} />
-      <Box
-        maxWidth="1200px"
-        mx="auto"
-        px={{ xs: 1.5, sm: 3, md: 1.5 }}
-        py={{ xs: 2, sm: 4, md: 0 }}
-      >
-        {/* Back Button */}
-        <Box display="flex" alignItems="center" mb={1} gap={2}>
-          <IconButton
-            onClick={onBack}
-            sx={{
-              bgcolor: "#f3f4f6",
-              "&:hover": { bgcolor: "#e5e7eb" },
-            }}
-          >
-            <ArrowBackIcon />
-          </IconButton>
-        </Box>
-
-        {/* Cards Layout */}
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            gap: { xs: 2, md: 3 },
-            justifyContent: "flex-start",
-            alignItems: "flex-start",
+      {showReceipt ? (
+        <BillPaymentReceipt
+          receiptData={receiptData}
+          onClose={() => {
+            setShowReceipt(false);
+            onBack(); // Go back to previous screen
           }}
-        >
-          {/* BILLER INPUT CARD */}
-          <Card
-            sx={{
-              flex: { xs: "1 1 auto", md: "0 0 40%" },
-              minWidth: { xs: "100%", sm: 300 },
-              borderRadius: 3,
-              boxShadow: "0 4px 16px rgba(178,176,176,0.08)",
-              background: "linear-gradient(135deg, #fefefe 0%, #f4f8f8 100%)",
-              border: "1px solid #e2e8f0",
-            }}
+          billerDetails={billerDetails}
+          inputValues={inputValues}
+        />
+      ) : (
+        <>
+          <Loader loading={payingBill} />
+          <Box
+            maxWidth="1200px"
+            mx="auto"
+            px={{ xs: 1.5, sm: 3, md: 1.5 }}
+            py={{ xs: 2, sm: 4, md: 0 }}
           >
-            <CardContent sx={{ p: { xs: 2, sm: 3 }, height: "100%" }}>
-              <Box
-                display="flex"
-                alignItems="center"
-                gap={2}
+            {/* Back Button */}
+            <Box display="flex" alignItems="center" mb={1} gap={2}>
+              <IconButton
+                onClick={onBack}
                 sx={{
-                  p: 2,
-                  borderRadius: "8px",
-                  background: "#f2efff",
+                  bgcolor: "#f3f4f6",
+                  "&:hover": { bgcolor: "#e5e7eb" },
                 }}
               >
-                {selectedBillerIdImage && (
+                <ArrowBackIcon />
+              </IconButton>
+            </Box>
+
+            {/* Cards Layout */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", md: "row" },
+                gap: { xs: 2, md: 3 },
+                justifyContent: "flex-start",
+                alignItems: "flex-start",
+              }}
+            >
+              {/* BILLER INPUT CARD */}
+              <Card
+                sx={{
+                  flex: { xs: "1 1 auto", md: "0 0 40%" },
+                  minWidth: { xs: "100%", sm: 300 },
+                  borderRadius: 3,
+                  boxShadow: "0 4px 16px rgba(178,176,176,0.08)",
+                  background:
+                    "linear-gradient(135deg, #fefefe 0%, #f4f8f8 100%)",
+                  border: "1px solid #e2e8f0",
+                }}
+              >
+                <CardContent sx={{ p: { xs: 2, sm: 3 }, height: "100%" }}>
                   <Box
-                    component="img"
-                    src={selectedBillerIdImage}
-                    alt={billerDetails?.billerInfo?.name || "Biller"}
+                    display="flex"
+                    alignItems="center"
+                    gap={2}
                     sx={{
-                      width: 55,
-                      height: 55,
-                      objectFit: "contain",
+                      p: 2,
                       borderRadius: "8px",
-                    }}
-                  />
-                )}
-                <Typography
-                  variant="h5"
-                  fontWeight="bold"
-                  color="#000"
-                  sx={{ fontSize: { xs: "1.1rem", sm: "1.3rem" } }}
-                >
-                  {billerDetails?.billerInfo?.name || "Biller"}
-                </Typography>
-              </Box>
-
-              <Divider sx={{ mb: 4 }} />
-
-              <Box display="flex" flexDirection="column" gap={2}>
-                {parameters?.map((param, idx) => (
-                  <TextField
-                    key={idx}
-                    fullWidth
-                    label={param.desc}
-                    variant="outlined"
-                    size="medium"
-                    value={inputValues[param.name] || ""}
-                    onChange={(e) => handleChange(param.name, e.target.value)}
-                    inputProps={{
-                      minLength: param.minLength,
-                      maxLength: param.maxLength,
-                      pattern: param.regex,
-                      required: param.mandatory === 1,
-                    }}
-                  />
-                ))}
-              </Box>
-
-              <Button
-                fullWidth
-                variant="contained"
-                sx={{
-                  mt: 4,
-                  borderRadius: 2,
-                  py: { xs: 1, sm: 1.4 },
-                  fontWeight: "bold",
-                  fontSize: { xs: "0.9rem", sm: "1rem" },
-                  background: "#fff",
-                  color: "#6C4BC7",
-                  boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
-                  "&:hover": {
-                    background: "#6C4BC7",
-                    color: "#fff",
-                  },
-                }}
-                onClick={handleFetchBill}
-                disabled={fetchingBill || !areAllInputsFilled()}
-              >
-                {fetchingBill ? "Fetching Bill..." : "Fetch Bill"}
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* BILL DETAILS CARD */}
-          <Card
-            sx={{
-              flex: { xs: "1 1 auto", md: "0 0 60%" },
-              minWidth: { xs: "100%", sm: 300 },
-              borderRadius: 3,
-              boxShadow: "0 4px 16px rgba(170,169,169,0.08)",
-              background: "#ffffff",
-              border: "1px solid #e2e8f0",
-            }}
-          >
-            <CardContent sx={{ p: { xs: 2, sm: 3 }, height: "100%" }}>
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between" // ✅ push children to edges
-                mb={1}
-              >
-                <Typography
-                  variant="h6"
-                  fontWeight="bold"
-                  sx={{
-                    fontSize: { xs: "1rem", sm: "1.25rem" },
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  Bill Details
-                </Typography>
-                <Typography
-                  variant="h6"
-                  fontWeight="bold"
-                  sx={{
-                    fontSize: { xs: "1rem", sm: "1.25rem" },
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  ({billerId})
-                </Typography>
-              </Box>
-
-              <Divider sx={{ mb: 3 }} />
-
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-                {[
-                  { label: "Customer Name", value: billData?.CustomerName },
-                  { label: "Bill Number", value: billData?.BillNumber },
-                  { label: "Bill Period", value: billData?.BillPeriod },
-                  { label: "Bill Date", value: billData?.BillDate },
-                  { label: "Due Date", value: billData?.BillDueDate },
-                ].map((item, index) => (
-                  <Box
-                    key={index}
-                    sx={{
-                      display: "grid",
-                      gridTemplateColumns: { xs: "1fr", sm: "40% 60%" },
-                      alignItems: "center",
-                      gap: 1,
-                      wordBreak: "break-word",
+                      background: "#f2efff",
                     }}
                   >
+                    {selectedBillerIdImage && (
+                      <Box
+                        component="img"
+                        src={selectedBillerIdImage}
+                        alt={billerDetails?.billerInfo?.name || "Biller"}
+                        sx={{
+                          width: 55,
+                          height: 55,
+                          objectFit: "contain",
+                          borderRadius: "8px",
+                        }}
+                      />
+                    )}
                     <Typography
-                      sx={{
-                        fontWeight: "bold",
-                        fontSize: { xs: "0.9rem", sm: "1rem" },
-                      }}
+                      variant="h5"
+                      fontWeight="bold"
+                      color="#000"
+                      sx={{ fontSize: { xs: "1.1rem", sm: "1.3rem" } }}
                     >
-                      {item.label} :
-                    </Typography>
-                    <Typography sx={{ fontSize: { xs: "0.9rem", sm: "1rem" } }}>
-                      {item.value || "-"}
+                      {billerDetails?.billerInfo?.name || "Biller"}
                     </Typography>
                   </Box>
-                ))}
 
-                {/* Editable Amount Field */}
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: { xs: "1fr", sm: "40% 60%" },
-                    alignItems: "center",
-                    gap: 1,
-                  }}
-                >
-                  <Typography
+                  <Divider sx={{ mb: 4 }} />
+
+                  <Box display="flex" flexDirection="column" gap={2}>
+                    {parameters?.map((param, idx) => (
+                      <TextField
+                        key={idx}
+                        fullWidth
+                        label={param.desc}
+                        variant="outlined"
+                        size="medium"
+                        value={inputValues[param.name] || ""}
+                        onChange={(e) =>
+                          handleChange(param.name, e.target.value)
+                        }
+                        inputProps={{
+                          minLength: param.minLength,
+                          maxLength: param.maxLength,
+                          pattern: param.regex,
+                          required: param.mandatory === 1,
+                        }}
+                      />
+                    ))}
+                  </Box>
+
+                  <Button
+                    fullWidth
+                    variant="contained"
                     sx={{
+                      mt: 4,
+                      borderRadius: 2,
+                      py: { xs: 1, sm: 1.4 },
                       fontWeight: "bold",
                       fontSize: { xs: "0.9rem", sm: "1rem" },
-                    }}
-                  >
-                    Amount :
-                  </Typography>
-                  <TextField
-                    size="small"
-                    variant="outlined"
-                    value={billData?.BillAmount || ""}
-                    onChange={(e) =>
-                      acceptsAdhoc
-                        ? setBillData((prev) => ({
-                            ...prev,
-                            BillAmount: e.target.value,
-                          }))
-                        : null
-                    }
-                    disabled={!acceptsAdhoc}
-                    InputProps={{
-                      startAdornment: (
-                        <Typography sx={{ mr: 0.5 }}>₹</Typography>
-                      ),
-                    }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        fontWeight: "bold",
-                        fontSize: { xs: "0.9rem", sm: "1rem" },
-                        color: "error.main",
+                      background: "#fff",
+                      color: "#6C4BC7",
+                      boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
+                      "&:hover": {
+                        background: "#6C4BC7",
+                        color: "#fff",
                       },
                     }}
-                  />
-                </Box>
+                    onClick={handleFetchBill}
+                    disabled={fetchingBill || !areAllInputsFilled()}
+                  >
+                    {fetchingBill ? "Fetching Bill..." : "Fetch Bill"}
+                  </Button>
+                </CardContent>
+              </Card>
 
-                {!acceptsAdhoc && (
-                  <Typography variant="caption" color="red" sx={{ mt: 0.5 }}>
-                    Amount cannot be edited for this biller.
-                  </Typography>
-                )}
-              </Box>
-
-              <Button
-                fullWidth
-                variant="contained"
+              {/* BILL DETAILS CARD */}
+              <Card
                 sx={{
-                  mt: 4,
-                  borderRadius: 2,
-                  py: { xs: 1, sm: 1.4 },
-                  fontWeight: "bold",
-                  fontSize: { xs: "0.9rem", sm: "1rem" },
-                  background: "#fff",
-                  color: "#6C4BC7",
-                  boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
-                  "&:hover": {
-                    background: " #6C4BC7",
-                    color: "#fff",
-                  },
+                  flex: { xs: "1 1 auto", md: "0 0 60%" },
+                  minWidth: { xs: "100%", sm: 300 },
+                  borderRadius: 3,
+                  boxShadow: "0 4px 16px rgba(170,169,169,0.08)",
+                  background: "#ffffff",
+                  border: "1px solid #e2e8f0",
                 }}
-                onClick={handleSendClick}
-                disabled={!canPayBill() || payingBill}
               >
-                {payingBill ? "Processing Payment..." : "Pay Bill"}
-              </Button>
-            </CardContent>
-          </Card>
-        </Box>
-      </Box>
+                <CardContent sx={{ p: { xs: 2, sm: 3 }, height: "100%" }}>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="space-between" // ✅ push children to edges
+                    mb={1}
+                  >
+                    <Typography
+                      variant="h6"
+                      fontWeight="bold"
+                      sx={{
+                        fontSize: { xs: "1rem", sm: "1.25rem" },
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      Bill Details
+                    </Typography>
+                    <Typography
+                      variant="h6"
+                      fontWeight="bold"
+                      sx={{
+                        fontSize: { xs: "1rem", sm: "1.25rem" },
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      ({billerId})
+                    </Typography>
+                  </Box>
 
-      <CommonMpinModal
-        open={mpinModalOpen}
-        setOpen={setMpinModalOpen}
-        title="Enter MPIN to Confirm Payment"
-        mPinCallBack={handlePayBill}
-      />
+                  <Divider sx={{ mb: 3 }} />
+
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}
+                  >
+                    {[
+                      { label: "Customer Name", value: billData?.CustomerName },
+                      { label: "Bill Number", value: billData?.BillNumber },
+                      { label: "Bill Period", value: billData?.BillPeriod },
+                      { label: "Bill Date", value: billData?.BillDate },
+                      { label: "Due Date", value: billData?.BillDueDate },
+                    ].map((item, index) => (
+                      <Box
+                        key={index}
+                        sx={{
+                          display: "grid",
+                          gridTemplateColumns: { xs: "1fr", sm: "40% 60%" },
+                          alignItems: "center",
+                          gap: 1,
+                          wordBreak: "break-word",
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontWeight: "bold",
+                            fontSize: { xs: "0.9rem", sm: "1rem" },
+                          }}
+                        >
+                          {item.label} :
+                        </Typography>
+                        <Typography
+                          sx={{ fontSize: { xs: "0.9rem", sm: "1rem" } }}
+                        >
+                          {item.value || "-"}
+                        </Typography>
+                      </Box>
+                    ))}
+
+                    {/* Editable Amount Field */}
+                    <Box
+                      sx={{
+                        display: "grid",
+                        gridTemplateColumns: { xs: "1fr", sm: "40% 60%" },
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontWeight: "bold",
+                          fontSize: { xs: "0.9rem", sm: "1rem" },
+                        }}
+                      >
+                        Amount :
+                      </Typography>
+                      <TextField
+                        size="small"
+                        variant="outlined"
+                        value={billData?.BillAmount || ""}
+                        onChange={(e) =>
+                          acceptsAdhoc
+                            ? setBillData((prev) => ({
+                                ...prev,
+                                BillAmount: e.target.value,
+                              }))
+                            : null
+                        }
+                        disabled={!acceptsAdhoc}
+                        InputProps={{
+                          startAdornment: (
+                            <Typography sx={{ mr: 0.5 }}>₹</Typography>
+                          ),
+                        }}
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            fontWeight: "bold",
+                            fontSize: { xs: "0.9rem", sm: "1rem" },
+                            color: "error.main",
+                          },
+                        }}
+                      />
+                    </Box>
+
+                    {!acceptsAdhoc && (
+                      <Typography
+                        variant="caption"
+                        color="red"
+                        sx={{ mt: 0.5 }}
+                      >
+                        Amount cannot be edited for this biller.
+                      </Typography>
+                    )}
+                  </Box>
+
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    sx={{
+                      mt: 4,
+                      borderRadius: 2,
+                      py: { xs: 1, sm: 1.4 },
+                      fontWeight: "bold",
+                      fontSize: { xs: "0.9rem", sm: "1rem" },
+                      background: "#fff",
+                      color: "#6C4BC7",
+                      boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
+                      "&:hover": {
+                        background: " #6C4BC7",
+                        color: "#fff",
+                      },
+                    }}
+                    onClick={handleSendClick}
+                    disabled={!canPayBill() || payingBill}
+                  >
+                    {payingBill ? "Processing Payment..." : "Pay Bill"}
+                  </Button>
+                </CardContent>
+              </Card>
+            </Box>
+          </Box>
+
+          <CommonMpinModal
+            open={mpinModalOpen}
+            setOpen={setMpinModalOpen}
+            title="Enter MPIN to Confirm Payment"
+            mPinCallBack={handlePayBill}
+          />
+        </>
+      )}
     </>
   );
 };

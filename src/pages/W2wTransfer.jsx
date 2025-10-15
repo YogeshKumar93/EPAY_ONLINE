@@ -103,7 +103,7 @@ const W2wTransfer = ({ handleFetchRef, type }) => {
         mpin,
       };
 
-      const { response,error } = await apiCall(
+      const { response, error } = await apiCall(
         "post",
         ApiEndpoints.WALLET_CREATE,
         payload

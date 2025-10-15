@@ -546,14 +546,6 @@ const Wallet2WalletTransfer = ({}) => {
 
   return (
     <Box>
-      <Box
-        sx={{
-          flex: 1,
-          borderRadius: 3,
-          display: "flex",
-        }}
-      ></Box>
-
       <Box sx={{}}>
         {loading ? (
           <CommonLoader loading={loading} text="Loading Wallet Transfers" />
