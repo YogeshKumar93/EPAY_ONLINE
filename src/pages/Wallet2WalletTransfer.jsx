@@ -40,9 +40,12 @@ const Wallet2WalletTransfer = ({}) => {
   const { showToast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
-  const [userSearch, setUserSearch] = useState("");
-  const [userOptions, setUserOptions] = useState([]);
-  const [selectedUserFilter, setSelectedUserFilter] = useState(null); // selected option
+
+  // User search states
+  const [senderSearch, setSenderSearch] = useState("");
+  const [receiverSearch, setReceiverSearch] = useState("");
+  const [senderOptions, setSenderOptions] = useState([]);
+  const [receiverOptions, setReceiverOptions] = useState([]);
   const [appliedFilters, setAppliedFilters] = useState({});
 
   const fetchUsersRef = useRef(null);
@@ -62,9 +65,10 @@ const Wallet2WalletTransfer = ({}) => {
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
+
   const handleRefundTxn = async (row) => {
     try {
-      const payload = { txn_id: row.txn_id }; // use actual transaction ID field
+      const payload = { txn_id: row.txn_id };
       const { response } = await apiCall(
         "post",
         ApiEndpoints.REFUND_TXN,
@@ -82,43 +86,87 @@ const Wallet2WalletTransfer = ({}) => {
     }
   };
 
-  useEffect(() => {
-    if (userSearch.trim().length < 4) {
-      setUserOptions([]); // Clear options if less than 4 characters
-      return;
-    }
-
-    const fetchUsersByEstablishment = async (searchTerm) => {
+  // Debounced search for sender
+  const debouncedSenderSearch = useRef(
+    debounce(async (searchValue) => {
+      if (!searchValue || searchValue.trim().length < 4) {
+        setSenderOptions([]);
+        return;
+      }
       try {
-        const { error, response } = await apiCall(
+        const { response, error } = await apiCall(
           "post",
           ApiEndpoints.GET_USER_DEBOUNCE,
-          { establishment: searchTerm }
+          {
+            id: searchValue, // ✅ send ID instead of search text
+          }
         );
 
-        if (!error && Array.isArray(response?.data)) {
-          setUserOptions(
+        if (!error && response?.data) {
+          setSenderOptions(
             response.data.map((u) => ({
-              label: u.establishment,
-              value: u.id,
-              sender_id: u.id,
-              receiver_id: u.id,
+              label: u.establishment || u.name || "N/A",
+              value: u.id, // this is the id
             }))
           );
         } else {
-          setUserOptions([]);
+          setSenderOptions([]);
         }
       } catch (err) {
-        console.error("User search failed:", err);
-        setUserOptions([]);
+        console.error(err);
+        setSenderOptions([]);
       }
+    }, 500)
+  ).current;
+
+  // Debounced search for receiver
+  const debouncedReceiverSearch = useRef(
+    debounce(async (searchValue) => {
+      if (!searchValue || searchValue.trim().length < 4) {
+        setReceiverOptions([]);
+        return;
+      }
+      try {
+        const { response, error } = await apiCall(
+          "post",
+          ApiEndpoints.GET_USER_DEBOUNCE,
+          {
+            id: searchValue, // ✅ send ID instead of search text
+          }
+        );
+
+        if (!error && response?.data) {
+          setReceiverOptions(
+            response.data.map((u) => ({
+              label: u.establishment || u.name || "N/A",
+              value: u.id, // this is the id
+            }))
+          );
+        } else {
+          setReceiverOptions([]);
+        }
+      } catch (err) {
+        console.error(err);
+        setReceiverOptions([]);
+      }
+    }, 500)
+  ).current;
+
+  useEffect(() => {
+    debouncedSenderSearch(senderSearch);
+  }, [senderSearch, debouncedSenderSearch]);
+
+  useEffect(() => {
+    debouncedReceiverSearch(receiverSearch);
+  }, [receiverSearch, debouncedReceiverSearch]);
+
+  // Cleanup debounce on unmount
+  useEffect(() => {
+    return () => {
+      debouncedSenderSearch.cancel();
+      debouncedReceiverSearch.cancel();
     };
-
-    const debouncedFetch = debounce(fetchUsersByEstablishment, 500);
-    debouncedFetch(userSearch);
-
-    return () => debouncedFetch.cancel(); // cleanup on unmount/change
-  }, [userSearch]);
+  }, [debouncedSenderSearch, debouncedReceiverSearch]);
 
   const filterRows = (rows) => {
     if (!searchTerm) return rows;
@@ -151,31 +199,34 @@ const Wallet2WalletTransfer = ({}) => {
         roles: ["adm", "sadm"],
       },
       {
-        id: "id",
-        label: "Sender/Receiver",
+        id: "sender_id",
+        label: "Sender",
         type: "autocomplete",
-        options: userOptions,
-        onSearch: (val) => {
-          // ✅ Only trigger user search, not applied filters
-          setUserSearch(val);
-        },
-        getOptionLabel: (option) => option.label,
+        options: senderOptions,
+        onSearch: (val) => setSenderSearch(val),
+        getOptionLabel: (option) => option.label || "N/A",
         onChange: (selected) => {
-          // ✅ Update filters only when user actually selects an option
-          if (selected) {
-            setAppliedFilters((prev) => ({
-              ...prev,
-              sender_id: selected.sender_id,
-              receiver_id: selected.receiver_id,
-            }));
-          } else {
-            setAppliedFilters((prev) => {
-              const { sender_id, receiver_id, ...rest } = prev;
-              return rest;
-            });
-          }
+          setAppliedFilters((prev) => ({
+            ...prev,
+            sender_id: selected?.value || null, // ✅ send ID to table query
+          }));
         },
       },
+      {
+        id: "receiver_id",
+        label: "Receiver",
+        type: "autocomplete",
+        options: receiverOptions,
+        onSearch: (val) => setReceiverSearch(val),
+        getOptionLabel: (option) => option.label || "N/A",
+        onChange: (selected) => {
+          setAppliedFilters((prev) => ({
+            ...prev,
+            receiver_id: selected?.value || null, // ✅ send ID to table query
+          }));
+        },
+      },
+
       {
         id: "txn_id",
         label: "Txn ID",
@@ -183,8 +234,9 @@ const Wallet2WalletTransfer = ({}) => {
         roles: ["adm", "sadm"],
       },
     ],
-    [userOptions, appliedFilters]
+    [senderOptions, receiverOptions, appliedFilters]
   );
+
   const columns = useMemo(
     () => [
       {
@@ -369,9 +421,9 @@ const Wallet2WalletTransfer = ({}) => {
       {
         name: "Amount",
         selector: (row) => {
-          const loggedInUserId = user.id || user.id; // tumhare auth context se
-          let isDebit = row.user_id === loggedInUserId; // logged-in user se nikal raha paisa → red
-          let isCredit = row.receiver_id === loggedInUserId; // logged-in user ko paisa mila → green
+          const loggedInUserId = user.id || user.id;
+          let isDebit = row.user_id === loggedInUserId;
+          let isCredit = row.receiver_id === loggedInUserId;
 
           let color = isCredit ? "green" : isDebit ? "red" : "black";
           let sign = isCredit ? "+" : isDebit ? "-" : "";
@@ -435,18 +487,6 @@ const Wallet2WalletTransfer = ({}) => {
                       minWidth: "80px",
                     }}
                   >
-                    {/* <Tooltip title="View Transaction">
-                    <IconButton
-                      color="info"
-                      onClick={() => {
-                        setSelectedRow(row);
-                        setDrawerOpen(true);
-                      }}
-                      size="small"
-                    >
-                      <VisibilityIcon />
-                    </IconButton>
-                  </Tooltip> */}
                     <Tooltip title="Print W2W">
                       <IconButton
                         color="secondary"
@@ -481,7 +521,6 @@ const Wallet2WalletTransfer = ({}) => {
                     alignItems: "center",
                   }}
                 >
-                  {/* FAILED or REFUND: Refresh */}
                   {row?.status === "REFUNDPENDING" && (
                     <Tooltip title="REFUND TXN">
                       <ReplayIcon
@@ -502,14 +541,14 @@ const Wallet2WalletTransfer = ({}) => {
           ]
         : []),
     ],
-    []
+    [user]
   );
 
   return (
     <Box>
       <Box
         sx={{
-          flex: 1, // chhota portion
+          flex: 1,
           borderRadius: 3,
           display: "flex",
         }}
