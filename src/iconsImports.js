@@ -264,6 +264,7 @@ import mpost from "../src/assets/sidebar_icons/mobile postpaid.svg";
 import mpre from "../src/assets/sidebar_icons/mobile prepaid.svg";
 import gpipe from "../src/assets/sidebar_icons/piped gas.svg";
 import allbbps from "../src/assets/sidebar_icons/allbbps.svg"; ///
+import bp_1 from "../src/assets/sidebar_icons/Billpayment.png"; ///
 import lic from "../src/assets/sidebar_icons/LIC.svg"; ///
 import land from "../src/assets/sidebar_icons/landline.svg"; ///
 import water from "../src/assets/sidebar_icons/water.svg"; ///
@@ -518,6 +519,7 @@ export const Postpaid = mpost;
 export const Prepaid = mpre;
 export const Gas = gpipe;
 export const BBPS = allbbps;
+export const bp = bp_1;
 export const licIcon = lic;
 export const landIcon = land;
 export const waterIcon = water;

@@ -24,7 +24,7 @@ import CreditCardTxn from "../components/Transactions/CreditCardTxn";
 
 export const Transaction = () => {
   const tabItems = [
-     {
+    {
       label: (
         <div
           style={{
@@ -58,7 +58,7 @@ export const Transaction = () => {
       ),
       component: <DmtTxn />,
     },
-        {
+    {
       label: (
         <div
           style={{
@@ -93,8 +93,6 @@ export const Transaction = () => {
       component: <BbpxTxn />,
     },
 
-
-   
     {
       label: (
         <div
@@ -112,7 +110,7 @@ export const Transaction = () => {
       ),
       component: <RechargeTxn />,
     },
-     {
+    {
       label: (
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Wallet fontSize="small" />
@@ -139,7 +137,6 @@ export const Transaction = () => {
       ),
       component: <Wallet2WalletTransfer />,
     },
-   
   ];
 
   return <CommonTabs tabs={tabItems} defaultTab={0} />;

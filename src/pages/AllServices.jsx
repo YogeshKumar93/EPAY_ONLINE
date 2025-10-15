@@ -49,6 +49,7 @@ import {
   thumbPrint,
   mobileRechargeNew,
   wallet1,
+  bp,
 } from "../iconsImports";
 import SuperTransfer from "./SuperTransfer";
 
@@ -82,6 +83,7 @@ import LevinFundTransfer from "./LevinFundTransfer";
 import CreditCardBbps from "../components/CrediCardPayment/CreditCardBbps";
 import BbpsBillers from "./BbpsBillers";
 import BillPayments from "./BillPayments";
+import W2wTransfer from "./w2wTransfer";
 
 const MenuCard = ({ icon, label, onClick, isActive, user }) => {
   return (
@@ -363,7 +365,7 @@ export default function AllServices() {
     hasPermission("bbps_offline") && {
       key: "billPayments",
       label: "Bill Payments",
-      icon: BBPS,
+      icon: bp,
       component: BillPayments,
     },
     hasPermission("bbps") && {
@@ -488,7 +490,7 @@ export default function AllServices() {
           label: "Wallet to Wallet",
           icon: wallet1,
           type: "dth",
-          component: Wallet2WalletTransfer,
+          component: W2wTransfer,
         },
         {
           key: "w2w1",

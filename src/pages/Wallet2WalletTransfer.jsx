@@ -552,11 +552,7 @@ const Wallet2WalletTransfer = ({}) => {
           borderRadius: 3,
           display: "flex",
         }}
-      >
-        {user.role !== "adm" && (
-          <W2wTransfer type="w2w" handleFetchRef={refreshTransfer} />
-        )}
-      </Box>
+      ></Box>
 
       <Box sx={{}}>
         {loading ? (
