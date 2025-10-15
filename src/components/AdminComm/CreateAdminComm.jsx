@@ -17,7 +17,7 @@ const CreateAdminComm = ({ open, handleClose, handleSave, onFetchRef }) => {
     "service_name",
     "rule_type",
     "value_type",
-  "route",
+    "route",
     "a_comm",
 
     "min_amount",
@@ -41,6 +41,15 @@ const CreateAdminComm = ({ open, handleClose, handleSave, onFetchRef }) => {
     });
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+  // Override handleChange to handle "route" field manually
+  const handleFieldChange = (name, value) => {
+    if (name === "route" && value) {
+      // ✅ store the 'code' as value
+      handleChange(name, value.code || value);
+    } else {
+      handleChange(name, value);
+    }
   };
 
   // ✅ Submit
@@ -94,7 +103,7 @@ const CreateAdminComm = ({ open, handleClose, handleSave, onFetchRef }) => {
       dividers
       fieldConfig={visibleFields}
       formData={formData}
-      handleChange={handleChange}
+      handleChange={handleFieldChange} // ✅ use updated handler
       errors={errors}
       loading={loading || submitting}
       footerButtons={[

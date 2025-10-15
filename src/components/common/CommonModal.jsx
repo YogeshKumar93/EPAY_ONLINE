@@ -298,16 +298,25 @@ const CommonFormField = ({
             ) || null
           }
           onChange={(e, newValue) => {
-            handleChange({
-              target: {
-                name,
-                value:
-                  newValue?.value ??
-                  newValue?.id ??
-                  newValue?.bank_id ??
+            let value = "";
+            if (newValue) {
+              // ✅ Special handling for route
+              if (name === "route" && newValue.code) {
+                value = newValue.code;
+              } else {
+                value =
+                  newValue.value ??
+                  newValue.id ??
+                  newValue.bank_id ??
+                  newValue.code ??
+                  newValue.name ??
                   newValue ??
-                  "",
-              },
+                  "";
+              }
+            }
+
+            handleChange({
+              target: { name, value },
             });
           }}
           loading={optionsLoading}
