@@ -503,6 +503,7 @@ const handleChangeRole = (row) => {
                   </IconButton>
                 </Tooltip>
               )}
+
             </Box>
           );
         } else {
@@ -515,7 +516,7 @@ const handleChangeRole = (row) => {
 
 
 baseColumns.push({
-  name: "Status",
+  name: "Chg Role",
   selector: (row) => {
     if ([ "sadm"].includes(userRole.role)) {
       return (
