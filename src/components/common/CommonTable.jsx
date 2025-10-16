@@ -811,7 +811,7 @@ const CommonTable = ({
                 fontSize: "15px",
                 lineHeight: "1",
                 fontFamily: "DM Sans, sans-serif",
-                fontWeight: 400,
+                fontWeight: 600,
 
                 color: "#646e84",
                 border: "none", // Remove default borders
@@ -888,7 +888,7 @@ const CommonTable = ({
                 alignItems: "center",
                 flexWrap: "wrap",
                 gap: 1,
-              
+
                 // mb: 2
               }}
             >
