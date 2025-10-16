@@ -7,6 +7,11 @@ import {
   MenuItem,
   TextField,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
@@ -42,49 +47,33 @@ const ChangeRoleModal = ({ open, onClose, user, onSuccess }) => {
   const [role, setRole] = useState(user?.role || "");
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [loadingRoles, setLoadingRoles] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false); // ✅ confirmation modal
 
-  // Fetch roles dynamically when modal opens
   useEffect(() => {
     if (open) {
       setRole(user?.role || "");
-    //   fetchRoles();
     }
   }, [open, user]);
 
-//   const fetchRoles = async () => {
-//     setLoadingRoles(true);
-//     try {
-//       const { response, error } = await apiCall("POST", ApiEndpoints.GET_USERROLES);
-//       if (response?.data?.length > 0) {
-//         setRoles(response.data); // expected: [{ role: "adm", role_name: "Admin" }, ...]
-//       } else {
-//         showToast("No roles found, using default roles", "info");
-//         setRoles([]);
-//       }
-//     } catch (err) {
-//       console.error("Error fetching roles:", err);
-//       showToast("Failed to load roles", "error");
-//     } finally {
-//       setLoadingRoles(false);
-//     }
-//   };
-
-  const handleSubmit = async () => {
+  const handleUpdateClick = () => {
     if (!role) {
       showToast("Please select a role", "error");
       return;
     }
+    setConfirmOpen(true); // open confirmation modal
+  };
 
+  const handleSubmit = async () => {
     if (!user?.id) {
       showToast("User ID is missing", "error");
+      setConfirmOpen(false);
       return;
     }
 
     setLoading(true);
     try {
       const { response, error } = await apiCall("POST", ApiEndpoints.CHANGE_ROLE, {
-        user_id: user.id, // ✅ backend expects user_id
+        user_id: user.id,
         role,
       });
 
@@ -100,21 +89,19 @@ const ChangeRoleModal = ({ open, onClose, user, onSuccess }) => {
       showToast("Something went wrong", "error");
     } finally {
       setLoading(false);
+      setConfirmOpen(false);
     }
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
-      <Box sx={modalStyle}>
-        <Typography variant="h6" mb={2}>
-          Change Role for {user?.name || "User"}
-        </Typography>
+    <>
+      {/* Main Modal */}
+      <Modal open={open} onClose={onClose}>
+        <Box sx={modalStyle}>
+          <Typography variant="h6" mb={2}>
+            Change Role for {user?.name || "User"}
+          </Typography>
 
-        {loadingRoles ? (
-          <Box display="flex" justifyContent="center" alignItems="center" py={3}>
-            <CircularProgress size={30} />
-          </Box>
-        ) : (
           <TextField
             select
             label="Select Role"
@@ -139,18 +126,36 @@ const ChangeRoleModal = ({ open, onClose, user, onSuccess }) => {
                   </MenuItem>
                 ))}
           </TextField>
-        )}
 
-        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1, mt: 3 }}>
-          <Button onClick={onClose} variant="outlined" color="error" disabled={loading}>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1, mt: 3 }}>
+            <Button onClick={onClose} variant="outlined" color="error" disabled={loading}>
+              Cancel
+            </Button>
+            <Button onClick={handleUpdateClick} variant="contained" color="primary" disabled={loading}>
+              {loading ? <CircularProgress size={24} /> : "Update Role"}
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+        <DialogTitle>Confirm Role Change</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to change the role of <b>{user?.name}</b> to <b>{roleLabels[role] || role}</b>?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmOpen(false)} color="error" variant="outlined">
             Cancel
           </Button>
-          <Button onClick={handleSubmit} variant="contained" color="primary" disabled={loading}>
-            {loading ? <CircularProgress size={24} /> : "Update Role"}
+          <Button onClick={handleSubmit} color="primary" variant="contained" disabled={loading}>
+            {loading ? <CircularProgress size={20} /> : "Confirm"}
           </Button>
-        </Box>
-      </Box>
-    </Modal>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 
