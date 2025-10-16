@@ -337,7 +337,7 @@ const RechargeTxn = ({ query }) => {
             {
               name: "Est.",
               selector: (row) => (
-                <div style={{ fontSize: "15px", fontWeight: "600" }}>
+                <div style={{ fontSize: "14px", fontWeight: "600" }}>
                   {row.establishment}
                 </div>
               ),
@@ -349,7 +349,7 @@ const RechargeTxn = ({ query }) => {
       {
         name: "Service",
         selector: (row) => (
-          <div style={{ textAlign: "left", fontWeight: 900, fontSize: "15px" }}>
+          <div style={{ textAlign: "left", fontWeight: 600, fontSize: "15px" }}>
             {row.operator}
             <br />
             {["adm", "sadm"].includes(user?.role) && (
@@ -464,7 +464,7 @@ const RechargeTxn = ({ query }) => {
                 <div
                   style={{
                     textAlign: "right",
-                    fontSize: "10px",
+                    fontSize: "11px",
                     fontWeight: 600,
                   }}
                 >
@@ -493,7 +493,7 @@ const RechargeTxn = ({ query }) => {
                 <div
                   style={{
                     textAlign: "right",
-                    fontSize: "10px",
+                    fontSize: "11px",
                     fontWeight: 600,
                   }}
                 >

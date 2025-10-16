@@ -35,6 +35,10 @@ import { AssignPlans } from "./AssignPlans";
 import AdminCreateUser from "./AdminCreateUser";
 import AddLein from "./AddLein";
 import debounce from "lodash.debounce";
+// import { useNavigate } from "react-router-dom";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import ChangeRoleModal from "../components/ChangeRole";
+
 
 const roleLabels = {
   ret: "Retailer",
@@ -71,6 +75,14 @@ const Users = ({ query }) => {
   const [userOptions, setUserOptions] = useState([]);
   const [selectedUserFilter, setSelectedUserFilter] = useState(null); // selected option
   const [appliedFilters, setAppliedFilters] = useState({}); // applied filter payload
+  // const navigate = useNavigate();
+  const [openChangeRole, setOpenChangeRole] = useState(false);
+// const [selectedUser, setSelectedUser] = useState(null);
+
+const handleChangeRole = (row) => {
+  setSelectedUser(row); // store selected user details
+  setOpenChangeRole(true); // open the modal
+};
 
   const handleOpenAssignPlans = (user) => {
     setSelectedUser(user);
@@ -461,6 +473,7 @@ const Users = ({ query }) => {
           ]
         : []),
     ];
+    
 
     // Status column
     baseColumns.push({
@@ -490,6 +503,7 @@ const Users = ({ query }) => {
                   </IconButton>
                 </Tooltip>
               )}
+
             </Box>
           );
         } else {
@@ -497,6 +511,31 @@ const Users = ({ query }) => {
         }
       },
     });
+
+
+
+
+if (userRole.role === "sadm") {
+  baseColumns.push({
+    name: "Chg Role",
+    selector: (row) => (
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Tooltip title="Change Role">
+          <IconButton
+            size="small"
+            sx={{ color: "secondary.main" }}
+            onClick={() => handleChangeRole(row)} // open your ChangeRoleModal
+          >
+            <ManageAccountsIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      </Box>
+    ),
+  });
+}
+
+
+
 
     // Actions column
     if (["adm", "di", "md", "sadm"].includes(userRole?.role)) {
@@ -638,6 +677,15 @@ const Users = ({ query }) => {
           onSuccess={refreshUsers} // refresh table after assigning
         />
       )}
+      {openChangeRole && (
+  <ChangeRoleModal
+    open={openChangeRole}
+    onClose={() => setOpenChangeRole(false)}
+    user={selectedUser}
+    onSuccess={refreshUsers} // refresh table after API success
+  />
+)}
+
     </Box>
   );
 };
