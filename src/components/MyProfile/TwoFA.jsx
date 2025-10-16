@@ -30,7 +30,7 @@ const TwoFA = ({ open, onClose }) => {
       });
 
       showToast(response?.message || "2FA changed successfully", "success");
-      await loadUserProfile();
+       loadUserProfile();
       onClose();
     } catch (error) {
       showToast(error?.message || "Something went wrong", "error");
