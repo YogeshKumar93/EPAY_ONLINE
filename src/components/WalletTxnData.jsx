@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Drawer,
   IconButton,
@@ -16,13 +16,15 @@ import CloseIcon from "@mui/icons-material/Close";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { useToast } from "../utils/ToastContext";
+import AuthContext from "../contexts/AuthContext";
 
 const WalletTxnData = ({ open, onClose, rowId }) => {
   const [loading, setLoading] = useState(false);
   const [txnData, setTxnData] = useState(null);
   const { showToast } = useToast();
-
-const fetchWalletTxnData = async () => {
+  const authCtx = useContext(AuthContext);
+  const user = authCtx?.user;
+  const fetchWalletTxnData = async () => {
     if (!rowId) return;
     setLoading(true);
     try {
@@ -51,16 +53,38 @@ const fetchWalletTxnData = async () => {
       fetchWalletTxnData();
     }
   }, [rowId, open]);
+  const showDiComm =
+    user?.role === "adm" ||
+    user?.role === "di" ||
+    user?.role === "sadm" ||
+    user?.role === "md" ||
+    user?.role === "asm" ||
+    user?.role === "zsm";
+
+  const showMdComm =
+    user?.role === "adm" ||
+    user?.role === "md" ||
+    user?.role === "sadm" ||
+    user?.role === "asm" ||
+    user?.role === "zsm";
 
   const rows = txnData
     ? [
         { label: "Amount", value: txnData.amount },
         { label: "Retailer Commission", value: txnData.ret_comm },
-        { label: "Distributor Commission", value: txnData.di_comm },
-        { label: "Master Distributor Commission", value: txnData.md_comm },
+        ...(showDiComm
+          ? [{ label: "Distributor Commission", value: txnData.di_comm }]
+          : []),
+        ...(showMdComm
+          ? [{ label: "Master Distributor Commission", value: txnData.md_comm }]
+          : []),
         { label: "Retailer TDS", value: txnData.ret_tds },
-        { label: "Distributor TDS", value: txnData.di_tds },
-        { label: "Master Distributor TDS", value: txnData.md_tds },
+        ...(showDiComm
+          ? [{ label: "Distributor TDS", value: txnData.di_tds }]
+          : []),
+        ...(showMdComm
+          ? [{ label: "Master Distributor TDS", value: txnData.md_tds }]
+          : []),
       ]
     : [];
 
@@ -69,16 +93,16 @@ const fetchWalletTxnData = async () => {
       anchor="right"
       open={open}
       onClose={onClose}
-     ModalProps={{
-    keepMounted: true, // Mobile perf ke liye
-  }}
-  sx={{
-    "& .MuiDrawer-paper": {
-      width: { xs: "100%", sm: 450 },
-      p: 2,
-      zIndex: (theme) => theme.zIndex.appBar + 1, // 👈 AppBar ke upar
-    },
-  }}
+      ModalProps={{
+        keepMounted: true, // Mobile perf ke liye
+      }}
+      sx={{
+        "& .MuiDrawer-paper": {
+          width: { xs: "100%", sm: 450 },
+          p: 2,
+          zIndex: (theme) => theme.zIndex.appBar + 1, // 👈 AppBar ke upar
+        },
+      }}
     >
       {/* Header */}
       <Box

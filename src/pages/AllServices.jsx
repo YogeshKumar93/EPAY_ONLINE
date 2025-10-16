@@ -84,6 +84,7 @@ import CreditCardBbps from "../components/CrediCardPayment/CreditCardBbps";
 import BbpsBillers from "./BbpsBillers";
 import BillPayments from "./BillPayments";
 import W2wTransfer from "./w2wTransfer";
+import LevinUpiTransfer from "./LevinUpiTransfer";
 
 const MenuCard = ({ icon, label, onClick, isActive, user }) => {
   return (
@@ -337,7 +338,7 @@ export default function AllServices() {
           key: "upiPay",
           label: "UPI Pay",
           icon: QrCodeIcon,
-          component: UpiTransfer,
+          component: LevinUpiTransfer,
           type: "upi",
         },
       ],
