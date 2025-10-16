@@ -317,7 +317,7 @@ const DmtTxn = ({ query }) => {
         name: "Service",
         selector: (row) => (
           <div
-            style={{ textAlign: "left", fontWeight: "600", fontSize: "15px" }}
+            style={{ textAlign: "left", fontWeight: "600", fontSize: "14px" }}
           >
             {row.operator} <br />
             {["adm", "sadm"].includes(user?.role) && (
@@ -360,7 +360,7 @@ const DmtTxn = ({ query }) => {
         name: "TxnId",
         selector: (row) => (
           <div
-            style={{ textAlign: "left", fontWeight: "500", fontSize: "12px" }}
+            style={{ textAlign: "left", fontWeight: "600", fontSize: "13px" }}
           >
             {row.txn_id} <br />
           </div>
@@ -385,7 +385,7 @@ const DmtTxn = ({ query }) => {
       {
         name: "Mobile",
         selector: (row) => (
-          <div style={{ textAlign: "left", fontWeight: "500" }}>
+          <div style={{ textAlign: "left", fontWeight: "600" }}>
             {row.sender_mobile}
           </div>
         ),
@@ -396,7 +396,7 @@ const DmtTxn = ({ query }) => {
         name: "Beneficiary",
         selector: (row) => (
           <div
-            style={{ textAlign: "left", fontSize: "11px", fontWeight: "500" }}
+            style={{ textAlign: "left", fontSize: "12px", fontWeight: "600" }}
           >
             {row.beneficiary_name?.toUpperCase()} <br />
             {/* {row.account_number} <br />
@@ -450,7 +450,7 @@ const DmtTxn = ({ query }) => {
             style={{
               color: "red",
               fontWeight: "600",
-              fontSize: "10px",
+              fontSize: "14px",
               textAlign: "right",
             }}
           >
@@ -468,7 +468,7 @@ const DmtTxn = ({ query }) => {
         name: "Ret Comm",
         selector: (row) => (
           <div
-            style={{ textAlign: "right", fontSize: "14px", fontWeight: 600 }}
+            style={{ textAlign: "right", fontSize: "12px", fontWeight: 600 }}
           >
             <div style={{ color: "green" }}>
               {parseFloat(row.ret_comm).toFixed(2)}
@@ -494,7 +494,7 @@ const DmtTxn = ({ query }) => {
                 <div
                   style={{
                     textAlign: "right",
-                    fontSize: "10px",
+                    fontSize: "12px",
                     fontWeight: 600,
                   }}
                 >
@@ -523,7 +523,7 @@ const DmtTxn = ({ query }) => {
                 <div
                   style={{
                     textAlign: "right",
-                    fontSize: "10px",
+                    fontSize: "12px",
                     fontWeight: 600,
                   }}
                 >

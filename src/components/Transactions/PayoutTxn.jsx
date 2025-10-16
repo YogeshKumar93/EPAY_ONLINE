@@ -370,7 +370,7 @@ const PayoutTxn = ({ query }) => {
                   style={{
                     textAlign: "left",
                     fontWeight: "600",
-                    fontSize: "15px",
+                    fontSize: "14px",
                   }}
                 >
                   {row.operator} <br />
@@ -420,7 +420,7 @@ const PayoutTxn = ({ query }) => {
                   style={{
                     textAlign: "left",
                     fontWeight: 600,
-                    fontSize: "15px",
+                    fontSize: "14px",
                   }}
                 >
                   {row?.purpose || "N/A"}
@@ -538,7 +538,7 @@ const PayoutTxn = ({ query }) => {
                 <div
                   style={{
                     textAlign: "right",
-                    fontSize: "10px",
+                    fontSize: "13px",
                     fontWeight: 600,
                   }}
                 >
@@ -567,7 +567,7 @@ const PayoutTxn = ({ query }) => {
                 <div
                   style={{
                     textAlign: "right",
-                    fontSize: "10px",
+                    fontSize: "13px",
                     fontWeight: 600,
                   }}
                 >
