@@ -515,28 +515,25 @@ const handleChangeRole = (row) => {
 
 
 
-baseColumns.push({
-  name: "Chg Role",
-  selector: (row) => {
-    if ([ "sadm"].includes(userRole.role)) {
-      return (
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Tooltip title="Change Role">
-            <IconButton
-              size="small"
-              sx={{ color: "secondary.main" }}
-              onClick={() => handleChangeRole(row)} // ✅ open modal
-            >
-              <ManageAccountsIcon fontSize="small" />
-            </IconButton>
-          </Tooltip> 
-        </Box>
-      );
-    } else {
-      return <CommonStatus value={row.is_active} />;
-    }
-  },
-});
+if (userRole.role === "sadm") {
+  baseColumns.push({
+    name: "Chg Role",
+    selector: (row) => (
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Tooltip title="Change Role">
+          <IconButton
+            size="small"
+            sx={{ color: "secondary.main" }}
+            onClick={() => handleChangeRole(row)} // open your ChangeRoleModal
+          >
+            <ManageAccountsIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      </Box>
+    ),
+  });
+}
+
 
 
 
