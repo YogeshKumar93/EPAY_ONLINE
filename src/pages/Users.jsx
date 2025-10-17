@@ -30,7 +30,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditUser from "./EditUser";
 import ViewDocuments from "./ViewDocuments";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { Assignment, CurrencyRupee } from "@mui/icons-material";
+import { Assignment, CurrencyRupee, VerifiedUser } from "@mui/icons-material";
 import { AssignPlans } from "./AssignPlans";
 import AdminCreateUser from "./AdminCreateUser";
 import AddLein from "./AddLein";
@@ -473,7 +473,41 @@ const handleChangeRole = (row) => {
           ]
         : []),
     ];
-    
+      if (["adm", "sadm"].includes(userRole.role)) {
+      baseColumns.push({
+        name: "KYC",
+        selector: (row) => {
+          let iconColor = "";
+          let tooltipTitle = "";
+
+          switch (row.status) {
+            case 1:
+              iconColor = "success.main";
+              tooltipTitle = "KYC Approved";
+              break;
+            case 2:
+              iconColor = "warning.main";
+              tooltipTitle = "KYC Pending";
+              break;
+            case 3:
+              iconColor = "error.main";
+              tooltipTitle = "KYC Image not Uploaded";
+              break;
+            default:
+              iconColor = "text.disabled";
+              tooltipTitle = "KYC Status Unknown";
+          }
+
+          return (
+            <Tooltip title={tooltipTitle}>
+              <IconButton size="small" sx={{ color: iconColor }}>
+                <VerifiedUser fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          );
+        },
+      });
+    }
 
     // Status column
     baseColumns.push({
