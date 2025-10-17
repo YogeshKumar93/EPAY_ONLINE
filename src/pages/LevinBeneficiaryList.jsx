@@ -190,8 +190,8 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
         type: "LEVINUPI",
         beneficiary_name: formData.beneficiary_name,
         account_number: combinedBenAcc, // ✅ Store combined value
-        ifsc_code: "UPIINR", // ✅ Add IFSC code for UPI
-        bank_name: "UPI", // ✅ Add bank name for UPI
+        // ifsc_code: "UPIINR", // ✅ Add IFSC code for UPI
+        // bank_name: "UPI", // ✅ Add bank name for UPI
         mobile_number: sender?.mobile_number,
         tup_reference: tupResponse?.data?.txnReferenceId,
         is_verified: 0,
