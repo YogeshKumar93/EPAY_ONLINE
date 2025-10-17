@@ -112,9 +112,8 @@ const MenuCard = ({ icon, label, onClick, isActive, user }) => {
             transform: "translateY(-4px) scale(1.04)",
             boxShadow: "0 8px 16px rgba(123, 63, 227, 0.35)",
             background: isActive
-        ? "linear-gradient(135deg, #5210c1 0%, #7b3fe3 100%)"
-        : "linear-gradient(135deg, #F3E8FF 0%, #FFFFFF 100%)",
-
+              ? "linear-gradient(135deg, #5210c1 0%, #7b3fe3 100%)"
+              : "linear-gradient(135deg, #F3E8FF 0%, #FFFFFF 100%)",
           },
           p: 2,
           position: "relative",
@@ -167,7 +166,6 @@ const MenuCard = ({ icon, label, onClick, isActive, user }) => {
             overflow: "hidden",
             textOverflow: "ellipsis",
             maxWidth: "130px",
-           
           }}
         >
           {label}
@@ -189,7 +187,7 @@ const SubMenuCard = ({ icon, label, onClick, isActive, user }) => {
           justifyContent: "center",
           height: { xs: 80, sm: 120 },
           width: { xs: 80, sm: 150 },
-          
+
           borderRadius: 2.5,
           background: isActive
             ? "linear-gradient(135deg, #5210c1 0%, #7b3fe3 100%)"
@@ -339,6 +337,13 @@ export default function AllServices() {
         {
           key: "upiPay",
           label: "UPI Pay",
+          icon: QrCodeIcon,
+          component: UpiTransfer,
+          type: "upi",
+        },
+        {
+          key: "upiPay",
+          label: "Levin UPI",
           icon: QrCodeIcon,
           component: LevinUpiTransfer,
           type: "upi",

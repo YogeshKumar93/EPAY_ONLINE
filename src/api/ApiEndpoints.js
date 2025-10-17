@@ -130,7 +130,9 @@ const ApiEndpoints = {
   LOGIN_HISTORY: "userDevice/getUserDevice",
   GET_WEBHOOKS: "webhook/getWebhook",
   GET_USER_DEBOUNCE: "user/getUserDebounce",
-
+GET_SENDER_UPI:"payout/getSenderUpi",
+REGISTER_REMITTER_UPI:"payout/registerRemitterUpi",
+VERIFY_REMITTER_UPI:"payout/verifyRemitterUpi",
   // ****************************** NEW API'S ABOVE ******************************
   GET_TXN_SUMMARY: "dashboard/getRetTxnSummary",
   GET_SERVICE_WISE_PROFIT: "dashboard/getServiceWiseProfitSummary",
@@ -237,7 +239,7 @@ const ApiEndpoints = {
   UPDATE_USER_STATUS: "user/blockAndUnblock",
 
   CHANGE_USER_LAYOUT: "user/changeLayout",
-
+LEVIN_UPI_TRANSFER:"payments/v2/upiTxn",
   DMT1: "dmt1/remitterStatus",
   REGISTER_DMT1_BENEFICIARY: "dmt1/registerBeneficiary",
   ADD_DMT1_SCHEMA: "dmt1/getBeneficiarySchema",

@@ -54,7 +54,7 @@ const LevinRegisterRemitter = ({ open, onClose, mobile, onRegistered }) => {
 
       const { error, response } = await apiCall(
         "post",
-        ApiEndpoints.LEVIN_REGISTER,
+        ApiEndpoints.REGISTER_REMITTER_UPI,
         payload
       );
 

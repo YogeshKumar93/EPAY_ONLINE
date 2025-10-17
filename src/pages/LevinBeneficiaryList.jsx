@@ -75,22 +75,26 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
 
   // schema for add form
   const { schema, formData, handleChange, errors, setErrors, loading } =
-    useSchemaForm(ApiEndpoints.ADD_BENEFICIARY_SCHEMA, openModal, {
+    useSchemaForm(ApiEndpoints.GET_UPI_SCHEMA, openModal, {
       sender_id: sender?.id,
     });
 
   // ✅ Step 1: Verify + Add new beneficiary
   const handleAddAndVerifyBeneficiary = () => {
     setErrors({});
+
+    // Combine prefix and suffix to form the complete UPI ID/account
+    const combinedBenAcc = `${formData.prefix}@${formData.suffix}`;
+
     const payload = {
       ...formData,
       sender_id: sender?.id,
       mobile_number: sender?.mobile_number,
       rem_mobile: sender?.mobileNumber,
       ben_name: formData.beneficiary_name,
-      ben_acc: formData.account_number,
-      ifsc: formData.ifsc_code,
-      operator: 18, // ✅ for Levin route
+      ben_acc: combinedBenAcc, // ✅ Use combined prefix@suffix
+      // ifsc: formData.ifsc_code, // Remove if not needed for UPI
+      operator: 21, // ✅ for Levin route
       latitude: location?.lat || "",
       longitude: location?.long || "",
       pf: "WEB",
@@ -98,7 +102,6 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
     setPendingPayload(payload);
     setVerifyOpen(true);
   };
-
   const handleVerify = async () => {
     if (mpinDigits.some((d) => !d)) {
       apiErrorToast("Please enter all 6 digits of MPIN");
@@ -136,12 +139,17 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
       }
 
       // ✅ Verification successful — Add beneficiary
-      const verifiedName = response?.data || formData.beneficiary_name;
+      const verifiedName =
+        response?.message || response?.data?.name || formData.beneficiary_name;
+      const combinedBenAcc = `${formData.prefix}@${formData.suffix}`;
+
       const addPayload = {
         ...formData,
         sender_id: sender?.id,
-        type: "LEVIN",
+        type: "LEVINUPI",
         beneficiary_name: verifiedName,
+        account_number: combinedBenAcc, // ✅ Add account_number
+      
         mobile_number: sender?.mobile_number,
         is_verified: 1,
       };
@@ -174,11 +182,16 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
   const handleTUPConfirmation = async () => {
     try {
       setSubmitting(true);
+      const combinedBenAcc = `${formData.prefix}@${formData.suffix}`;
+
       const addPayload = {
         ...formData,
         sender_id: sender?.id,
-        type: "LEVIN",
+        type: "LEVINUPI",
         beneficiary_name: formData.beneficiary_name,
+        account_number: combinedBenAcc, // ✅ Store combined value
+        ifsc_code: "UPIINR", // ✅ Add IFSC code for UPI
+        bank_name: "UPI", // ✅ Add bank name for UPI
         mobile_number: sender?.mobile_number,
         tup_reference: tupResponse?.data?.txnReferenceId,
         is_verified: 0,
@@ -348,7 +361,7 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
                               ben_name: b.beneficiary_name,
                               ben_acc: b.account_number,
                               ifsc: b.ifsc_code,
-                              operator: 19,
+                              operator: 21,
                               latitude: location?.lat || "",
                               longitude: location?.long || "",
                               pf: "WEB",

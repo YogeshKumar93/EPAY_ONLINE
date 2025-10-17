@@ -73,7 +73,7 @@ const LevinVerifySender = ({
 
       const { error, response } = await apiCall(
         "post",
-        ApiEndpoints.LEVIN_VERIFY,
+        ApiEndpoints.VERIFY_REMITTER_UPI,
         payload
       );
 

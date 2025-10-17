@@ -55,7 +55,7 @@ const LevinUpiTransfer = () => {
 
     const { error, response } = await apiCall(
       "post",
-      ApiEndpoints.LEVIN_SENDER,
+      ApiEndpoints.GET_SENDER_UPI,
       {
         mobile_number: number,
         type: "UPI",
