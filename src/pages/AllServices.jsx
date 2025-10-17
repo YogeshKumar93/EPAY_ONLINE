@@ -342,7 +342,7 @@ export default function AllServices() {
           type: "upi",
         },
         {
-          key: "upiPay",
+          key: "LEVIN UPI",
           label: "Levin UPI",
           icon: QrCodeIcon,
           component: LevinUpiTransfer,
