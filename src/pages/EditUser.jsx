@@ -12,16 +12,41 @@ const TAB_CONFIG = [
   { key: "kyc", label: "KYC" },
 ];
 
-// Convert key_name to Label (e.g., business_email -> Business Email)
 const formatLabel = (key) =>
   key.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
-
 const EditUser = ({ open, onClose, user, onFetchRef }) => {
   const [selectedTab, setSelectedTab] = useState("basic");
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [originalData, setOriginalData] = useState({});
+  const [uploadedFiles, setUploadedFiles] = useState({});
   const { showToast } = useToast();
+
+  // Define field configurations for each tab
+  const TAB_FIELDS = {
+    basic: [
+      { name: "name", label: "Name", type: "text" },
+      { name: "email", label: "Email", type: "text" },
+      { name: "phone", label: "Phone", type: "text" },
+      // Add other basic fields as needed
+    ],
+    kyc: [
+      { name: "aadhaar_front", label: "Aadhaar Front", type: "file" },
+      { name: "aadhaar_back", label: "Aadhaar Back", type: "file" },
+      { name: "pan_card", label: "PAN Card", type: "file" },
+      { name: "shop_image", label: "Shop Image", type: "file" },
+      { name: "photo", label: "Photo", type: "file" },
+    ],
+    business: [
+      { name: "business_name", label: "Business Name", type: "text" },
+      { name: "business_type", label: "Business Type", type: "text" },
+      { name: "address", label: "Address", type: "text" },
+      // Add other business fields as needed
+    ],
+    // Add more tabs as needed
+  };
+
   // Fetch data when modal opens or tab changes
   useEffect(() => {
     if (!user || !open) return;
@@ -36,9 +61,30 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
         type: type,
       });
       const data = res?.data || res?.response?.data || {};
-      setFormData(data);
+
+      // Initialize form data with default values for all fields in the tab
+      const initializedData = {};
+      const tabFields = TAB_FIELDS[type] || [];
+
+      tabFields.forEach((field) => {
+        // Use API data if available, otherwise use empty string
+        initializedData[field.name] = data[field.name] || "";
+      });
+
+      setFormData(initializedData);
+      setOriginalData(initializedData);
+      setUploadedFiles({});
     } catch (err) {
       console.error("Error fetching business details:", err);
+
+      // Initialize with empty data if API fails
+      const tabFields = TAB_FIELDS[selectedTab] || [];
+      const emptyData = {};
+      tabFields.forEach((field) => {
+        emptyData[field.name] = "";
+      });
+      setFormData(emptyData);
+      setOriginalData(emptyData);
     } finally {
       setLoading(false);
     }
@@ -55,9 +101,69 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
+  // Fixed file upload handler
+  const handleFileUpload = (fieldName, file) => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const fileData = reader.result;
+        setFormData((prev) => ({
+          ...prev,
+          [fieldName]: fileData,
+        }));
+        setUploadedFiles((prev) => ({
+          ...prev,
+          [fieldName]: fileData,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Helper function to get only changed fields
+  const getChangedFields = () => {
+    const changedFields = {};
+
+    // First, include all uploaded files
+    Object.keys(uploadedFiles).forEach((key) => {
+      if (uploadedFiles[key]) {
+        changedFields[key] = uploadedFiles[key];
+      }
+    });
+
+    // Then, include non-file fields that have changed
+    Object.keys(formData).forEach((key) => {
+      // Skip if it's already included as an uploaded file
+      if (uploadedFiles[key]) return;
+
+      // Skip if it's a file field but not uploaded (to avoid sending empty file fields)
+      const isFileField =
+        TAB_FIELDS[selectedTab]?.find((field) => field.name === key)?.type ===
+        "file";
+      if (isFileField && !uploadedFiles[key]) return;
+
+      // Check if value changed from original for non-file fields
+      if (formData[key] !== originalData[key]) {
+        changedFields[key] = formData[key];
+      }
+    });
+
+    return changedFields;
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      const changedFields = getChangedFields();
+
+      if (Object.keys(changedFields).length === 0) {
+        showToast("No changes detected", "info");
+        setLoading(false);
+        return;
+      }
+
+      console.log("Sending changed fields:", Object.keys(changedFields));
+
       const { error, response } = await apiCall(
         "post",
         ApiEndpoints.UPDATE_BY_TYPE,
@@ -65,18 +171,15 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
           id: user.id,
           user_id: user.id,
           type: selectedTab,
-          ...formData,
+          ...changedFields,
         }
       );
       if (response) {
-        showToast(
-          response?.message || "AEPS2 onboarding successful",
-          "success"
-        );
+        showToast(response?.message || "Update successful", "success");
         onFetchRef?.();
         onClose();
       } else {
-        showToast(error?.message || "AEPS2 onboarding failed", "error");
+        showToast(error?.message || "Update failed", "error");
       }
     } catch (err) {
       console.error(err);
@@ -85,28 +188,8 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
     }
   };
 
-  // Dynamically generate fields from API response
-  const NON_EDITABLE_FIELDS = ["id", "user_id", "created_at", "updated_at"];
-
-  // Dynamically generate fields from API response but skip non-editable ones
-  let fields = Object.keys(formData || {})
-    .filter((key) => !NON_EDITABLE_FIELDS.includes(key))
-    .map((key) => ({
-      name: key,
-      label: formatLabel(key),
-      type: key.toLowerCase().includes("date") ? "date" : "text",
-    }));
-
-  // If KYC tab and no data received, create placeholder fields for upload
-  if (selectedTab === "kyc" && fields.length === 0) {
-    fields = [
-      { name: "aadhaar_front", label: "Aadhaar Front", type: "file" },
-      { name: "aadhaar_back", label: "Aadhaar Back", type: "file" },
-      { name: "pan_card", label: "PAN Card", type: "file" },
-      { name: "shop_image", label: "Shop Image", type: "file" },
-      { name: "photo", label: "Photo", type: "file" },
-    ];
-  }
+  // Get fields for current tab - always use predefined fields
+  const fields = TAB_FIELDS[selectedTab] || [];
 
   return (
     <CommonModal
@@ -128,7 +211,6 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
       </Box>
 
       <Box position="relative">
-        {/* Loader overlay */}
         {loading && (
           <Box
             position="absolute"
@@ -148,12 +230,15 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
         <Box opacity={loading ? 0.5 : 1}>
           {fields.map((field) => {
             const value = formData[field.name] || "";
-            const isImageField = selectedTab === "kyc"; // For KYC tab only
+            const isImageField = field.type === "file";
             const hasValue =
+              isImageField &&
               typeof value === "string" &&
               (value.startsWith("http://") ||
                 value.startsWith("https://") ||
                 value.startsWith("data:image"));
+
+            const isNewlyUploaded = uploadedFiles[field.name];
 
             return (
               <div
@@ -171,7 +256,6 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
 
                 {isImageField ? (
                   <>
-                    {/* Show preview only if a value exists */}
                     {hasValue && (
                       <Box>
                         <img
@@ -185,26 +269,27 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
                             objectFit: "cover",
                           }}
                         />
+                        {isNewlyUploaded && (
+                          <div
+                            style={{
+                              color: "green",
+                              fontSize: "12px",
+                              marginTop: "5px",
+                            }}
+                          >
+                            Newly uploaded
+                          </div>
+                        )}
                       </Box>
                     )}
 
-                    {/* Always show file input for KYC fields */}
                     <Box>
                       <input
                         type="file"
                         accept="image/*"
                         onChange={(e) => {
                           const file = e.target.files[0];
-                          if (file) {
-                            const reader = new FileReader();
-                            reader.onload = () => {
-                              setFormData((prev) => ({
-                                ...prev,
-                                [field.name]: reader.result,
-                              }));
-                            };
-                            reader.readAsDataURL(file);
-                          }
+                          handleFileUpload(field.name, file);
                         }}
                       />
                     </Box>
@@ -232,5 +317,4 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
     </CommonModal>
   );
 };
-
 export default EditUser;

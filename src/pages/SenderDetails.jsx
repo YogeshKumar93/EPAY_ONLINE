@@ -185,7 +185,7 @@ const SenderDetails = ({ sender }) => {
             minHeight={120}
           >
             <Typography variant="body2" color="text.secondary">
-              Enter Mobile Number to view sender details
+              Enter Mobile Number or Account Number To View Sender Details
             </Typography>
           </Box>
         )}

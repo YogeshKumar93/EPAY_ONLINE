@@ -56,11 +56,12 @@ const Prepaid = () => {
   const username = `TRANS${authCtx?.user?.id}`;
   const loadUserProfile = authCtx.loadUserProfile;
   const [rechargeResponse, setRechargeResponse] = useState(null);
-
+  const [w1Limit, setW1Limit] = useState(null); // store max allowed amount
 
   const amountInWords = manualAmount
-    ? `${convertNumberToWordsIndian(manualAmount)
-        .replace(/\b\w/g, (char) => char.toUpperCase())} Only`
+    ? `${convertNumberToWordsIndian(manualAmount).replace(/\b\w/g, (char) =>
+        char.toUpperCase()
+      )} Only`
     : "";
 
   // Fetch services and auto-select first operator
@@ -87,6 +88,18 @@ const Prepaid = () => {
     };
 
     fetchInitial();
+  }, []);
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const user = await authCtx.loadUserProfile();
+        if (user?.w1) setW1Limit(user.w1 / 100); // convert paisa → rupee
+      } catch (err) {
+        console.error("Failed to load user profile:", err);
+      }
+    };
+
+    fetchUserProfile();
   }, []);
 
   // Fetch plans for selected operator
@@ -246,65 +259,89 @@ const Prepaid = () => {
                     <Typography variant="h6" gutterBottom>
                       Enter Custom Amount
                     </Typography>
-                   <Box sx={{ display: "flex", justifyContent: "center", gap: 2, alignItems: "flex-start" }}>
-  {/* Amount input + words */}
-  <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-    <TextField
-      label="Amount"
-      type="text"
-      value={manualAmount}
-      onChange={(e) => {
-        const val = e.target.value;
-        if (/^\d*$/.test(val)) {
-          setManualAmount(val);
-        }
-      }}
-      InputProps={{
-        startAdornment: <InputAdornment position="start">₹</InputAdornment>,
-      }}
-      sx={{ width: 160 }}
-    />
-    {manualAmount && (
-      <Typography
-        variant="body2"
-        sx={{
-          color: "#555",
-          fontSize:"12px",
-          fontWeight: 500,
-           width: 180,
-           textAlign:"left",
-        }}
-      >
-        {amountInWords}
-      </Typography>
-    )}
-  </Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column", // stack vertically
+                        alignItems: "center",
+                        gap: 2, // space between input and button
+                      }}
+                    >
+                      {/* Amount input + words */}
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 0.5,
+                          alignItems: "center",
+                        }}
+                      >
+                        <TextField
+                          label="Amount"
+                          type="text"
+                          value={manualAmount}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (/^\d*$/.test(val)) {
+                              if (w1Limit && Number(val) > w1Limit) {
+                                showToast(
+                                  `Amount cannot exceed ₹${w1Limit}`,
+                                  "error"
+                                );
+                                return;
+                              }
+                              setManualAmount(val);
+                            }
+                          }}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                ₹
+                              </InputAdornment>
+                            ),
+                          }}
+                          sx={{ width: 160 }}
+                        />
 
-  {/* Continue button */}
-  <Button
-    variant="contained"
-    sx={{
-      borderRadius: 2,
-      fontWeight: "bold",
-      fontSize: { xs: "0.9rem", sm: "1rem" },
-      background: "#fff",
-      color: "#6C4BC7",
-    }}
-    onClick={() => {
-      if (!manualAmount) return apiErrorToast("Please enter amount");
-      setSelectedPlan({
-        id: "custom",
-        name: "Custom Amount",
-        price: manualAmount,
-      });
-      setStep(3);
-    }}
-    disabled={!manualAmount}
-  >
-    Continue
-  </Button>
-</Box>
+                        {manualAmount && (
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: "#555",
+                              fontSize: "12px",
+                              fontWeight: 500,
+                              width: 180,
+                              textAlign: "center",
+                            }}
+                          >
+                            {amountInWords}
+                          </Typography>
+                        )}
+                      </Box>
 
+                      {/* Continue button */}
+                      <Button
+                        variant="contained"
+                        onClick={() => {
+                          if (!manualAmount)
+                            return apiErrorToast("Please enter amount");
+                          if (w1Limit && Number(manualAmount) > w1Limit)
+                            return apiErrorToast(
+                              `Amount cannot exceed ₹${w1Limit}`
+                            );
+                          setSelectedPlan({
+                            id: "custom",
+                            name: "Custom Amount",
+                            price: manualAmount,
+                          });
+                          setStep(3);
+                        }}
+                        disabled={!manualAmount}
+                        sx={{ width: 160 }}
+                      >
+                        Continue
+                      </Button>
+                    </Box>
                   </Paper>
 
                   {/* Plans grid */}

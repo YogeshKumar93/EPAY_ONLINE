@@ -38,7 +38,7 @@ const CommissionRule = ({ query }) => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [rowToDelete, setRowToDelete] = useState(null);
- const [services, setServices] = useState([]);
+  const [services, setServices] = useState([]);
   const [plans, setPlans] = useState([]);
 
   const fetchUsersRef = useRef(null);
@@ -134,12 +134,11 @@ const CommissionRule = ({ query }) => {
       console.error("Error fetching services:", error);
     }
   };
-  
+
   useEffect(() => {
     fetchPlans();
     fetchServices();
   }, []);
-  
 
   // ✅ Filters with lazy loaded dropdown & plan_id selection
   const filters = useMemo(
@@ -149,9 +148,8 @@ const CommissionRule = ({ query }) => {
         label: "Plan",
         type: "dropdown",
         options: plans,
-
       },
-       {
+      {
         id: "service_name",
         label: "Service Name",
         type: "dropdown",
@@ -170,8 +168,7 @@ const CommissionRule = ({ query }) => {
       },
     ],
 
-    [plans,services]
-    
+    [plans, services]
   );
 
   const handleSaveCreate = () => {
@@ -207,24 +204,24 @@ const CommissionRule = ({ query }) => {
         ),
         wrap: true,
       },
-      {
-        name: "Id",
-        selector: (row) => (
-          <Tooltip title={row?.id || ""}>
-            <div style={{ textAlign: "left" }}>{row?.id || "-"}</div>
-          </Tooltip>
-        ),
-        wrap: true,
-      },
-      {
-        name: "Plan Id",
-        selector: (row) => (
-          <Tooltip title={row?.plan_id || ""}>
-            <div style={{ textAlign: "left" }}>{row?.plan_id || "-"}</div>
-          </Tooltip>
-        ),
-        wrap: true,
-      },
+      // {
+      //   name: "Id",
+      //   selector: (row) => (
+      //     <Tooltip title={row?.id || ""}>
+      //       <div style={{ textAlign: "left" }}>{row?.id || "-"}</div>
+      //     </Tooltip>
+      //   ),
+      //   wrap: true,
+      // },
+      // {
+      //   name: "Plan Id",
+      //   selector: (row) => (
+      //     <Tooltip title={row?.plan_id || ""}>
+      //       <div style={{ textAlign: "left" }}>{row?.plan_id || "-"}</div>
+      //     </Tooltip>
+      //   ),
+      //   wrap: true,
+      // },
       {
         name: "Rule Type",
         selector: (row) => (

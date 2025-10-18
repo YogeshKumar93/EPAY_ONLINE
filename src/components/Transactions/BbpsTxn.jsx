@@ -148,9 +148,13 @@ const BbpxTxn = ({ query }) => {
     if (!selectedForRefund) return;
     setRefundLoading(true);
 
-    const { error, response } = await apiCall("post", ApiEndpoints.REFUND_TXN, {
-      txn_id: selectedForRefund.txn_id,
-    });
+    const { error, response } = await apiCall(
+      "post",
+      ApiEndpoints.REFUND_TXN_BYADMIN,
+      {
+        txn_id: selectedForRefund.txn_id,
+      }
+    );
 
     if (response) {
       showToast(
@@ -703,15 +707,13 @@ const BbpxTxn = ({ query }) => {
               <Tooltip title="Print ">
                 <Box
                   component="span"
-                 onClick={() => {
-      // Save individual transaction data
-      sessionStorage.setItem("txnData", JSON.stringify(row));
+                  onClick={() => {
+                    // Save individual transaction data
+                    sessionStorage.setItem("txnData", JSON.stringify(row));
 
-      // Open receipt page in a new tab
-      window.open("/print-bbps", "_blank");
-    }}
-  
- 
+                    // Open receipt page in a new tab
+                    window.open("/print-bbps", "_blank");
+                  }}
                   sx={{
                     cursor: "pointer",
                     display: "inline-flex",
@@ -826,23 +828,29 @@ const BbpxTxn = ({ query }) => {
                     variant="contained"
                     size="small"
                     color="primary"
-                  onClick={() => {
-      if (!selectedRows || selectedRows.length === 0) {
-        alert("Please select at least one transaction to print.");
-        return;
-      }
+                    onClick={() => {
+                      if (!selectedRows || selectedRows.length === 0) {
+                        alert(
+                          "Please select at least one transaction to print."
+                        );
+                        return;
+                      }
 
-      // Save all selected rows
-      sessionStorage.setItem("txnData", JSON.stringify(selectedRows));
+                      // Save all selected rows
+                      sessionStorage.setItem(
+                        "txnData",
+                        JSON.stringify(selectedRows)
+                      );
 
-      // Open receipt page in a new tab
-      window.open("/print-bbps", "_blank");
-    }}
-    sx={{ ml: 1 }}
-  >
+                      // Open receipt page in a new tab
+                      window.open("/print-bbps", "_blank");
+                    }}
+                    sx={{ ml: 1 }}
+                  >
                     <PrintIcon
                       sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
-                    />Print
+                    />
+                    Print
                   </Button>
                 </Tooltip>
               )}

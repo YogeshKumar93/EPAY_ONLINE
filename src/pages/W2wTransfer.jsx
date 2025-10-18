@@ -4,13 +4,10 @@ import {
   TextField,
   CircularProgress,
   Card,
-  CardContent,
   Typography,
   Grid,
-  Paper,
   Button,
   Box,
-  Tooltip,
 } from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
@@ -29,12 +26,33 @@ const W2wTransfer = ({ handleFetchRef, type }) => {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const { showToast } = useToast();
   const [modalOpen, setModalOpen] = useState(false);
   const [mpinModalOpen, setMpinModalOpen] = useState(false);
-  const authCtx = useContext(AuthContext);
+  const [w1Balance, setW1Balance] = useState(0);
+  const [mobileError, setMobileError] = useState("");
+  const [amountError, setAmountError] = useState("");
+  const [remarkError, setRemarkError] = useState("");
 
-  const loadUserProfile = authCtx.loadUserProfile;
+  const { showToast } = useToast();
+  const authCtx = useContext(AuthContext);
+  const { loadUserProfile } = authCtx;
+
+  // 🟢 Fetch user profile and get W1 balance
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const user = await loadUserProfile();
+        if (user) {
+          setW1Balance(parseFloat(user.w1 / 100 || 0));
+        }
+      } catch (err) {
+        console.error("Failed to load user profile for W1:", err);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
   const fetchReceiver = async (mobileNumber) => {
     if (!mobileNumber) {
       setReceiver(null);
@@ -42,7 +60,7 @@ const W2wTransfer = ({ handleFetchRef, type }) => {
     }
 
     setLoading(true);
-    setError("");
+    setMobileError("");
 
     const { response, error } = await apiCall(
       "post",
@@ -56,9 +74,6 @@ const W2wTransfer = ({ handleFetchRef, type }) => {
     } else {
       setReceiver(null);
 
-      console.log("Hr errors wwwe", error);
-
-      // 🔹 Message ko top priority pe rakha
       const errMsg =
         error?.message ||
         (Array.isArray(error?.errors) && error.errors.length > 0
@@ -67,7 +82,7 @@ const W2wTransfer = ({ handleFetchRef, type }) => {
         "Receiver not found";
 
       showToast(errMsg, "error");
-      setError(errMsg);
+      setMobileError(errMsg);
     }
 
     setLoading(false);
@@ -88,6 +103,14 @@ const W2wTransfer = ({ handleFetchRef, type }) => {
   const handleCreateTransfer = async (mpin) => {
     if (!amount || parseFloat(amount) <= 0) {
       setError("Enter valid amount");
+      return;
+    }
+
+    // 🚫 Prevent transfer if amount > W1 balance
+    if (parseFloat(amount) > w1Balance) {
+      const msg = `Insufficient balance. Your W1 balance is ₹${w1Balance}.`;
+      showToast(msg, "error");
+      setError(msg);
       return;
     }
 
@@ -117,7 +140,7 @@ const W2wTransfer = ({ handleFetchRef, type }) => {
         setReceiver(null);
         setMobile("");
         setModalOpen(false);
-        loadUserProfile();
+        await loadUserProfile(); // ✅ refresh user data
       } else {
         showToast(error.message || error.errors, "error");
         setError(error?.message || "Transfer failed");
@@ -129,227 +152,212 @@ const W2wTransfer = ({ handleFetchRef, type }) => {
     }
   };
 
-  // when Send Amount is clicked, open MPIN modal
   const handleSendClick = () => {
+    // also precheck before MPIN modal opens
+    if (!amount || parseFloat(amount) <= 0) {
+      showToast("Please enter a valid amount", "error");
+      return;
+    }
+    if (parseFloat(amount) > w1Balance) {
+      showToast(
+        `Insufficient balance. Your W1 balance is ₹${w1Balance}.`,
+        "error"
+      );
+      return;
+    }
     setMpinModalOpen(true);
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        width: "100%",
-        // mt: -4,
-      }}
-    >
+    <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
       <Box sx={{ width: "100%" }}>
-        <Box elevation={6} sx={{ borderRadius: 3 }}>
-          {type !== "w2w" && (
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 700,
-                mb: 2,
-                color: "#1976d2",
-                textAlign: { xs: "center", md: "left" },
-              }}
-            >
-              Wallet to Wallet Transfer
-            </Typography>
-          )}
-
-          {/* Mobile Input */}
-          <TextField
-            label="Enter Receiver's Number"
-            variant="outlined"
-            fullWidth
-            value={mobile}
-            onChange={(e) => {
-              let val = e.target.value.toUpperCase(); // 🔹 convert to uppercase
-              val = val.replace(/[^A-Z0-9]/g, ""); // 🔹 allow only letters & numbers
-              setMobile(val);
+        {/* {type !== "w2w" && (
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 700,
+              mb: 2,
+              color: "#1976d2",
+              textAlign: { xs: "center", md: "left" },
             }}
-            margin="normal"
-            inputProps={{ maxLength: 10 }}
-            sx={{ mb: 3, "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
-          />
-
-          {/* Loader */}
-          {loading && (
-            <Grid container justifyContent="center" sx={{ my: 2 }}>
-              <CircularProgress />
-            </Grid>
-          )}
-
-          {/* Error / Success Messages */}
-          {error && (
-            <Typography
-              color="error"
-              sx={{ mt: 1, mb: 2, textAlign: "center" }}
-            >
-              {error}
-            </Typography>
-          )}
-          {success && (
-            <Typography
-              color="success.main"
-              sx={{ mt: 1, mb: 2, textAlign: "center" }}
-            >
-              {success}
-            </Typography>
-          )}
-
-          {/* Receiver Modal */}
-          <CommonModal
-            title="W1 TO W1 Transfer"
-            open={modalOpen}
-            onClose={() => setModalOpen(false)}
-            footerButtons={[]}
           >
-            {receiver && (
-              <>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    color: "#1976d2",
-                    fontWeight: 700,
-                    textAlign: "center",
-                  }}
-                >
-                  Receiver Details
-                </Typography>
+            Wallet to Wallet Transfer
+          </Typography>
+        )} */}
 
-                <Card
-                  elevation={4}
-                  sx={{
-                    // mb: 3,
-                    borderRadius: 3,
-                    p: 2,
-                    background: "linear-gradient(to right, #e3f2fd, #ffffff)",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                    // justifyContent:"space-between"
-                  }}
-                >
-                  <Grid container spacing={2} justifyContent="space-between">
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="subtitle2"
-                        color="textSecondary"
-                        fontWeight={600}
-                      >
-                        Name
-                      </Typography>
-                      <Typography variant="body1" fontWeight={500}>
-                        {receiver.name}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="subtitle2"
-                        color="textSecondary"
-                        fontWeight={600}
-                      >
-                        Establishment
-                      </Typography>
-                      <Typography variant="body1" fontWeight={500}>
-                        {receiver.establishment}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="subtitle2"
-                        color="textSecondary"
-                        fontWeight={600}
-                      >
-                        Role
-                      </Typography>
-                      <Typography variant="body1" fontWeight={500}>
-                        {receiver.role}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="subtitle2"
-                        color="textSecondary"
-                        fontWeight={600}
-                      >
-                        Mobile
-                      </Typography>
-                      <Typography variant="body1" fontWeight={500}>
-                        {receiver.mobile}
-                      </Typography>
-                    </Grid>
+        {/* ✅ Display W1 Balance */}
+        <Typography
+          variant="subtitle1"
+          sx={{ fontWeight: 600, mb: 2, color: "green", textAlign: "center" }}
+        >
+          Available Main Balance: ₹{w1Balance.toFixed(2)}
+        </Typography>
+
+        <TextField
+          label="Enter Receiver's Login Id"
+          variant="outlined"
+          fullWidth
+          value={mobile}
+          onChange={(e) => {
+            let val = e.target.value;
+            setMobile(val);
+            setMobileError(""); // clear error on typing
+          }}
+          margin="normal"
+          inputProps={{ maxLength: 10 }}
+          sx={{ mb: 3, "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
+          error={Boolean(mobileError)}
+          helperText={mobileError}
+        />
+
+        {loading && (
+          <Grid container justifyContent="center" sx={{ my: 2 }}>
+            <CircularProgress />
+          </Grid>
+        )}
+
+        {/* {error && (
+          <Typography color="error" sx={{ mt: 1, mb: 2, textAlign: "center" }}>
+            {error}
+          </Typography>
+        )} */}
+        {success && (
+          <Typography
+            color="success.main"
+            sx={{ mt: 1, mb: 2, textAlign: "center" }}
+          >
+            {success}
+          </Typography>
+        )}
+
+        <CommonModal
+          title="W1 TO W1 Transfer"
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          footerButtons={[]}
+        >
+          {receiver && (
+            <>
+              <Typography
+                variant="h6"
+                sx={{ color: "#1976d2", fontWeight: 700, textAlign: "center" }}
+              >
+                Receiver Details
+              </Typography>
+
+              <Card
+                elevation={4}
+                sx={{
+                  borderRadius: 3,
+                  p: 2,
+                  background: "linear-gradient(to right, #e3f2fd, #ffffff)",
+                }}
+              >
+                <Grid container spacing={2} justifyContent="space-between">
+                  <Grid item xs={6}>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      Name
+                    </Typography>
+                    <Typography variant="body1" fontWeight={500}>
+                      {receiver.name}
+                    </Typography>
                   </Grid>
-                </Card>
+                  <Grid item xs={6}>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      Establishment
+                    </Typography>
+                    <Typography variant="body1" fontWeight={500}>
+                      {receiver.establishment}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      Role
+                    </Typography>
+                    <Typography variant="body1" fontWeight={500}>
+                      {receiver.role}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      Mobile
+                    </Typography>
+                    <Typography variant="body1" fontWeight={500}>
+                      {receiver.mobile}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </Card>
 
-                {/* Amount + Remark */}
-                <TextField
-                  label="Enter Amount"
-                  variant="outlined"
-                  fullWidth
-                  value={amount}
-                  onChange={(e) =>
-                    setAmount(e.target.value.replace(/[^0-9.]/g, ""))
+              <TextField
+                label="Enter Amount"
+                variant="outlined"
+                fullWidth
+                value={amount}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^0-9.]/g, "");
+                  setAmount(val);
+
+                  if (!val) {
+                    setAmountError("Please enter an amount");
+                  } else if (parseFloat(val) > w1Balance) {
+                    setAmountError(
+                      `You cannot transfer more than ₹${w1Balance}.`
+                    );
+                  } else {
+                    setAmountError("");
                   }
-                  margin="normal"
-                  sx={{
-                    "& .MuiOutlinedInput-root": { borderRadius: 2 },
-                    mb: 1,
-                  }}
-                />
+                }}
+                margin="normal"
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 }, mb: 1 }}
+                error={Boolean(amountError)}
+                helperText={amountError}
+              />
 
-                <TextField
-                  label="Remark"
-                  variant="outlined"
-                  fullWidth
-                  value={remark}
-                  onChange={(e) => setRemark(e.target.value)}
-                  margin="normal"
-                  sx={{
-                    "& .MuiOutlinedInput-root": { borderRadius: 2 },
-                    mb: 2,
-                  }}
-                />
+              <TextField
+                label="Remark"
+                variant="outlined"
+                fullWidth
+                value={remark}
+                onChange={(e) => {
+                  setRemark(e.target.value);
+                  setRemarkError("");
+                }}
+                margin="normal"
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 }, mb: 2 }}
+                error={Boolean(remarkError)}
+                helperText={remarkError}
+              />
 
-                <Button
-                  variant="contained"
-                  fullWidth
-                  sx={{
-                    mt: 1,
-                    py: 1.8,
-                    fontSize: "1rem",
-                    borderRadius: 3,
-                    textTransform: "none",
-                    background:
-                      "linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
-                    "&:hover": {
-                      background:
-                        "linear-gradient(90deg, #1565c0 0%, #1e88e5 100%)",
-                    },
-                  }}
-                  onClick={handleSendClick}
-                  disabled={creating}
-                >
-                  {creating ? (
-                    <CircularProgress size={24} sx={{ color: "#fff" }} />
-                  ) : (
-                    "Send Amount"
-                  )}
-                </Button>
-              </>
-            )}
-          </CommonModal>
+              <Button
+                variant="contained"
+                fullWidth
+                sx={{
+                  mt: 1,
+                  py: 1.8,
+                  fontSize: "1rem",
+                  borderRadius: 3,
+                  textTransform: "none",
+                }}
+                onClick={handleSendClick}
+                disabled={creating}
+              >
+                {creating ? (
+                  <CircularProgress size={24} sx={{ color: "#fff" }} />
+                ) : (
+                  "Send Amount"
+                )}
+              </Button>
+            </>
+          )}
+        </CommonModal>
 
-          {/* MPIN Modal */}
-          <CommonMpinModal
-            open={mpinModalOpen}
-            setOpen={setMpinModalOpen}
-            title="Enter MPIN"
-            mPinCallBack={handleCreateTransfer} // MPIN entered -> create transfer
-          />
-        </Box>
+        <CommonMpinModal
+          open={mpinModalOpen}
+          setOpen={setMpinModalOpen}
+          title="Enter MPIN"
+          mPinCallBack={handleCreateTransfer}
+        />
       </Box>
     </Box>
   );
