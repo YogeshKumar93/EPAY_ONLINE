@@ -54,6 +54,7 @@ import {
 import { useToast } from "../utils/ToastContext";
 import LevinBeneficiaryDetails from "./LevinUpiBeneficiaryDetails";
 import AuthContext from "../contexts/AuthContext";
+import LevinUpiBeneficiaryDetails from "./LevinUpiBeneficiaryDetails";
 
 const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
   const theme = useTheme();
@@ -537,7 +538,7 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
 
       {/* Send Money Modal */}
       {openPayModal && (
-        <LevinBeneficiaryDetails
+        <LevinUpiBeneficiaryDetails
           open={openPayModal}
           onClose={() => setOpenPayModal(false)}
           beneficiary={selectedBeneficiary}
