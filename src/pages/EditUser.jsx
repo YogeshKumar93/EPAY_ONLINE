@@ -25,10 +25,12 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
 
   // Define field configurations for each tab
   const TAB_FIELDS = {
-    basic: [
-      { name: "name", label: "Name", type: "text" },
-      { name: "email", label: "Email", type: "text" },
-      { name: "phone", label: "Phone", type: "text" },
+    address: [
+      { name: "address_line1", label: "address_line1", type: "text" },
+      { name: "address_line2", label: "address_line2", type: "text" },
+      { name: "city", label: "city", type: "text" },
+      { name: "state", label: "state", type: "text" },
+      { name: "pincode", label: "pincode", type: "text" },
       // Add other basic fields as needed
     ],
     kyc: [
@@ -38,7 +40,7 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
       { name: "shop_image", label: "Shop Image", type: "file" },
       { name: "photo", label: "Photo", type: "file" },
     ],
-    business: [
+    basic: [
       { name: "business_name", label: "Business Name", type: "text" },
       { name: "business_type", label: "Business Type", type: "text" },
       { name: "address", label: "Address", type: "text" },
