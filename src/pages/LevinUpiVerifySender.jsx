@@ -16,7 +16,7 @@ import ApiEndpoints from "../api/ApiEndpoints";
 import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
 import { useToast } from "../utils/ToastContext";
 
-const LevinVerifySender = ({
+const LevinUpiVerifySender = ({
   open,
   onClose,
   mobile,
@@ -73,7 +73,7 @@ const LevinVerifySender = ({
 
       const { error, response } = await apiCall(
         "post",
-        ApiEndpoints.LEVIN_VERIFY,
+        ApiEndpoints.VERIFY_REMITTER_UPI,
         payload
       );
 
@@ -160,4 +160,4 @@ const LevinVerifySender = ({
   );
 };
 
-export default LevinVerifySender;
+export default LevinUpiVerifySender;

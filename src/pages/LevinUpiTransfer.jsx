@@ -21,13 +21,16 @@ import VerifySenderModal from "./VerifySenderModal";
 import BeneficiaryDetails from "./BeneficiaryDetails";
 import CommonLoader from "../components/common/CommonLoader";
 import { useToast } from "../utils/ToastContext";
-import LevinRegisterRemitter from "./LevinRegisterRemitter";
-import LevinVerifySender from "./LevinVerifySender";
-import LevinBeneficiaryList from "./LevinBeneficiaryList";
-import LevinBeneficiaryDetails from "./LevinBeneficiaryDetails";
+import LevinRegisterRemitter from "./LevinUpiRegisterRemitter";
+import LevinVerifySender from "./LevinUpiVerifySender";
+import LevinBeneficiaryList from "./LevinUpiBeneficiaryList";
+import LevinBeneficiaryDetails from "./LevinUpiBeneficiaryDetails";
 import LevinTransferReceipt from "./LevinTransferReceipt";
 import MobileNumberList from "./MobileNumberList";
 import SearchIcon from "@mui/icons-material/Search";
+import LevinUpiBeneficiaryList from "./LevinUpiBeneficiaryList";
+import LevinUpiRegisterRemitter from "./LevinUpiRegisterRemitter";
+import LevinUpiVerifySender from "./LevinUpiVerifySender";
 
 const LevinUpiTransfer = () => {
   const theme = useTheme();
@@ -274,7 +277,7 @@ const LevinUpiTransfer = () => {
 
             {/* Beneficiary List */}
             <Box width="100%">
-              <LevinBeneficiaryList
+              <LevinUpiBeneficiaryList
                 sender={sender}
                 onSuccess={() => handleFetchSender()}
                 onSelect={(b) => setSelectedBeneficiary(b)}
@@ -409,7 +412,7 @@ const LevinUpiTransfer = () => {
       )}
       {/* Register Modal */}
       {openRegisterModal && (
-        <LevinRegisterRemitter
+        <LevinUpiRegisterRemitter
           open={openRegisterModal}
           onClose={() => setOpenRegisterModal(false)}
           mobile={mobile}
@@ -430,7 +433,7 @@ const LevinUpiTransfer = () => {
 
       {/* Verify Modal */}
       {openVerifyModal && otpData && (
-        <LevinVerifySender
+        <LevinUpiVerifySender
           open={openVerifyModal}
           onClose={() => setOpenVerifyModal(false)}
           mobile={otpData.mobile_number}

@@ -19,7 +19,7 @@ import ApiEndpoints from "../api/ApiEndpoints";
 import { useToast } from "../utils/ToastContext";
 import AuthContext from "../contexts/AuthContext";
 
-const LevinRegisterRemitter = ({ open, onClose, mobile, onRegistered }) => {
+const LevinUpiRegisterRemitter = ({ open, onClose, mobile, onRegistered }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const { showToast } = useToast();
@@ -54,7 +54,7 @@ const LevinRegisterRemitter = ({ open, onClose, mobile, onRegistered }) => {
 
       const { error, response } = await apiCall(
         "post",
-        ApiEndpoints.LEVIN_REGISTER,
+        ApiEndpoints.REGISTER_REMITTER_UPI,
         payload
       );
 
@@ -240,4 +240,4 @@ const LevinRegisterRemitter = ({ open, onClose, mobile, onRegistered }) => {
   );
 };
 
-export default LevinRegisterRemitter;
+export default LevinUpiRegisterRemitter;
