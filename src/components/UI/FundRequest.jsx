@@ -280,19 +280,20 @@ const FundRequest = () => {
         name: "Remark",
         selector: (row) => (
           <Tooltip title={row?.remark}>
-            <Typography noWrap>{row?.remark}</Typography>
+            <Typography Wrap>{row?.remark}</Typography>
           </Tooltip>
+          
         ),
-        grow: 2,
+       grow:1,
       },
       {
         name: "Admin Remark",
         selector: (row) => (
           <Tooltip title={row?.admin_remark}>
-            <Typography noWrap>{row?.admin_remark || "N/A"}</Typography>
+            <Typography Wrap>{row?.admin_remark || "N/A"}</Typography>
           </Tooltip>
         ),
-        grow: 2,
+      grow:1,
       },
       {
         name: "Status",
