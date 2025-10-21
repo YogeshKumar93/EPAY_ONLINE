@@ -346,9 +346,19 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
                   secondaryAction={
                     <Stack direction="row" spacing={1}>
                       {b.is_verified === 1 ? (
-                        <CheckCircleIcon
-                          sx={{ fontSize: 18, color: "success.main" }}
-                        />
+                        <Box display="flex" alignItems="center" gap={0.3}>
+                          <CheckCircleIcon
+                            sx={{ fontSize: 16, color: "success.main" }}
+                          />
+                          <Typography
+                            variant="caption"
+                            color="success.main"
+                            fontWeight="500"
+                            sx={{ fontSize: "0.75rem" }}
+                          >
+                            Verified
+                          </Typography>
+                        </Box>
                       ) : (
                         <Button
                           variant="outlined"

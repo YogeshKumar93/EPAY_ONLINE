@@ -3,14 +3,11 @@ import {
   Card,
   CardContent,
   Typography,
-  Avatar,
-  Chip,
   Box,
   IconButton,
   Collapse,
   useMediaQuery,
   useTheme,
-  Stack,
   Grid,
 } from "@mui/material";
 import {
@@ -30,17 +27,18 @@ const SenderDetails = ({ sender }) => {
   const handleToggle = () => setOpen((prev) => !prev);
 
   const iconWrapperStyle = {
-    width: 36,
-    height: 36,
+    width: 40,
+    height: 40,
     borderRadius: "50%",
     bgcolor: "#eaf4ff",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    mr: 1.2,
+    mr: 1.5,
+    flexShrink: 0,
   };
 
-  const iconStyle = { fontSize: 18, color: "#5c3ac8" };
+  const iconStyle = { fontSize: 20, color: "#5c3ac8" };
 
   return (
     <Card
@@ -53,44 +51,57 @@ const SenderDetails = ({ sender }) => {
         overflow: "hidden",
       }}
     >
-      {/* Header */}
-      {/* <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="space-between"
-        sx={{
-          p: 1,
-          cursor: isMobile ? "pointer" : "default",
-          background: "#9d72ff",
-          color: "#fff",
-        }}
-        onClick={isMobile ? handleToggle : undefined}
-      >
-        <Box display="flex" alignItems="center">
-          <Person sx={{ mr: 1, fontSize: 18 }} />
+      {/* Collapsible Header for Mobile */}
+      {isMobile && (
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{
+            p: 1,
+            background: "#9d72ff",
+            color: "#fff",
+            cursor: "pointer",
+          }}
+          onClick={handleToggle}
+        >
           <Typography variant="subtitle2" fontWeight={600}>
             Sender Details
           </Typography>
-        </Box> */}
-      {isMobile && (
-        <IconButton size="small" sx={{ color: "white" }}>
-          {open ? <ExpandLess /> : <ExpandMore />}
-        </IconButton>
+          <IconButton size="small" sx={{ color: "white" }}>
+            {open ? <ExpandLess /> : <ExpandMore />}
+          </IconButton>
+        </Box>
       )}
-      {/* </Box> */}
 
       {/* Collapsible Content */}
       <Collapse in={open} timeout="auto" unmountOnExit>
         {sender ? (
-          <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
-            <Grid container spacing={2}>
+          <CardContent
+            sx={{
+              p: { xs: 2, sm: 3 },
+              "&:last-child": { pb: { xs: 2, sm: 3 } },
+              width: "100%",
+            }}
+          >
+            <Grid
+              container
+              spacing={3}
+              justifyContent="space-between"
+              sx={{ width: "100%", m: 0 }}
+            >
               {/* Name */}
-              <Grid item xs={12} sm={6}>
-                <Box display="flex" alignItems="center">
+              <Grid item xs={12} sm={6} md={3}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  width="100%"
+                >
                   <Box sx={iconWrapperStyle}>
                     <Person sx={iconStyle} />
                   </Box>
-                  <Box>
+                  <Box flexGrow={1}>
                     <Typography
                       variant="caption"
                       color="text.secondary"
@@ -98,7 +109,7 @@ const SenderDetails = ({ sender }) => {
                     >
                       Name
                     </Typography>
-                    <Typography variant="body2" fontWeight={600}>
+                    <Typography variant="body2" fontWeight={600} noWrap>
                       {sender?.sender_name || "N/A"}
                     </Typography>
                   </Box>
@@ -106,12 +117,17 @@ const SenderDetails = ({ sender }) => {
               </Grid>
 
               {/* Number */}
-              <Grid item xs={12} sm={6}>
-                <Box display="flex" alignItems="center">
+              <Grid item xs={12} sm={6} md={3}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  width="100%"
+                >
                   <Box sx={iconWrapperStyle}>
                     <Phone sx={iconStyle} />
                   </Box>
-                  <Box>
+                  <Box flexGrow={1}>
                     <Typography
                       variant="caption"
                       color="text.secondary"
@@ -127,12 +143,17 @@ const SenderDetails = ({ sender }) => {
               </Grid>
 
               {/* KYC Status */}
-              <Grid item xs={12} sm={6}>
-                <Box display="flex" alignItems="center">
+              <Grid item xs={12} sm={6} md={3}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  width="100%"
+                >
                   <Box sx={iconWrapperStyle}>
                     <VerifiedUser sx={iconStyle} />
                   </Box>
-                  <Box>
+                  <Box flexGrow={1}>
                     <Typography
                       variant="caption"
                       color="text.secondary"
@@ -152,12 +173,17 @@ const SenderDetails = ({ sender }) => {
               </Grid>
 
               {/* Remaining Limit */}
-              <Grid item xs={12} sm={6}>
-                <Box display="flex" alignItems="center">
+              <Grid item xs={12} sm={6} md={3}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  width="100%"
+                >
                   <Box sx={iconWrapperStyle}>
                     <AccountBalance sx={iconStyle} />
                   </Box>
-                  <Box>
+                  <Box flexGrow={1}>
                     <Typography
                       variant="caption"
                       color="text.secondary"
@@ -183,9 +209,14 @@ const SenderDetails = ({ sender }) => {
             alignItems="center"
             justifyContent="center"
             minHeight={120}
+            p={2}
           >
-            <Typography variant="body2" color="text.secondary">
-              Enter Mobile Number or Account Number To View Sender Details
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              textAlign="center"
+            >
+              Enter Mobile Number or Account Number to View Sender Details
             </Typography>
           </Box>
         )}
