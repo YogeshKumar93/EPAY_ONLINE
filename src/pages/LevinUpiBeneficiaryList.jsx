@@ -297,22 +297,26 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
         sx={{ py: 1, px: 2, background: "#6C4BC7" }}
       >
         <Typography variant="subtitle2" color="#fff" fontWeight="600">
-          Beneficiary List ({sender?.beneficiary?.length || 0})
+          Beneficiary List
+          {/* ({sender?.beneficiary?.length || 0}) */}
+          {sender && <>({sender?.beneficiary?.length || 0})</>}
         </Typography>
-        <Button
-          size="small"
-          variant="contained"
-          startIcon={<PersonAddIcon sx={{ fontSize: 14 }} />}
-          onClick={() => setOpenModal(true)}
-          sx={{
-            color: "#000",
-            backgroundColor: "#fff",
-            textTransform: "none",
-            fontSize: "0.7rem",
-          }}
-        >
-          Add Beneficiary
-        </Button>
+        {sender && (
+          <Button
+            size="small"
+            variant="contained"
+            startIcon={<PersonAddIcon sx={{ fontSize: 14 }} />}
+            onClick={() => setOpenModal(true)}
+            sx={{
+              color: "#000",
+              backgroundColor: "#fff",
+              textTransform: "none",
+              fontSize: "0.7rem",
+            }}
+          >
+            Add Beneficiary
+          </Button>
+        )}
       </Box>
 
       {/* List */}
