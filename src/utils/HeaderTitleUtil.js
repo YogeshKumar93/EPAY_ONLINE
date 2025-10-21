@@ -68,6 +68,7 @@ const titleMap = {
     "/customer/login_history": "Login History",
     "/customer/invoice": "Invoices",
     "/customer/travel": "Travel Booking",
+     "/customer/profile": "My Profile",
   },
 
   asm: {
@@ -77,6 +78,7 @@ const titleMap = {
     "/asm/cred-req": "Fund Requests",
     "/asm/my-profile": "My Profile",
     "/asm/login_history": "Login History",
+     "/asm/profile": "My Profile",
   },
 
   zsm: {
@@ -86,6 +88,7 @@ const titleMap = {
     "/zsm/cred-req": "Fund Requests",
     "/zsm/my-profile": "My Profile",
     "/zsm/login_history": "Login History",
+     "/zsm/profile": "My Profile",
   },
 
   md: {
@@ -99,6 +102,7 @@ const titleMap = {
     "/md/my-profile": "My Profile",
     "/md/khata-book": "Khata Book",
     "/md/login_history": "Login History",
+     "/md/profile": "My Profile",
   },
 
   ad: {
@@ -112,6 +116,7 @@ const titleMap = {
     "/ad/my-profile": "My Profile",
     "/ad/khata-book": "Khata Book",
     "/ad/login_history": "Login History",
+     "/ad/profile": "My Profile",
   },
 
   "api-user": {
@@ -133,6 +138,7 @@ const titleMap = {
     "/di/wallet-ledger": "Wallet Ledger",
     "/di/my-profile": "My Profile",
     "/di/login_history": "Login History",
+     "/di/profile": "My Profile",
   },
 };
 

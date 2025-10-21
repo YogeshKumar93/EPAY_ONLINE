@@ -488,10 +488,16 @@ const Wallet2WalletTransfer = ({}) => {
                       <IconButton
                         color="secondary"
                         size="small"
-                        onClick={() =>
-                          navigate("/print-w2w", { state: { txnData: row } })
-                        }
-                      >
+                          onClick={() => {
+                    // Save individual transaction data
+                    sessionStorage.setItem("txnData", JSON.stringify(row));
+
+                    // Open receipt page in a new tab
+                    window.open("/print-w2w", "_blank");
+                  }}
+                  sx={{ backgroundColor: "transparent" }}
+                >
+                      
                         <PrintIcon />
                       </IconButton>
                     </Tooltip>

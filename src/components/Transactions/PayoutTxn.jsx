@@ -74,6 +74,8 @@ const PayoutTxn = ({ query }) => {
   const [openLeinModal, setOpenLeinModal] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [routes, setRoutes] = useState([]);
+    const [openSuccessModal, setOpenSuccessModal] = useState(false);
+  const [selectedSuccessTxn, setSelectedSuccessTxn] = useState(null);
 
   const handleRefundClick = (row) => {
     setSelectedForRefund(row);
@@ -240,6 +242,43 @@ const PayoutTxn = ({ query }) => {
     ],
     [routes] // ✅ depends on routes, so dropdown updates automatically
   );
+
+    const handleSuccessClick = (row) => {
+  setSelectedSuccessTxn(row);
+  setOpenSuccessModal(true);
+};
+ const handleConfirmSuccessTxn = async () => {
+  if (!selectedSuccessTxn) return;
+
+  try {
+    const payload = {
+      txn_id: selectedSuccessTxn.txn_id,
+      operator_id: selectedSuccessTxn.operator_id,
+    };
+
+    const { response, error } = await apiCall(
+      "post",
+      ApiEndpoints.REFUND_SUCCESS_TXN,
+      payload
+    );
+
+    if (response?.status) {
+      showToast(response.message || "Transaction marked as success!", "success");
+      setOpenSuccessModal(false);
+      setSelectedSuccessTxn(null);
+      refreshPlans(); // refresh the table
+    } else {
+      showToast(error?.message || "Failed to mark transaction as success", "error");
+    }
+  } catch (err) {
+    console.error("Error updating success txn:", err);
+    showToast("Something went wrong!", "error");
+  }
+};
+
+
+
+
   const columns = useMemo(
     () => [
       {
@@ -482,12 +521,11 @@ const PayoutTxn = ({ query }) => {
         selector: (row) => (
           <div style={{ textAlign: "left", fontSize: "12px" }}>
             {row.beneficiary_name?.toUpperCase()} <br />
-            {(user?.role === "ret" || user?.role === "dd") && (
               <>
                 {row.account_number} <br />
                 {/* {row.ifsc_code} */}
               </>
-            )}
+          
           </div>
         ),
         wrap: true,
@@ -637,8 +675,12 @@ const PayoutTxn = ({ query }) => {
                   {/* PENDING: CheckCircle + Replay */}
                   {row?.status === "PENDING" && (
                     <>
-                      <Tooltip title="Click To Success">
-                        <DoneIcon sx={{ color: "green", fontSize: 25 }} />
+                     <Tooltip title="Click To Success">
+                              <DoneIcon
+        sx={{ color: "green", fontSize: 25, cursor: "pointer" }}
+        onClick={() => handleSuccessClick(row)} // ✅ open modal
+      />
+
                       </Tooltip>
                       <Tooltip title="Click To Refund">
                         <ReplayIcon
@@ -935,6 +977,32 @@ const PayoutTxn = ({ query }) => {
         <Typography sx={{ fontSize: 14 }}>
           Are you sure you want to refund transaction ID:{" "}
           {selectedForRefund?.txn_id}?
+        </Typography>
+      </CommonModal>
+          <CommonModal
+        open={openSuccessModal}
+        onClose={() => setOpenSuccessModal(false)}
+        title="Confirm Transaction Success"
+        footerButtons={[
+          {
+            text: "Cancel",
+            variant: "outlined",
+            onClick: () => setOpenSuccessModal(false),
+          },
+          {
+            text: "Confirm",
+            variant: "contained",
+            color: "success",
+            onClick: handleConfirmSuccessTxn,
+          },
+        ]}
+      >
+        <Typography variant="body1" sx={{ textAlign: "center" }}>
+          Are you sure you want to mark this transaction as{" "}
+          <b>SUCCESS</b>?
+          <br />
+          <br />
+          <b>Txn ID:</b> {selectedSuccessTxn?.txn_id}
         </Typography>
       </CommonModal>
       {openLeinModal && (
