@@ -26,6 +26,13 @@ const RemitterDetails = ({ sender }) => {
 
   const handleToggle = () => setOpen((prev) => !prev);
 
+  const iconStyle = {
+    bgcolor: "#e6f3fb",
+    color: "#5c3ac8",
+    width: 36,
+    height: 36,
+  };
+
   return (
     <Card
       sx={{
@@ -35,9 +42,10 @@ const RemitterDetails = ({ sender }) => {
         borderColor: "divider",
         overflow: "hidden",
         width: "100%",
+        bgcolor: "#fff",
       }}
     >
-      {/* Mobile Toggle */}
+      {/* Mobile Header Toggle */}
       {isMobile && (
         <Box
           sx={{
@@ -61,106 +69,100 @@ const RemitterDetails = ({ sender }) => {
         </Box>
       )}
 
+      {/* Details Section */}
       <Collapse in={open || !isMobile} timeout="auto" unmountOnExit>
         {sender ? (
-          <Box sx={{ p: 2 }}>
-            <Grid container spacing={2}>
-              {/** Name */}
-              <Grid item xs={12} md={3}>
+          <Box sx={{ p: { xs: 2, sm: 3 }, width: "100%" }}>
+            <Grid
+              container
+              spacing={3}
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              {/* Name */}
+              <Grid item xs={12} sm={6} md={3}>
                 <Box display="flex" alignItems="center" width="100%">
-                  <Avatar
-                    sx={{
-                      bgcolor: "#e6f3fb",
-                      color: "#5c3ac8",
-                      width: 32,
-                      height: 32,
-                    }}
-                  >
+                  <Avatar sx={iconStyle}>
                     <Person fontSize="small" />
                   </Avatar>
-                  <Box ml={1.5}>
-                    <Typography variant="body2" color="text.secondary">
+                  <Box ml={1.5} flexGrow={1}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      fontWeight={500}
+                    >
                       Name
                     </Typography>
-                    <Typography sx={{ fontSize: "12px" }}>
+                    <Typography sx={{ fontSize: "13px", fontWeight: 600 }}>
                       {sender.firstName || sender?.fname}{" "}
-                      {sender.lastName || sender?.lname}
+                      {sender.lastName || sender?.lname || ""}
                     </Typography>
                   </Box>
                 </Box>
               </Grid>
 
-              {/** Number */}
-              <Grid item xs={12} md={3}>
+              {/* Number */}
+              <Grid item xs={12} sm={6} md={3}>
                 <Box display="flex" alignItems="center" width="100%">
-                  <Avatar
-                    sx={{
-                      bgcolor: "#e6f3fb",
-                      color: "#5c3ac8",
-                      width: 32,
-                      height: 32,
-                    }}
-                  >
+                  <Avatar sx={iconStyle}>
                     <Phone fontSize="small" />
                   </Avatar>
-                  <Box ml={1.5}>
-                    <Typography variant="body2" color="text.secondary">
+                  <Box ml={1.5} flexGrow={1}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      fontWeight={500}
+                    >
                       Number
                     </Typography>
-                    <Typography sx={{ fontSize: "12px" }}>
+                    <Typography sx={{ fontSize: "13px", fontWeight: 600 }}>
                       {sender.mobileNumber || sender.mobile}
                     </Typography>
                   </Box>
                 </Box>
               </Grid>
 
-              {/** Limit per txn */}
-              <Grid item xs={12} md={3}>
+              {/* Limit per txn */}
+              <Grid item xs={12} sm={6} md={3}>
                 <Box display="flex" alignItems="center" width="100%">
-                  <Avatar
-                    sx={{
-                      bgcolor: "#e6f3fb",
-                      color: "#5c3ac8",
-                      width: 32,
-                      height: 32,
-                    }}
-                  >
+                  <Avatar sx={iconStyle}>
                     <Verified fontSize="small" />
                   </Avatar>
-                  <Box ml={1.5}>
-                    <Typography variant="body2" color="text.secondary">
-                      Limit per txn
+                  <Box ml={1.5} flexGrow={1}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      fontWeight={500}
+                    >
+                      Limit Per Txn
                     </Typography>
-                    <Typography sx={{ fontSize: "12px" }}>
-                      {sender.limitPerTransaction || 25000}
+                    <Typography sx={{ fontSize: "13px", fontWeight: 600 }}>
+                      ₹{sender.limitPerTransaction || 25000}
                     </Typography>
                   </Box>
                 </Box>
               </Grid>
 
-              {/** Limit Available */}
-              <Grid item xs={12} md={3}>
+              {/* Limit Available */}
+              <Grid item xs={12} sm={6} md={3}>
                 <Box display="flex" alignItems="center" width="100%">
-                  <Avatar
-                    sx={{
-                      bgcolor: "#e6f3fb",
-                      color: "#5c3ac8",
-                      width: 32,
-                      height: 32,
-                    }}
-                  >
+                  <Avatar sx={iconStyle}>
                     <AccountBalance fontSize="small" />
                   </Avatar>
-                  <Box ml={1.5}>
-                    <Typography variant="body2" color="text.secondary">
+                  <Box ml={1.5} flexGrow={1}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      fontWeight={500}
+                    >
                       Limit Available
                     </Typography>
                     <Typography
                       fontWeight="bold"
                       color="#5c3ac8"
-                      sx={{ fontSize: "12px" }}
+                      sx={{ fontSize: "13px" }}
                     >
-                      ₹{sender.limitAvailable || sender.limit}
+                      ₹{sender.limitAvailable || sender.limit || "0"}
                     </Typography>
                   </Box>
                 </Box>

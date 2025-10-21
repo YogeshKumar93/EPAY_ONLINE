@@ -297,22 +297,26 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
         sx={{ py: 1, px: 2, background: "#6C4BC7" }}
       >
         <Typography variant="subtitle2" color="#fff" fontWeight="600">
-          Beneficiary List ({sender?.beneficiary?.length || 0})
+          Beneficiary List
+          {/* ({sender?.beneficiary?.length || 0}) */}
+          {sender && <>({sender?.beneficiary?.length || 0})</>}
         </Typography>
-        <Button
-          size="small"
-          variant="contained"
-          startIcon={<PersonAddIcon sx={{ fontSize: 14 }} />}
-          onClick={() => setOpenModal(true)}
-          sx={{
-            color: "#000",
-            backgroundColor: "#fff",
-            textTransform: "none",
-            fontSize: "0.7rem",
-          }}
-        >
-          Add Beneficiary
-        </Button>
+        {sender && (
+          <Button
+            size="small"
+            variant="contained"
+            startIcon={<PersonAddIcon sx={{ fontSize: 14 }} />}
+            onClick={() => setOpenModal(true)}
+            sx={{
+              color: "#000",
+              backgroundColor: "#fff",
+              textTransform: "none",
+              fontSize: "0.7rem",
+            }}
+          >
+            Add Beneficiary
+          </Button>
+        )}
       </Box>
 
       {/* List */}
@@ -346,9 +350,19 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
                   secondaryAction={
                     <Stack direction="row" spacing={1}>
                       {b.is_verified === 1 ? (
-                        <CheckCircleIcon
-                          sx={{ fontSize: 18, color: "success.main" }}
-                        />
+                        <Box display="flex" alignItems="center" gap={0.3}>
+                          <CheckCircleIcon
+                            sx={{ fontSize: 16, color: "success.main" }}
+                          />
+                          <Typography
+                            variant="caption"
+                            color="success.main"
+                            fontWeight="500"
+                            sx={{ fontSize: "0.75rem" }}
+                          >
+                            Verified
+                          </Typography>
+                        </Box>
                       ) : (
                         <Button
                           variant="outlined"

@@ -231,7 +231,7 @@ const LevinUpiTransfer = () => {
               </Divider>
             </Box>
 
-            <TextField
+            {/* <TextField
               label="Account Number"
               variant="outlined"
               value={accountNumber}
@@ -255,7 +255,7 @@ const LevinUpiTransfer = () => {
                   </InputAdornment>
                 ),
               }}
-            />
+            /> */}
             {loading && (
               <CommonLoader
                 loading={loading}
