@@ -16,6 +16,7 @@ import {
   Tooltip,
   TextField,
   Grid,
+  MenuItem,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
@@ -75,17 +76,44 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
 
   // schema for add form
-  const { schema, formData, handleChange, errors, setErrors, loading } =
-    useSchemaForm(ApiEndpoints.GET_UPI_SCHEMA, openModal, {
-      sender_id: sender?.id,
-    });
+  // const { schema, formData, handleChange, errors, setErrors, loading } =
+  //   useSchemaForm(ApiEndpoints.GET_UPI_SCHEMA, openModal, {
+  //     sender_id: sender?.id,
+  //   });
+  const [formData, setFormData] = useState({
+    beneficiary_name: "",
+    prefix: "",
+    suffix: "ybl",
+  });
+  const [errors, setErrors] = useState({});
+
+  // ✅ Hardcoded suffix options
+  const suffixOptions = [
+    "ybl",
+    "paytm",
+    "ibl",
+    "axl",
+    "okicici",
+    "okaxis",
+    "okhdfcbank",
+    "kotak",
+    "oksbi",
+    "phpnepay",
+  ];
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   // ✅ Step 1: Verify + Add new beneficiary
   const handleAddAndVerifyBeneficiary = () => {
     setErrors({});
 
     // Combine prefix and suffix to form the complete UPI ID/account
-    const combinedBenAcc = `${formData.prefix}@${formData.suffix}`;
+    const suffixToUse =
+      formData.suffix === "other" ? formData.custom_suffix : formData.suffix;
+    const combinedBenAcc = `${formData.prefix}@${suffixToUse}`;
 
     const payload = {
       ...formData,
@@ -441,7 +469,7 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
                         {b.beneficiary_name}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        IFSC: {b.ifsc_code} | A/C: {b.account_number}
+                        VPA: {b.account_number}
                       </Typography>
                     </Box>
                   </Box>
@@ -461,11 +489,7 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
           iconType="info"
           size="small"
           dividers
-          fieldConfig={schema}
-          formData={formData}
-          handleChange={handleChange}
-          errors={errors}
-          loading={loading || submitting}
+          loading={submitting}
           footerButtons={[
             {
               text: submitting ? "Saving..." : "Verify and Add Beneficiary",
@@ -475,7 +499,76 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
               disabled: submitting,
             },
           ]}
-        />
+        >
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                label="Beneficiary Name"
+                name="beneficiary_name"
+                fullWidth
+                size="small"
+                value={formData.beneficiary_name}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label="Prefix"
+                name="prefix"
+                fullWidth
+                size="small"
+                value={formData.prefix}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              {formData.suffix === "other" ? (
+                <TextField
+                  label="Custom Suffix"
+                  name="custom_suffix"
+                  fullWidth
+                  size="small"
+                  placeholder="Enter your UPI suffix (e.g., mybank)"
+                  value={formData.custom_suffix || ""}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      custom_suffix: e.target.value,
+                    }))
+                  }
+                  InputProps={{
+                    startAdornment: <Typography sx={{ mr: 1 }}>@</Typography>,
+                  }}
+                />
+              ) : (
+                <TextField
+                  select
+                  label="Suffix"
+                  name="suffix"
+                  fullWidth
+                  size="small"
+                  value={formData.suffix}
+                  onChange={(e) => {
+                    const { value } = e.target;
+                    setFormData((prev) => ({
+                      ...prev,
+                      suffix: value,
+                      custom_suffix:
+                        value === "other" ? "" : prev.custom_suffix,
+                    }));
+                  }}
+                >
+                  {suffixOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      @{option}
+                    </MenuItem>
+                  ))}
+                  <MenuItem value="other">Other</MenuItem>
+                </TextField>
+              )}
+            </Grid>
+          </Grid>
+        </CommonModal>
       )}
 
       {/* MPIN Verification Modal */}
