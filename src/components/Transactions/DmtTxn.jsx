@@ -18,6 +18,7 @@ import {
   ddmmyy,
   ddmmyyWithTime,
 } from "../../utils/DateUtils";
+import Swal from "sweetalert2";
 import CommonStatus from "../common/CommonStatus";
 import ComplaintForm from "../ComplaintForm";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -64,8 +65,17 @@ const DmtTxn = ({ query }) => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedTransaction, setSelectedTrancation] = useState("");
   const [routes, setRoutes] = useState([]);
+  const [openSuccessModal, setOpenSuccessModal] = useState(false);
+const [selectedSuccessTxn, setSelectedSuccessTxn] = useState(null);
+
 
   const [openLeinModal, setOpenLeinModal] = useState(false);
+
+  const handleSuccessClick = (row) => {
+  setSelectedSuccessTxn(row);
+  setOpenSuccessModal(true);
+};
+
   useEffect(() => {
     const fetchRoutes = async () => {
       try {
@@ -215,6 +225,36 @@ const DmtTxn = ({ query }) => {
     ],
     [routes] // ✅ depends on routes, so dropdown updates automatically
   );
+
+ const handleConfirmSuccessTxn = async () => {
+  if (!selectedSuccessTxn) return;
+
+  try {
+    const payload = {
+      txn_id: selectedSuccessTxn.txn_id,
+      operator_id: selectedSuccessTxn.operator_id,
+    };
+
+    const { response, error } = await apiCall(
+      "post",
+      ApiEndpoints.REFUND_SUCCESS_TXN,
+      payload
+    );
+
+    if (response?.status) {
+      showToast(response.message || "Transaction marked as success!", "success");
+      setOpenSuccessModal(false);
+      setSelectedSuccessTxn(null);
+      refreshPlans(); // refresh the table
+    } else {
+      showToast(error?.message || "Failed to mark transaction as success", "error");
+    }
+  } catch (err) {
+    console.error("Error updating success txn:", err);
+    showToast("Something went wrong!", "error");
+  }
+};
+
 
   const columns = useMemo(() => {
     const baseColumns = [
@@ -609,8 +649,13 @@ const DmtTxn = ({ query }) => {
                   {row?.status === "PENDING" && (
                     <>
                       <Tooltip title="Click To Success">
-                        <DoneIcon sx={{ color: "green", fontSize: 25 }} />
+                              <DoneIcon
+        sx={{ color: "green", fontSize: 25, cursor: "pointer" }}
+        onClick={() => handleSuccessClick(row)} // ✅ open modal
+      />
+
                       </Tooltip>
+
                       <Tooltip title="Click To Refund">
                         <ReplayIcon
                           sx={{ color: "red", fontSize: 25, cursor: "pointer" }}
@@ -682,15 +727,15 @@ const DmtTxn = ({ query }) => {
                 <IconButton
                   color="secondary"
                   size="small"
-                    onClick={() => {
-      // Save individual transaction data
-      sessionStorage.setItem("txnData", JSON.stringify(row));
+                  onClick={() => {
+                    // Save individual transaction data
+                    sessionStorage.setItem("txnData", JSON.stringify(row));
 
-      // Open receipt page in a new tab
-      window.open("/print-dmt2", "_blank");
-    }}
-    sx={{ backgroundColor: "transparent" }}
-  >
+                    // Open receipt page in a new tab
+                    window.open("/print-dmt2", "_blank");
+                  }}
+                  sx={{ backgroundColor: "transparent" }}
+                >
                   <PrintIcon />
                 </IconButton>
               </Tooltip>
@@ -800,18 +845,23 @@ const DmtTxn = ({ query }) => {
                       size="small"
                       color="primary"
                       onClick={() => {
-      if (!selectedRows || selectedRows.length === 0) {
-        alert("Please select at least one transaction to print.");
-        return;
-      }
+                        if (!selectedRows || selectedRows.length === 0) {
+                          alert(
+                            "Please select at least one transaction to print."
+                          );
+                          return;
+                        }
 
-      // Save all selected rows
-      sessionStorage.setItem("txnData", JSON.stringify(selectedRows));
+                        // Save all selected rows
+                        sessionStorage.setItem(
+                          "txnData",
+                          JSON.stringify(selectedRows)
+                        );
 
-      // Open receipt page in a new tab
-      window.open("/print-dmt2", "_blank");
-    }}
-    sx={{ ml: 1 }}
+                        // Open receipt page in a new tab
+                        window.open("/print-dmt2", "_blank");
+                      }}
+                      sx={{ ml: 1 }}
                     >
                       <PrintIcon
                         sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
@@ -931,6 +981,33 @@ const DmtTxn = ({ query }) => {
           {selectedForRefund?.txn_id}?
         </Typography>
       </CommonModal>
+      <CommonModal
+  open={openSuccessModal}
+  onClose={() => setOpenSuccessModal(false)}
+  title="Confirm Transaction Success"
+  footerButtons={[
+    {
+      text: "Cancel",
+      variant: "outlined",
+      onClick: () => setOpenSuccessModal(false),
+    },
+    {
+      text: "Confirm",
+      variant: "contained",
+      color: "success",
+      onClick: handleConfirmSuccessTxn,
+    },
+  ]}
+>
+  <Typography variant="body1" sx={{ textAlign: "center" }}>
+    Are you sure you want to mark this transaction as{" "}
+    <b>SUCCESS</b>?
+    <br />
+    <br />
+    <b>Txn ID:</b> {selectedSuccessTxn?.txn_id}
+  </Typography>
+</CommonModal>
+
       {openLeinModal && (
         <AddLein
           open={openLeinModal}
@@ -940,6 +1017,9 @@ const DmtTxn = ({ query }) => {
           type="transaction"
         />
       )}
+
+
+
     </>
   );
 };
