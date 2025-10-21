@@ -521,12 +521,11 @@ const PayoutTxn = ({ query }) => {
         selector: (row) => (
           <div style={{ textAlign: "left", fontSize: "12px" }}>
             {row.beneficiary_name?.toUpperCase()} <br />
-            {(user?.role === "ret" || user?.role === "dd") && (
               <>
                 {row.account_number} <br />
                 {/* {row.ifsc_code} */}
               </>
-            )}
+          
           </div>
         ),
         wrap: true,
