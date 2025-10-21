@@ -326,7 +326,7 @@ const Users = ({ query }) => {
 
       {
         id: "id",
-        label: "User",
+        label: "Type Est.",
         type: "autocomplete",
         options: userOptions,
         onSearch: (val) => setUserSearch(val),
