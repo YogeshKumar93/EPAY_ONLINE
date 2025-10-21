@@ -55,10 +55,10 @@ const AepsTxn = ({ query }) => {
 
   const [reason, setReason] = useState("");
 
-  const handleOpenLein = (row) => {
-    setOpenLeinModal(true);
-    setSelectedTrancation(row);
-  };
+  // const handleOpenLein = (row) => {
+  //   setOpenLeinModal(true);
+  //   setSelectedTrancation(row);
+  // };
 
   const refreshPlans = () => {
     fetchUsersRef.current?.();
