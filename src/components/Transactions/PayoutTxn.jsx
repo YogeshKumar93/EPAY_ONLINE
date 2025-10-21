@@ -219,6 +219,18 @@ const PayoutTxn = ({ query }) => {
         roles: ["adm", "sadm"],
       },
       {
+        id: "service",
+        label: "Service Name",
+        type: "dropdown",
+        options: [
+          { value: "Vendor Payment 1", label: "Vendor Payment 1" },
+          { value: "Vendor Payment 2", label: "Vendor Payment 2" },
+          { value: "Upi Payment 1", label: "Upi Payment 1" },
+          { value: "Upi Payment 2", label: "Upi Payment 2" },
+        ],
+        defaultValue: "pending",
+      },
+      {
         id: "user_id",
         label: "User ID",
         type: "textfield",
