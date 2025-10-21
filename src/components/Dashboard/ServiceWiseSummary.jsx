@@ -218,7 +218,7 @@ const ServiceWiseSummary = () => {
       <Box
         sx={{
           p: 2,
-          background: "#1B6AAB",
+          background: "#6C4BC7",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
