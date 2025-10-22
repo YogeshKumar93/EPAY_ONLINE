@@ -603,11 +603,7 @@ const PayoutTxn = ({ query }) => {
             },
           ]
         : []),
-           ...(user?.role === "adm" ||
-     
-      user?.role === "sadm" 
-     
-     
+      ...(user?.role === "adm" || user?.role === "sadm"
         ? [
             {
               name: "A Comm",
@@ -622,7 +618,6 @@ const PayoutTxn = ({ query }) => {
                   <div style={{ color: "green" }}>
                     {parseFloat(row?.a_comm || 0).toFixed(2)}
                   </div>
-                
                 </div>
               ),
               right: true,
@@ -707,7 +702,7 @@ const PayoutTxn = ({ query }) => {
                       handleOpenLein(row);
                     }}
                   >
-                    Mark Lein
+                    Lein
                   </MenuItem>
                 </div>
               ),

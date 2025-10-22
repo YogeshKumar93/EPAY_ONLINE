@@ -550,11 +550,7 @@ const DmtTxn = ({ query }) => {
             },
           ]
         : []),
-             ...(user?.role === "adm" ||
-     
-      user?.role === "sadm" 
-     
-     
+      ...(user?.role === "adm" || user?.role === "sadm"
         ? [
             {
               name: "A Comm",
@@ -569,7 +565,6 @@ const DmtTxn = ({ query }) => {
                   <div style={{ color: "green" }}>
                     {parseFloat(row?.a_comm || 0).toFixed(2)}
                   </div>
-                
                 </div>
               ),
               right: true,
@@ -684,7 +679,7 @@ const DmtTxn = ({ query }) => {
                       handleClose();
                     }}
                   >
-                    Mark Lein
+                    Lein
                   </MenuItem>
                 </div>
               ),
