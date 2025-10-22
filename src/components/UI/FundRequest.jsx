@@ -301,7 +301,7 @@ const FundRequest = () => {
         center: true,
       },
       {
-        name: "Reciept",
+        name: "Receipt",
         selector: (row) => <ReceiptButton row={row} />,
         center: true,
       },
