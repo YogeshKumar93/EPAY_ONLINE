@@ -190,9 +190,7 @@ const LevinUpiBeneficiaryDetails = ({
       <Box sx={{ bgcolor: "#f0f8ff", p: 2, borderRadius: 2 }}>
         {[
           { label: "Name", value: beneficiary.beneficiary_name },
-          { label: "Account Number", value: beneficiary.account_number },
-          { label: "Bank", value: beneficiary.bank_name },
-          { label: "IFSC", value: beneficiary.ifsc_code },
+          { label: "VPA", value: beneficiary.account_number },
         ].map((item, index) => (
           <Box key={index} display="flex" mb={1}>
             <Typography
