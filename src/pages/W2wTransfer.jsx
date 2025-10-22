@@ -33,10 +33,25 @@ const W2wTransfer = ({ handleFetchRef, type }) => {
   const [amountError, setAmountError] = useState("");
   const [remarkError, setRemarkError] = useState("");
 const navigate = useNavigate();
+  const authCtx = useContext(AuthContext);
+  const user = authCtx?.user;
 
   const { showToast } = useToast();
-  const authCtx = useContext(AuthContext);
+ 
   const { loadUserProfile } = authCtx;
+  const dashboardRoutes = {
+  adm: "/admin/dashboard",
+  sadm: "/admin/dashboard",
+  ret: "/customer/dashboard",
+  dd: "/customer/dashboard",
+  di: "/di/dashboard",
+  md: "/md/dashboard",
+  asm: "/asm/dashboard",
+  zsm: "/zsm/dashboard",
+  api: "/api/dashboard",
+};
+const userRole = user?.role;
+
 
   // 🟢 Fetch user profile and get W1 balance
   useEffect(() => {
@@ -143,7 +158,10 @@ const navigate = useNavigate();
         setMobile("");
         setModalOpen(false);
         await loadUserProfile(); // ✅ refresh user data
-        navigate("/customer/dashboard"); 
+       if (userRole && dashboardRoutes[userRole]) {
+  navigate(dashboardRoutes[userRole]);
+}
+
       } else {
         showToast(error.message || error.errors, "error");
         setError(error?.message || "Transfer failed");

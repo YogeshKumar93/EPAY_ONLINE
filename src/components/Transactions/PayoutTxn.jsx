@@ -56,6 +56,7 @@ import FileDownloadIcon from "@mui/icons-material/FileDownload"; // Excel export
 import Scheduler from "../common/Scheduler";
 import TransactionDrawer from "../TransactionDrawer";
 import ConfirmSuccessTxnModal from "./ConfirmSuccessTxnModal";
+import ConfirmActionModal from "./ConfirmActionModal";
 
 const PayoutTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
@@ -77,6 +78,9 @@ const PayoutTxn = ({ query }) => {
   const [routes, setRoutes] = useState([]);
   const [openSuccessModal, setOpenSuccessModal] = useState(false);
   const [selectedSuccessTxn, setSelectedSuccessTxn] = useState(null);
+  const [refundModalOpen, setRefundModalOpen] = useState(false);
+const [refundTxnId, setRefundTxnId] = useState(null);
+
 
   const handleRefundClick = (row) => {
     setSelectedForRefund(row);
@@ -781,14 +785,14 @@ const PayoutTxn = ({ query }) => {
                   {/* FAILED or REFUND: Refresh */}
                   {row?.status === "REFUNDPENDING" && (
                     <Tooltip title="REFUND TXN">
-                      <ReplayIcon
-                        sx={{
-                          color: "orange",
-                          fontSize: 25,
-                          cursor: "pointer",
-                        }}
-                        onClick={() => handleRefundTxn(row)}
-                      />
+                   <ReplayIcon
+  sx={{ color: "orange", fontSize: 25, cursor: "pointer" }}
+  onClick={() => {
+    setRefundTxnId(row.txn_id);
+    setRefundModalOpen(true);
+  }}
+/>
+
                     </Tooltip>
                   )}
                 </div>
@@ -980,6 +984,17 @@ const PayoutTxn = ({ query }) => {
         txnId={selectedSuccessTxn?.txn_id}
         onSuccess={refreshPlans} // optional: refresh the table after success
       />
+      <ConfirmActionModal
+  open={refundModalOpen}
+  onClose={() => setRefundModalOpen(false)}
+  title="Confirm Refund"
+  txnId={refundTxnId}
+  apiEndpoint={ApiEndpoints.REFUND_TXN}
+  onSuccess={refreshPlans}
+  confirmText="Refund"
+  cancelText="Cancel"
+/>
+
       {openLeinModal && (
         <AddLein
           open={openLeinModal}
