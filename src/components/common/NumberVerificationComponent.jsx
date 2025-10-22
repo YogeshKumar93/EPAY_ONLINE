@@ -120,99 +120,99 @@ const NumberVerificationComponent = ({ open, onClose, username }) => {
       title="Change Mobile Number"
       footerButtons={[]}
     >
-      <Box sx={{mt:2}}>
-      <Typography variant="h5" gutterBottom align="center" sx={{ mb: 3 }}>
-        {step === 1 ? "Initiate Number Change" : "Verify OTPs"}
-      </Typography>
+      <Box sx={{ mt: 2 }}>
+        <Typography variant="h5" gutterBottom align="center" sx={{ mb: 3 }}>
+          {step === 1 ? "Initiate Number Change" : "Verify OTPs"}
+        </Typography>
 
-      <Box>
-        <Grid container spacing={2}>
-          {step === 1 ? (
-            <>
-              {/* Old Number */}
+        <Box>
+          <Grid container spacing={2}>
+            {step === 1 ? (
+              <>
+                {/* Old Number */}
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Old Number"
+                    name="oldNumber"
+                    value={formData.oldNumber}
+                    onChange={handleInputChange}
+                    error={!!errors.oldNumber}
+                    helperText={errors.oldNumber}
+                    placeholder="Enter your old number"
+                  />
+                </Grid>
+
+                {/* New Number */}
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="New Number"
+                    name="newNumber"
+                    value={formData.newNumber}
+                    onChange={handleInputChange}
+                    error={!!errors.newNumber}
+                    helperText={errors.newNumber}
+                    placeholder="Enter your new number"
+                  />
+                </Grid>
+
+                <Grid item xs={12} sx={{ textAlign: "center" }}>
+                  <Button variant="contained" onClick={handleInitiate}>
+                    Send OTP's
+                  </Button>
+                </Grid>
+              </>
+            ) : (
+              <>
+                {/* Old OTP */}
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="OTP sent to Old Number"
+                    name="oldOtp"
+                    value={formData.oldOtp}
+                    onChange={handleInputChange}
+                    error={!!errors.oldOtp}
+                    helperText={errors.oldOtp}
+                    placeholder="Enter OTP"
+                  />
+                </Grid>
+
+                {/* New OTP */}
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="OTP sent to New Number"
+                    name="newOtp"
+                    value={formData.newOtp}
+                    onChange={handleInputChange}
+                    error={!!errors.newOtp}
+                    helperText={errors.newOtp}
+                    placeholder="Enter OTP"
+                  />
+                </Grid>
+
+                <Grid item xs={12} sx={{ textAlign: "center" }}>
+                  <Button variant="contained" onClick={handleVerify}>
+                    Verify & Change Number
+                  </Button>
+                </Grid>
+              </>
+            )}
+
+            {message && (
               <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Old Number"
-                  name="oldNumber"
-                  value={formData.oldNumber}
-                  onChange={handleInputChange}
-                  error={!!errors.oldNumber}
-                  helperText={errors.oldNumber}
-                  placeholder="Enter your old number"
-                />
+                <Alert
+                  severity={isVerified ? "success" : "info"}
+                  icon={isVerified ? <Verified /> : <ErrorOutline />}
+                >
+                  {message}
+                </Alert>
               </Grid>
-
-              {/* New Number */}
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="New Number"
-                  name="newNumber"
-                  value={formData.newNumber}
-                  onChange={handleInputChange}
-                  error={!!errors.newNumber}
-                  helperText={errors.newNumber}
-                  placeholder="Enter your new number"
-                />
-              </Grid>
-
-              <Grid item xs={12} sx={{ textAlign: "center" }}>
-                <Button variant="contained" onClick={handleInitiate}>
-                  Send OTPs
-                </Button>
-              </Grid>
-            </>
-          ) : (
-            <>
-              {/* Old OTP */}
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="OTP sent to Old Number"
-                  name="oldOtp"
-                  value={formData.oldOtp}
-                  onChange={handleInputChange}
-                  error={!!errors.oldOtp}
-                  helperText={errors.oldOtp}
-                  placeholder="Enter OTP"
-                />
-              </Grid>
-
-              {/* New OTP */}
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="OTP sent to New Number"
-                  name="newOtp"
-                  value={formData.newOtp}
-                  onChange={handleInputChange}
-                  error={!!errors.newOtp}
-                  helperText={errors.newOtp}
-                  placeholder="Enter OTP"
-                />
-              </Grid>
-
-              <Grid item xs={12} sx={{ textAlign: "center" }}>
-                <Button variant="contained" onClick={handleVerify}>
-                  Verify & Change Number
-                </Button>
-              </Grid>
-            </>
-          )}
-
-          {message && (
-            <Grid item xs={12}>
-              <Alert
-                severity={isVerified ? "success" : "info"}
-                icon={isVerified ? <Verified /> : <ErrorOutline />}
-              >
-                {message}
-              </Alert>
-            </Grid>
-          )}
-        </Grid>
-      </Box>
+            )}
+          </Grid>
+        </Box>
       </Box>
     </CommonModal>
   );

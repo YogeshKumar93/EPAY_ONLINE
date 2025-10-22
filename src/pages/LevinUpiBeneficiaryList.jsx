@@ -504,7 +504,6 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
           </List>
         </CardContent>
       </Collapse>
-
       {/* Add Beneficiary Modal */}
       {openModal && (
         <Dialog
@@ -514,20 +513,48 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
             resetForm();
           }}
           fullWidth
+          maxWidth="sm"
         >
-          <DialogTitle>Add New Beneficiary</DialogTitle>
-          <DialogContent dividers>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  label="Beneficiary Name"
-                  name="beneficiary_name"
-                  fullWidth
-                  size="small"
-                  value={formData.beneficiary_name}
-                  onChange={handleChange}
-                />
-              </Grid>
+          <DialogTitle
+            sx={{
+              fontWeight: 600,
+              textAlign: "center",
+              backgroundColor: "#f7f7f9",
+              borderBottom: "1px solid #e0e0e0",
+            }}
+          >
+            Add New Beneficiary
+          </DialogTitle>
+
+          <DialogContent dividers sx={{ p: 3 }}>
+            {/* Beneficiary Name */}
+            <TextField
+              label="Beneficiary Name"
+              name="beneficiary_name"
+              fullWidth
+              size="small"
+              value={formData.beneficiary_name}
+              onChange={handleChange}
+              sx={{ mb: 2 }}
+            />
+
+            {/* Prefix + Suffix */}
+            <Grid
+              container
+              spacing={2}
+              sx={{
+                mt: 0,
+                "& .MuiGrid-item": {
+                  display: "flex",
+                  flexDirection: "column",
+                },
+                "& .MuiTextField-root": {
+                  flex: 1,
+                  width: "100%",
+                },
+              }}
+            >
+              {" "}
               <Grid item xs={12} sm={6}>
                 <TextField
                   label="Prefix"
@@ -585,19 +612,54 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
                 )}
               </Grid>
             </Grid>
+
+            {/* ✅ Full UPI ID Preview */}
+            {formData.prefix && (
+              <Box
+                sx={{
+                  mt: 3,
+                  p: 1.2,
+                  borderRadius: 1,
+                  textAlign: "center",
+                  backgroundColor: "#f2f4f8",
+                  border: "1px dashed #ccc",
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: 600,
+                    color: "#333",
+                    letterSpacing: "0.5px",
+                  }}
+                >
+                  Full UPI ID:{" "}
+                  <span style={{ color: "#5c3ac8" }}>
+                    {formData.prefix}@
+                    {formData.suffix === "other"
+                      ? formData.custom_suffix || "____"
+                      : formData.suffix}
+                  </span>
+                </Typography>
+              </Box>
+            )}
           </DialogContent>
-          <DialogActions>
+
+          <DialogActions sx={{ p: 2, justifyContent: "center" }}>
             <Button
               onClick={() => {
                 setOpenModal(false);
                 resetForm();
               }}
+              variant="outlined"
+              color="inherit"
             >
               Cancel
             </Button>
             <Button
               onClick={handleAddAndVerifyBeneficiary}
               variant="contained"
+              sx={{ backgroundColor: "#5c3ac8" }}
               disabled={submitting}
             >
               {submitting ? "Saving..." : "Verify & Add"}

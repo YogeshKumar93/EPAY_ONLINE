@@ -56,7 +56,7 @@ const ProfilePage = () => {
   const [resetMpinModalOpen, setResetMpinModalOpen] = useState(false);
   const [changePasswordModal, setChangePasswordModal] = useState(false);
   const [changeMpinModal, setChangeMpinModal] = useState(false);
- const [twoFAModalOpen, setTwoFAModalOpen] = useState(false);
+  const [twoFAModalOpen, setTwoFAModalOpen] = useState(false);
   const [newNumberModal, setNewNumberModal] = useState(false);
   const [changeLayout, setChangeLayout] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -86,7 +86,7 @@ const ProfilePage = () => {
   const handleChangePassword = () => {
     setChangePasswordModal(true);
   };
-   const handleTwoFAModalOpen = () => {
+  const handleTwoFAModalOpen = () => {
     setTwoFAModalOpen(true);
   };
 
@@ -138,7 +138,7 @@ const ProfilePage = () => {
     },
     {
       id: 3,
-      label: "New Number",
+      label: "Change Number",
       icon: <Phone sx={{ fontSize: { xs: 18, sm: 20 } }} />,
       onClick: handleNewNumber,
       gradient: "#fff",
@@ -161,7 +161,7 @@ const ProfilePage = () => {
       gradient: "#fff",
       hoverGradient: "linear-gradient(135deg, #c9ffbf, #7bed9f)",
     },
-        {
+    {
       id: 6,
       label: "Two FA",
       icon: <Dashboard sx={{ fontSize: { xs: 18, sm: 20 } }} />,
@@ -633,11 +633,8 @@ const ProfilePage = () => {
           onClose={() => setViewInfoModalOpen(false)}
         />
       )}
-        {twoFAModalOpen && (
-        <TwoFA
-          open={twoFAModalOpen}
-          onClose={() => setTwoFAModalOpen(false)}
-        />
+      {twoFAModalOpen && (
+        <TwoFA open={twoFAModalOpen} onClose={() => setTwoFAModalOpen(false)} />
       )}
     </Box>
   );
