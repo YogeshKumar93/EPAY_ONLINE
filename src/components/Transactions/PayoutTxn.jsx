@@ -214,13 +214,6 @@ const PayoutTxn = ({ query }) => {
         options: routes, // ✅ dynamic routes here
         roles: ["adm", "sadm"],
       },
-      { id: "mobile_number", label: "Mobile Number", type: "textfield" },
-      {
-        id: "txn_id",
-        label: "Txn ID",
-        type: "textfield",
-        roles: ["adm", "sadm"],
-      },
       {
         id: "service",
         label: "Service Name",
@@ -233,6 +226,14 @@ const PayoutTxn = ({ query }) => {
         ],
         defaultValue: "pending",
       },
+      { id: "mobile_number", label: "Mobile Number", type: "textfield" },
+      {
+        id: "txn_id",
+        label: "Txn ID",
+        type: "textfield",
+        roles: ["adm", "sadm"],
+      },
+
       {
         id: "user_id",
         label: "User ID",

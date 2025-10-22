@@ -56,6 +56,7 @@ import {
 } from "../utils/iconsImports";
 import UpiBeneficiaryDetails from "./UpiBeneficiaryDetails";
 import { useToast } from "../utils/ToastContext";
+import { upi2 } from "../iconsImports";
 
 const UpiBeneficiaryList = ({ sender, onSuccess }) => {
   const theme = useTheme();
@@ -136,30 +137,30 @@ const UpiBeneficiaryList = ({ sender, onSuccess }) => {
     }
   };
 
-  const bankImageMapping = {
-    SBI: sbi2,
-    IBKL: idbi2,
-    UTIB: axis2,
-    HDFC: hdfc2,
-    ICIC: icici2,
-    KKBK: kotak2,
-    BARB: bob2,
-    PUNB: pnb2,
-    MAHB: bom2,
-    UBIN: union2,
-    DBSS: dbs2,
-    RATN: rbl2,
-    YESB: yes2,
-    INDB: indus2,
-    AIRP: airtel2,
-    ABHY: abhy2,
-    CNRB: canara2,
-    BDBL: bandhan2,
-    CBIN: cbi2,
-    IDIB: idib2,
-    SCBL: stand2,
-    JAKA: jk2,
-  };
+  // const bankImageMapping = {
+  //   SBI: sbi2,
+  //   IBKL: idbi2,
+  //   UTIB: axis2,
+  //   HDFC: hdfc2,
+  //   ICIC: icici2,
+  //   KKBK: kotak2,
+  //   BARB: bob2,
+  //   PUNB: pnb2,
+  //   MAHB: bom2,
+  //   UBIN: union2,
+  //   DBSS: dbs2,
+  //   RATN: rbl2,
+  //   YESB: yes2,
+  //   INDB: indus2,
+  //   AIRP: airtel2,
+  //   ABHY: abhy2,
+  //   CNRB: canara2,
+  //   BDBL: bandhan2,
+  //   CBIN: cbi2,
+  //   IDIB: idib2,
+  //   SCBL: stand2,
+  //   JAKA: jk2,
+  // };
 
   const beneficiaries =
     sender?.beneficiary?.length > 0
@@ -362,34 +363,21 @@ const UpiBeneficiaryList = ({ sender, onSuccess }) => {
                 }
               >
                 <Box display="flex" alignItems="flex-start" gap={1.5}>
-                  {bankImageMapping[b.bank_name] ? (
-                    <Box
-                      component="img"
-                      src={bankImageMapping[b.bank_name]}
-                      alt={b.bank_name}
-                      sx={{
-                        width: 36,
-                        height: 36,
-                        objectFit: "contain",
-                        borderRadius: 1,
-                        border: "1px solid",
-                        borderColor: "divider",
-                        p: 0.5,
-                        backgroundColor: "white",
-                      }}
-                    />
-                  ) : (
-                    <Avatar
-                      sx={{
-                        width: 36,
-                        height: 36,
-                        bgcolor: "primary.light",
-                        fontSize: 16,
-                      }}
-                    >
-                      <AccountBalanceIcon sx={{ fontSize: 20 }} />
-                    </Avatar>
-                  )}
+                  <Box
+                    component="img"
+                    src={upi2}
+                    alt="Upi 1"
+                    sx={{
+                      width: 36,
+                      height: 36,
+                      objectFit: "contain",
+                      borderRadius: 1,
+                      border: "1px solid",
+                      borderColor: "divider",
+                      p: 0.5,
+                      backgroundColor: "white",
+                    }}
+                  />
 
                   <Box flexGrow={1} minWidth={0}>
                     <Typography

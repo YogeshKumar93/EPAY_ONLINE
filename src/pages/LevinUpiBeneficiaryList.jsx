@@ -60,6 +60,7 @@ import { useToast } from "../utils/ToastContext";
 import LevinBeneficiaryDetails from "./LevinUpiBeneficiaryDetails";
 import AuthContext from "../contexts/AuthContext";
 import LevinUpiBeneficiaryDetails from "./LevinUpiBeneficiaryDetails";
+import { upi, upi2 } from "../iconsImports";
 
 const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
   const theme = useTheme();
@@ -298,30 +299,30 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
   };
 
   // Bank image mapping
-  const bankImageMapping = {
-    SBI: sbi2,
-    IBKL: idbi2,
-    UTIB: axis2,
-    HDFC: hdfc2,
-    ICIC: icici2,
-    KKBK: kotak2,
-    BARB: bob2,
-    PUNB: pnb2,
-    MAHB: bom2,
-    UBIN: union2,
-    DBSS: dbs2,
-    RATN: rbl2,
-    YESB: yes2,
-    INDB: indus2,
-    AIRP: airtel2,
-    ABHY: abhy2,
-    CNRB: canara2,
-    BDBL: bandhan2,
-    CBIN: cbi2,
-    IDIB: idib2,
-    SCBL: stand2,
-    JAKA: jk2,
-  };
+  // const bankImageMapping = {
+  //   SBI: sbi2,
+  //   IBKL: idbi2,
+  //   UTIB: axis2,
+  //   HDFC: hdfc2,
+  //   ICIC: icici2,
+  //   KKBK: kotak2,
+  //   BARB: bob2,
+  //   PUNB: pnb2,
+  //   MAHB: bom2,
+  //   UBIN: union2,
+  //   DBSS: dbs2,
+  //   RATN: rbl2,
+  //   YESB: yes2,
+  //   INDB: indus2,
+  //   AIRP: airtel2,
+  //   ABHY: abhy2,
+  //   CNRB: canara2,
+  //   BDBL: bandhan2,
+  //   CBIN: cbi2,
+  //   IDIB: idib2,
+  //   SCBL: stand2,
+  //   JAKA: jk2,
+  // };
 
   const filteredBeneficiaries = useMemo(() => {
     if (!searchText) return sender?.beneficiary || [];
@@ -470,25 +471,20 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
                   }
                 >
                   <Box display="flex" alignItems="center" gap={1.5}>
-                    {bankImageMapping[b.bank_name] ? (
-                      <Box
-                        component="img"
-                        src={bankImageMapping[b.bank_name]}
-                        alt={b.bank_name}
-                        sx={{
-                          width: 36,
-                          height: 36,
-                          borderRadius: 1,
-                          border: "1px solid",
-                          borderColor: "divider",
-                          p: 0.5,
-                        }}
-                      />
-                    ) : (
-                      <Avatar sx={{ width: 36, height: 36 }}>
-                        <AccountBalanceIcon sx={{ fontSize: 20 }} />
-                      </Avatar>
-                    )}
+                    <Box
+                      component="img"
+                      src={upi2}
+                      alt="upi 2"
+                      sx={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: 1,
+                        border: "1px solid",
+                        borderColor: "divider",
+                        p: 0.5,
+                      }}
+                    />
+
                     <Box>
                       <Typography fontWeight="500">
                         {b.beneficiary_name}
