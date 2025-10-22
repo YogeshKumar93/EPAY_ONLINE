@@ -32,6 +32,7 @@ const W2wTransfer = ({ handleFetchRef, type }) => {
   const [mobileError, setMobileError] = useState("");
   const [amountError, setAmountError] = useState("");
   const [remarkError, setRemarkError] = useState("");
+const navigate = useNavigate();
 
   const { showToast } = useToast();
   const authCtx = useContext(AuthContext);
@@ -142,6 +143,7 @@ const W2wTransfer = ({ handleFetchRef, type }) => {
         setMobile("");
         setModalOpen(false);
         await loadUserProfile(); // ✅ refresh user data
+        navigate("/customer/dashboard"); 
       } else {
         showToast(error.message || error.errors, "error");
         setError(error?.message || "Transfer failed");
