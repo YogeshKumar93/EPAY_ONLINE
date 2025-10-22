@@ -307,7 +307,7 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
   };
 
   const bankImageMapping = {
-    SBI: sbi2,
+    SBIN: sbi2,
     IBKL: idbi2,
     UTIB: axis2,
     HDFC: hdfc2,
