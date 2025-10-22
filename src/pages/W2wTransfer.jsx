@@ -134,7 +134,8 @@ const W2wTransfer = ({ handleFetchRef, type }) => {
 
       if (response) {
         showToast(response?.message || "Transfer successful", "success");
-        handleFetchRef();
+        handleFetchRef?.();
+
         setAmount("");
         setRemark("");
         setReceiver(null);
