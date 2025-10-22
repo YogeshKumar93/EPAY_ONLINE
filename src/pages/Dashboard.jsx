@@ -216,7 +216,7 @@ const Dashboard = () => {
         </Box>
 
         {/* Right: ApiBalance */}
-        {!["dd", "ret"].includes(user?.role) && (
+        {["adm", "sadm"].includes(user?.role) && (
           <Box
             sx={{
               flex: "0 0 30%",

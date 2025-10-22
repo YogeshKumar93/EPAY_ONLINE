@@ -279,7 +279,7 @@ export default function AppRoutes() {
           )}
           {isDi && (
             <>
-              <Route path="di/dashboard" element={<MdDashboard />} />
+              <Route path="di/dashboard" element={<Dashboard />} />
               {/* <Route path="di/dashboard" element={<AdminTransactions />} /> */}
               <Route path="di/users" element={<Users />} />
 
@@ -300,7 +300,7 @@ export default function AppRoutes() {
 
           {isAsm && (
             <>
-              <Route path="asm/dashboard" element={<Users />} />
+              <Route path="asm/dashboard" element={<Dashboard />} />
               <Route path="asm/users" element={<Users />} />
               <Route path="asm/transcations" element={<Transaction />} />
               <Route path="asm/profile" element={<ProfilePage />} />
@@ -311,7 +311,7 @@ export default function AppRoutes() {
 
           {isZsm && (
             <>
-              <Route path="zsm/dashboard" element={<Users />} />
+              <Route path="zsm/dashboard" element={<Dashboard />} />
               <Route path="zsm/users" element={<Users />} />
               <Route path="zsm/transcations" element={<Transaction />} />
               <Route path="zsm/profile" element={<ProfilePage />} />
@@ -336,7 +336,7 @@ export default function AppRoutes() {
 
           {isMd && (
             <>
-              <Route path="md/dashboard" element={<MdDashboard />} />
+              <Route path="md/dashboard" element={<Dashboard />} />
               <Route path="md/users" element={<Users />} />
               <Route path="md/transcations" element={<Transaction />} />
               <Route path="md/profile" element={<ProfilePage />} />{" "}
