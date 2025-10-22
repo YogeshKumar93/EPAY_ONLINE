@@ -435,7 +435,7 @@ const RechargeTxn = ({ query }) => {
       {
         name: "Amount",
         selector: (row) => (
-          <div style={{ color: "red", fontWeight: 700, textAlign: "right" }}>
+          <div style={{ color: "red", fontWeight: 600, textAlign: "right" }}>
             ₹ {parseFloat(row.amount).toFixed(2)}
           </div>
         ),

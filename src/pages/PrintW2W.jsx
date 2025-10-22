@@ -47,8 +47,7 @@ const PrintW2W = () => {
 
   // Parse numeric values safely
   const amount = parseFloat(data.amount || 0);
-  const charge = parseFloat(data.charge || 0);
-  const gst = parseFloat(data.gst || 0);
+
 
   // ✅ Only Wallet2Wallet fields
   const headers = [
@@ -57,22 +56,18 @@ const PrintW2W = () => {
     "Sender",
     "Receiver",
     "Amount (₹)",
-    "Charge (₹)",
-    "GST (₹)",
-    "Remarks",
-    "Status",
+   
+   
   ];
 
   const values = [
     data.created_at ? ddmmyyWithTime(data.created_at) : "",
     data.txn_id || "",
-    data.sender_name || data.user_id || "N/A",
-    data.receiver_name || data.receiver_id || "N/A",
+    data.sender_est || data.user_id || "N/A",
+    data.receiver_est || data.receiver_id || "N/A",
     `₹ ${amount.toFixed(2)}`,
-    `₹ ${charge.toFixed(2)}`,
-    `₹ ${gst.toFixed(2)}`,
-    data.remark || "N/A",
-    data.status || "",
+   
+   
   ];
 
   return (
@@ -182,7 +177,7 @@ const PrintW2W = () => {
                 "&:hover": { borderColor: "#ff9a3c", color: "#ff9a3c" },
               }}
             >
-              Wallet-to-Wallet Transaction Summary
+              Transaction Summary
             </Button>
           </Box>
 
