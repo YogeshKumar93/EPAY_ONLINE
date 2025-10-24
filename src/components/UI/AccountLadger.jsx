@@ -64,7 +64,7 @@ const AccountLadger = ({ query }) => {
         type: "daterange",
       },
       {
-        id: "id",
+        id: "user_id",
         label: "Type Est.",
         type: "autocomplete",
         options: userOptions,
