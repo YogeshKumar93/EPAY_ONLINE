@@ -17,7 +17,14 @@ import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
 import { Terminal } from "@mui/icons-material";
 import { useToast } from "../utils/ToastContext";
 
-const VerifySenderModal = ({ open, onClose, mobile, otpRef, otpData }) => {
+const VerifySenderModal = ({
+  open,
+  onClose,
+  mobile,
+  otpRef,
+  otpData,
+  onSuccess,
+}) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);
   const { showToast } = useToast();
@@ -73,6 +80,7 @@ const VerifySenderModal = ({ open, onClose, mobile, otpRef, otpData }) => {
       if (response) {
         okSuccessToast(response?.message || "Sender verified successfully");
         onClose();
+        onSuccess?.(mobile); // ✅ Always use the verified mobile number
       } else {
         showToast(error?.message || "Failed to verify sender", "error");
       }

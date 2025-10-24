@@ -452,6 +452,7 @@ const SuperTransfer = () => {
           mobile={otpData.mobile_number}
           otpRef={otpData.otp_ref}
           otpData={otpData}
+          onSuccess={handleFetchSender}
         />
       )}
       {mobileListOpen && (

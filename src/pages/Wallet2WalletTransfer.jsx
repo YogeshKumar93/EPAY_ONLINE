@@ -182,19 +182,6 @@ const Wallet2WalletTransfer = ({}) => {
   const filters = useMemo(
     () => [
       {
-        id: "status",
-        label: "Status",
-        type: "dropdown",
-        options: [
-          { value: "success", label: "Success" },
-          { value: "failed", label: "Failed" },
-          { value: "refund", label: "Refund" },
-          { value: "pending", label: "Pending" },
-        ],
-        defaultValue: "pending",
-        roles: ["adm", "sadm"],
-      },
-      {
         id: "sender_id",
         label: "Sender",
         type: "autocomplete",

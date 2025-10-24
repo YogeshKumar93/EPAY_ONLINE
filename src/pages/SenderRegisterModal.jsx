@@ -54,13 +54,14 @@ const SenderRegisterModal = ({ open, onClose, mobile, onRegistered }) => {
       );
 
       if (response) {
-        const otp_ref = response?.response?.data?.otp_ref;
+        const otp_ref = response?.data?.otp_ref;
         const sender_id = response?.response?.data?.sender?.id;
 
         showToast(
           response?.response?.data?.message || "Sender registered",
           "success"
         );
+        console.log("otp_ref", otp_ref);
 
         onRegistered?.({
           mobile_number: formData.mobile_number,
