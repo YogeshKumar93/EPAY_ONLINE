@@ -122,7 +122,6 @@ const LevinUpiBeneficiaryDetails = ({
         beneficiary_id: beneficiary.id,
         beneficiary_name: beneficiary.beneficiary_name,
         account_number: beneficiary.account_number,
-        ifsc_code: beneficiary.ifsc_code,
         bank_name: beneficiary.bank_name,
         mobile_number: sender.mobile_number,
         operator: 20,

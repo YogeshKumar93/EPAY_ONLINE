@@ -12,6 +12,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { RemoveRedEye } from "@mui/icons-material";
 import WalletTxnData from "../WalletTxnData";
 import { apiCall } from "../../api/apiClient";
+import { debounce } from "lodash";
 
 const AccountLadger = ({ query }) => {
   const authCtx = useContext(AuthContext);
@@ -20,7 +21,8 @@ const AccountLadger = ({ query }) => {
   const [selectedRowId, setSelectedRowId] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [services, setServices] = useState([]);
-
+  const [userSearch, setUserSearch] = useState("");
+  const [userOptions, setUserOptions] = useState([]);
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false); // stop loader after data is ready
@@ -61,9 +63,51 @@ const AccountLadger = ({ query }) => {
         // label: "Date Range",
         type: "daterange",
       },
+      {
+        id: "id",
+        label: "Type Est.",
+        type: "autocomplete",
+        options: userOptions,
+        onSearch: (val) => setUserSearch(val),
+        getOptionLabel: (option) => option.label,
+        // Remove valueKey and handle the value extraction in handleFilterChange
+      },
     ],
-    [services]
+    [services, user?.role, userOptions]
   );
+  useEffect(() => {
+    if (userSearch.length <= 4) {
+      setUserOptions([]); // Clear options if less than or equal to 4 chars
+      return;
+    }
+
+    const fetchUsersByEstablishment = async (searchTerm) => {
+      try {
+        const { error, response } = await apiCall(
+          "post",
+          ApiEndpoints.GET_USER_DEBOUNCE,
+          {
+            establishment: searchTerm, // send under establishment key
+          }
+        );
+        if (!error && response?.data) {
+          setUserOptions(
+            response.data.map((u) => ({
+              label: u.establishment,
+              value: u.id, // ✅ This is the id
+            }))
+          );
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    const debouncedFetch = debounce(fetchUsersByEstablishment, 500); // 500ms delay
+    debouncedFetch(userSearch);
+
+    return () => debouncedFetch.cancel(); // cleanup on unmount or change
+  }, [userSearch]);
 
   const columns = useMemo(
     () => [
@@ -76,7 +120,6 @@ const AccountLadger = ({ query }) => {
         ),
         wrap: true,
       },
-
       {
         name: "Service",
         selector: (row) => (
