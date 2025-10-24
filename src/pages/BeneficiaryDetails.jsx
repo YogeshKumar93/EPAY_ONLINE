@@ -141,7 +141,7 @@ const BeneficiaryDetails = ({
     const value = e.target.value;
     if (/^\d*$/.test(value)) {
       if (parseFloat(value) > parseFloat(sender?.rem_limit || 0)) {
-        apiErrorToast("Exceeds Rem Limit");
+        showToast("Exceeds Rem Limit", "error");
         return;
       }
       setAmount(value);
@@ -149,9 +149,10 @@ const BeneficiaryDetails = ({
   };
 
   const amountInWords = amount
-  ? `${convertNumberToWordsIndian(amount)
-      .replace(/\b\w/g, (char) => char.toUpperCase())} Only`
-  : "";
+    ? `${convertNumberToWordsIndian(amount).replace(/\b\w/g, (char) =>
+        char.toUpperCase()
+      )} Only`
+    : "";
 
   // --- Custom Content ---
   const customContent = (
@@ -229,20 +230,17 @@ const BeneficiaryDetails = ({
         value={amount}
         onChange={handleChange}
       />
-           {amount && (
-  <Typography
-    variant="body2"
-    sx={{
-    
-      color: "#555",
-      fontWeight: 500,
-      
-    }}
-  >
-    {amountInWords}
-  </Typography>
-)}
-  
+      {amount && (
+        <Typography
+          variant="body2"
+          sx={{
+            color: "#555",
+            fontWeight: 500,
+          }}
+        >
+          {amountInWords}
+        </Typography>
+      )}
 
       <Box>
         <Typography variant="body2" mb={0.5}>

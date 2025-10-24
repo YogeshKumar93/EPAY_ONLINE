@@ -76,6 +76,7 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
   const [amountInputs, setAmountInputs] = useState({});
   const { location } = useContext(AuthContext);
   const [amountInWords, setAmountInWords] = useState({});
+  // console.log("limit", sender?.limitTotal);
 
   const { schema, formData, handleChange, errors, setErrors, loading } =
     useSchemaForm(ApiEndpoints.ADD_DMT1_SCHEMA, openModal, {
@@ -85,6 +86,14 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
   const handleAmountChange = (beneficiaryId, value) => {
     // Allow only numbers and decimal
     const numericValue = value.replace(/[^\d.]/g, "");
+    const amount = parseFloat(numericValue);
+    const limit = parseFloat(sender?.limitTotal || 0);
+
+    // ✅ Check against sender limit
+    if (limit && amount > limit) {
+      showToast(`Amount cannot exceed your limit of ₹${limit}`, "error");
+      return; // Stop further update
+    }
 
     setAmountInputs((prev) => ({
       ...prev,

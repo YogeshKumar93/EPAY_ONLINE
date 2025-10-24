@@ -176,7 +176,7 @@ const LevinBeneficiaryDetails = ({
     const value = e.target.value;
     if (/^\d*$/.test(value)) {
       if (parseFloat(value) > parseFloat(sender?.rem_limit || 0)) {
-        apiErrorToast("Exceeds Rem Limit");
+        showToast("Exceeds Rem Limit", "error");
         return;
       }
       setAmount(value);
