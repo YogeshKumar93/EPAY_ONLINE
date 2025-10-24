@@ -71,6 +71,7 @@ const AccountLadger = ({ query }) => {
         onSearch: (val) => setUserSearch(val),
         getOptionLabel: (option) => option.label,
         // Remove valueKey and handle the value extraction in handleFilterChange
+        roles: ["adm", "sadm"],
       },
     ],
     [services, user?.role, userOptions]
