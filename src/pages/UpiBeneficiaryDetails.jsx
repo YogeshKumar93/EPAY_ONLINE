@@ -17,6 +17,7 @@ const UpiBeneficiaryDetails = ({
   beneficiary,
   senderMobile,
   senderId,
+  sender,
 }) => {
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
@@ -33,14 +34,13 @@ const UpiBeneficiaryDetails = ({
   const user = authCtx?.user;
   const { location } = useContext(AuthContext);
   const { showToast } = useToast();
+  console.log("limit", sender?.rem_limit);
 
- const amountInWords = amount
-  ? `${convertNumberToWordsIndian(amount)
-      .replace(/\b\w/g, (char) => char.toUpperCase())} Only`
-  : "";
-
-
-
+  const amountInWords = amount
+    ? `${convertNumberToWordsIndian(amount).replace(/\b\w/g, (char) =>
+        char.toUpperCase()
+      )} Only`
+    : "";
   if (!beneficiary) return null;
   const username = `GURU1${user?.id}`;
 
@@ -111,7 +111,16 @@ const UpiBeneficiaryDetails = ({
       setLoading(false);
     }
   };
-
+  const handleChange = (e) => {
+    const val = e.target.value;
+    if (/^\d*$/.test(val)) {
+      if (parseFloat(val) > parseFloat(sender?.rem_limit || 0)) {
+        showToast("Exceeds Rem Limit", "error");
+        return;
+      }
+      setAmount(val);
+    }
+  };
   const customContent = (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <Box sx={{ bgcolor: "#f0f8ff", p: 2, borderRadius: 2 }}>
@@ -158,28 +167,26 @@ const UpiBeneficiaryDetails = ({
         size="small"
         fullWidth
         value={amount}
-        onChange={(e) => {
-          const val = e.target.value;
-          if (/^\d*$/.test(val)) {
-            // allow only numbers
-            setAmount(val);
-          }
-        }}
+        onChange={handleChange}
+        // onChange={(e) => {
+        //   const val = e.target.value;
+        //   if (/^\d*$/.test(val)) {
+        //     // allow only numbers
+        //     setAmount(val);
+        //   }
+        // }}
       />
-        {amount && (
-  <Typography
-    variant="body2"
-    sx={{
-    
-      color: "#555",
-      fontWeight: 500,
-      
-    }}
-  >
-    {amountInWords}
-  </Typography>
-)}
-
+      {amount && (
+        <Typography
+          variant="body2"
+          sx={{
+            color: "#555",
+            fontWeight: 500,
+          }}
+        >
+          {amountInWords}
+        </Typography>
+      )}
 
       <Box>
         <Typography variant="body2" mb={0.5}>

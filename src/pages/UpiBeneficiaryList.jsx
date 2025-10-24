@@ -737,6 +737,7 @@ const UpiBeneficiaryList = ({ sender, onSuccess }) => {
           beneficiary={selectedForDetails}
           senderMobile={sender?.mobile_number}
           senderId={sender?.id}
+          sender={sender}
         />
       )}
     </Card>
