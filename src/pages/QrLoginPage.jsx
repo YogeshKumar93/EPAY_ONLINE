@@ -170,18 +170,21 @@ const QrLoginPage = () => {
   useEffect(() => {
     console.log("🔄 Fetching location...");
 
-    const fetchLocation = getGeoLocation(
+    const maybeFetch = getGeoLocation(
       (lat, long) => {
         console.log("✅ Got location:", lat, long);
-        // Update AuthContext
         authCtx.latLongHandler(lat, long);
-        // Also store in localStorage
         localStorage.setItem("location", JSON.stringify({ lat, long }));
       },
       (err) => console.error("❌ Location error:", err)
     );
 
-    fetchLocation();
+    // If the util returns a function (old pattern), call it.
+    if (typeof maybeFetch === "function") {
+      maybeFetch();
+    }
+
+    // If it returned nothing and auto-ran, nothing to call (safe).
   }, []);
 
   useEffect(() => {

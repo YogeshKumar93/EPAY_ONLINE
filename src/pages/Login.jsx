@@ -73,21 +73,17 @@ const Login = () => {
   });
 
   useEffect(() => {
-    const fetchLocation = getGeoLocation(
+    getGeoLocation(
       (lat, long) => {
         console.log("✅ User Location fetched:", { lat, long });
         setLocation({ lat, long });
         localStorage.setItem("location", JSON.stringify({ lat, long }));
-        // authCtx.setLocation(lat, long);
       },
       (err) => {
         console.error("❌ Location Error:", err);
         okErrorToast("Location access denied or unavailable");
       }
     );
-
-    // ✅ Call the returned function
-    fetchLocation();
   }, []);
 
   const onSubmit = async (data) => {
@@ -247,7 +243,6 @@ const Login = () => {
             component="img"
             src={biggpayLogo}
             alt="Logo"
-          
             sx={{
               width: "100%",
               maxWidth: 330,
@@ -257,7 +252,7 @@ const Login = () => {
               display: "block",
               mx: "auto",
             }}
-               onClick={() => window.open("https://p2pae.com", )}  
+            onClick={() => window.open("https://p2pae.com")}
           />
           {/* </a> */}
 

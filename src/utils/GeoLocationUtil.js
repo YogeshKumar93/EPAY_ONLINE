@@ -76,26 +76,31 @@ function getLatLongWiFi(onSuccess, onFailed, markFetched) {
 export const getGeoLocation = (onSuccess, onFailed) => {
   let lat, long;
   let locationFetchedAt = null;
-console.log("RGe the lat long ",lat,long)
-  return () => {
-    const now = Date.now();
-    if (!lat || !long || !locationFetchedAt || now - locationFetchedAt > 5 * 60 * 1000) {
-      console.log("🔄 Fetching fresh location...");
-      getLatLong(
-        (latX, longX) => {
-          lat = latX;
-          long = longX;
-          locationFetchedAt = now;
-          onSuccess(lat, long);
-        },
-        (err) => {
-          console.error("❌ Location error:", err);
-          onFailed(err);
-        }
-      );
-    } else {
-      console.log("♻️ Using cached location:", lat, long);
-      onSuccess(lat, long);
-    }
-  };
+
+  const now = Date.now();
+
+  if (
+    !lat ||
+    !long ||
+    !locationFetchedAt ||
+    now - locationFetchedAt > 5 * 60 * 1000
+  ) {
+    console.log("🔄 Fetching fresh location...");
+    getLatLong(
+      (latX, longX) => {
+        lat = latX;
+        long = longX;
+        locationFetchedAt = now;
+        console.log("✅ Location fetched:", lat, long);
+        onSuccess(lat, long);
+      },
+      (err) => {
+        console.error("❌ Location error:", err);
+        onFailed(err);
+      }
+    );
+  } else {
+    console.log("♻️ Using cached location:", lat, long);
+    onSuccess(lat, long);
+  }
 };
