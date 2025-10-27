@@ -173,11 +173,13 @@ const Users = ({ query }) => {
             establishment: searchTerm, // send under establishment key
           }
         );
+        console.log("respinse ofthe debounce is thius ", response?.data?.id);
+
         if (!error && response?.data) {
           setUserOptions(
             response.data.map((u) => ({
+              id: u.id, // ✅ consistent key
               label: u.establishment,
-              value: u.id, // ✅ This is the id
             }))
           );
         }
@@ -324,14 +326,23 @@ const Users = ({ query }) => {
         options: roleOptions,
       },
 
+      // {
+      //   id: "id",
+      //   label: "Type Est.",
+      //   type: "autocomplete",
+      //   options: userOptions,
+      //   onSearch: (val) => setUserSearch(val),
+      //   getOptionLabel: (option) => option.label,
+      //   // Remove valueKey and handle the value extraction in handleFilterChange
+      // },
       {
         id: "id",
         label: "Type Est.",
         type: "autocomplete",
         options: userOptions,
         onSearch: (val) => setUserSearch(val),
-        getOptionLabel: (option) => option.label,
-        // Remove valueKey and handle the value extraction in handleFilterChange
+        getOptionLabel: (option) => option?.label || "",
+        isOptionEqualToValue: (option, value) => option.id === value.id, // ✅ this line keeps selection visible
       },
       {
         id: "parent_id",

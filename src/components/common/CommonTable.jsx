@@ -196,13 +196,13 @@ const CommonTable = ({
     });
     return values;
   }, [availableFilters]);
-  useEffect(() => {
-    setFilterValues(initialFilterValues);
-    setAppliedFilters(initialFilterValues);
-    setExportFilters(initialFilterValues); // ✅ Initialize export filters state
-    appliedFiltersRef.current = initialFilterValues;
-    console.log("🔍 [Table] Initialized all filters:", initialFilterValues);
-  }, [initialFilterValues]);
+  // useEffect(() => {
+  //   setFilterValues(initialFilterValues);
+  //   setAppliedFilters(initialFilterValues);
+  //   setExportFilters(initialFilterValues); // ✅ Initialize export filters state
+  //   appliedFiltersRef.current = initialFilterValues;
+  //   console.log("🔍 [Table] Initialized all filters:", initialFilterValues);
+  // }, [initialFilterValues]);
   const { handleExportExcel } = useExcelExport();
 
   const handleTableExport = useCallback(async () => {
@@ -386,136 +386,143 @@ const CommonTable = ({
   }, [fetchData]);
 
   // Memoized filter handlers
-// ✅ Memoized filter change handler
-// ✅ Memoized filter change handler
-const handleFilterChange = useCallback((filterId, value) => {
-  setFilterValues((prev) => ({
-    ...prev,
-    [filterId]: value,
-  }));
-}, []);
+  // ✅ Memoized filter change handler
+  // ✅ Memoized filter change handler
+  const handleFilterChange = (id, newValue) => {
+    console.log("🧩 Updating filter value for:", id, newValue);
+    setFilterValues((prev) => ({ ...prev, [id]: newValue }));
+  };
 
-// ✅ Apply filters with proper id/value handling
-const applyFilters = useCallback(() => {
-  console.log("🔍 [Table] applyFilters called with:", filterValues);
+  const applyFilters = useCallback(() => {
+    console.log("🔍 [Table] applyFilters called with:", filterValues);
 
-  const formattedFilters = { ...filterValues };
+    const formattedFilters = { ...filterValues };
 
-  Object.keys(formattedFilters).forEach((key) => {
-    const filterConfig = availableFilters.find((f) => f.id === key);
-    const val = formattedFilters[key];
+    Object.keys(formattedFilters).forEach((key) => {
+      const filterConfig = availableFilters.find((f) => f.id === key);
+      const val = formattedFilters[key];
 
-    // 🚫 Skip empty or "All" values
-    if (val === "" || val === null || val === undefined || val === "All") {
-      delete formattedFilters[key];
-      return;
-    }
-
-    // 🧠 Extract ID or value for dropdown/autocomplete
-    if (filterConfig?.type === "dropdown" && val) {
-      formattedFilters[key] = val.id || val.value || val;
-    }
-
-    if (filterConfig?.type === "autocomplete" && val) {
-      formattedFilters[key] = val.id || val.value || val;
-    }
-
-    // 📅 Handle single date filter
-    if (filterConfig?.type === "date" && val) {
-      formattedFilters[key] = new Date(val).toISOString().split("T")[0];
-    }
-
-    // 📆 Handle date range
-    if (filterConfig?.type === "daterange" && val) {
-      if (val.start) {
-        formattedFilters["from_date"] = new Date(val.start)
-          .toISOString()
-          .split("T")[0];
+      // 🚫 Skip empty or "All" values
+      if (val === "" || val === null || val === undefined || val === "All") {
+        delete formattedFilters[key];
+        return;
       }
-      if (val.end) {
-        formattedFilters["to_date"] = new Date(val.end)
-          .toISOString()
-          .split("T")[0];
+
+      // 🧠 Extract ID or value for dropdown/autocomplete
+      if (
+        (filterConfig?.type === "dropdown" ||
+          filterConfig?.type === "autocomplete") &&
+        val
+      ) {
+        // For autocomplete, we want to send the ID (value property)
+        if (filterConfig?.type === "autocomplete" && typeof val === "object") {
+          formattedFilters[key] = val.value || val.id || val; // Use value property which contains the ID
+        } else {
+          formattedFilters[key] = val.id || val.value || val;
+        }
       }
-      delete formattedFilters[key];
-    }
-  });
 
-  console.log("✅ [Table] Final formatted filters:", formattedFilters);
+      // 📅 Handle single date filter
+      if (filterConfig?.type === "date" && val) {
+        formattedFilters[key] = new Date(val).toISOString().split("T")[0];
+      }
 
-  // ✅ Update filter states & refs
-  setAppliedFilters(formattedFilters);
-  setExportFilters(formattedFilters);
-  appliedFiltersRef.current = formattedFilters;
+      // 📆 Handle date range
+      if (filterConfig?.type === "daterange" && val) {
+        if (val.start) {
+          formattedFilters["from_date"] = new Date(val.start)
+            .toISOString()
+            .split("T")[0];
+        }
+        if (val.end) {
+          formattedFilters["to_date"] = new Date(val.end)
+            .toISOString()
+            .split("T")[0];
+        }
+        delete formattedFilters[key];
+      }
+    });
 
-  // ✅ Trigger parent callback if present
-  if (onFilterChange) {
-    onFilterChange(formattedFilters);
-  }
+    console.log("✅ [Table] Final formatted filters:", formattedFilters);
 
-  // Reset pagination & refetch data
-  setPage(0);
-  pageRef.current = 0;
+    // ✅ Update filter states & refs
+    setAppliedFilters(formattedFilters);
+    setExportFilters(formattedFilters);
+    appliedFiltersRef.current = formattedFilters;
 
-  if (isSmallScreen) {
-    setFilterModalOpen(false);
-  }
-
-  // 🚀 Fetch data with updated filters
-  fetchData();
-}, [filterValues, availableFilters, isSmallScreen, fetchData, onFilterChange]);
-
-// ✅ Reset filters completely
-const resetFilters = useCallback(() => {
-  setFilterValues(initialFilterValues);
-  setAppliedFilters(initialFilterValues);
-  setExportFilters(initialFilterValues);
-  appliedFiltersRef.current = initialFilterValues;
-
-  if (onFilterChange) {
-    onFilterChange(initialFilterValues);
-  }
-
-  setPage(0);
-  pageRef.current = 0;
-  fetchData();
-}, [initialFilterValues, fetchData, onFilterChange]);
-
-// ✅ Remove an individual filter safely
-const removeFilter = useCallback(
-  (filterId) => {
-    const filterConfig = availableFilters.find((f) => f.id === filterId);
-    let resetValue;
-
-    if (filterConfig?.type === "dropdown") {
-      resetValue = "All";
-    } else if (filterConfig?.type === "daterange") {
-      resetValue = { start: "", end: "" };
-    } else {
-      resetValue = "";
+    // ✅ Trigger parent callback if present
+    if (onFilterChange) {
+      onFilterChange(formattedFilters);
     }
 
-    const newFilters = {
-      ...appliedFiltersRef.current,
-      [filterId]: resetValue,
-    };
+    // Reset pagination & refetch data
+    setPage(0);
+    pageRef.current = 0;
 
-    setFilterValues((prev) => ({ ...prev, [filterId]: resetValue }));
-    setAppliedFilters(newFilters);
-    setExportFilters(newFilters);
-    appliedFiltersRef.current = newFilters;
+    if (isSmallScreen) {
+      setFilterModalOpen(false);
+    }
+
+    // 🚀 Fetch data with updated filters
+    fetchData();
+  }, [
+    filterValues,
+    availableFilters,
+    isSmallScreen,
+    fetchData,
+    onFilterChange,
+  ]);
+
+  // ✅ Reset filters completely
+  const resetFilters = useCallback(() => {
+    setFilterValues(initialFilterValues);
+    setAppliedFilters(initialFilterValues);
+    setExportFilters(initialFilterValues);
+    appliedFiltersRef.current = initialFilterValues;
 
     if (onFilterChange) {
-      onFilterChange(newFilters);
+      onFilterChange(initialFilterValues);
     }
 
     setPage(0);
     pageRef.current = 0;
     fetchData();
-  },
-  [availableFilters, fetchData, onFilterChange]
-);
+  }, [initialFilterValues, fetchData, onFilterChange]);
 
+  // ✅ Remove an individual filter safely
+  const removeFilter = useCallback(
+    (filterId) => {
+      const filterConfig = availableFilters.find((f) => f.id === filterId);
+      let resetValue;
+
+      if (filterConfig?.type === "dropdown") {
+        resetValue = "All";
+      } else if (filterConfig?.type === "daterange") {
+        resetValue = { start: "", end: "" };
+      } else {
+        resetValue = "";
+      }
+
+      const newFilters = {
+        ...appliedFiltersRef.current,
+        [filterId]: resetValue,
+      };
+
+      setFilterValues((prev) => ({ ...prev, [filterId]: resetValue }));
+      setAppliedFilters(newFilters);
+      setExportFilters(newFilters);
+      appliedFiltersRef.current = newFilters;
+
+      if (onFilterChange) {
+        onFilterChange(newFilters);
+      }
+
+      setPage(0);
+      pageRef.current = 0;
+      fetchData();
+    },
+    [availableFilters, fetchData, onFilterChange]
+  );
 
   const handleChangePage = useCallback(
     (event, newPage) => {
@@ -707,14 +714,20 @@ const removeFilter = useCallback(
           {filter.type === "autocomplete" ? (
             <Autocomplete
               options={filter.options || []}
-              getOptionLabel={filter.getOptionLabel || ((opt) => opt.label)}
-              onInputChange={(event, value) => {
-                if (filter.onSearch) filter.onSearch(value);
-              }}
+              getOptionLabel={filter.getOptionLabel}
+              isOptionEqualToValue={filter.isOptionEqualToValue}
+              onInputChange={(e, val) => filter.onSearch?.(val)}
               value={filterValues[filter.id] || null}
-              onChange={(event, value) => handleFilterChange(filter.id, value)}
+              onChange={(e, newValue) => {
+                console.log("🟠 Selected value:", newValue);
+                handleFilterChange(filter.id, newValue);
+              }}
               renderInput={(params) => (
-                <TextField {...params} label={filter.label} size="small" />
+                <TextField
+                  {...params}
+                  label={filter.label}
+                  variant="outlined"
+                />
               )}
             />
           ) : filter.type === "dropdown" ? (
