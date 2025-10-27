@@ -386,127 +386,137 @@ const CommonTable = ({
   }, [fetchData]);
 
   // Memoized filter handlers
-  const handleFilterChange = useCallback((filterId, value) => {
-    setFilterValues((prev) => ({
-      ...prev,
-      [filterId]: value,
-    }));
-  }, []);
-  const applyFilters = useCallback(() => {
-    console.log(
-      "🔍 [Table] applyFilters called with filterValues:",
-      filterValues
-    );
+// ✅ Memoized filter change handler
+// ✅ Memoized filter change handler
+const handleFilterChange = useCallback((filterId, value) => {
+  setFilterValues((prev) => ({
+    ...prev,
+    [filterId]: value,
+  }));
+}, []);
 
-    // Copy current filter values
-    const formattedFilters = { ...filterValues };
+// ✅ Apply filters with proper id/value handling
+const applyFilters = useCallback(() => {
+  console.log("🔍 [Table] applyFilters called with:", filterValues);
 
-    Object.keys(formattedFilters).forEach((key) => {
-      const filterConfig = availableFilters.find((f) => f.id === key);
+  const formattedFilters = { ...filterValues };
 
-      // Handle autocomplete values (extract value from object)
-      if (filterConfig?.type === "autocomplete" && formattedFilters[key]) {
-        formattedFilters[key] =
-          formattedFilters[key].value || formattedFilters[key];
-      }
+  Object.keys(formattedFilters).forEach((key) => {
+    const filterConfig = availableFilters.find((f) => f.id === key);
+    const val = formattedFilters[key];
 
-      if (filterConfig?.type === "date" && formattedFilters[key]) {
-        // Format single date to YYYY-MM-DD
-        formattedFilters[key] = new Date(formattedFilters[key])
+    // 🚫 Skip empty or "All" values
+    if (val === "" || val === null || val === undefined || val === "All") {
+      delete formattedFilters[key];
+      return;
+    }
+
+    // 🧠 Extract ID or value for dropdown/autocomplete
+    if (filterConfig?.type === "dropdown" && val) {
+      formattedFilters[key] = val.id || val.value || val;
+    }
+
+    if (filterConfig?.type === "autocomplete" && val) {
+      formattedFilters[key] = val.id || val.value || val;
+    }
+
+    // 📅 Handle single date filter
+    if (filterConfig?.type === "date" && val) {
+      formattedFilters[key] = new Date(val).toISOString().split("T")[0];
+    }
+
+    // 📆 Handle date range
+    if (filterConfig?.type === "daterange" && val) {
+      if (val.start) {
+        formattedFilters["from_date"] = new Date(val.start)
           .toISOString()
           .split("T")[0];
-      } else if (filterConfig?.type === "daterange" && formattedFilters[key]) {
-        // Convert daterange to from_date / to_date
-        if (formattedFilters[key].start) {
-          formattedFilters["from_date"] = new Date(formattedFilters[key].start)
-            .toISOString()
-            .split("T")[0];
-        }
-        if (formattedFilters[key].end) {
-          formattedFilters["to_date"] = new Date(formattedFilters[key].end)
-            .toISOString()
-            .split("T")[0];
-        }
-        // Remove original daterange object
-        delete formattedFilters[key];
       }
-    });
-    console.log("🔍 [Table] Formatted filters:", formattedFilters);
+      if (val.end) {
+        formattedFilters["to_date"] = new Date(val.end)
+          .toISOString()
+          .split("T")[0];
+      }
+      delete formattedFilters[key];
+    }
+  });
 
-    // Apply filters
-    setAppliedFilters(formattedFilters);
-    setExportFilters(formattedFilters); // ✅ Update export filters state
-    appliedFiltersRef.current = formattedFilters;
-    console.log(
-      "🔍 [Table] currentAppliedFiltersRef updated:",
-      currentAppliedFiltersRef.current
-    );
+  console.log("✅ [Table] Final formatted filters:", formattedFilters);
+
+  // ✅ Update filter states & refs
+  setAppliedFilters(formattedFilters);
+  setExportFilters(formattedFilters);
+  appliedFiltersRef.current = formattedFilters;
+
+  // ✅ Trigger parent callback if present
+  if (onFilterChange) {
+    onFilterChange(formattedFilters);
+  }
+
+  // Reset pagination & refetch data
+  setPage(0);
+  pageRef.current = 0;
+
+  if (isSmallScreen) {
+    setFilterModalOpen(false);
+  }
+
+  // 🚀 Fetch data with updated filters
+  fetchData();
+}, [filterValues, availableFilters, isSmallScreen, fetchData, onFilterChange]);
+
+// ✅ Reset filters completely
+const resetFilters = useCallback(() => {
+  setFilterValues(initialFilterValues);
+  setAppliedFilters(initialFilterValues);
+  setExportFilters(initialFilterValues);
+  appliedFiltersRef.current = initialFilterValues;
+
+  if (onFilterChange) {
+    onFilterChange(initialFilterValues);
+  }
+
+  setPage(0);
+  pageRef.current = 0;
+  fetchData();
+}, [initialFilterValues, fetchData, onFilterChange]);
+
+// ✅ Remove an individual filter safely
+const removeFilter = useCallback(
+  (filterId) => {
+    const filterConfig = availableFilters.find((f) => f.id === filterId);
+    let resetValue;
+
+    if (filterConfig?.type === "dropdown") {
+      resetValue = "All";
+    } else if (filterConfig?.type === "daterange") {
+      resetValue = { start: "", end: "" };
+    } else {
+      resetValue = "";
+    }
+
+    const newFilters = {
+      ...appliedFiltersRef.current,
+      [filterId]: resetValue,
+    };
+
+    setFilterValues((prev) => ({ ...prev, [filterId]: resetValue }));
+    setAppliedFilters(newFilters);
+    setExportFilters(newFilters);
+    appliedFiltersRef.current = newFilters;
 
     if (onFilterChange) {
-      onFilterChange(formattedFilters);
+      onFilterChange(newFilters);
     }
 
     setPage(0);
     pageRef.current = 0;
-
-    // Close mobile modal if small screen
-    if (isSmallScreen) {
-      setFilterModalOpen(false);
-    }
-
-    // Fetch data with new filters
     fetchData();
-  }, [
-    filterValues,
-    fetchData,
-    availableFilters,
-    isSmallScreen,
-    onFilterChange,
-  ]);
-  const resetFilters = useCallback(() => {
-    setFilterValues(initialFilterValues);
-    setAppliedFilters(initialFilterValues);
-    setExportFilters(initialFilterValues); // ✅ Reset export filters too
-    appliedFiltersRef.current = initialFilterValues;
-    if (onFilterChange) {
-      onFilterChange(initialFilterValues);
-    }
-    setPage(0);
-    pageRef.current = 0;
-    fetchData();
-  }, [initialFilterValues, fetchData, onFilterChange]);
-  const removeFilter = useCallback(
-    (filterId) => {
-      const filterConfig = availableFilters.find((f) => f.id === filterId);
-      let resetValue;
+  },
+  [availableFilters, fetchData, onFilterChange]
+);
 
-      if (filterConfig?.type === "dropdown") {
-        resetValue = "All";
-      } else if (filterConfig?.type === "daterange") {
-        resetValue = { start: "", end: "" };
-      } else {
-        resetValue = "";
-      }
-      const newFilters = {
-        ...appliedFiltersRef.current,
-        [filterId]: resetValue,
-      };
-      setFilterValues((prev) => ({ ...prev, [filterId]: resetValue }));
-      setAppliedFilters(newFilters);
-      setExportFilters(newFilters); // ✅ Update export filters
 
-      appliedFiltersRef.current = newFilters;
-      // currentAppliedFiltersRef.current = newFilters; // ✅ Sync export filters
-
-      if (onFilterChange) {
-        onFilterChange(newFilters);
-      }
-      setPage(0);
-      pageRef.current = 0;
-      fetchData();
-    },
-    [availableFilters, fetchData, onFilterChange]
-  );
   const handleChangePage = useCallback(
     (event, newPage) => {
       setPage(newPage);
