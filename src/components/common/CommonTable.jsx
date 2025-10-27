@@ -725,6 +725,7 @@ const CommonTable = ({
               renderInput={(params) => (
                 <TextField
                   {...params}
+                   size="small"
                   label={filter.label}
                   variant="outlined"
                 />
