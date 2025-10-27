@@ -344,9 +344,9 @@ const PrintDmt2 = () => {
           )}
 
           <Box display="flex" justifyContent="flex-end" mt={1} sx={{ pr: 2 }}>
-            {/* <Typography variant="body1" sx={{ fontWeight: 700 }}>
+             <Typography variant="body1" sx={{ fontWeight: 700 }}>
            Total Amount: ₹ {totalAmountValue.toFixed(2)}
-         </Typography> */}
+         </Typography> 
           </Box>
           {/* Print Button */}
           <Box

@@ -6,6 +6,7 @@ import {
   Grid,
   Typography,
   Paper,
+  Button,
 } from "@mui/material";
 import { Edit } from "@mui/icons-material";
 import CommonTable from "../components/common/CommonTable";
@@ -40,7 +41,7 @@ const Wallet2WalletTransfer = ({}) => {
   const { showToast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
-
+  const [selectedRows, setSelectedRows] = useState([]);
   // User search states
   const [senderSearch, setSenderSearch] = useState("");
   const [receiverSearch, setReceiverSearch] = useState("");
@@ -553,26 +554,90 @@ const Wallet2WalletTransfer = ({}) => {
     ],
     [user]
   );
-
-  return (
-    <Box>
-      <Box sx={{}}>
-        {loading ? (
-          <CommonLoader loading={loading} text="Loading Wallet Transfers" />
-        ) : (
-          <CommonTable
-            onFetchRef={handleFetchRef}
-            columns={columns}
-            endpoint={tableEndpoint}
-            filters={filters}
-            transformData={filterRows}
-            queryParam={{ ...appliedFilters, service: "W2W transfer" }}
-            refresh={true}
-            includeClientRef={false}
+ const columnsWithSelection = useMemo(() => {
+    // Only show checkbox if user is NOT adm or sadm
+    if (user?.role === "adm" || user?.role === "sadm") {
+      return columns; // no selection column
+    }
+    return [
+      {
+        name: "",
+        selector: (row) => (
+          <input
+            type="checkbox"
+            checked={selectedRows.some((r) => r.id === row.id)}
+            disabled={row.status?.toLowerCase() === "failed"}
+            onChange={() => {
+              const isSelected = selectedRows.some((r) => r.id === row.id);
+              const newSelectedRows = isSelected
+                ? selectedRows.filter((r) => r.id !== row.id)
+                : [...selectedRows, row];
+              setSelectedRows(newSelectedRows);
+            }}
           />
-        )}
-      </Box>
+        ),
+        width: "40px",
+      },
+      ...columns,
+    ];
+  }, [selectedRows, columns]);
+  
+  return (
+       <Box>
+      {loading ? (
+        <CommonLoader loading={loading} text="Loading Wallet Transfers" />
+      ) : (
+        <CommonTable
+          onFetchRef={handleFetchRef}
+          columns={columnsWithSelection}
+          endpoint={tableEndpoint}
+          filters={filters}
+          transformData={filterRows}
+          queryParam={{ ...appliedFilters, service: "W2W transfer" }}
+          refresh={true}
+          includeClientRef={false}
+          enableSelection={false}
+          selectedRows={selectedRows}
+          onSelectionChange={setSelectedRows}
+          customHeader={
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                padding: "8px",
+              }}
+            >
+              {selectedRows.length > 0 && (
+                <Tooltip title="Print ">
+                  <Button
+                    variant="contained"
+                    size="small"
+                    color="primary"
+                    onClick={() => {
+                      if (!selectedRows || selectedRows.length === 0) {
+                        alert("Please select at least one transaction to print.");
+                        return;
+                      }
+                      sessionStorage.setItem(
+                        "txnData",
+                        JSON.stringify(selectedRows)
+                      );
+                      window.open("/print-w2w", "_blank");
+                    }}
+                    sx={{ ml: 1 }}
+                  >
+                    <PrintIcon sx={{ fontSize: 22, color: "#fff", mr: 1 }} />
+                    Print
+                  </Button>
+                </Tooltip>
+              )}
+            </Box>
+          }
+        />
+      )}
     </Box>
+
   );
 };
 
