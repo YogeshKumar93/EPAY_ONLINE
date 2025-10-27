@@ -282,9 +282,8 @@ const FundRequest = () => {
           <Tooltip title={row?.remark}>
             <Typography Wrap>{row?.remark}</Typography>
           </Tooltip>
-          
         ),
-       grow:1,
+        grow: 1,
       },
       {
         name: "Admin Remark",
@@ -293,7 +292,21 @@ const FundRequest = () => {
             <Typography Wrap>{row?.admin_remark || "N/A"}</Typography>
           </Tooltip>
         ),
-      grow:1,
+        grow: 1,
+      },
+      {
+        name: "Deposit Date",
+        selector: (row) => (
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <Tooltip title={`Created: ${ddmmyyWithTime(row.created_at)}`} arrow>
+              <div style={{ display: "inline-flex", gap: 4 }}>
+                <span>{ddmmyy(row.date)}</span>
+              </div>
+            </Tooltip>
+          </div>
+        ),
+        wrap: true,
+        width: "80px",
       },
       {
         name: "Status",
