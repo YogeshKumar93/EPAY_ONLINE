@@ -95,7 +95,7 @@ const SoliTechBeneficiaryDetails = ({
         bank_name: beneficiary.bank_name,
         account_number: beneficiary.account_number,
         ifsc_code: beneficiary.ifsc_code,
-        operator: 81,
+        operator: 89,
         mop: transferMode,
         latitude: location?.lat || "",
         longitude: location?.long || "",
@@ -136,7 +136,7 @@ const SoliTechBeneficiaryDetails = ({
 
   return (
     <Paper sx={{ p: 0, mt: 2, borderRadius: 2, overflow: "hidden" }}>
-      <CommonLoader loading={loading} /> 
+      <CommonLoader loading={loading} />
       {/* Header */}
       <Box
         sx={{
