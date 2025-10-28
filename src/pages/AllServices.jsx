@@ -85,6 +85,7 @@ import BbpsBillers from "./BbpsBillers";
 import BillPayments from "./BillPayments";
 import W2wTransfer from "./w2wTransfer";
 import LevinUpiTransfer from "./LevinUpiTransfer";
+import SoliTechPayout from "./SoliTechPayout/SoliTechPayout";
 
 const MenuCard = ({ icon, label, onClick, isActive, user }) => {
   return (
@@ -325,6 +326,13 @@ export default function AllServices() {
           label: "Fund Transfer2",
           icon: AccountBalanceWalletIcon,
           component: LevinFundTransfer,
+          type: "super",
+        },
+        hasPermission("levin") && {
+          key: "fundtransfer3",
+          label: "Fund Transfer3",
+          icon: AccountBalanceWalletIcon,
+          component: SoliTechPayout,
           type: "super",
         },
       ].filter(Boolean), // remove null items

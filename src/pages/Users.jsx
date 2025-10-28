@@ -38,6 +38,7 @@ import debounce from "lodash.debounce";
 // import { useNavigate } from "react-router-dom";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import ChangeRoleModal from "../components/ChangeRole";
+import ChangeParentModal from "./ChangeParentModal";
 
 const roleLabels = {
   ret: "Retailer",
@@ -77,6 +78,15 @@ const Users = ({ query }) => {
   // const navigate = useNavigate();
   const [openChangeRole, setOpenChangeRole] = useState(false);
   // const [selectedUser, setSelectedUser] = useState(null);
+  const [openChangeParent, setOpenChangeParent] = useState(false);
+  const handleOpenChangeParent = (row) => {
+    setSelectedUser(row);
+    setOpenChangeParent(true);
+  };
+  const handleCloseChangeParent = () => {
+    setSelectedUser(null);
+    setOpenChangeParent(false);
+  };
 
   const handleChangeRole = (row) => {
     setSelectedUser(row); // store selected user details
@@ -271,6 +281,15 @@ const Users = ({ query }) => {
               }}
             >
               <ListItemText>Assign Plan</ListItemText>
+            </MenuItem>,
+            <MenuItem
+              key="change_parent"
+              onClick={() => {
+                handleOpenChangeParent(row);
+                handleMenuClose();
+              }}
+            >
+              <ListItemText>Change Parent</ListItemText>
             </MenuItem>,
           ]}
 
@@ -721,6 +740,14 @@ const Users = ({ query }) => {
           onClose={() => setOpenChangeRole(false)}
           user={selectedUser}
           onSuccess={refreshUsers} // refresh table after API success
+        />
+      )}
+      {openChangeParent && (
+        <ChangeParentModal
+          open={openChangeParent}
+          onClose={handleCloseChangeParent}
+          user={selectedUser}
+          onSuccess={refreshUsers}
         />
       )}
     </Box>

@@ -29,7 +29,6 @@ const modalStyle = {
   p: 4,
 };
 
-// Role labels for display
 const roleLabels = {
   ret: "Retailer",
   adm: "Admin",
@@ -42,25 +41,87 @@ const roleLabels = {
   md: "Master Distributor",
 };
 
+const roleMapping = {
+  ret: "di",
+  di: "md",
+  asm: "zsm",
+  md: "asm",
+  dd: "asm",
+};
+
 const ChangeRoleModal = ({ open, onClose, user, onSuccess }) => {
   const { showToast } = useToast();
   const [role, setRole] = useState(user?.role || "");
-  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [confirmOpen, setConfirmOpen] = useState(false); // ✅ confirmation modal
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [parentList, setParentList] = useState([]);
+  const [parentId, setParentId] = useState("");
+  const [loadingParents, setLoadingParents] = useState(false);
+  const [isRoleChanged, setIsRoleChanged] = useState(false);
 
   useEffect(() => {
     if (open) {
       setRole(user?.role || "");
+      setParentId("");
+      setParentList([]);
+      setIsRoleChanged(false);
     }
   }, [open, user]);
+
+  const fetchParentList = async (mappedRole) => {
+    if (!mappedRole) return;
+    setLoadingParents(true);
+    try {
+      const { response, error } = await apiCall(
+        "POST",
+        ApiEndpoints.GET_USERS,
+        {
+          role: mappedRole,
+        }
+      );
+      if (response?.data?.data) {
+        setParentList(response.data.data);
+      } else {
+        showToast(error?.message || "Failed to fetch parent list", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("Error fetching parent list", "error");
+    } finally {
+      setLoadingParents(false);
+    }
+  };
+
+  const handleRoleChange = (e) => {
+    const selectedRole = e.target.value;
+    setRole(selectedRole);
+
+    const mappedRole = roleMapping[selectedRole];
+
+    // ✅ Show parent field only when role actually changes
+    const roleChanged = selectedRole !== user?.role;
+    setIsRoleChanged(roleChanged);
+
+    if (roleChanged && mappedRole) {
+      fetchParentList(mappedRole);
+    } else {
+      setParentList([]);
+      setParentId("");
+    }
+  };
 
   const handleUpdateClick = () => {
     if (!role) {
       showToast("Please select a role", "error");
       return;
     }
-    setConfirmOpen(true); // open confirmation modal
+
+    if (isRoleChanged && roleMapping[role] && !parentId) {
+      showToast("Please select a parent user", "error");
+      return;
+    }
+
+    setConfirmOpen(true);
   };
 
   const handleSubmit = async () => {
@@ -72,10 +133,20 @@ const ChangeRoleModal = ({ open, onClose, user, onSuccess }) => {
 
     setLoading(true);
     try {
-      const { response, error } = await apiCall("POST", ApiEndpoints.CHANGE_ROLE, {
+      const payload = {
         user_id: user.id,
         role,
-      });
+      };
+
+      if (parentId) {
+        payload.parent_id = parentId;
+      }
+
+      const { response, error } = await apiCall(
+        "POST",
+        ApiEndpoints.CHANGE_ROLE,
+        payload
+      );
 
       if (response) {
         showToast(response.message || "Role updated successfully", "success");
@@ -95,7 +166,6 @@ const ChangeRoleModal = ({ open, onClose, user, onSuccess }) => {
 
   return (
     <>
-      {/* Main Modal */}
       <Modal open={open} onClose={onClose}>
         <Box sx={modalStyle}>
           <Typography variant="h6" mb={2}>
@@ -107,50 +177,94 @@ const ChangeRoleModal = ({ open, onClose, user, onSuccess }) => {
             label="Select Role"
             fullWidth
             value={role}
-            onChange={(e) => setRole(e.target.value)}
+            onChange={handleRoleChange}
             margin="normal"
           >
-            {roles.length > 0
-              ? roles.map((r) => {
-                  const value = r.role || r.code;
-                  const label = roleLabels[value] || r.role_name || r.name || value;
-                  return (
-                    <MenuItem key={value} value={value}>
-                      {label}
-                    </MenuItem>
-                  );
-                })
-              : Object.entries(roleLabels).map(([key, label]) => (
-                  <MenuItem key={key} value={key}>
-                    {label}
-                  </MenuItem>
-                ))}
+            {Object.entries(roleLabels).map(([key, label]) => (
+              <MenuItem key={key} value={key}>
+                {label}
+              </MenuItem>
+            ))}
           </TextField>
 
-          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1, mt: 3 }}>
-            <Button onClick={onClose} variant="outlined" color="error" disabled={loading}>
+          {/* ✅ Show Select Parent only when role actually changes */}
+          {isRoleChanged && roleMapping[role] && (
+            <TextField
+              select
+              label="Select Parent"
+              fullWidth
+              value={parentId}
+              onChange={(e) => setParentId(e.target.value)}
+              margin="normal"
+              disabled={loadingParents}
+            >
+              {loadingParents ? (
+                <MenuItem disabled>
+                  <CircularProgress size={20} />
+                </MenuItem>
+              ) : parentList.length > 0 ? (
+                parentList.map((p) => (
+                  <MenuItem key={p.id} value={p.id}>
+                    {p.name} ({p.establishment})
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>No parents available</MenuItem>
+              )}
+            </TextField>
+          )}
+
+          <Box
+            sx={{ display: "flex", justifyContent: "flex-end", gap: 1, mt: 3 }}
+          >
+            <Button
+              onClick={onClose}
+              variant="outlined"
+              color="error"
+              disabled={loading}
+            >
               Cancel
             </Button>
-            <Button onClick={handleUpdateClick} variant="contained" color="primary" disabled={loading}>
+            <Button
+              onClick={handleUpdateClick}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+            >
               {loading ? <CircularProgress size={24} /> : "Update Role"}
             </Button>
           </Box>
         </Box>
       </Modal>
 
-      {/* Confirmation Dialog */}
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <DialogTitle>Confirm Role Change</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to change the role of <b>{user?.name}</b> to <b>{roleLabels[role] || role}</b>?
+            Are you sure you want to change the role of <b>{user?.name}</b> to{" "}
+            <b>{roleLabels[role] || role}</b>?
+            {isRoleChanged && roleMapping[role] && parentId && (
+              <>
+                <br />
+                New Parent ID: <b>{parentId}</b>
+              </>
+            )}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setConfirmOpen(false)} color="error" variant="outlined">
+          <Button
+            onClick={() => setConfirmOpen(false)}
+            color="error"
+            variant="outlined"
+          >
             Cancel
           </Button>
-          <Button onClick={handleSubmit} color="primary" variant="contained" disabled={loading}>
+          <Button
+            onClick={handleSubmit}
+            color="primary"
+            variant="contained"
+            disabled={loading}
+          >
             {loading ? <CircularProgress size={20} /> : "Confirm"}
           </Button>
         </DialogActions>

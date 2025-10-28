@@ -58,6 +58,7 @@ const AdminCreateUser = ({ open, onClose, onFetchRef }) => {
     di: "md",
     asm: "zsm",
     md: "asm",
+    dd: "asm",
   };
 
   useEffect(() => {
