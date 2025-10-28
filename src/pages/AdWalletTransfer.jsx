@@ -234,7 +234,10 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
                 sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
               >
                 <MenuItem value="credit">Credit</MenuItem>
-                {(user.role === "adm" || user.role === "sadm") && (
+                {(user.role === "adm" ||
+                  user.role === "sadm" ||
+                  user.role === "md" ||
+                  user.role === "di") && (
                   <MenuItem value="debit">Debit</MenuItem>
                 )}
               </TextField>
