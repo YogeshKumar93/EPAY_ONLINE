@@ -133,7 +133,7 @@ const ChangeParentModal = ({ open, onClose, user, onSuccess }) => {
         ApiEndpoints.CHANGE_PARENT,
         {
           user_id: user.id,
-          new_parent_id: selectedParent.id,
+          parent_id: selectedParent.id,
         }
       );
 

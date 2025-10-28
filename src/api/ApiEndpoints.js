@@ -290,7 +290,7 @@ const ApiEndpoints = {
   SOLITECH_DELETE_BENEFICIARY: "payout/deleteBeneficiary2",
   SOLITECH_CHECK_TRANSACTION_STATUS: "payout/checkTransactionStatus",
   SOLITECH_BANK_IFSC: "payout/getIfsc",
-
+  CHANGE_PARENT: "auth/changeParent",
   BASIC_SCHEMA: "business/basicSchema",
   CONTACT_SCHEMA: "business/contactSchema",
   ADDRESS_SCHEMA: "business/addressSchema",
