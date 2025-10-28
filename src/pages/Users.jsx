@@ -595,7 +595,7 @@ const Users = ({ query }) => {
     }
 
     // Actions column
-    if (["adm", "di", "md", "sadm"].includes(userRole?.role)) {
+    if (["adm", "sadm"].includes(userRole?.role)) {
       baseColumns.push({
         name: "Actions",
         selector: (row) => (
