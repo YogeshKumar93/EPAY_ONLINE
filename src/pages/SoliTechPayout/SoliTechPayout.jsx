@@ -177,13 +177,13 @@ const SoliTechPayout = () => {
         gap={1}
         mb={1}
       >
-        {" "}
         <Autocomplete
           freeSolo
-          options={history}
-          value={mobile}
+          options={history.map(String)} // ✅ Ensure all are strings
+          value={String(mobile || "")} // ✅ Force string value
           onInputChange={handleChange}
           sx={{ flex: 1 }}
+          getOptionLabel={(option) => String(option)} // ✅ Always return string
           renderInput={(params) => (
             <TextField
               {...params}

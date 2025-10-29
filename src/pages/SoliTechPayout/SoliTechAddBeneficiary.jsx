@@ -301,7 +301,7 @@ const SoliTechAddBeneficiary = ({
           onOpen={() => setBankOpen(true)}
           onClose={() => setBankOpen(false)}
           options={filteredBanks}
-          getOptionLabel={(option) => `${option.BankName} (${option.BankCode})`}
+          getOptionLabel={(option) => `${option.BankName}`}
           loading={loadingBanks}
           inputValue={bankSearch}
           onInputChange={(event, newValue) => setBankSearch(newValue)}
