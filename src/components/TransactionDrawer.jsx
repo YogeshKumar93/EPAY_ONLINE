@@ -165,7 +165,9 @@ const TransactionDrawer = ({
             title="Raise Complaint"
             sx={{ color: "secondary.main" }}
           >
-            <PanToolIcon />
+            <Tooltip>
+              <PanToolIcon />
+            </Tooltip>
           </IconButton>
           {renderSection("Transaction Details", transactionDetails)}
 

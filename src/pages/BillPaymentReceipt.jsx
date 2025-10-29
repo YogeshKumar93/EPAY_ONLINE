@@ -39,22 +39,6 @@ const BillPaymentReceipt = ({
     console.log("Downloading receipt...");
   };
 
-  // Share receipt
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: "Payment Receipt",
-        text: `Payment of ₹${amount} to ${operator} completed successfully. Transaction ID: ${transactionId}`,
-      });
-    } else {
-      // Fallback: copy to clipboard
-      navigator.clipboard.writeText(
-        `Payment Receipt\nAmount: ₹${amount}\nOperator: ${operator}\nTransaction ID: ${transactionId}`
-      );
-      alert("Receipt details copied to clipboard!");
-    }
-  };
-
   // Print receipt
   const handlePrint = () => {
     window.print();
