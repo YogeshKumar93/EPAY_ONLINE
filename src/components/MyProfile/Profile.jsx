@@ -43,6 +43,7 @@ import ChangeLayoutModal from "../Layout/ChangeLayoutModal";
 import { BusinessInformation } from "./BusinessInformation";
 import ProfileTabs from "./ProfileTabs";
 import TwoFA from "./TwoFA";
+import ProfileImageUploadModal from "./ProfileImageUploadModal";
 // import ProfileTabs from "./ProfileTabs";
 
 const ProfilePage = () => {
@@ -64,6 +65,7 @@ const ProfilePage = () => {
   const [editedUser, setEditedUser] = useState({ ...user });
   const [businessModal, setBusinessModal] = useState(false);
   const [viewInfoModalOpen, setViewInfoModalOpen] = useState(false);
+  const [profileImageModalOpen, setProfileImageModalOpen] = useState(false);
 
   // Sync editedUser with user context when user changes
   useEffect(() => {
@@ -251,6 +253,8 @@ const ProfilePage = () => {
               <Grid item xs={12} sm="auto" sx={{ position: "relative" }}>
                 <Box sx={{ position: "relative", display: "inline-block" }}>
                   <Avatar
+                    src={user?.profile_image || ""}
+                    alt={user?.name || "User Avatar"}
                     sx={{
                       width: { xs: 100, sm: 120, md: 140 },
                       height: { xs: 100, sm: 120, md: 140 },
@@ -261,6 +265,7 @@ const ProfilePage = () => {
                       justifyContent: "center",
                       alignItems: "center",
                       transition: "all 0.3s ease",
+                      objectFit: "cover",
                       "&:hover": {
                         transform: "scale(1.05)",
                         border: "4px solid rgba(255, 215, 0, 0.8)",
@@ -268,12 +273,14 @@ const ProfilePage = () => {
                       },
                     }}
                   >
-                    <Person
-                      sx={{
-                        fontSize: { xs: 40, sm: 50, md: 60 },
-                        color: "white",
-                      }}
-                    />
+                    {!user?.profile_image && (
+                      <Person
+                        sx={{
+                          fontSize: { xs: 40, sm: 50, md: 60 },
+                          color: "white",
+                        }}
+                      />
+                    )}
                   </Avatar>
 
                   <IconButton
@@ -289,7 +296,7 @@ const ProfilePage = () => {
                       },
                       transition: "all 0.2s ease",
                     }}
-                    // onClick={handleEditToggle}
+                    onClick={() => setProfileImageModalOpen(true)}
                   >
                     <Edit sx={{ fontSize: 16, color: "#1E3A8A" }} />
                   </IconButton>
@@ -635,6 +642,17 @@ const ProfilePage = () => {
       )}
       {twoFAModalOpen && (
         <TwoFA open={twoFAModalOpen} onClose={() => setTwoFAModalOpen(false)} />
+      )}
+      {profileImageModalOpen && (
+        <ProfileImageUploadModal
+          open={profileImageModalOpen}
+          onClose={() => setProfileImageModalOpen(false)}
+          onUploadSuccess={(newImageUrl) => {
+            authCtx.setUser({ ...user, profile_image: newImageUrl });
+            setProfileImageModalOpen(false);
+            setSuccessMessage("Profile image updated successfully!");
+          }}
+        />
       )}
     </Box>
   );

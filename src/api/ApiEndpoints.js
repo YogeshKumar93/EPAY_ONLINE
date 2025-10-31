@@ -326,35 +326,11 @@ const ApiEndpoints = {
   REMOVE_LEIN: "lien/removeLien",
   GET_LEIN: "lien/getLien",
   API_BALANCE: "misc/apiBalance",
+  UPDATE_USER_PROFILE_NEW: "user/updateProfileImage",
   // WALLET_UPDATE: "wallet/update",
   // WALLET_DELETE: "wallet/delete",
 
   // ****************************** NEW API'S ABOVE ******************************
-
-  GET_ACC_BANKS: "",
-  UPDATE_BANKS: "admin/changeBankStatus",
-  ADD_ACCOUNT: "admin/createNewAcc",
-  ADD_ACCOUNT_TXN: "admin/addAccTxn",
-  DELETE_TXN: "admin/deleteTxn",
-  GET_MASSEGE: "admin/getMessages",
-  GET_OUT_MASSEGE: "admin/getOutMessages",
-  GET_WEBHOOK: "admin/getWebHooks",
-  // GET_ACCOUNT_STATEMENT: "admin/getAccStatement",
-  GET_BANK_STATEMENT: "admin/getBankStatement",
-  ADD_BANK_TXN: "admin/addBankTxn",
-  DELETE_BANK_TXN: "admin/deleteBankTxn",
-  GET_PENDING_ACCOUNT_TRANSACTION: "admin/getPendingBankTxn",
-  GET_STATUS: "admin/checkTxnStatus",
-  CHANGE_STATUS: "admin/changeTxnStatus",
-
-  LOGIN_HISTORY: "userDevice/getUserDevice",
-  GET_WEBHOOKS: "webhook/getWebhook",
-
-  BLOCK_UNBLOCK_PLANS: "",
-  ADD_PLAN: "admin/createPlan",
-  DELETE_PLAN: "admin/deletePlan",
-  COMPLAINTS: "admin/getIssues",
-  GET_USER_AD_ASM: "admin/getUserAdAsm",
 
   ADMIN_OP_SERVICE: "admin/service",
   VERIFY_PAN: "admin/verifyPan",
@@ -409,13 +385,8 @@ const ApiEndpoints = {
   ADD_BENE: "dmr/registerBeneficiary",
   DMT2_ADD_BENE: "dmr/registerBeneficiaryDmt2",
   ADD_REM: "dmr/registerRemitter",
-  NEW_ADD_REM: "dmr/registerExpRemitter",
-  GET_BLOCKED_AC: "admin/blockedAccounts",
 
   DMT2_ADD_REM: "dmr/registerRemitterDmt2",
-  ADD_BENE_EXPRESS: "dmr/addBenExpress",
-  ADD_BENE_SUPER: "dmr/addBenExpress",
-  REMOVE_BENE_EXPRESS: "dmr/delBenExpress",
 
   ADD_REM_EXPRESS: "dmr/registerExpRemitter",
   ADD_REM_SUPER: "dmr/registerSupRemitter",
@@ -428,34 +399,6 @@ const ApiEndpoints = {
   DMR_MONEY_TRANSFER: "dmr/transactionDmr",
   VERIFY_ACC: "dmr/accountVerification",
   DMT2_MT: "dmr/transactionDmt2",
-
-  BBPS_CATEGORIES: "prepaid/getCategories",
-  // BBPS_GET_BILLERS: "prepaid/getBillers",
-  // BBPS_GET_BILLERS_DETAILS: "prepaid/getBillerDetails",
-  // BBPS_FETCH_BILL: "prepaid/fetchBillInst",
-  // BBPS_PAY_BILL: "prepaid/payBillInst",
-
-  //recharges and bill payment
-  RECH_FETCH_BILL: "prepaid/fetchBill",
-  RECH_PAY_BILL: "prepaid/payBill",
-
-  // user
-  GET_ROLL: "",
-  RAISE_ISSUE_USER: "user/raiseIssue",
-  UPLOAD_USER_PHOTO: "user/uploadProfileImg",
-  UPLOAD_USER_KYC: "user/uploadKycImg",
-  UPDATE_USER_PROFILE: "user/updateProfile",
-  ADD_SETTLEMENT_ACC: "/user/addSettlementAcc",
-  GET_SETTLEMENT_ACCS: "/user/getSettlementAcc",
-  GET_VIRTUAL_ACC: "user/getVa",
-  //
-  HANDLE_ISSUE: "admin/updateIssue",
-  BANK_SETTELMENT: "dmr/accSettlementNew", ///
-  VERIFY_ACC_UPI: "dmr/vpaVerification",
-  UPI_PAY: "dmr/upiPay",
-
-  BILLPAY_CC: "dmr/billPaymentCc",
-  OLD_TRANSACTIONS: "admin/getOldTransactions",
 
   // aeps
   AEPS_BANK: "aeps/getBanks",
@@ -537,65 +480,19 @@ const ApiEndpoints = {
   NEPAL_COMPLIANCE_TRANSACTION: "nepalTransfer/ComplianceTransactions",
   GET_SERVICE_CHARGE: "nepalTransfer/GetServiceChargeByCollection",
 
-  ADMIN_SERVICES: "admin/updateServices",
-  USER_SERVICES: "admin/getUserServices",
-  GET_SIGNUP_ROLES: "onboarding/userOnboarding",
-
-  // flight
-  GETAIRPORTS: "flights/getAirports",
-  GET_CALENDAR_FARE: "flights/GetCalendarFareByMonth",
-  SEARCH_FLIGHTS: "flights/searchFlight",
-  PRICE_CHECK_FLIGHTS: "flights/priceCheck",
-  BOOK_FLIGHT: "flights/flightBooking",
-  CREATE_ORDER_CMS: "user/createOrderCms",
-  // pg api
-  CREATE_ORDER: "user/createOrderPg",
-  // IRCTC AUTH
-  IRCTC_AUTH_PAYMENT: "prod/irctc/authPayment",
-  UAT_IRCTC_AUTH_PAYMENT: "uat/irctc/authPayment",
   // aeps2 api
-  AEPS2_OUTLETREG: "aeps/merchantOnboardingFp",
-  AEPS2_MERCHANTEKYC: "aeps/merchantEkycFp",
-  AEPS2_VALIDATEOTP: "aeps/validateOtpFp",
-  AEPS2_BIOMETRICKYC: "aeps/merchantBiomatricKyc",
-  AEPS2_OUTLET_LOGIN: "aeps/twoFaFp",
-  AEPS2_CASHWITHDRAWAL: "aeps/cashWithdrawlFp",
-  AEPS2_AADHAARPAY: "aeps/aadhaarPayFp",
-  AEPS2_BALANCE: "aeps/balanceInquiryFp",
-  AEPS2_STATEMENT: "aeps/miniStatementFp",
-  AEPS2_STATES: "aeps/getStatesFp",
-  AEPS2_BANKS: "aeps/getBanksFp",
   REMITTER_KYC: "dmr/remitterKyc",
   REMITTER_KYC_dmt2: "dmr/remitterEkycDmt2",
-  DMT2_REGISTER_REM: "dmr/registerRemitterDmt2",
-  // DMT2_MT: "dmr/transactionDmrDmt2",
   OTP_PSPRINT: "dmr/otpForDmt2",
   DMR_MONEY_TRANSFER: "dmr/transactionDmr",
   REGISTER_REMITTER_DMT3: "dmr/registerRemitterDmt3",
   DMT3_ADD_REM: "dmr/remitterEkycDmt3",
   GET_REMMITTER_STATUS_DMT3: "dmr/getRemitterStatusDmt3",
-  GET_REMMITTER_STATUS_DMT3: "dmr/getRemitterStatusDmt3",
   VALIDATE_SUP_OTP: "dmr/verifySupRemitter",
   VALIDATE_EXP_OTP: "dmr/verifyExpRemitter",
   VALIDATE_SUP_OTP: "dmr/verifySupRemitter",
-  OTP_EXP: "dmr/otpExp",
-  OTP_dmt1: "dmr/transactionOtpDmt1",
   GET_REMMITTER_STATUS_NEW: "dmr/getRemitterStatusNew",
   GET_REMMITTER_STATUS_SUPER: "dmr/remitterStatusSuper",
-  GET_TXN_ID_CR_REQUEST: "user/getTxnIdCrRequest",
-  CREATE_AEPS_SCHEME: "schemes/createAepsScheme",
-  CREATE_CARD_SCHEME: "schemes/createCardScheme",
-  UPDATE_AEPS_SCHEME: "schemes/updateAepsScheme",
-  UPDATE_CARD_SCHEME: "schemes/updateCardScheme",
-  CREATE_UPI_SCHEME: "schemes/createUpiScheme",
-  UPDATE_UPI_SCHEME: "schemes/updateUpiScheme",
-  ADMIN_RESEND_TRANSACTION: "admin/resendTransaction",
-  GET_AEPS_SCHEMA: "schemes/aepsSchemes",
-  GET_CARD_SCHEMA: "schemes/cardSchemes",
-  PAN_LINK: "admin/mobileUpdate",
-  PAN_VERIFY: "admin/mobileUpdateVerify",
-  CREATE_QR: "admin/generateVirQr",
   GET_TIME: "https://timeapi.io/api/time/current/zone?timeZone=Asia%2FKolkata",
-  GET_MERCHANTS: "admin/getMerchantsData",
 };
 export default ApiEndpoints;
