@@ -49,13 +49,14 @@ const BankStatements = () => {
   const user = authCtx.user;
   const { showToast } = useToast();
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const handleOpenDeleteModal = () => setOpenDeleteModal(true);
   const handleCloseDeleteModal = () => setOpenDeleteModal(false);
   const [openDownloadExcel, SetOpenDownloadExcel] = useState(false);
   const { bank_id, bank_name, balance: oldBalance } = location.state || {};
 
-  const [loading, setLoading] = useState(true);
+  const [openUploadSuccess, setOpenUploadSuccess] = useState(false);
+
   const [filterValues, setFilterValues] = useState({ date: {}, dateVal: "" });
   const [query, setQuery] = useState(`bank_id=${bank_id}`);
 
@@ -71,12 +72,12 @@ const BankStatements = () => {
     if (bank_id && oldBalance !== undefined) setLoading(false);
   }, [bank_id, oldBalance]);
 
-  const handleDownloadSample = () => {
-    const link = document.createElement("a");
-    link.href = `${process.env.PUBLIC_URL}/uplodeexcel2.xlsx`;
-    link.download = "uplodeexcel2.xlsx";
-    link.click();
-  };
+  // const handleDownloadSample = () => {
+  //   const link = document.createElement("a");
+  //   link.href = `${process.env.PUBLIC_URL}/uplodeexcel2.xlsx`;
+  //   link.download = "uplodeexcel2.xlsx";
+  //   link.click();
+  // };
 
   const handleConfirmDelete = async () => {
     try {
@@ -101,111 +102,125 @@ const BankStatements = () => {
     }
   };
 
- const handleDownloadExcel = async () => {
-  try {
-    showToast("Preparing Excel download...", "info");
+  const handleDownloadExcel = async () => {
+    try {
+      showToast("Preparing Excel download...", "info");
 
-    // Fetch filtered data (same API as your table)
-    const { response, error } = await apiCall(
-      "POST",
-      `${ApiEndpoints.GET_BANK_STATEMENTS}?${query}`
-    );
+      // Fetch filtered data (same API as your table)
+      const { response, error } = await apiCall(
+        "POST",
+        `${ApiEndpoints.GET_BANK_STATEMENTS}?${query}`
+      );
 
-    if (error || !response?.data) {
-      showToast("No data found for selected filters", "warning");
-      return;
-    }
-
-    const tableData = response.data.map((row, index) => ({
-      "S.No": index + 1,
-      Date: ddmmyy(row.created_at),
-      Time: dateToTime1(row.created_at),
-      "Handled By": row.handle_by,
-      Particulars: row.particulars,
-      Remarks: row.remarks,
-      MOP: row.mop,
-      Credit: row.credit,
-      Debit: row.debit,
-      Balance: row.balance,
-      Status: row.status === 0 ? "UNCLAIMED" : "CLAIMED",
-    }));
-
-    // Convert to Excel worksheet
-    const worksheet = XLSX.utils.json_to_sheet(tableData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Bank Statements");
-
-    // Trigger download
-    XLSX.writeFile(workbook, `BankStatements_${bank_name || "Bank"}.xlsx`);
-
-    showToast("Excel downloaded successfully!", "success");
-  } catch (err) {
-    console.error("Excel download error:", err);
-    showToast("Failed to download Excel", "error");
-  }
-};
-
-
-// 👇 Add this inside BankStatements component
-const handleUploadExcel = async (file) => {
-  try {
-    const reader = new FileReader();
-
-    reader.onload = async (e) => {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
-      if (!jsonData.length) {
-        showToast("No data found in Excel", "error");
+      if (error || !response?.data) {
+        showToast("No data found for selected filters", "warning");
         return;
       }
 
-      showToast(`Uploading ${jsonData.length} records...`, "info");
+      const tableData = response.data.map((row, index) => ({
+        "S.No": index + 1,
+        Date: ddmmyy(row.created_at),
+        Time: dateToTime1(row.created_at),
+        "Handled By": row.handle_by,
+        Particulars: row.particulars,
+        Remarks: row.remarks,
+        MOP: row.mop,
+        Credit: row.credit,
+        Debit: row.debit,
+        Balance: row.balance,
+        Status: row.status === 0 ? "UNCLAIMED" : "CLAIMED",
+      }));
 
-      // Process each row sequentially
-      for (let i = 0; i < jsonData.length; i++) {
-        const row = jsonData[i];
+      // Convert to Excel worksheet
+      const worksheet = XLSX.utils.json_to_sheet(tableData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Bank Statements");
 
-        // Build payload same as CreateBankStatement form
-        const payload = {
-          bank_id: bank_id,
-          balance: oldBalance || 0,
-          date: row.date ? new Date(row.date).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
-          credit: Number(row.credit || 0),
-          debit: Number(row.debit || 0),
-          mop: row.mop || "",
-          handle_by: row.handle_by || "",
-          particulars: row.particulars || "",
-        };
+      // Trigger download
+      XLSX.writeFile(workbook, `BankStatements_${bank_name || "Bank"}.xlsx`);
 
-     
+      showToast("Excel downloaded successfully!", "success");
+    } catch (err) {
+      console.error("Excel download error:", err);
+      showToast("Failed to download Excel", "error");
+    }
+  };
 
-        const { response, error } = await apiCall(
-          "POST",
-          ApiEndpoints.CREATE_BANK_STATEMENT,
-          payload
-        );
+  // 👇 Add this inside BankStatements component
+  const handleUploadExcel = async (file) => {
+    try {
+      const reader = new FileReader();
 
-        if (response) {
-      showToast(response?.message, "success");
-        } else {
-      showToast(error?.message, "error");
+      reader.onload = async (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+        if (!jsonData.length) {
+          showToast("No data found in Excel", "error");
+
+          return;
         }
-      }
 
-      refreshStatements(); // refresh table after upload
-    };
+        showToast(`Uploading ${jsonData.length} records...`, "info");
 
-    reader.readAsArrayBuffer(file);
-  } catch (err) {
-    console.error("Error reading Excel file:", err);
-    showToast("Failed to process Excel file", "error");
-  }
-};
+        // Process each row sequentially
+        for (let i = 0; i < jsonData.length; i++) {
+          const row = jsonData[i];
 
+          // Build payload same as CreateBankStatement form
+          const payload = {
+            bank_id: bank_id,
+            balance: oldBalance || 0,
+            date: (() => {
+              if (row.date) {
+                const parsedDate = new Date(row.date);
+                if (!isNaN(parsedDate)) {
+                  // ✅ Format for DATETIME column
+                  return parsedDate
+                    .toISOString()
+                    .slice(0, 19)
+                    .replace("T", " ");
+                }
+              }
+              // ✅ Fallback: current datetime
+              return new Date().toISOString().slice(0, 19).replace("T", " ");
+            })(),
+
+            credit: Number(row.credit || 0),
+            debit: Number(row.debit || 0),
+            mop: row.mop || "",
+            handle_by: row.handle_by || "",
+            particulars: row.particulars || "",
+          };
+          const { response, error } = await apiCall(
+            "POST",
+            ApiEndpoints.CREATE_BANK_STATEMENT,
+            payload
+          );
+
+          if (response) {
+            setLoading(true);
+
+            showToast(response?.message, "success");
+            refreshStatements(); // refresh table after upload
+          } else {
+            showToast(error?.message, "error");
+            setLoading(false);
+          }
+        }
+        setLoading(false);
+        setOpenUploadSuccess(true);
+      };
+
+      reader.readAsArrayBuffer(file);
+    } catch (err) {
+      console.error("Error reading Excel file:", err);
+      showToast("Failed to process Excel file", "error");
+    }
+  };
 
   const columns = [
     {
@@ -331,7 +346,35 @@ const handleUploadExcel = async (file) => {
 
   return (
     <>
+      {/* Existing Loader */}
       <CommonLoader loading={loading} text="Loading Statements..." />
+
+      <Dialog
+        open={openUploadSuccess}
+        onClose={() => setOpenUploadSuccess(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle sx={{ textAlign: "center", fontWeight: 600 }}>
+          Data Uploaded Successfully
+        </DialogTitle>
+        <DialogContent sx={{ textAlign: "center", pb: 2 }}>
+          Your Excel data has been uploaded and processed successfully.
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: "center" }}>
+          <Button
+            variant="contained"
+            onClick={() => setOpenUploadSuccess(false)}
+            sx={{
+              backgroundColor: primaryColor(),
+              color: "#fff",
+              "&:hover": { backgroundColor: secondaryColor() },
+            }}
+          >
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {!loading && (
         <Box>
@@ -343,12 +386,12 @@ const handleUploadExcel = async (file) => {
             balance={oldBalance}
           />
 
-          <DownloadExcel 
-           open={openDownloadExcel}
-  handleClose={() => SetOpenDownloadExcel(false)}
-  onFetchRef={refreshStatements}
-  bankId={bank_id}
-  balance={oldBalance}
+          <DownloadExcel
+            open={openDownloadExcel}
+            handleClose={() => SetOpenDownloadExcel(false)}
+            onFetchRef={refreshStatements}
+            bankId={bank_id}
+            balance={oldBalance}
           />
           <Dialog open={openDeleteModal} onClose={handleCloseDeleteModal}>
             <DialogTitle>Confirm Delete</DialogTitle>
@@ -409,7 +452,6 @@ const handleUploadExcel = async (file) => {
                         },
                       }}
                       onClick={() => SetOpenDownloadExcel(true)}
-
                     >
                       {/* Use the imported image */}
                       <img
@@ -417,39 +459,37 @@ const handleUploadExcel = async (file) => {
                         alt="Excel"
                         style={{ width: 23, height: 23 }}
                       />
-
-                     
                     </IconButton>
                   </Tooltip>
 
-   <Tooltip title="Upload Excel">
-  <IconButton
-    component="label"
-    size="small"
-    sx={{
-      color: "#fff",
-      "&:hover": { backgroundColor: "#098f60ff" },
-    }}
-  >
-    <img src={excelImg} alt="Upload Excel" style={{ width: 23, height: 23 }} />
-    <input
-      type="file"
-      accept=".xlsx, .xls"
-      hidden
-      onChange={(e) => {
-        const file = e.target.files[0];
-        if (file) {
-          handleUploadExcel(file); // ✅ this now works
-          e.target.value = ""; // reset input
-        }
-      }}
-    />
-  </IconButton>
-</Tooltip>
-
-
-
-
+                  <Tooltip title="Upload Excel">
+                    <IconButton
+                      component="label"
+                      size="small"
+                      sx={{
+                        color: "#fff",
+                        "&:hover": { backgroundColor: "#098f60ff" },
+                      }}
+                    >
+                      <img
+                        src={sampleFileImg}
+                        alt="Upload Excel"
+                        style={{ width: 23, height: 23 }}
+                      />
+                      <input
+                        type="file"
+                        accept=".xlsx, .xls"
+                        hidden
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            handleUploadExcel(file); // ✅ this now works
+                            e.target.value = ""; // reset input
+                          }
+                        }}
+                      />
+                    </IconButton>
+                  </Tooltip>
 
                   <Tooltip title="Delete Last Txn">
                     <IconButton
@@ -462,23 +502,22 @@ const handleUploadExcel = async (file) => {
                   </Tooltip>
 
                   {/* Upload Excel */}
-                 <Tooltip title="Download Excel">
-  <IconButton
-    size="small"
-    sx={{
-      color: "#fff",
-      "&:hover": { backgroundColor: "#098f60ff" },
-    }}
-    onClick={handleDownloadExcel} // ✅ attach function here
-  >
-    <img
-      src={excelImg}
-      alt="Download Excel"
-      style={{ width: 23, height: 23 }}
-    />
-  </IconButton>
-</Tooltip>
-
+                  <Tooltip title="Download Excel">
+                    <IconButton
+                      size="small"
+                      sx={{
+                        color: "#fff",
+                        "&:hover": { backgroundColor: "#098f60ff" },
+                      }}
+                      onClick={handleDownloadExcel} // ✅ attach function here
+                    >
+                      <img
+                        src={excelImg}
+                        alt="Download Excel"
+                        style={{ width: 23, height: 23 }}
+                      />
+                    </IconButton>
+                  </Tooltip>
                 </Box>
               </Box>
             }

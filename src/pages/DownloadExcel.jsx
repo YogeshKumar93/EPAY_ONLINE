@@ -5,7 +5,7 @@ import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { useToast } from "../utils/ToastContext";
 
-const DownloadExcel = ({ open, handleClose, onFetchRef, bankId, balance }) => {
+const DownloadExcel = ({ open, handleClose, onFetchRef, bankId }) => {
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -17,29 +17,25 @@ const DownloadExcel = ({ open, handleClose, onFetchRef, bankId, balance }) => {
 
   const generateAndDownloadExcel = async () => {
     try {
-      // ✅ Optionally fetch schema to know field names (not required but can confirm structure)
-      const { response: schemaResponse } = await apiCall(
+      // ✅ Fetch schema (optional)
+      const { data: schemaResponse } = await apiCall(
         "POST",
         ApiEndpoints.GET_BANK_STATEMENT_SCHEMA
       );
 
-      // ✅ Build dummy data (with real field names if schema available)
-      const fields =
-        schemaResponse?.data?.fields?.map((f) => f.name) || [
-        //   "bank_id",
-        //   "balance",
-          "date",
-          "credit",
-          "debit",
-          "mop",
-          "handle_by",
-          "particulars",
-        ];
+      // ✅ Use schema field names if available
+      const fields = schemaResponse?.fields?.map((f) => f.name) || [
+        "date",
+        "credit",
+        "debit",
+        "mop",
+        "handle_by",
+        "particulars",
+      ];
 
+      // ✅ Dummy data for Excel
       const dummyData = [
         {
-        //   bank_id: bankId || "123",
-        //   balance: balance || 10000,
           date: new Date().toISOString().split("T")[0],
           credit: 205000,
           debit: 0,
@@ -48,10 +44,8 @@ const DownloadExcel = ({ open, handleClose, onFetchRef, bankId, balance }) => {
           particulars: "P2PAE",
         },
         {
-        //   bank_id: bankId || "123",
-        //   balance: (balance || 10000) + 5000 - 2000,
           date: new Date().toISOString().split("T")[0],
-          credit:0,
+          credit: 0,
           debit: 901000,
           mop: "SHANKY",
           handle_by: "NATKHAT",
@@ -59,17 +53,18 @@ const DownloadExcel = ({ open, handleClose, onFetchRef, bankId, balance }) => {
         },
       ];
 
-      // ✅ Convert to Excel
-      const worksheet = XLSX.utils.json_to_sheet(dummyData);
+      // ✅ Generate worksheet
+      const worksheet = XLSX.utils.json_to_sheet(dummyData, { header: fields });
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "BankStatement");
 
-      // ✅ Write to file
+      // ✅ Create Excel buffer
       const excelBuffer = XLSX.write(workbook, {
         bookType: "xlsx",
         type: "array",
       });
 
+      // ✅ Save as file
       const blob = new Blob([excelBuffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
@@ -77,7 +72,7 @@ const DownloadExcel = ({ open, handleClose, onFetchRef, bankId, balance }) => {
       saveAs(blob, `BankStatement_Sample_${bankId || "Data"}.xlsx`);
       showToast("Sample Excel downloaded successfully!", "success");
 
-      // ✅ Close modal + trigger refresh
+      // ✅ Trigger callbacks
       handleClose?.();
       onFetchRef?.();
     } catch (err) {
@@ -86,7 +81,7 @@ const DownloadExcel = ({ open, handleClose, onFetchRef, bankId, balance }) => {
     }
   };
 
-  return null; // no UI or modal
+  return null;
 };
 
 export default DownloadExcel;
