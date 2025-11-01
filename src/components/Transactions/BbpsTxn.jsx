@@ -349,7 +349,7 @@ const BbpxTxn = ({ query }) => {
           let icon;
           if (row.pf.toLowerCase().includes("windows"))
             icon = <img src={windows2} style={{ width: "22px" }} alt="" />;
-          else if (row.pf.toLowerCase().includes("android"))
+          else if (row.pf.toLowerCase().includes("p2pae"))
             icon = <img src={android2} style={{ width: "22px" }} alt="" />;
           else if (row.pf.toLowerCase().includes("mac"))
             icon = <img src={macintosh2} style={{ width: "22px" }} alt="" />;

@@ -31,6 +31,7 @@ import { apiCall } from "../../api/apiClient";
 import { useToast } from "../../utils/ToastContext";
 import { json2Excel } from "../../utils/exportToExcel";
 import { apiErrorToast } from "../../utils/ToastUtil";
+import { okhttp } from "../../utils/iconsImports";
 
 const AepsTxn = ({ query }) => {
   const authCtx = useContext(AuthContext);
@@ -259,7 +260,7 @@ const AepsTxn = ({ query }) => {
           const pf = row.pf?.toLowerCase() || "";
           if (pf.includes("windows"))
             icon = <img src={windows2} style={{ width: 22 }} />;
-          else if (pf.includes("android"))
+          else if (pf.includes("p2ape"))
             icon = <img src={android2} style={{ width: 22 }} />;
           else if (pf.includes("mac"))
             icon = <img src={macintosh2} style={{ width: 22 }} />;
