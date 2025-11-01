@@ -328,7 +328,7 @@ export default function AllServices() {
           component: LevinFundTransfer,
           type: "super",
         },
-        hasPermission("levin") && {
+        hasPermission("soliteck") && {
           key: "fundtransfer3",
           label: "Fund Transfer3",
           icon: AccountBalanceWalletIcon,
