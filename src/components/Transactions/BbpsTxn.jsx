@@ -860,6 +860,7 @@ const BbpxTxn = ({ query }) => {
         selectedRows={selectedRows}
         onSelectionChange={setSelectedRows}
         enableExcelExport={true}
+        
         exportFileName="BbpsTransactions"
         exportEndpoint={ApiEndpoints.GET_BBPS_TXN}
         customHeader={

@@ -158,24 +158,24 @@ const AepsTxn = ({ query }) => {
     [routes]
   );
 
-  const handleExportExcel = async () => {
-    try {
-      const { error, response } = await apiCall(
-        "post",
-        ApiEndpoints.GET_AEPS_TXN,
-        { export: 1 }
-      );
-      const usersData = response?.data?.data || [];
-      if (usersData.length > 0) {
-        json2Excel("AepsTxns", usersData);
-      } else {
-        apiErrorToast("No data found");
-      }
-    } catch (error) {
-      console.error("Excel export failed:", error);
-      apiErrorToast("Failed to export Excel");
-    }
-  };
+  // const handleExportExcel = async () => {
+  //   try {
+  //     const { error, response } = await apiCall(
+  //       "post",
+  //       ApiEndpoints.GET_AEPS_TXN,
+  //       { export: 1 }
+  //     );
+  //     const usersData = response?.data?.data || [];
+  //     if (usersData.length > 0) {
+  //       json2Excel("AepsTxns", usersData);
+  //     } else {
+  //       apiErrorToast("No data found");
+  //     }
+  //   } catch (error) {
+  //     console.error("Excel export failed:", error);
+  //     apiErrorToast("Failed to export Excel");
+  //   }
+  // };
 
   // const ActionColumn = ({ row }) => {
   //   const [anchorEl, setAnchorEl] = useState(null);
@@ -462,6 +462,7 @@ const AepsTxn = ({ query }) => {
         queryParam={query || ""}
         enableActionsHover
         enableSelection={false}
+         enableExcelExport={true}
         selectedRows={selectedRows}
         onSelectionChange={setSelectedRows}
         customHeader={

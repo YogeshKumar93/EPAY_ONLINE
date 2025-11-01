@@ -820,6 +820,7 @@ const DmtTxn = ({ query }) => {
           onSelectionChange={setSelectedRows}
           onFilterChange={handleFilterChange}
           enableExcelExport={true}
+          
           exportFileName="DmtTransactions"
           exportEndpoint={ApiEndpoints.GET_DMT_TXN}
           customHeader={

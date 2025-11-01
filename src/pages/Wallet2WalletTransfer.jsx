@@ -121,6 +121,27 @@ const Wallet2WalletTransfer = ({}) => {
     }, 500)
   ).current;
 
+    const handleExportExcel = async () => {
+      try {
+        // Fetch all users (without pagination/filters) from API
+        const { error, response } = await apiCall(
+          "post",
+          ApiEndpoints.GET_BBPS_TXN,
+          { export: 1 }
+        );
+        const usersData = response?.data?.data || [];
+  
+        if (usersData.length > 0) {
+          json2Excel("BbpsTxns", usersData); // generates and downloads Users.xlsx
+        } else {
+          apiErrorToast("no data found");
+        }
+      } catch (error) {
+        console.error("Excel export failed:", error);
+        alert("Failed to export Excel");
+      }
+    };
+
   // Debounced search for receiver
   const debouncedReceiverSearch = useRef(
     debounce(async (searchValue) => {
@@ -131,7 +152,7 @@ const Wallet2WalletTransfer = ({}) => {
       try {
         const { response, error } = await apiCall(
           "post",
-          ApiEndpoints.GET_USER_DEBOUNCE,
+          ApiEndpoints.WALLET_GET_W2W_TRANSACTION,
           {
             establishment: searchValue,
           }
@@ -596,6 +617,7 @@ const Wallet2WalletTransfer = ({}) => {
           refresh={true}
           includeClientRef={false}
           enableSelection={false}
+           enableExcelExport={true}
           selectedRows={selectedRows}
           onSelectionChange={setSelectedRows}
           customHeader={
