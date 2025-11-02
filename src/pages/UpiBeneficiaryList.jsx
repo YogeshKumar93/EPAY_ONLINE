@@ -640,6 +640,13 @@ const UpiBeneficiaryList = ({ sender, onSuccess }) => {
           </Button>
           <Button
             variant="contained"
+            onClick={handleAddBeneficiary}
+            disabled={submitting}
+          >
+            {submitting ? "Saving..." : "Add"}
+          </Button>
+          <Button
+            variant="contained"
             onClick={handleAddAndVerifyBeneficiary}
             disabled={submitting}
           >
