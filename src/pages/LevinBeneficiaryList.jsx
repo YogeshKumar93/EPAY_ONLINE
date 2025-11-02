@@ -121,11 +121,26 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
         setVerifyOpen(false);
         setMpinDigits(Array(6).fill(""));
         return;
-      } else {
-        setVerifyOpen(false);
-        showToast(response?.message, "success");
-        onSuccess?.(sender.mobile_number);
       }
+
+      // ✅ check if response indicates success (status true)
+      if (response?.status === true) {
+        showToast(
+          response?.message || "Beneficiary verified successfully",
+          "success"
+        );
+
+        // ✅ Automatically call handleTUPConfirmation when verification succeeds
+        await handleTUPConfirmation();
+
+        setVerifyOpen(false);
+        setMpinDigits(Array(6).fill(""));
+        onSuccess?.(sender.mobile_number);
+        return;
+      }
+
+      // fallback if not status true
+      showToast(response?.message || "Verification failed", "error");
     } catch (err) {
       apiErrorToast(err);
     } finally {
@@ -407,10 +422,17 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
           loading={loading || submitting}
           footerButtons={[
             {
-              text: submitting ? "Saving..." : " Add Beneficiary",
+              text: submitting ? "Saving..." : "Add Beneficiary",
               variant: "contained",
               color: "primary",
               onClick: handleTUPConfirmation,
+              disabled: submitting,
+            },
+            {
+              text: submitting ? "Verifying..." : "Verify & Add",
+              variant: "outlined",
+              color: "secondary",
+              onClick: handleAddAndVerifyBeneficiary,
               disabled: submitting,
             },
           ]}

@@ -665,6 +665,14 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
               disabled: submitting || !isFormValid,
               sx: { borderRadius: 1 },
             },
+            {
+              text: submitting ? "Saving..." : "Add Beneficiary",
+              variant: "contained",
+              color: "primary",
+              onClick: handleTUPConfirmation,
+              disabled: submitting || !isFormValid,
+              sx: { borderRadius: 1 },
+            },
           ]}
         />
       )}

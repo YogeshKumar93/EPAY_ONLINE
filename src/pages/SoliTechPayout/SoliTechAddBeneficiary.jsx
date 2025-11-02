@@ -272,18 +272,26 @@ const SoliTechAddBeneficiary = ({
       dividers
       loading={submitting}
       footerButtons={[
-        {
-          text: "Cancel",
-          variant: "outlined",
-          onClick: onClose,
-          disabled: submitting,
-          sx: { borderRadius: 1 },
-        },
+        // {
+        //   text: "Cancel",
+        //   variant: "outlined",
+        //   onClick: onClose,
+        //   disabled: submitting,
+        //   sx: { borderRadius: 1 },
+        // },
         {
           text: submitting ? "Adding..." : "Verify & Add Beneficiary",
           variant: "contained",
           color: "primary",
           onClick: handleVerifyAndAddBeneficiary,
+          disabled: submitting || !isFormValid,
+          sx: { borderRadius: 1 },
+        },
+        {
+          text: submitting ? "Adding..." : "Add Beneficiary",
+          variant: "contained",
+          color: "primary",
+          onClick: handleAddBeneficiaryDirect,
           disabled: submitting || !isFormValid,
           sx: { borderRadius: 1 },
         },
