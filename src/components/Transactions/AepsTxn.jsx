@@ -472,61 +472,64 @@ const AepsTxn = ({ query }) => {
          enableExcelExport={true}
         selectedRows={selectedRows}
         onSelectionChange={setSelectedRows}
+         
+          
+          exportFileName="DmtTransactions"
+          exportEndpoint={ApiEndpoints.GET_DMT_TXN}
         customHeader={
           <>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                padding: "8px",
-              }}
-            >
-              {selectedRows.length > 0 && (
-                <Tooltip title="Print">
-                  <Button
-                    variant="contained"
-                    size="small"
-                    color="primary"
-                    onClick={() => {
-                      if (!selectedRows || selectedRows.length === 0) {
-                        alert(
-                          "Please select at least one transaction to print."
+           <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  padding: "8px",
+                }}
+              >
+                {selectedRows.length > 0 && (
+                  <Tooltip title="PRINT">
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color="primary"
+                      onClick={() => {
+                        if (!selectedRows || selectedRows.length === 0) {
+                          alert(
+                            "Please select at least one transaction to print."
+                          );
+                          return;
+                        }
+
+                        // Save all selected rows
+                        sessionStorage.setItem(
+                          "txnData",
+                          JSON.stringify(selectedRows)
                         );
-                        return;
-                      }
 
-                      // Save all selected rows
-                      sessionStorage.setItem(
-                        "txnData",
-                        JSON.stringify(selectedRows)
-                      );
-
-                      // Open receipt page in a new tab
-                      window.open("/print-aeps", "_blank");
-                    }}
-                    sx={{ ml: 1 }}
-                  >
-                    <PrintIcon
-                      sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
-                    />
-                    Print
-                  </Button>
-                </Tooltip>
-              )}
-            </Box>
-            <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
-              {user?.role === "adm" && (
-                <IconButton
-                  color="primary"
-                  onClick={handleExportExcel}
-                  title="Export to Excel"
-                >
-                  <FileDownloadIcon />
-                </IconButton>
-              )}
-              <Scheduler onRefresh={refreshPlans} />
-            </Box>
+                        // Open receipt page in a new tab
+                        window.open("/print-dmt2", "_blank");
+                      }}
+                      sx={{ ml: 1 }}
+                    >
+                      <PrintIcon
+                        sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
+                      />
+                      Print
+                    </Button>
+                  </Tooltip>
+                )}
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  padding: "8px",
+                  flexWrap: "wrap",
+                }}
+              >
+                <Scheduler onRefresh={refreshPlans} />
+              </Box>
           </>
         }
       />
