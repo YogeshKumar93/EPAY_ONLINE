@@ -227,6 +227,46 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
       setSubmitting(false);
     }
   };
+  // ✅ NEW FUNCTION — Directly Add Beneficiary (without verify)
+  const handleAddBeneficiary = async () => {
+    setErrors({});
+
+    try {
+      setSubmitting(true);
+
+      const payload = {
+        ...formData,
+        sender_id: sender?.id,
+        mobile_number: sender?.mobileNumber,
+        rem_mobile: sender?.mobileNumber,
+        ben_name: formData.name,
+        ben_acc: formData.account_number,
+        ifsc: formData.ifsc,
+        operator: 18,
+        latitude: location?.lat || "",
+        longitude: location?.long || "",
+        pf: "WEB",
+      };
+
+      const { error, response } = await apiCall(
+        "post",
+        ApiEndpoints.REGISTER_DMT1_BENEFICIARY,
+        payload
+      );
+
+      if (response?.status) {
+        okSuccessToast(response.message || "Beneficiary added successfully");
+        setOpenModal(false);
+        onSuccess?.(sender.mobileNumber);
+      } else {
+        showToast(error?.message || "Failed to add beneficiary", "error");
+      }
+    } catch (err) {
+      apiErrorToast(err?.message || "Something went wrong while adding");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   // const handleVerify = async () => {
   //   if (mpinDigits.some((d) => !d)) {
@@ -328,9 +368,13 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
     SCBL: stand2,
     JAKA: jk2,
   };
-  const filteredBeneficiaries = normalized.filter((b) =>
-    b.beneficiary_name.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const filteredBeneficiaries = normalized.filter((b) => {
+    const lowerSearch = searchText.toLowerCase();
+    return (
+      b.beneficiary_name?.toLowerCase().includes(lowerSearch) ||
+      b.account_number?.toLowerCase().includes(lowerSearch)
+    );
+  });
 
   return (
     <Card
@@ -627,17 +671,18 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
           loading={loading || submitting}
           footerButtons={[
             {
-              text: "Cancel",
-              variant: "outlined",
-              onClick: () => setOpenModal(false),
-              disabled: submitting,
-              sx: { borderRadius: 1 },
-            },
-            {
               text: submitting ? "Processing..." : "Add & Verify",
               variant: "contained",
               color: "primary",
               onClick: handleAddAndVerifyBeneficiary, // ✅ नया function
+              disabled: submitting,
+              sx: { borderRadius: 1 },
+            },
+            {
+              text: submitting ? "Processing..." : "Add",
+              variant: "contained",
+              color: "primary",
+              onClick: handleAddBeneficiary, // ✅ नया function
               disabled: submitting,
               sx: { borderRadius: 1 },
             },

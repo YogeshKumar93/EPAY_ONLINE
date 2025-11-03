@@ -61,7 +61,7 @@ const LevinUpiTransfer = () => {
       ApiEndpoints.GET_SENDER_UPI,
       {
         mobile_number: number,
-        type: "UPI",
+        type: "LEVINUPI",
       }
     );
     // stop loader

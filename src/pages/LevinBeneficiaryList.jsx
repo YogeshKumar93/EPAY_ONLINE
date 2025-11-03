@@ -108,7 +108,7 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
     const mpin = mpinDigits.join("");
     try {
       setSubmitting(true);
-      const verifyPayload = { ...pendingPayload, mpin };
+      const verifyPayload = { ...pendingPayload, mpin, is_verified: 1 };
       const { error, response } = await apiCall(
         "post",
         ApiEndpoints.DMT1_VERIFY_BENEFICIARY,
@@ -123,47 +123,24 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
         return;
       }
 
-      if (
-        response?.data?.statuscode === "TUP" ||
-        response?.message?.includes("Transaction Under Process")
-      ) {
-        // TUP - verification pending
-        setTupResponse(response);
+      // ✅ check if response indicates success (status true)
+      if (response?.status === true) {
+        showToast(
+          response?.message || "Beneficiary verified successfully",
+          "success"
+        );
+
+        // ✅ Automatically call handleTUPConfirmation when verification succeeds
+        await handleTUPConfirmation();
+
         setVerifyOpen(false);
-        setSubmitting(false);
         setMpinDigits(Array(6).fill(""));
+        onSuccess?.(sender.mobile_number);
         return;
       }
 
-      // ✅ Verification successful — Add beneficiary
-      const verifiedName = response?.data || formData.beneficiary_name;
-      const addPayload = {
-        ...formData,
-        sender_id: sender?.id,
-        type: "LEVIN",
-        beneficiary_name: verifiedName,
-        mobile_number: sender?.mobile_number,
-        is_verified: 1,
-      };
-
-      const { response: addRes, error: addErr } = await apiCall(
-        "post",
-        ApiEndpoints.CREATE_BENEFICIARY,
-        addPayload
-      );
-
-      if (addRes) {
-        showToast(
-          addRes?.message || "Beneficiary verified & added successfully",
-          "success"
-        );
-        setVerifyOpen(false);
-        setOpenModal(false);
-        setMpinDigits(Array(6).fill(""));
-        onSuccess?.(sender.mobile_number);
-      } else {
-        apiErrorToast(addErr?.message || "Failed to add beneficiary");
-      }
+      // fallback if not status true
+      showToast(response?.message || "Verification failed", "error");
     } catch (err) {
       apiErrorToast(err);
     } finally {
@@ -199,10 +176,10 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
         setOpenModal(false);
         onSuccess?.(sender.mobile_number);
       } else {
-        apiErrorToast(error?.message || "Failed to add beneficiary");
+        showToast(error?.message || "Failed to add beneficiary", "error");
       }
     } catch (err) {
-      apiErrorToast(err);
+      showToast(err);
     } finally {
       setSubmitting(false);
     }
@@ -259,8 +236,11 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
 
   const filteredBeneficiaries = useMemo(() => {
     if (!searchText) return sender?.beneficiary || [];
-    return sender?.beneficiary?.filter((b) =>
-      b.beneficiary_name.toLowerCase().includes(searchText.toLowerCase())
+    const lowerSearch = searchText.toLowerCase();
+    return sender?.beneficiary?.filter(
+      (b) =>
+        b.beneficiary_name?.toLowerCase().includes(lowerSearch) ||
+        b.account_number?.toLowerCase().includes(lowerSearch)
     );
   }, [searchText, sender?.beneficiary]);
 
@@ -308,7 +288,7 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
           <TextField
             fullWidth
             size="small"
-            placeholder="Search beneficiary by name"
+            placeholder="Search beneficiary by name or account number"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             sx={{ mb: 2 }}
@@ -348,7 +328,8 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
                               ben_name: b.beneficiary_name,
                               ben_acc: b.account_number,
                               ifsc: b.ifsc_code,
-                              operator: 19,
+                              operator: 18,
+                              mobile_number: sender?.mobile_number,
                               latitude: location?.lat || "",
                               longitude: location?.long || "",
                               pf: "WEB",
@@ -441,9 +422,16 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
           loading={loading || submitting}
           footerButtons={[
             {
-              text: submitting ? "Saving..." : "Verify and Add Beneficiary",
+              text: submitting ? "Saving..." : "Add Beneficiary",
               variant: "contained",
               color: "primary",
+              onClick: handleTUPConfirmation,
+              disabled: submitting,
+            },
+            {
+              text: submitting ? "Verifying..." : "Verify & Add",
+              variant: "outlined",
+              color: "secondary",
               onClick: handleAddAndVerifyBeneficiary,
               disabled: submitting,
             },

@@ -270,32 +270,6 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
     }
   };
 
-  // Bank image mapping
-  // const bankImageMapping = {
-  //   SBI: sbi2,
-  //   IBKL: idbi2,
-  //   UTIB: axis2,
-  //   HDFC: hdfc2,
-  //   ICIC: icici2,
-  //   KKBK: kotak2,
-  //   BARB: bob2,
-  //   PUNB: pnb2,
-  //   MAHB: bom2,
-  //   UBIN: union2,
-  //   DBSS: dbs2,
-  //   RATN: rbl2,
-  //   YESB: yes2,
-  //   INDB: indus2,
-  //   AIRP: airtel2,
-  //   ABHY: abhy2,
-  //   CNRB: canara2,
-  //   BDBL: bandhan2,
-  //   CBIN: cbi2,
-  //   IDIB: idib2,
-  //   SCBL: stand2,
-  //   JAKA: jk2,
-  // };
-
   const filteredBeneficiaries = useMemo(() => {
     if (!searchText) return sender?.beneficiary || [];
     return sender?.beneficiary?.filter((b) =>
@@ -623,6 +597,14 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
               color="inherit"
             >
               Cancel
+            </Button>
+            <Button
+              onClick={handleTUPConfirmation}
+              variant="contained"
+              sx={{ backgroundColor: "#5c3ac8" }}
+              disabled={submitting}
+            >
+              {submitting ? "Saving..." : "Add"}
             </Button>
             <Button
               onClick={handleAddAndVerifyBeneficiary}

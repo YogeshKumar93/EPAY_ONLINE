@@ -271,8 +271,11 @@ const SoliTechBeneficiaryList = ({
 
   const filteredBeneficiaries = useMemo(() => {
     if (!searchText) return beneficiaries;
-    return beneficiaries.filter((b) =>
-      b.beneficiary_name.toLowerCase().includes(searchText.toLowerCase())
+    const lowerSearch = searchText.toLowerCase();
+    return beneficiaries.filter(
+      (b) =>
+        b.beneficiary_name?.toLowerCase().includes(lowerSearch) ||
+        b.account_number?.toLowerCase().includes(lowerSearch)
     );
   }, [searchText, beneficiaries]);
 
@@ -356,7 +359,7 @@ const SoliTechBeneficiaryList = ({
               <TextField
                 fullWidth
                 size="small"
-                placeholder="Search beneficiary by name"
+                placeholder="Search beneficiary by name or account number"
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
                 InputProps={{

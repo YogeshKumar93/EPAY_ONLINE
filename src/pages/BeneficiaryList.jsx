@@ -358,8 +358,11 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
 
   const filteredBeneficiaries = useMemo(() => {
     if (!searchText) return beneficiaries;
-    return beneficiaries.filter((b) =>
-      b.beneficiary_name.toLowerCase().includes(searchText.toLowerCase())
+    const lowerSearch = searchText.toLowerCase();
+    return beneficiaries.filter(
+      (b) =>
+        b.beneficiary_name?.toLowerCase().includes(lowerSearch) ||
+        b.account_number?.toLowerCase().includes(lowerSearch)
     );
   }, [searchText, beneficiaries]);
 
@@ -440,7 +443,7 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
             <TextField
               fullWidth
               size="small"
-              placeholder="Search beneficiary by name"
+              placeholder="Search beneficiary by name or account number "
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />
@@ -659,6 +662,14 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
               variant: "contained",
               color: "primary",
               onClick: handleAddAndVerifyBeneficiary,
+              disabled: submitting || !isFormValid,
+              sx: { borderRadius: 1 },
+            },
+            {
+              text: submitting ? "Saving..." : "Add Beneficiary",
+              variant: "contained",
+              color: "primary",
+              onClick: handleTUPConfirmation,
               disabled: submitting || !isFormValid,
               sx: { borderRadius: 1 },
             },
