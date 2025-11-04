@@ -833,7 +833,7 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
               sx: { borderRadius: 1 },
             },
             {
-              text: submitting ? "Verifying..." : "Verify Simple",
+              text: submitting ? "Verifying..." : "Verify",
               variant: "contained",
               color: "primary",
               onClick: handleVerifyUpi,

@@ -389,39 +389,40 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
                           </Typography>
                         </Box>
                       ) : (
-                        // <Button
-                        //   variant="outlined"
-                        //   size="small"
-                        //   color="warning"
-                        //   sx={{ textTransform: "none", fontSize: "0.7rem" }}
-                        //   onClick={() => {
-                        //     setPendingPayload({
-                        //       sender_id: sender?.id,
-                        //       ben_name: b.beneficiary_name,
-                        //       ben_acc: b.account_number,
-                        //       ifsc: b.ifsc_code,
-                        //       operator: 18,
-                        //       mobile_number: sender?.mobile_number,
-                        //       latitude: location?.lat || "",
-                        //       longitude: location?.long || "",
-                        //       pf: "WEB",
-                        //     });
-                        //     setVerifyOpen(true);
-                        //     setVerifyingBeneficiary(b);
-                        //   }}
-                        // >
-                        //   Verify
-                        // </Button>
-                        <Box display="flex" alignItems="center" gap={0.3}>
-                          <Typography
-                            variant="caption"
-                            color="red"
-                            fontWeight="500"
-                            sx={{ fontSize: "0.75rem" }}
-                          >
-                            Not Verified
-                          </Typography>
-                        </Box>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          color="warning"
+                          sx={{ textTransform: "none", fontSize: "0.7rem" }}
+                          onClick={() => {
+                            setPendingPayload({
+                              sender_id: sender?.id,
+                              ben_name: b.beneficiary_name,
+                              ben_acc: b.account_number,
+                              ifsc: b.ifsc_code,
+                              operator: 18,
+                              type: "PAYOUT",
+                              mobile_number: sender?.mobile_number,
+                              latitude: location?.lat || "",
+                              longitude: location?.long || "",
+                              pf: "WEB",
+                            });
+                            setVerifyOpen(true);
+                            setVerifyingBeneficiary(b);
+                          }}
+                        >
+                          Verify
+                        </Button>
+                        // <Box display="flex" alignItems="center" gap={0.3}>
+                        //   <Typography
+                        //     variant="caption"
+                        //     color="red"
+                        //     fontWeight="500"
+                        //     sx={{ fontSize: "0.75rem" }}
+                        //   >
+                        //     Not Verified
+                        //   </Typography>
+                        // </Box>
                       )}
 
                       <Button
