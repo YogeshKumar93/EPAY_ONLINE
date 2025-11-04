@@ -149,47 +149,59 @@ const PermissionsModal = ({ open, handleClose, user, onFetchRef }) => {
           />
         </Box>
 
-        <Table>
-          <TableHead>
-            <TableRow sx={{ backgroundColor: alpha("#1976d2", 0.08) }}>
-              <TableCell sx={{ fontWeight: 700 }}>Service</TableCell>
-              <TableCell sx={{ fontWeight: 700, textAlign: "center" }}>View</TableCell>
-              <TableCell sx={{ fontWeight: 700, textAlign: "center" }}>Action</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {serviceKeys.map((key) => (
-              <TableRow key={key} hover>
-                <TableCell sx={{ textTransform: "capitalize", fontWeight: 600 }}>
-                  {key.replace(/_/g, " ")}
-                </TableCell>
-                <TableCell align="center">
-                  <Switch
-                    checked={viewPermissions[key] === 1}
-                    onChange={() => handleViewToggle(key)}
-                    color="primary"
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell align="center">
-                  {key + "_actions" in permissions ? (
-                    <Switch
-                      checked={actionPermissions[key] === 1}
-                      onChange={() => handleActionToggle(key)}
-                      color="success"
-                      size="small"
-                      disabled={viewPermissions[key] !== 1}
-                    />
-                  ) : (
-                    <Typography variant="body2" color="text.secondary">
-                      —
-                    </Typography>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+  <Table>
+  <TableHead>
+    <TableRow sx={{ backgroundColor: alpha("#1976d2", 0.08) }}>
+      <TableCell sx={{ fontWeight: 700 }}>Service</TableCell>
+      <TableCell sx={{ fontWeight: 700, textAlign: "center" }}>Status</TableCell>
+
+      {/* ✅ Show Action column only if user.role is NOT ret, dd, or api */}
+      {!["ret", "dd", "api", "di"].includes(user?.role) && (
+        <TableCell sx={{ fontWeight: 700, textAlign: "center" }}>Action</TableCell>
+      )}
+    </TableRow>
+  </TableHead>
+
+  <TableBody>
+    {serviceKeys.map((key) => (
+      <TableRow key={key} hover>
+        <TableCell sx={{ textTransform: "capitalize", fontWeight: 600 }}>
+          {key.replace(/_/g, " ")}
+        </TableCell>
+
+        <TableCell align="center">
+          <Switch
+            checked={viewPermissions[key] === 1}
+            onChange={() => handleViewToggle(key)}
+            color="primary"
+            size="small"
+          />
+        </TableCell>
+
+        {/* ✅ Action column will show only if user.role is NOT ret, dd, or api */}
+        {!["ret", "dd", "api", "di"].includes(user?.role) && (
+          <TableCell align="center">
+            {key + "_actions" in permissions ? (
+              <Switch
+                checked={actionPermissions[key] === 1}
+                onChange={() => handleActionToggle(key)}
+                color="success"
+                size="small"
+                disabled={viewPermissions[key] !== 1}
+              />
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                —
+              </Typography>
+            )}
+          </TableCell>
+        )}
+      </TableRow>
+    ))}
+  </TableBody>
+</Table>
+
+
 
         {serviceKeys.length === 0 && (
           <Box sx={{ textAlign: "center", py: 5, color: "text.secondary" }}>
