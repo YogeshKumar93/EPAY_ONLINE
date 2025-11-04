@@ -111,6 +111,7 @@ export const navConfig = [
       dd: "/customer/aeps",
     },
     roles: ["ret", "dd"],
+     permissionKey: "aeps1",
   },
 
   // BBPS Online
@@ -164,6 +165,7 @@ export const navConfig = [
       md: "/md/wallet-transfer",
     },
     roles: ["ret", "di", "md", "dd"],
+      permissionKey: "wallet_transfer",
   },
 
   // Fund Request
@@ -201,6 +203,7 @@ export const navConfig = [
       md: "/md/transcations",
     },
     roles: ["sadm", "adm", "ret", "di", "asm", "zsm", "api", "md", "dd"],
+     permissionKey: "txn",
   },
 
   {
@@ -227,6 +230,7 @@ export const navConfig = [
       dd: "/customer/allServices",
     },
     roles: ["adm", "ret", "dd", "sadm"],
+     permissionKey: "service",
   },
 
   // Wallet Ledger
@@ -245,6 +249,7 @@ export const navConfig = [
       md: "/md/wallet-ledger",
     },
     roles: ["sadm", "adm", "ret", "di", "asm", "zsm", "md", "dd"],
+     
   },
 
   // Settings
@@ -273,6 +278,7 @@ export const navConfig = [
       api: "/api/complaint",
     },
     roles: ["adm", "ret", "api", "dd", "sadm"],
+    
   },
 
   // Risk
@@ -288,6 +294,7 @@ export const navConfig = [
       di: "/di/risk",
     },
     roles: ["adm", "di", "sadm"],
+     permissionKey: "",
   },
 
   // Login History
@@ -306,6 +313,7 @@ export const navConfig = [
       md: "/md/login_history",
     },
     roles: ["adm", "ret", "di", "asm", "zsm", "md", "dd", "sadm"],
+     permissionKey: "",
   },
 
   {
