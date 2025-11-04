@@ -32,7 +32,6 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
       { name: "city", label: "city", type: "text" },
       { name: "state", label: "state", type: "text" },
       { name: "pincode", label: "pincode", type: "text" },
-      // Add other basic fields as needed
     ],
     kyc: [
       { name: "aadhaar_front", label: "Aadhaar Front", type: "file" },
@@ -109,47 +108,39 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
   };
 
   // Fixed file upload handler
+  // ✅ Store raw File object instead of base64
   const handleFileUpload = (fieldName, file) => {
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const fileData = reader.result;
-        setFormData((prev) => ({
-          ...prev,
-          [fieldName]: fileData,
-        }));
-        setUploadedFiles((prev) => ({
-          ...prev,
-          [fieldName]: fileData,
-        }));
-      };
-      reader.readAsDataURL(file);
+      setFormData((prev) => ({
+        ...prev,
+        [fieldName]: file,
+      }));
+      setUploadedFiles((prev) => ({
+        ...prev,
+        [fieldName]: file,
+      }));
     }
   };
 
-  // Helper function to get only changed fields
   const getChangedFields = () => {
     const changedFields = {};
 
-    // First, include all uploaded files
+    // Include uploaded files
     Object.keys(uploadedFiles).forEach((key) => {
       if (uploadedFiles[key]) {
         changedFields[key] = uploadedFiles[key];
       }
     });
 
-    // Then, include non-file fields that have changed
+    // Include non-file fields that changed
     Object.keys(formData).forEach((key) => {
-      // Skip if it's already included as an uploaded file
-      if (uploadedFiles[key]) return;
+      if (uploadedFiles[key]) return; // skip already uploaded files
 
-      // Skip if it's a file field but not uploaded (to avoid sending empty file fields)
       const isFileField =
-        TAB_FIELDS[selectedTab]?.find((field) => field.name === key)?.type ===
-        "file";
-      if (isFileField && !uploadedFiles[key]) return;
+        TAB_FIELDS[selectedTab]?.find((f) => f.name === key)?.type === "file";
 
-      // Check if value changed from original for non-file fields
+      if (isFileField) return; // skip file fields not updated
+
       if (formData[key] !== originalData[key]) {
         changedFields[key] = formData[key];
       }
@@ -171,16 +162,27 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
 
       console.log("Sending changed fields:", Object.keys(changedFields));
 
+      // ✅ Create FormData
+      const formDataToSend = new FormData();
+      formDataToSend.append("id", user.id);
+      formDataToSend.append("user_id", user.id);
+      formDataToSend.append("type", selectedTab);
+
+      Object.entries(changedFields).forEach(([key, value]) => {
+        if (value instanceof File) {
+          formDataToSend.append(key, value); // ✅ binary file
+        } else {
+          formDataToSend.append(key, value);
+        }
+      });
+
+      // ✅ Call API (no manual Content-Type header)
       const { error, response } = await apiCall(
         "post",
         ApiEndpoints.UPDATE_BY_TYPE,
-        {
-          id: user.id,
-          user_id: user.id,
-          type: selectedTab,
-          ...changedFields,
-        }
+        formDataToSend
       );
+
       if (response) {
         showToast(response?.message || "Update successful", "success");
         onFetchRef?.();
@@ -189,7 +191,8 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
         showToast(error?.message || "Update failed", "error");
       }
     } catch (err) {
-      console.error(err);
+      console.error("Error updating user:", err);
+      showToast("Something went wrong while updating user", "error");
     } finally {
       setLoading(false);
     }
@@ -308,6 +311,20 @@ const EditUser = ({ open, onClose, user, onFetchRef }) => {
                     value={value}
                     onChange={handleChange}
                     style={{ width: "100%", padding: "8px", marginTop: "5px" }}
+                  />
+                )}
+                {uploadedFiles[field.name] && (
+                  <img
+                    src={URL.createObjectURL(uploadedFiles[field.name])}
+                    alt="Preview"
+                    style={{
+                      maxWidth: "150px",
+                      maxHeight: "150px",
+                      border: "1px solid #ccc",
+                      borderRadius: "4px",
+                      objectFit: "cover",
+                      marginTop: "5px",
+                    }}
                   />
                 )}
 
