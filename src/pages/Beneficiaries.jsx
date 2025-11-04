@@ -69,6 +69,7 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
   const [verifyOpen, setVerifyOpen] = useState(false); // 🔑 verify modal state
+  const [verifyUpiOpen, setVerifyUpiOpen] = useState(false); // 🔑 verify modal state
   const [mpinDigits, setMpinDigits] = useState(Array(6).fill(""));
   const [searchText, setSearchText] = useState("");
   const [pendingPayload, setPendingPayload] = useState(null);
@@ -227,6 +228,48 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
       setSubmitting(false);
     }
   };
+  const handleVerifyUpi = async () => {
+    if (mpinDigits.some((d) => !d)) {
+      showToast("Please enter all 6 digits of MPIN", "error");
+      return;
+    }
+    const mpin = mpinDigits.join("");
+
+    try {
+      setSubmitting(true);
+
+      // 🔹 Step 1: Verify
+      const verifyPayload = {
+        ...pendingPayload,
+        mpin,
+      };
+
+      const { error: verifyError, response: verifyResponse } = await apiCall(
+        "post",
+        ApiEndpoints.DMT1_VERIFY_BENEFICIARY,
+        verifyPayload
+      );
+
+      if (!verifyResponse) {
+        showToast(
+          verifyError?.message || "Failed to verify beneficiary",
+          "error"
+        );
+        setSubmitting(false);
+        setVerifyOpen(false);
+        setMpinDigits(Array(6).fill(""));
+        return;
+      } else {
+        showToast(verifyResponse?.message, "success");
+        onSuccess?.(sender.mobileNumber);
+        setVerifyUpiOpen(false);
+      }
+    } catch (err) {
+      showToast(err, "error");
+    } finally {
+      setSubmitting(false);
+    }
+  };
   // ✅ NEW FUNCTION — Directly Add Beneficiary (without verify)
   const handleAddBeneficiary = async () => {
     setErrors({});
@@ -243,6 +286,7 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
         ben_acc: formData.account_number,
         ifsc: formData.ifsc,
         operator: 18,
+        is_verified: 0,
         latitude: location?.lat || "",
         longitude: location?.long || "",
         pf: "WEB",
@@ -412,15 +456,10 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
               onClick={() => setOpenModal(true)}
               startIcon={<PersonAddIcon sx={{ fontSize: 16 }} />}
               sx={{
-                minWidth: "auto",
-                px: 1.5,
-                backgroundColor: "#6C4BC7",
-                py: 0.5,
-                fontSize: "0.75rem",
-                borderRadius: 1,
+                color: "#000",
+                backgroundColor: "#fff",
                 textTransform: "none",
-                fontWeight: "500",
-                boxShadow: "none",
+                fontSize: "0.7rem",
               }}
             >
               Add Beneficiary
@@ -468,27 +507,26 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
                 secondaryAction={
                   b.id !== "na" && (
                     <Stack direction="row" spacing={1} alignItems="center">
-                      {b.is_verified ? (
-                        <Box display="flex" alignItems="center" gap={0.3}>
-                          <CheckCircleIcon
-                            sx={{ fontSize: 16, color: "success.main" }}
-                          />
-                          <Typography
-                            variant="caption"
-                            color="success.main"
-                            fontWeight="500"
-                            sx={{ fontSize: "0.75rem" }}
-                          >
-                            Verified
-                          </Typography>
-                        </Box>
-                      ) : (
+                      {b.is_verified === "0" ? (
                         <Button
                           size="small"
                           variant="outlined"
                           onClick={() => {
                             setSelectedBeneficiary(b);
-                            setVerifyOpen(true);
+                            setVerifyUpiOpen(true);
+                            setPendingPayload({
+                              sender_id: sender?.id,
+                              ben_name: b.beneficiary_name,
+                              ben_acc: b.account_number,
+                              ifsc: b.ifsc_code,
+                              mobile_number: sender?.mobileNumber,
+                              operator: 18,
+                              type: "DMT",
+                              is_verified: new Date().toISOString(),
+                              latitude: location?.lat || "",
+                              longitude: location?.long || "",
+                              pf: "WEB",
+                            });
                           }}
                           sx={{
                             backgroundColor: "#ff9d4d",
@@ -503,6 +541,30 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
                         >
                           Verify
                         </Button>
+                      ) : (
+                        <Box display="flex" alignItems="center" gap={0.3}>
+                          <CheckCircleIcon
+                            sx={{ fontSize: 16, color: "success.main" }}
+                          />
+                          <Typography
+                            variant="caption"
+                            color="success.main"
+                            fontWeight="500"
+                            sx={{ fontSize: "0.75rem" }}
+                          >
+                            Verified
+                          </Typography>
+                        </Box>
+                        // <Box display="flex" alignItems="center" gap={0.3}>
+                        //   <Typography
+                        //     variant="caption"
+                        //     color="red"
+                        //     fontWeight="500"
+                        //     sx={{ fontSize: "0.75rem" }}
+                        //   >
+                        //     Not Verified
+                        //   </Typography>
+                        // </Box>
                       )}
 
                       <TextField
@@ -713,6 +775,52 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
               variant: "contained",
               color: "primary",
               onClick: handleVerify,
+              disabled: submitting,
+              sx: { borderRadius: 1 },
+            },
+          ]}
+        >
+          <Grid container spacing={1} justifyContent="center" sx={{ mt: 1 }}>
+            {mpinDigits.map((digit, idx) => (
+              <Grid item key={idx}>
+                <TextField
+                  id={`mpin-${idx}`}
+                  value={digit}
+                  type="password"
+                  onChange={(e) => handleMpinChange(idx, e.target.value)}
+                  inputProps={{
+                    maxLength: 1,
+                    style: { textAlign: "center", fontSize: "1.2rem" },
+                  }}
+                  sx={{ width: 45 }}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        </CommonModal>
+      )}
+      {verifyUpiOpen && (
+        <CommonModal
+          open={verifyUpiOpen}
+          onClose={() => setVerifyUpiOpen(false)}
+          title="Enter 6-digit MPIN"
+          iconType="info"
+          size="small"
+          dividers
+          loading={submitting}
+          footerButtons={[
+            {
+              text: "Cancel",
+              variant: "outlined",
+              onClick: () => setVerifyOpen(false),
+              disabled: submitting,
+              sx: { borderRadius: 1 },
+            },
+            {
+              text: submitting ? "Verifying..." : "Verify",
+              variant: "contained",
+              color: "primary",
+              onClick: handleVerifyUpi,
               disabled: submitting,
               sx: { borderRadius: 1 },
             },

@@ -40,7 +40,7 @@ const VerifyUpiBene = ({
 
     const { error, response } = await apiCall(
       "post",
-      ApiEndpoints.VERIFY_UPI_BENEFICIARY,
+      ApiEndpoints.DMT1_VERIFY_BENEFICIARY,
       payload
     );
 

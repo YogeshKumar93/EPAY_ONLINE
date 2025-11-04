@@ -18,22 +18,27 @@ import {
   CheckCircle,
 } from "@mui/icons-material";
 import AuthContext from "../contexts/AuthContext";
-import { useSchemaForm } from "../hooks/useSchemaForm";
-import ApiEndpoints from "../api/ApiEndpoints";
 import { apiCall } from "../api/apiClient";
+import ApiEndpoints from "../api/ApiEndpoints";
 import { useToast } from "../utils/ToastContext";
-import CommonFormField from "./common/CommonFormField";
 
 const OnBoarding = () => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const username = `P2PAE${user?.id}`;
   const { showToast } = useToast();
-
   const [successMessage, setSuccessMessage] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({ ...user });
   const [submitting, setSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    aadhaar_front: null,
+    aadhaar_back: null,
+    pan_card: null,
+    shop_image: null,
+    photo: null,
+  });
+  const [previews, setPreviews] = useState({});
 
   useEffect(() => {
     setEditedUser({ ...user });
@@ -44,45 +49,58 @@ const OnBoarding = () => {
     setIsEditing(!isEditing);
   };
 
-  const handleInputChange = (field, value) => {
-    setEditedUser((prev) => ({ ...prev, [field]: value }));
+  const handleInputChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // KYC Form (Business Info)
-  const kyc = useSchemaForm(ApiEndpoints.KYC_SCHEMA, true);
+  const handleFileChange = (e, name) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setFormData((prev) => ({ ...prev, [name]: file }));
+
+    // generate preview
+    const previewURL = URL.createObjectURL(file);
+    setPreviews((prev) => ({ ...prev, [name]: previewURL }));
+  };
 
   const handleSubmitKYC = async () => {
-    if (!kyc.schema || !kyc.schema.length) {
-      showToast("Schema not loaded yet", "error");
-      return;
-    }
-
     setSubmitting(true);
     try {
+      const fd = new FormData();
+      for (const key in formData) {
+        const value = formData[key];
+        if (value instanceof File || value instanceof Blob) {
+          fd.append(key, value);
+        } else {
+          fd.append(key, value ?? "");
+        }
+      }
+      fd.append("status", 2);
+
       const { error, response } = await apiCall(
         "POST",
         ApiEndpoints.CREATE_KYC,
-        {
-          ...kyc.formData,
-          status: 2,
-        }
+        fd,
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
 
       if (response) {
-        showToast(response?.message || "KYC saved successfully", "success");
+        showToast(
+          response?.message || "KYC submitted successfully!",
+          "success"
+        );
         authCtx.loadUserProfile();
-        showToast("🎉 Business information completed!", "success");
       } else {
-        showToast(error?.message || "Failed to save KYC", "error");
+        showToast(error?.message || "Failed to submit KYC", "error");
       }
     } catch (err) {
-      console.error("Error saving KYC:", err);
-      showToast("Something went wrong while saving", "error");
+      console.error("Error submitting KYC:", err);
+      showToast("Something went wrong", "error");
     } finally {
       setSubmitting(false);
     }
   };
-  // Define the required image fields for KYC
+
   const requiredImages = [
     "aadhaar_front",
     "aadhaar_back",
@@ -91,10 +109,10 @@ const OnBoarding = () => {
     "photo",
   ];
 
-  // Check if all required images are uploaded
   const allImagesUploaded = requiredImages.every(
-    (key) => kyc.formData[key] && kyc.formData[key] !== ""
+    (key) => formData[key] && formData[key] !== ""
   );
+
   return (
     <Box
       sx={{
@@ -149,7 +167,9 @@ const OnBoarding = () => {
           {isEditing ? (
             <TextField
               value={editedUser.name || ""}
-              onChange={(e) => handleInputChange("name", e.target.value)}
+              onChange={(e) =>
+                setEditedUser({ ...editedUser, name: e.target.value })
+              }
               variant="outlined"
               size="small"
               sx={{ mb: 1 }}
@@ -169,30 +189,12 @@ const OnBoarding = () => {
 
           <Box sx={{ display: "flex", alignItems: "center", mt: 2, gap: 1 }}>
             <Email />
-            {isEditing ? (
-              <TextField
-                value={editedUser.email || ""}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                variant="outlined"
-                size="small"
-              />
-            ) : (
-              <Typography>{user?.email}</Typography>
-            )}
+            <Typography>{user?.email}</Typography>
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", mt: 1, gap: 1 }}>
             <Smartphone />
-            {isEditing ? (
-              <TextField
-                value={editedUser.mobile || ""}
-                onChange={(e) => handleInputChange("mobile", e.target.value)}
-                variant="outlined"
-                size="small"
-              />
-            ) : (
-              <Typography>{user?.mobile}</Typography>
-            )}
+            <Typography>{user?.mobile}</Typography>
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", mt: 1, gap: 1 }}>
@@ -221,21 +223,20 @@ const OnBoarding = () => {
           <Typography>{successMessage}</Typography>
         </Box>
       )}
-      <Box sx={{ mb: 2 }}>
-        <Typography
-          variant="subtitle1"
-          sx={{
-            fontWeight: 600,
-            color: "#6B21A8",
-            textAlign: "center",
-            mb: 1,
-          }}
-        >
-          📂 Please upload the required documents to move further.
-        </Typography>
-      </Box>
 
-      {/* Business Information Form - Full Height */}
+      {/* KYC Section */}
+      <Typography
+        variant="h6"
+        sx={{
+          mb: 2,
+          textAlign: "center",
+          fontWeight: 600,
+          color: "#6B21A8",
+        }}
+      >
+        📂 Upload Required KYC Documents
+      </Typography>
+
       <Box
         sx={{
           flexGrow: 1,
@@ -246,32 +247,65 @@ const OnBoarding = () => {
           boxShadow: 2,
         }}
       >
-        {kyc.loading ? (
+        {submitting ? (
           <CircularProgress />
         ) : (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {kyc.schema.map((field, i) => (
-              <CommonFormField
-                key={i}
-                field={field}
-                formData={kyc.formData}
-                handleChange={kyc.handleChange}
-                errors={kyc.errors}
-                loading={kyc.loading}
-              />
+          <>
+            {[
+              { name: "aadhaar_front", label: "Aadhaar Front" },
+              { name: "aadhaar_back", label: "Aadhaar Back" },
+              { name: "pan_card", label: "PAN Card" },
+              { name: "shop_image", label: "Shop Image" },
+              { name: "photo", label: "Your Photo" },
+            ].map((f) => (
+              <Box key={f.name} sx={{ mb: 2 }}>
+                <Typography fontWeight={500} sx={{ mb: 1 }}>
+                  {f.label}
+                </Typography>
+                <Button
+                  variant="contained"
+                  component="label"
+                  disabled={submitting}
+                >
+                  Upload {f.label}
+                  <input
+                    type="file"
+                    hidden
+                    accept="image/*"
+                    onChange={(e) => handleFileChange(e, f.name)}
+                  />
+                </Button>
+
+                {previews[f.name] && (
+                  <Box sx={{ mt: 1 }}>
+                    <img
+                      src={previews[f.name]}
+                      alt={f.label}
+                      style={{
+                        width: 100,
+                        height: 100,
+                        objectFit: "cover",
+                        borderRadius: 8,
+                        border: "1px solid #ccc",
+                      }}
+                    />
+                  </Box>
+                )}
+              </Box>
             ))}
 
-            <Box mt={2} display="flex" justifyContent="flex-end" gap={1}>
+            {/* Submit */}
+            <Box mt={2} display="flex" justifyContent="flex-end">
               <Button
                 variant="contained"
                 color="primary"
                 onClick={handleSubmitKYC}
-                disabled={submitting || kyc.loading || !allImagesUploaded}
+                disabled={submitting || !allImagesUploaded}
               >
                 {submitting ? "Saving..." : "Save Business Info"}
               </Button>
             </Box>
-          </Box>
+          </>
         )}
       </Box>
     </Box>

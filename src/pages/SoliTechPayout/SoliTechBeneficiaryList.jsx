@@ -408,17 +408,26 @@ const SoliTechBeneficiaryList = ({
                         )}
 
                         {b.is_verified === 0 && (
-                          <Button
-                            size="small"
-                            variant="outlined"
-                            onClick={() => handleVerifyExistingBeneficiary(b)}
-                            sx={{
-                              fontSize: "0.7rem",
-                              px: 1,
-                            }}
-                          >
-                            Verify
-                          </Button>
+                          // <Button
+                          //   size="small"
+                          //   variant="outlined"
+                          //   onClick={() => handleVerifyExistingBeneficiary(b)}
+                          //   sx={{
+                          //     fontSize: "0.7rem",
+                          //     px: 1,
+                          //   }}
+                          // >
+                          //   Verify
+                          // </Button>
+                          <Box display="flex" alignItems="center" gap={0.3}>
+                            <Typography
+                              variant="caption"
+                              color="red"
+                              fontWeight="500"
+                            >
+                              Not Verified
+                            </Typography>
+                          </Box>
                         )}
 
                         <Button

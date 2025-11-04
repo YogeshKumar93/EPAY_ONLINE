@@ -33,6 +33,7 @@ import { useToast } from "../utils/ToastContext";
 import AuthContext from "../contexts/AuthContext";
 import LevinUpiBeneficiaryDetails from "./LevinUpiBeneficiaryDetails";
 import { upi, upi2 } from "../iconsImports";
+import UpiVerificationModal from "./UpiVerificationModal";
 
 const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
   const theme = useTheme();
@@ -100,7 +101,6 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
       rem_mobile: sender?.mobileNumber,
       ben_name: formData.beneficiary_name,
       ben_acc: combinedBenAcc, // ✅ Use combined prefix@suffix
-      // ifsc: formData.ifsc_code, // Remove if not needed for UPI
       operator: 21, // ✅ for Levin route
       latitude: location?.lat || "",
       longitude: location?.long || "",
@@ -192,6 +192,49 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
       } else {
         apiErrorToast(addErr?.message || "Failed to add beneficiary");
       }
+    } catch (err) {
+      apiErrorToast(err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleVerifyUpi = async () => {
+    if (mpinDigits.some((d) => !d)) {
+      apiErrorToast("Please enter all 6 digits of MPIN");
+      return;
+    }
+
+    const mpin = mpinDigits.join("");
+    try {
+      setSubmitting(true);
+      const verifyPayload = { ...pendingPayload, mpin, type: "UPI" };
+      const { error, response } = await apiCall(
+        "post",
+        ApiEndpoints.DMT1_VERIFY_BENEFICIARY,
+        verifyPayload
+      );
+
+      if (!response) {
+        showToast(error?.message || "Failed to verify beneficiary", "error");
+        setSubmitting(false);
+        setMpinDigits(Array(6).fill(""));
+        setVerifyingBeneficiary(null); // ✅ Close modal on failure
+        return;
+      }
+
+      // ✅ Success case
+      showToast(
+        response?.message || "Beneficiary verified successfully",
+        "success"
+      );
+
+      // ✅ Close modal & reset fields
+      setVerifyingBeneficiary(null);
+      setMpinDigits(Array(6).fill(""));
+
+      // ✅ Trigger success callback
+      onSuccess?.(sender.mobile_number);
     } catch (err) {
       apiErrorToast(err);
     } finally {
@@ -374,18 +417,30 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
                               sender_id: sender?.id,
                               ben_name: b.beneficiary_name,
                               ben_acc: b.account_number,
-                              ifsc: b.ifsc_code,
+                              mobile_number: sender?.mobile_number,
                               operator: 21,
                               latitude: location?.lat || "",
                               longitude: location?.long || "",
                               pf: "WEB",
                             });
-                            setVerifyOpen(true);
-                            setVerifyingBeneficiary(b);
+                            setVerifyingBeneficiary(b); // ✅ opens the new modal
                           }}
                         >
                           Verify
                         </Button>
+                        // <Box display="flex" alignItems="center" gap={0.3}>
+                        //   {/* <CheckCircleIcon
+                        //     sx={{ fontSize: 16, color: "success.main" }}
+                        //   /> */}
+                        //   <Typography
+                        //     variant="caption"
+                        //     color="red"
+                        //     fontWeight="500"
+                        //     sx={{ fontSize: "0.75rem" }}
+                        //   >
+                        //     Not Verified
+                        //   </Typography>
+                        // </Box>
                       )}
 
                       <Button
@@ -509,23 +564,50 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
               </Grid>
               <Grid item xs={12} sm={6}>
                 {formData.suffix === "other" ? (
-                  <TextField
-                    label="Custom Suffix"
-                    name="custom_suffix"
-                    fullWidth
-                    size="small"
-                    placeholder="Enter custom suffix"
-                    value={formData.custom_suffix || ""}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        custom_suffix: e.target.value,
-                      }))
-                    }
-                    InputProps={{
-                      startAdornment: <Typography sx={{ mr: 1 }}>@</Typography>,
-                    }}
-                  />
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <TextField
+                      label="Custom Suffix"
+                      name="custom_suffix"
+                      fullWidth
+                      size="small"
+                      placeholder="Enter custom suffix"
+                      value={formData.custom_suffix || ""}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          custom_suffix: e.target.value,
+                        }))
+                      }
+                      InputProps={{
+                        startAdornment: (
+                          <Typography sx={{ mr: 1, color: "text.secondary" }}>
+                            @
+                          </Typography>
+                        ),
+                      }}
+                    />
+
+                    {/* 🔗 Replace button with subtle link */}
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        cursor: "pointer",
+                        color: "#5c3ac8",
+                        textDecoration: "underline",
+                        whiteSpace: "nowrap",
+                        "&:hover": { opacity: 0.8 },
+                      }}
+                      onClick={() =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          suffix: "ybl",
+                          custom_suffix: "",
+                        }))
+                      }
+                    >
+                      Choose from list
+                    </Typography>
+                  </Box>
                 ) : (
                   <TextField
                     select
@@ -659,6 +741,20 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
             ))}
           </Grid>
         </CommonModal>
+      )}
+      {/* ✅ New Verify MPIN Modal for existing beneficiary verification */}
+      {verifyingBeneficiary && (
+        <UpiVerificationModal
+          open={!!verifyingBeneficiary}
+          onClose={() => {
+            setVerifyingBeneficiary(null);
+            setMpinDigits(Array(6).fill(""));
+          }}
+          mpinDigits={mpinDigits}
+          setMpinDigits={setMpinDigits}
+          submitting={submitting}
+          onVerify={handleVerifyUpi}
+        />
       )}
 
       {/* TUP Confirmation Modal */}

@@ -59,6 +59,7 @@ import UpiBeneficiaryDetails from "./UpiBeneficiaryDetails";
 import { useToast } from "../utils/ToastContext";
 import { upi2 } from "../iconsImports";
 import CommonModal from "../components/common/CommonModal";
+import UpiVerificationModal from "./UpiVerificationModal";
 
 const UpiBeneficiaryList = ({ sender, onSuccess }) => {
   const theme = useTheme();
@@ -82,6 +83,7 @@ const UpiBeneficiaryList = ({ sender, onSuccess }) => {
   const [mpinDigits, setMpinDigits] = useState(Array(6).fill(""));
   const [pendingPayload, setPendingPayload] = useState(null);
   const [tupResponse, setTupResponse] = useState(null);
+  const [verifyingBeneficiary, setVerifyingBeneficiary] = useState(null);
 
   const handleAddBeneficiary = async () => {
     // if (!beneficiaryName.trim() || !vpa.trim()) {
@@ -229,7 +231,48 @@ const UpiBeneficiaryList = ({ sender, onSuccess }) => {
       setSubmitting(false);
     }
   };
+  const handleVerifyUpi = async () => {
+    if (mpinDigits.some((d) => !d)) {
+      apiErrorToast("Please enter all 6 digits of MPIN");
+      return;
+    }
 
+    const mpin = mpinDigits.join("");
+    try {
+      setSubmitting(true);
+      const verifyPayload = { ...pendingPayload, mpin, type: "UPI" };
+      const { error, response } = await apiCall(
+        "post",
+        ApiEndpoints.DMT1_VERIFY_BENEFICIARY,
+        verifyPayload
+      );
+
+      if (!response) {
+        showToast(error?.message || "Failed to verify beneficiary", "error");
+        setSubmitting(false);
+        setMpinDigits(Array(6).fill(""));
+        setVerifyingBeneficiary(null); // ✅ Close modal on failure
+        return;
+      }
+
+      // ✅ Success case
+      showToast(
+        response?.message || "Beneficiary verified successfully",
+        "success"
+      );
+
+      // ✅ Close modal & reset fields
+      setVerifyingBeneficiary(null);
+      setMpinDigits(Array(6).fill(""));
+
+      // ✅ Trigger success callback
+      onSuccess?.(sender.mobile_number);
+    } catch (err) {
+      apiErrorToast(err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
   // ✅ TUP confirmation
   const handleTUPConfirmation = async () => {
     setSubmitting(true);
@@ -350,15 +393,10 @@ const UpiBeneficiaryList = ({ sender, onSuccess }) => {
                 onClick={() => setOpenModal(true)}
                 startIcon={<PersonAddIcon sx={{ fontSize: 16 }} />}
                 sx={{
-                  minWidth: "auto",
-                  px: 0.8,
-                  py: 0.3,
-                  fontSize: "0.65rem",
-                  borderRadius: 1,
+                  color: "#000",
+                  backgroundColor: "#fff",
                   textTransform: "none",
-                  fontWeight: 500,
-                  boxShadow: "none",
-                  backgroundColor: "#7a4dff",
+                  fontSize: "0.7rem",
                 }}
               >
                 Add Beneficiary
@@ -437,7 +475,16 @@ const UpiBeneficiaryList = ({ sender, onSuccess }) => {
                           variant="outlined"
                           onClick={() => {
                             setSelectedBene(b);
-                            setVerifyModal(true);
+                            setVerifyingBeneficiary(b); // ✅ opens the new modal
+                            setPendingPayload({
+                              sender_id: sender?.id,
+                              ben_acc: b.account_number,
+                              mobile_number: sender?.mobile_number,
+                              operator: 21,
+                              latitude: location?.lat || "",
+                              longitude: location?.long || "",
+                              pf: "WEB",
+                            });
                           }}
                           sx={{
                             borderRadius: 1,
@@ -451,6 +498,16 @@ const UpiBeneficiaryList = ({ sender, onSuccess }) => {
                         >
                           Verify
                         </Button>
+                        // <Box display="flex" alignItems="center" gap={0.3}>
+                        //   <Typography
+                        //     variant="caption"
+                        //     color="red"
+                        //     fontWeight="500"
+                        //     sx={{ fontSize: "0.75rem" }}
+                        //   >
+                        //     Not Verified
+                        //   </Typography>
+                        // </Box>
                       )}
 
                       <Button
@@ -745,6 +802,19 @@ const UpiBeneficiaryList = ({ sender, onSuccess }) => {
           senderMobile={sender?.mobile_number}
           senderId={sender?.id}
           sender={sender}
+        />
+      )}
+      {verifyingBeneficiary && (
+        <UpiVerificationModal
+          open={!!verifyingBeneficiary}
+          onClose={() => {
+            setVerifyingBeneficiary(null);
+            setMpinDigits(Array(6).fill(""));
+          }}
+          mpinDigits={mpinDigits}
+          setMpinDigits={setMpinDigits}
+          submitting={submitting}
+          onVerify={handleVerifyUpi}
         />
       )}
     </Card>

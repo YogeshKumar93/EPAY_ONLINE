@@ -109,38 +109,100 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
     try {
       setSubmitting(true);
       const verifyPayload = { ...pendingPayload, mpin, is_verified: 1 };
-      const { error, response } = await apiCall(
+      const { error: verifyError, response: verifyResponse } = await apiCall(
         "post",
         ApiEndpoints.DMT1_VERIFY_BENEFICIARY,
         verifyPayload
       );
 
-      if (!response) {
-        showToast(error?.message || "Failed to verify beneficiary", "error");
+      if (!verifyResponse) {
+        showToast(
+          verifyError?.message || "Failed to verify beneficiary",
+          "error"
+        );
         setSubmitting(false);
         setVerifyOpen(false);
         setMpinDigits(Array(6).fill(""));
+        setVerifyingBeneficiary(null);
+
         return;
+      }
+      console.log(":THe verfi repsonve is", verifyResponse);
+
+      if (
+        !verifyingBeneficiary &&
+        (verifyResponse?.data?.statuscode === "TUP" ||
+          verifyResponse?.message?.includes("Transaction Under Process"))
+      ) {
+        // Close MPIN modal and open TUP confirmation modal
+        setTupResponse(verifyResponse); // Store the TUP response
+        setVerifyOpen(false); // Close MPIN modal
+        setSubmitting(false);
+        setMpinDigits(Array(6).fill("")); // Reset MPIN
+        setVerifyingBeneficiary(null);
+        return;
+      }
+      if (verifyingBeneficiary) {
+        showToast(verifyResponse?.message, "success");
+        setVerifyOpen(false);
+        setMpinDigits(Array(6).fill(""));
+        setVerifyingBeneficiary(null);
+        onSuccess?.(sender.mobileNumber);
+      } else {
+        // ✅ Normal flow - adding new beneficiary
+        const verifiedName = verifyResponse?.data || verifyResponse?.message;
+        const encryptedData = verifyResponse?.encrypted_data;
+        console.log("verifiedName", verifiedName);
+
+        const { beneficiary_name, ...restFormData } = formData;
+
+        const addPayload = {
+          ...restFormData,
+          sender_id: sender.id,
+          type: "LEVIN",
+          beneficiary_name: verifiedName || formData.beneficiary_name, // Fallback to typed name
+          mobile_number: sender?.mobile_number,
+          is_verified: 1, // ✅ Set as verified since verification was successful
+        };
+
+        const { error: addError, response: addResponse } = await apiCall(
+          "post",
+          ApiEndpoints.CREATE_BENEFICIARY,
+          addPayload
+        );
+
+        if (addResponse) {
+          showToast(
+            addResponse?.message || "Beneficiary verified & added successfully",
+            "success"
+          );
+          setVerifyOpen(false);
+          setOpenModal(false);
+          setMpinDigits(Array(6).fill(""));
+          onSuccess?.(sender.mobileNumber);
+        } else {
+          showToast(addError?.message || "Failed to add beneficiary", "error");
+        }
       }
 
       // ✅ check if response indicates success (status true)
-      if (response?.status === true) {
-        showToast(
-          response?.message || "Beneficiary verified successfully",
-          "success"
-        );
+      // if (response?.status === true) {
+      //   showToast(
+      //     response?.message || "Beneficiary verified successfully",
+      //     "success"
+      //   );
 
-        // ✅ Automatically call handleTUPConfirmation when verification succeeds
-        await handleTUPConfirmation();
+      //   // ✅ Automatically call handleTUPConfirmation when verification succeeds
+      //   await handleTUPConfirmation();
 
-        setVerifyOpen(false);
-        setMpinDigits(Array(6).fill(""));
-        onSuccess?.(sender.mobile_number);
-        return;
-      }
+      //   setVerifyOpen(false);
+      //   setMpinDigits(Array(6).fill(""));
+      //   onSuccess?.(sender.mobile_number);
+      //   return;
+      // }
 
       // fallback if not status true
-      showToast(response?.message || "Verification failed", "error");
+      // showToast(response?.message || "Verification failed", "error");
     } catch (err) {
       apiErrorToast(err);
     } finally {
@@ -313,33 +375,53 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
                   secondaryAction={
                     <Stack direction="row" spacing={1}>
                       {b.is_verified === 1 ? (
-                        <CheckCircleIcon
-                          sx={{ fontSize: 18, color: "success.main" }}
-                        />
+                        <Box display="flex" alignItems="center" gap={0.3}>
+                          <CheckCircleIcon
+                            sx={{ fontSize: 18, color: "success.main" }}
+                          />
+                          <Typography
+                            variant="caption"
+                            color="success.main"
+                            fontWeight="500"
+                            sx={{ fontSize: "0.75rem" }}
+                          >
+                            Verified
+                          </Typography>
+                        </Box>
                       ) : (
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          color="warning"
-                          sx={{ textTransform: "none", fontSize: "0.7rem" }}
-                          onClick={() => {
-                            setPendingPayload({
-                              sender_id: sender?.id,
-                              ben_name: b.beneficiary_name,
-                              ben_acc: b.account_number,
-                              ifsc: b.ifsc_code,
-                              operator: 18,
-                              mobile_number: sender?.mobile_number,
-                              latitude: location?.lat || "",
-                              longitude: location?.long || "",
-                              pf: "WEB",
-                            });
-                            setVerifyOpen(true);
-                            setVerifyingBeneficiary(b);
-                          }}
-                        >
-                          Verify
-                        </Button>
+                        // <Button
+                        //   variant="outlined"
+                        //   size="small"
+                        //   color="warning"
+                        //   sx={{ textTransform: "none", fontSize: "0.7rem" }}
+                        //   onClick={() => {
+                        //     setPendingPayload({
+                        //       sender_id: sender?.id,
+                        //       ben_name: b.beneficiary_name,
+                        //       ben_acc: b.account_number,
+                        //       ifsc: b.ifsc_code,
+                        //       operator: 18,
+                        //       mobile_number: sender?.mobile_number,
+                        //       latitude: location?.lat || "",
+                        //       longitude: location?.long || "",
+                        //       pf: "WEB",
+                        //     });
+                        //     setVerifyOpen(true);
+                        //     setVerifyingBeneficiary(b);
+                        //   }}
+                        // >
+                        //   Verify
+                        // </Button>
+                        <Box display="flex" alignItems="center" gap={0.3}>
+                          <Typography
+                            variant="caption"
+                            color="red"
+                            fontWeight="500"
+                            sx={{ fontSize: "0.75rem" }}
+                          >
+                            Not Verified
+                          </Typography>
+                        </Box>
                       )}
 
                       <Button

@@ -205,6 +205,7 @@ const SoliTechAddBeneficiary = ({
         bank_name: formData.bank_name,
         bank_code: formData.bank_code,
         ifsc_code: formData.ifsc_code, // Include IFSC in payload (e.g., "KKBK0005033")
+        is_verified: 0,
       };
 
       const { response, error } = await apiCall(

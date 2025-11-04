@@ -168,10 +168,14 @@ const FundRequest = () => {
               </div>
             </Tooltip>
             <Tooltip title={`Updated: ${dateToTime1(row.updated_at)}`} arrow>
-              <span style={{ marginTop: "8px" }}>
+              {/* <span style={{ marginTop: "8px" }}>
                 {ddmmyy(row.updated_at)}
                 {dateToTime1(row.updated_at)}
-              </span>
+              </span> */}
+              <div style={{ display: "inline-flex", gap: 4 }}>
+                <span>{ddmmyy(row.updated_at)}</span>
+                <span>{dateToTime1(row.updated_at)}</span>
+              </div>
             </Tooltip>
           </div>
         ),
@@ -275,6 +279,11 @@ const FundRequest = () => {
           );
         },
         width: "200px", // ✅ Increased width for better layout
+      },
+      {
+        name: "Txn Id",
+        selector: (row) => <Typography>{row?.client_ref}</Typography>,
+        wrap: true,
       },
       {
         name: "Remark",

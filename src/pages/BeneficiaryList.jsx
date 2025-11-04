@@ -68,6 +68,7 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
   const [openList, setOpenList] = useState(true);
   const [searchText, setSearchText] = useState("");
   const [verifyOpen, setVerifyOpen] = useState(false); // 🔑 verify modal state
+  const [verifyUpiOpen, setVerifyUpiOpen] = useState(false); // 🔑 verify modal state
   const [mpinDigits, setMpinDigits] = useState(Array(6).fill(""));
   const [pendingPayload, setPendingPayload] = useState(null);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
@@ -142,7 +143,7 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
   };
   const handleVerify = async () => {
     if (mpinDigits.some((d) => !d)) {
-      apiErrorToast("Please enter all 6 digits of MPIN");
+      showToast("Please enter all 6 digits of MPIN", "error");
       return;
     }
     const mpin = mpinDigits.join("");
@@ -229,11 +230,57 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
           setMpinDigits(Array(6).fill(""));
           onSuccess?.(sender.mobileNumber);
         } else {
-          apiErrorToast(addError?.message || "Failed to add beneficiary");
+          showToast(addError?.message || "Failed to add beneficiary", "error");
         }
       }
     } catch (err) {
-      apiErrorToast(err);
+      showToast(err, "error");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+  const handleVerifyUpi = async () => {
+    if (mpinDigits.some((d) => !d)) {
+      showToast("Please enter all 6 digits of MPIN", "error");
+      return;
+    }
+    const mpin = mpinDigits.join("");
+
+    try {
+      setSubmitting(true);
+
+      // 🔹 Step 1: Verify
+      const verifyPayload = {
+        ...pendingPayload,
+        mpin,
+      };
+
+      const { error: verifyError, response: verifyResponse } = await apiCall(
+        "post",
+        ApiEndpoints.DMT1_VERIFY_BENEFICIARY,
+        verifyPayload
+      );
+
+      if (!verifyResponse) {
+        showToast(
+          verifyError?.message || "Failed to verify beneficiary",
+          "error"
+        );
+        setSubmitting(false);
+        setVerifyOpen(false);
+        setMpinDigits(Array(6).fill(""));
+        setVerifyingBeneficiary(null);
+        return;
+      } else {
+        showToast(verifyResponse?.message, "success");
+        onSuccess?.(sender.mobileNumber);
+        setVerifyUpiOpen(false);
+        setMpinDigits(Array(6).fill(""));
+      }
+
+      console.log(":THe verfi repsonve is", verifyResponse);
+    } catch (err) {
+      showToast(err, "error");
     } finally {
       setSubmitting(false);
     }
@@ -273,10 +320,10 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
         setMpinDigits(Array(6).fill(""));
         onSuccess?.(sender.mobileNumber);
       } else {
-        apiErrorToast(addError?.message || "Failed to add beneficiary");
+        showToast(addError?.message || "Failed to add beneficiary", "error");
       }
     } catch (err) {
-      apiErrorToast(err);
+      showToast(err, "error");
     } finally {
       setSubmitting(false);
     }
@@ -290,19 +337,23 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
 
   const handleDeleteBeneficiary = async (beneficiaryId) => {
     try {
-      const res = await apiCall("post", ApiEndpoints.DELETE_BENEFICIARY, {
-        sender_id: sender.id,
-        id: beneficiaryId,
-      });
+      const { error, response } = await apiCall(
+        "post",
+        ApiEndpoints.DELETE_BENEFICIARY,
+        {
+          sender_id: sender.id,
+          id: beneficiaryId,
+        }
+      );
 
-      if (res) {
-        okSuccessToast(res?.message || "Beneficiary deleted successfully");
+      if (response) {
+        okSuccessToast(response?.message || "Beneficiary deleted successfully");
         onSuccess?.(sender.mobile_number);
       } else {
-        apiErrorToast(res?.message || "Failed to delete beneficiary");
+        showToast(error?.message || "Failed to delete beneficiary", "error");
       }
     } catch (err) {
-      apiErrorToast(err);
+      showToast(err, "error");
     }
   };
 
@@ -491,7 +542,24 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
                           size="small"
                           variant="outlined"
                           color="warning"
-                          onClick={() => handleVerifyExistingBeneficiary(b)}
+                          // onClick={() => handleVerifyExistingBeneficiary(b)}
+                          onClick={() => {
+                            setSelectedBeneficiary(b);
+                            setVerifyUpiOpen(true);
+                            setPendingPayload({
+                              sender_id: sender?.id,
+                              ben_name: b.beneficiary_name,
+                              ben_acc: b.account_number,
+                              ifsc: b.ifsc_code,
+                              mobile_number: sender?.mobile_number,
+                              operator: 18,
+                              type: "PAYOUT",
+                              is_verified: 1,
+                              latitude: location?.lat || "",
+                              longitude: location?.long || "",
+                              pf: "WEB",
+                            });
+                          }}
                           sx={{
                             borderRadius: 1,
                             textTransform: "none",
@@ -502,6 +570,16 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
                         >
                           Verify
                         </Button>
+                        // <Box display="flex" alignItems="center" gap={0.3}>
+                        //   <Typography
+                        //     variant="caption"
+                        //     color="red"
+                        //     fontWeight="500"
+                        //     sx={{ fontSize: "0.75rem" }}
+                        //   >
+                        //     Not Verified
+                        //   </Typography>
+                        // </Box>
                       )}
 
                       {/* Pay button */}
@@ -730,7 +808,59 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
           </Grid>
         </CommonModal>
       )}
-
+      {/* function for normal verify  */}
+      {verifyUpiOpen && (
+        <CommonModal
+          open={verifyUpiOpen}
+          onClose={() => {
+            setVerifyUpiOpen(false);
+            setVerifyingBeneficiary(null);
+          }}
+          title="Enter 6-digit MPIN"
+          iconType="info"
+          size="small"
+          dividers
+          loading={submitting}
+          footerButtons={[
+            {
+              text: "Cancel",
+              variant: "outlined",
+              onClick: () => {
+                setVerifyOpen(false);
+                setVerifyingBeneficiary(null);
+              },
+              disabled: submitting,
+              sx: { borderRadius: 1 },
+            },
+            {
+              text: submitting ? "Verifying..." : "Verify Simple",
+              variant: "contained",
+              color: "primary",
+              onClick: handleVerifyUpi,
+              disabled: submitting,
+              sx: { borderRadius: 1 },
+            },
+          ]}
+        >
+          <Grid container spacing={1} justifyContent="center" sx={{ mt: 1 }}>
+            {mpinDigits.map((digit, idx) => (
+              <Grid item key={idx}>
+                <TextField
+                  id={`mpin-${idx}`}
+                  value={digit}
+                  type="password"
+                  onChange={(e) => handleMpinChange(idx, e.target.value)}
+                  inputProps={{
+                    maxLength: 1,
+                    style: { textAlign: "center", fontSize: "1.2rem" },
+                  }}
+                  sx={{ width: 45 }}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        </CommonModal>
+      )}
       {/* TUP Confirmation Modal - SEPARATE from MPIN modal */}
       {tupResponse && (
         <CommonModal
