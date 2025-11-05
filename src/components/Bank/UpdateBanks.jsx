@@ -153,6 +153,7 @@ const UpdateBanks = ({ open, onClose, bankData, onFetchRef }) => {
             label="Balance"
             type="number"
             fullWidth
+            disabled
             value={formData.balance}
             onChange={(e) => handleChange("balance", e.target.value)}
             error={!!errors.balance}
