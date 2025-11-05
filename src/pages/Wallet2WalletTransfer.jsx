@@ -60,6 +60,9 @@ const Wallet2WalletTransfer = ({}) => {
     }
   };
 
+ 
+
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
@@ -121,26 +124,30 @@ const Wallet2WalletTransfer = ({}) => {
     }, 500)
   ).current;
 
-    const handleExportExcel = async () => {
-      try {
-        // Fetch all users (without pagination/filters) from API
-        const { error, response } = await apiCall(
-          "post",
-          ApiEndpoints.GET_BBPS_TXN,
-          { export: 1 }
-        );
-        const usersData = response?.data?.data || [];
+ 
+
+
+    // const handleExportExcel = async () => {
+    //   try {
+    //     // Fetch all users (without pagination/filters) from API
+    //     const { error, response } = await apiCall(
+    //       "post",
+    //       ApiEndpoints.GET_BBPS_TXN,
+    //       { export: 1 }
+    //     );
+    //     const usersData = response?.data?.data || [];
   
-        if (usersData.length > 0) {
-          json2Excel("BbpsTxns", usersData); // generates and downloads Users.xlsx
-        } else {
-          apiErrorToast("no data found");
-        }
-      } catch (error) {
-        console.error("Excel export failed:", error);
-        alert("Failed to export Excel");
-      }
-    };
+    //     if (usersData.length > 0) {
+    //       json2Excel("BbpsTxns", usersData); // generates and downloads Users.xlsx
+    //     } else {
+    //       apiErrorToast("no data found");
+    //     }
+    //   } catch (error) {
+    //     console.error("Excel export failed:", error);
+    //     alert("Failed to export Excel");
+    //   }
+    // };
+
 
   // Debounced search for receiver
   const debouncedReceiverSearch = useRef(
@@ -617,9 +624,12 @@ const Wallet2WalletTransfer = ({}) => {
           refresh={true}
           includeClientRef={false}
           enableSelection={false}
-           enableExcelExport={true}
+           
           selectedRows={selectedRows}
           onSelectionChange={setSelectedRows}
+            enableExcelExport={true}
+        exportFileName="W2WTransactions"
+        exportEndpoint={ApiEndpoints.WALLET_GET_W2W_TRANSACTION}
           customHeader={
             <Box
               sx={{
