@@ -610,6 +610,7 @@ const Wallet2WalletTransfer = ({}) => {
         <CommonTable
           onFetchRef={handleFetchRef}
           columns={columnsWithSelection}
+          endpoint={tableEndpoint}
           filters={filters}
           transformData={filterRows}
           queryParam={{ ...appliedFilters, service: "W2W transfer" }}

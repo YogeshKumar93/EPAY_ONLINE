@@ -11,7 +11,10 @@ import {
   Chip,
   Alert,
 } from "@mui/material";
-import { Delete as DeleteIcon, Warning as WarningIcon } from "@mui/icons-material";
+import {
+  Delete as DeleteIcon,
+  Warning as WarningIcon,
+} from "@mui/icons-material";
 import { apiCall } from "../../api/apiClient";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import { useToast } from "../../utils/ToastContext";
@@ -53,10 +56,14 @@ const DeleteFundRequest = ({ open, handleClose, row, onFetchRef }) => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "Pending": return "warning";
-      case "Approved": return "success";
-      case "Rejected": return "error";
-      default: return "default";
+      case "Pending":
+        return "warning";
+      case "Approved":
+        return "success";
+      case "Rejected":
+        return "error";
+      default:
+        return "default";
     }
   };
 
@@ -73,13 +80,13 @@ const DeleteFundRequest = ({ open, handleClose, row, onFetchRef }) => {
         customContent={
           <Box>
             {/* Warning Alert */}
-            <Alert 
-              severity="warning" 
+            <Alert
+              severity="warning"
               icon={<WarningIcon />}
-              sx={{ 
+              sx={{
                 mb: 3,
                 borderRadius: 2,
-                alignItems: "center"
+                alignItems: "center",
               }}
             >
               <Typography variant="subtitle2" fontWeight={600}>
@@ -90,50 +97,86 @@ const DeleteFundRequest = ({ open, handleClose, row, onFetchRef }) => {
             {/* Fund Request Details */}
             <Card
               variant="outlined"
-              sx={{ 
+              sx={{
                 mb: 3,
                 borderRadius: 2,
                 borderColor: "warning.light",
-                backgroundColor: "warning.lightest"
+                backgroundColor: "warning.lightest",
               }}
             >
               <CardContent sx={{ p: 3 }}>
                 <Stack spacing={2}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <Typography variant="h6" color="text.primary" fontWeight={600}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <Typography
+                      variant="h6"
+                      color="text.primary"
+                      fontWeight={600}
+                    >
                       ₹{row?.amount}
                     </Typography>
-                    <Chip 
-                      label={row?.status} 
+                    <Chip
+                      label={row?.status}
                       color={getStatusColor(row?.status)}
                       size="small"
                       variant="outlined"
                     />
                   </Box>
-                  
+
                   <Divider />
-                  
+
                   <Stack spacing={1.5}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography variant="body2" color="text.secondary">Bank:</Typography>
-                      <Typography variant="body2" fontWeight={500}>{row?.bank_name}</Typography>
+                    <Box
+                      sx={{ display: "flex", justifyContent: "space-between" }}
+                    >
+                      <Typography variant="body2" color="text.secondary">
+                        Bank:
+                      </Typography>
+                      <Typography variant="body2" fontWeight={500}>
+                        {row?.bank_name}
+                      </Typography>
                     </Box>
-                    
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography variant="body2" color="text.secondary">Mode:</Typography>
-                      <Typography variant="body2" fontWeight={500}>{row?.mode}</Typography>
+
+                    <Box
+                      sx={{ display: "flex", justifyContent: "space-between" }}
+                    >
+                      <Typography variant="body2" color="text.secondary">
+                        Mode:
+                      </Typography>
+                      <Typography variant="body2" fontWeight={500}>
+                        {row?.mode}
+                      </Typography>
                     </Box>
-                    
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography variant="body2" color="text.secondary">Reference ID:</Typography>
-                      <Typography variant="body2" fontWeight={500} fontFamily="monospace">
+
+                    <Box
+                      sx={{ display: "flex", justifyContent: "space-between" }}
+                    >
+                      <Typography variant="body2" color="text.secondary">
+                        Reference ID:
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        fontWeight={500}
+                        fontFamily="monospace"
+                      >
                         {row?.bank_ref_id}
                       </Typography>
                     </Box>
-                    
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography variant="body2" color="text.secondary">Date:</Typography>
-                      <Typography variant="body2" fontWeight={500}>{row?.date}</Typography>
+
+                    <Box
+                      sx={{ display: "flex", justifyContent: "space-between" }}
+                    >
+                      <Typography variant="body2" color="text.secondary">
+                        Date:
+                      </Typography>
+                      <Typography variant="body2" fontWeight={500}>
+                        {row?.date}
+                      </Typography>
                     </Box>
                   </Stack>
                 </Stack>
@@ -141,9 +184,9 @@ const DeleteFundRequest = ({ open, handleClose, row, onFetchRef }) => {
             </Card>
 
             {/* Confirmation Text */}
-            <Typography 
-              variant="body2" 
-              color="text.secondary" 
+            <Typography
+              variant="body2"
+              color="text.secondary"
               align="center"
               sx={{ mb: 1 }}
             >
@@ -157,11 +200,11 @@ const DeleteFundRequest = ({ open, handleClose, row, onFetchRef }) => {
             variant: "outlined",
             onClick: handleClose,
             disabled: submitting,
-            sx: { minWidth: 100 }
+            sx: { minWidth: 100 },
           },
           {
             text: submitting ? (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <CircularProgress size={16} />
                 Deleting...
               </Box>
@@ -173,13 +216,13 @@ const DeleteFundRequest = ({ open, handleClose, row, onFetchRef }) => {
             onClick: handleSendClick,
             startIcon: !submitting && <DeleteIcon />,
             disabled: submitting,
-            sx: { 
+            sx: {
               minWidth: 120,
               backgroundColor: "error.main",
               "&:hover": {
                 backgroundColor: "error.dark",
-              }
-            }
+              },
+            },
           },
         ]}
       />

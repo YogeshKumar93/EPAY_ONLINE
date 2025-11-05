@@ -740,9 +740,11 @@ const CommonModal = ({
               sx={{
                 fontFamily: '"DM Sans", sans-serif !important',
                 backgroundColor:
+                  typeof button.text === "string" &&
                   button.text.toLowerCase() === "cancel"
                     ? "#8094ae !important"
                     : "#854fff",
+
                 color: "#fff",
                 textTransform: "none",
               }}
