@@ -26,10 +26,8 @@ const Banks = ({ filters = [] }) => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [selectedBank, setSelectedBank] = useState(null);
   const [loading, setLoading] = useState(false);
- const bank_name = location.state?.bank_name || "Bank";
-const acc_number = location.state?.acc_number || "Account Number";
-
-
+  const bank_name = location.state?.bank_name || "Bank";
+  const acc_number = location.state?.acc_number || "Account Number";
 
   // ✅ keep a ref to CommonTable for refreshing
   const fetchBanksRef = useRef(null);
@@ -55,7 +53,7 @@ const acc_number = location.state?.acc_number || "Account Number";
         bank_id: row.id,
         bank_name: row.bank_name,
         balance: row.balance,
-        acc_number: row.acc_number, 
+        acc_number: row.acc_number,
       },
     });
   };
@@ -168,17 +166,18 @@ const acc_number = location.state?.acc_number || "Account Number";
                   </IconButton>
                 </Tooltip>
 
-                {user?.role === "adm" && (
-                  <Tooltip title="Delete">
-                    <IconButton
-                      color="error"
-                      size="small"
-                      onClick={() => handleDelete(row)}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                )}
+                {user?.role === "adm" ||
+                  (user?.role === "sadm" && (
+                    <Tooltip title="Delete">
+                      <IconButton
+                        color="error"
+                        size="small"
+                        onClick={() => handleDelete(row)}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  ))}
               </Box>
             </Box>
           );
@@ -232,7 +231,7 @@ const acc_number = location.state?.acc_number || "Account Number";
           )}
 
           {/* Delete Bank Modal */}
-          {selectedBank && user?.role === "adm" && (
+          {selectedBank && (
             <DeleteBank
               open={openDelete}
               handleClose={() => {

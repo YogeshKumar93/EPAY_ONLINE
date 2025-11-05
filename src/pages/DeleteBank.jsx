@@ -12,23 +12,27 @@ import {
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CommonModal from "../components/common/CommonModal";
+import { okSuccessToast } from "../utils/ToastUtil";
+import { useToast } from "../utils/ToastContext";
 
-const DeleteBank = ({ open, handleClose, selectedBank,onFetchRef}) => {
+const DeleteBank = ({ open, handleClose, selectedBank, onFetchRef }) => {
   const [loading, setLoading] = useState(false);
-
+  const { showToast } = useToast();
   const handleConfirmDelete = async () => {
     try {
       setLoading(true);
       const { error, response } = await apiCall(
         "POST",
         `${ApiEndpoints.DELETE_BANK}`,
-        { id: selectedBank.id } 
+        { id: selectedBank.id }
       );
 
-      if  (response) {
+      if (response) {
+        okSuccessToast(response?.message);
         onFetchRef();
         handleClose();
       } else {
+        showToast(error?.message, "error");
         console.error("Delete failed:", error || response);
       }
     } catch (err) {
@@ -39,36 +43,29 @@ const DeleteBank = ({ open, handleClose, selectedBank,onFetchRef}) => {
   };
 
   return (
-      <CommonModal
+    <CommonModal
       open={open}
       onClose={handleClose}
       title="Delete Bank"
       maxWidth="xs"
-   footerButtons={[
+      footerButtons={[
         {
           text: "Cancel",
           variant: "outlined",
-          onClick: handleClose
+          onClick: handleClose,
         },
         {
           text: loading ? "Deleting..." : "Confirm",
           variant: "contained",
           onClick: handleConfirmDelete,
-          disabled: loading
-        }
+          disabled: loading,
+        },
       ]}
     >
       <Box sx={{ p: 2 }}>
-       <Typography sx={{ mt: 3 }}>
-  Are you sure you want to delete bank{" "}
-  <b>{selectedBank?.bank_name}</b>?
-</Typography>
-
-
-
-       
-
-
+        <Typography sx={{ mt: 3 }}>
+          Are you sure you want to delete bank <b>{selectedBank?.bank_name}</b>?
+        </Typography>
       </Box>
     </CommonModal>
   );
