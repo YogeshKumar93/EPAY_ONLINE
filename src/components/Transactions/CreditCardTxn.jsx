@@ -147,6 +147,7 @@ const CreditCardTxn = ({ query }) => {
       { id: "number", label: "Number", type: "textfield" },
       { id: "card_number", label: "Card Number", type: "textfield" },
       { id: "txn_id", label: "Txn ID", type: "textfield" },
+            { id: "amount", label: "Amount", type: "textfield" },
       {
         id: "user_id",
         label: "User ID",

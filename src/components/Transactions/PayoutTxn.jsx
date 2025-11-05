@@ -181,6 +181,7 @@ const PayoutTxn = ({ query }) => {
     setSelectedTrancation(row);
   };
   const handleCloseLein = () => setOpenLeinModal(false);
+  
   const filters = useMemo(
     () => [
       {
@@ -215,6 +216,7 @@ const PayoutTxn = ({ query }) => {
         defaultValue: "pending",
       },
       { id: "mobile_number", label: "Sender Number", type: "textfield" },
+      { id: "amount", label: "Amount", type: "textfield" },
       {
         id: "txn_id",
         label: "Txn ID",

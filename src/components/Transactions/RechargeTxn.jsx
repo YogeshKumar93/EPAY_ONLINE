@@ -194,6 +194,7 @@ const RechargeTxn = ({ query }) => {
       },
       { id: "mobile_number", label: "Sender Number", type: "textfield" },
       { id: "txn_id", label: "Txn ID", type: "textfield" },
+            { id: "amount", label: "Amount", type: "textfield" },
       {
         id: "user_id",
         label: "User ID",

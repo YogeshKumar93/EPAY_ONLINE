@@ -246,6 +246,7 @@ const Wallet2WalletTransfer = ({}) => {
         type: "textfield",
         roles: ["adm", "sadm"],
       },
+            // { id: "amount", label: "Amount", type: "textfield" },
       {
         id: "date_range",
         // label: "Date Range",

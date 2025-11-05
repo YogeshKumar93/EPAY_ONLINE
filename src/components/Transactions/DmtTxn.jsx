@@ -197,6 +197,8 @@ const DmtTxn = ({ query }) => {
       },
 
       { id: "sender_mobile", label: "Sender Mobile", type: "textfield" },
+      
+      { id: "amount", label: "Amount", type: "textfield" },
       { id: "txn_id", label: "Txn ID", type: "textfield" },
       {
         id: "user_id",
