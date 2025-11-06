@@ -349,15 +349,16 @@ const FundRequest = () => {
               </Tooltip>
             )}
 
-            {row.status === "pending" && (
-              <Tooltip title="Delete">
-                <Delete
-                  fontSize="small"
-                  sx={{ color: "red", cursor: "pointer" }}
-                  onClick={() => handleOpenModal("delete", row)}
-                />
-              </Tooltip>
-            )}
+            {row.status === "pending" &&
+              (user?.role === "adm" || user?.role === "sadm") && (
+                <Tooltip title="Delete">
+                  <Delete
+                    fontSize="small"
+                    sx={{ color: "red", cursor: "pointer" }}
+                    onClick={() => handleOpenModal("delete", row)}
+                  />
+                </Tooltip>
+              )}
 
             {/* Admin actions */}
             {(user?.role === "adm" || user?.role === "sadm") &&
