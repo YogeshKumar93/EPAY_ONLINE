@@ -411,6 +411,7 @@ const roleHierarchy = {
       "Complaint",
       "Wallet Ledger",
       "Risk",
+      "Login History",
     ],
   },
   dd: {

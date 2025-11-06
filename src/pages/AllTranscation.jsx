@@ -9,27 +9,14 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
- 
- 
- 
- 
+
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import PrintIcon from "@mui/icons-material/Print";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import LaptopIcon from "@mui/icons-material/Laptop";
 import { useNavigate } from "react-router-dom";
-
 import biggpayLogo from "../assets/Images/PPALogor.png";
- 
-
- 
- 
- 
- 
- 
-
- 
 import ApiEndpoints from "../api/ApiEndpoints";
 import CommonTable from "../components/common/CommonTable";
 import { dateToTime1, ddmmyy, ddmmyyWithTime } from "../utils/DateUtils";
@@ -156,7 +143,7 @@ const AllTranscation = ({ query }) => {
         roles: ["adm", "sadm"],
       },
       { id: "txn_id", label: "Txn ID", type: "textfield" },
-            { id: "amount", label: "Amount", type: "textfield" },
+      { id: "amount", label: "Amount", type: "textfield" },
       {
         id: "user_id",
         label: "User ID",
@@ -235,7 +222,7 @@ const AllTranscation = ({ query }) => {
 
   const columns = useMemo(
     () => [
-       {
+      {
         name: "S.No",
         selector: (row) => row.serialNo,
         wrap: true,
@@ -250,7 +237,6 @@ const AllTranscation = ({ query }) => {
                 {ddmmyy(row.created_at)} {dateToTime1(row.created_at)}
               </span>
             </Tooltip>
-        
           </Box>
         ),
         wrap: true,
@@ -267,81 +253,47 @@ const AllTranscation = ({ query }) => {
       {
         name: "Service",
         selector: (row) => (
-          <div style={{ fontSize: "10px", fontWeight: "600" }}>{row.service_name}</div>
+          <div style={{ fontSize: "10px", fontWeight: "600" }}>
+            {row.service_name}
+          </div>
         ),
         center: true,
         width: "70px",
       },
-       {
+      {
         name: "Txn ID",
         selector: (row) => (
-          <div style={{ fontSize: "10px", fontWeight: "600" }}>{row.txn_id}</div>
+          <div style={{ fontSize: "10px", fontWeight: "600" }}>
+            {row.txn_id}
+          </div>
         ),
         center: true,
         width: "70px",
       },
-       {
+      ...(user?.role === "adm" || user?.role === "sadm"
+        ? [
+            {
+              name: "Route",
+              selector: (row) => (
+                <div style={{ fontSize: "10px", fontWeight: "600" }}>
+                  {row.route}
+                </div>
+              ),
+              center: true,
+              width: "70px",
+            },
+          ]
+        : []),
+      {
         name: "Operator",
         selector: (row) => (
-          <div style={{ fontSize: "10px", fontWeight: "600" }}>{row.operator_name}</div>
+          <div style={{ fontSize: "10px", fontWeight: "600" }}>
+            {row.operator_name}
+          </div>
         ),
         center: true,
         width: "70px",
       },
-    //   {
-    //     name: "Pf",
-    //     selector: (row) => {
-    //       let icon;
-    //       const pf = row.pf?.toLowerCase() || "";
-    //       if (pf.includes("windows"))
-    //         icon = <img src={windows2} style={{ width: 22 }} />;
-    //       else if (pf.includes("p2ape"))
-    //         icon = <img src={android2} style={{ width: 22 }} />;
-    //       else if (pf.includes("mac"))
-    //         icon = <img src={macintosh2} style={{ width: 22 }} />;
-    //       else if (pf.includes("linux"))
-    //         icon = <img src={linux2} style={{ width: 22 }} />;
-    //       else if (pf.includes("okhttp"))
-    //         icon = <img src={okhttp} style={{ width: 22 }} />;
-    //       else icon = <LaptopIcon sx={{ color: "blue", width: 22 }} />;
-    //       return (
-    //         <Box display="flex" alignItems="center" gap={2}>
-    //           {icon}
-    //         </Box>
-    //       );
-    //     },
-    //     width: "20px",
-    //   },
-      // Additional conditional columns based on roles
-    //   ...(user?.role !== "ret" && user?.role !== "dd"
-    //     ? [
-    //         {
-    //           name: "Est.",
-    //           selector: (row) => (
-    //             <div style={{ fontSize: 10, fontWeight: 600 }}>
-    //               {row.establishment}
-    //             </div>
-    //           ),
-    //           width: 70,
-    //           center: true,
-    //         },
-    //         {
-    //           name: "Txn ID /Ref",
-    //           selector: (row) => (
-    //             <div style={{ fontSize: 10, fontWeight: 600 }}>
-    //               {row.txn_id}
-    //               <br />
-    //               {row.client_ref}
-    //             </div>
-    //           ),
-    //           width: 100,
-    //         },
-    //       ]
-    //     : []),
-    //   {
-    //     name: "Aadhaar No.",
-    //     selector: (row) => <div>**** **** {row.aadhaar_number?.slice(-4)}</div>,
-    //   },
       {
         name: "Amount",
         selector: (row) => (
@@ -351,52 +303,105 @@ const AllTranscation = ({ query }) => {
         ),
         right: true,
       },
-       {
-        name: "Ret. Comm.",
-        selector: (row) => (
-          <div style={{ fontSize: "10px", fontWeight: "600" }}>{row.ret_comm}</div>
-        ),
-        center: true,
-        width: "70px",
-      },
-       {
-        name: "Di. Comm.",
-        selector: (row) => (
-          <div style={{ fontSize: "10px", fontWeight: "600" }}>{row.di_comm}</div>
-        ),
-        center: true,
-        width: "70px",
-      },
-       {
-        name: "Md. Comm.",
-        selector: (row) => (
-          <div style={{ fontSize: "10px", fontWeight: "600" }}>{row.md_comm}</div>
-        ),
-        center: true,
-        width: "70px",
-      },
+
       {
         name: "Status",
         selector: (row) => <CommonStatus value={row.status} />,
         center: true,
       },
-      // ...((user?.role === "adm" || user?.role === "sadm") &&
-      // user?.permissions?.txn_actions === 1
-      //   ? [
-      //       {
-      //         name: "Action",
-      //         selector: (row) => (
-      //           <ActionColumn
-      //             row={row}
-      //             // handleRefundClick={handleRefundClick}
-      //             handleOpenLein={handleOpenLein}
-      //           />
-      //         ),
-      //         center: true,
-      //         width: "100px",
-      //       },
-      //     ]
-      //   : []),
+      ...(user?.role === "adm" ||
+      user?.role === "di" ||
+      user?.role === "sadm" ||
+      user?.role === "md" ||
+      user?.role === "asm" ||
+      user?.role === "zsm"
+        ? [
+            {
+              name: "Di Comm",
+              selector: (row) => (
+                <div
+                  style={{
+                    textAlign: "right",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                  }}
+                >
+                  <div style={{ color: "green" }}>
+                    {parseFloat(row.di_comm).toFixed(2)}
+                  </div>
+                </div>
+              ),
+              right: true,
+              width: "60px",
+            },
+          ]
+        : []),
+      ...(user?.role === "adm" ||
+      user?.role === "md" ||
+      user?.role === "sadm" ||
+      user?.role === "asm" ||
+      user?.role === "zsm"
+        ? [
+            {
+              name: "Md Comm",
+              selector: (row) => (
+                <div
+                  style={{
+                    textAlign: "right",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                  }}
+                >
+                  <div style={{ color: "green" }}>
+                    {parseFloat(row.md_comm).toFixed(2)}
+                  </div>
+                </div>
+              ),
+              right: true,
+              width: "60px",
+            },
+          ]
+        : []),
+      ...(user?.role === "adm" ||
+      user?.role === "md" ||
+      user?.role === "sadm" ||
+      user?.role === "asm" ||
+      user?.role === "zsm"
+        ? [
+            {
+              name: "Ret Comm",
+              selector: (row) => (
+                <div
+                  style={{
+                    textAlign: "right",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                  }}
+                >
+                  <div style={{ color: "green" }}>
+                    {parseFloat(row.ret_comm).toFixed(2)}
+                  </div>
+                </div>
+              ),
+              right: true,
+              width: "60px",
+            },
+          ]
+        : []),
+      {
+        name: "Ret Comm",
+        selector: (row) => (
+          <div
+            style={{ textAlign: "right", fontSize: "12px", fontWeight: 600 }}
+          >
+            <div style={{ color: "green" }}>
+              {parseFloat(row.ret_comm).toFixed(2)}
+            </div>
+          </div>
+        ),
+        center: false,
+        width: "60px",
+      },
       {
         name: "View",
         selector: (row) => (
@@ -425,7 +430,7 @@ const AllTranscation = ({ query }) => {
             </Tooltip>
 
             {/* Print Aeps visible only to ret and dd */}
-            {(user?.role === "ret" || user?.role === "dd") && (
+            {/* {(user?.role === "ret" || user?.role === "dd") && (
               <Tooltip title="Print Aeps">
                 <IconButton
                   color="secondary"
@@ -442,47 +447,12 @@ const AllTranscation = ({ query }) => {
                   <PrintIcon />
                 </IconButton>
               </Tooltip>
-            )}
+            )} */}
           </Box>
         ),
         width: "100px",
         center: true,
       },
-      // ...(user?.role === "ret" || user?.role === "dd"
-      //   ? [
-      //       {
-      //         name: "Actions",
-      //         selector: (row) => (
-      //           <div
-      //             style={{
-      //               fontSize: "10px",
-      //               fontWeight: "600",
-      //               display: "flex",
-      //               gap: "4px",
-      //               justifyContent: "center",
-      //               alignItems: "center",
-      //             }}
-      //           >
-      //             {/* FAILED or REFUND: Refresh */}
-      //             {/* {row?.status === "REFUNDPENDING" && (
-      //               <Tooltip title="REFUND TXN">
-      //                 <ReplayIcon
-      //                   sx={{
-      //                     color: "orange",
-      //                     fontSize: 25,
-      //                     cursor: "pointer",
-      //                   }}
-      //                   onClick={() => handleRefundTxn(row)}
-      //                 />
-      //               </Tooltip>
-      //             )} */}
-      //           </div>
-      //         ),
-      //         center: true,
-      //         width: "70px",
-      //       },
-      //     ]
-      //   : []),
     ],
     []
   );
@@ -522,67 +492,65 @@ const AllTranscation = ({ query }) => {
         queryParam={query || ""}
         enableActionsHover
         enableSelection={false}
-         enableExcelExport={true}
+        enableExcelExport={true}
         selectedRows={selectedRows}
         onSelectionChange={setSelectedRows}
-         
-          
-          exportFileName="DmtTransactions"
-          exportEndpoint={ApiEndpoints.GET_ALL_TXN}
+        exportFileName="Alltxns"
+        exportEndpoint={ApiEndpoints.GET_ALL_TXN}
         customHeader={
           <>
-           <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  padding: "8px",
-                }}
-              >
-                {selectedRows.length > 0 && (
-                  <Tooltip title="PRINT">
-                    <Button
-                      variant="contained"
-                      size="small"
-                      color="primary"
-                      onClick={() => {
-                        if (!selectedRows || selectedRows.length === 0) {
-                          alert(
-                            "Please select at least one transaction to print."
-                          );
-                          return;
-                        }
-
-                        // Save all selected rows
-                        sessionStorage.setItem(
-                          "txnData",
-                          JSON.stringify(selectedRows)
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                padding: "8px",
+              }}
+            >
+              {selectedRows.length > 0 && (
+                <Tooltip title="PRINT">
+                  <Button
+                    variant="contained"
+                    size="small"
+                    color="primary"
+                    onClick={() => {
+                      if (!selectedRows || selectedRows.length === 0) {
+                        alert(
+                          "Please select at least one transaction to print."
                         );
+                        return;
+                      }
 
-                        // Open receipt page in a new tab
-                        window.open("/print-dmt2", "_blank");
-                      }}
-                      sx={{ ml: 1 }}
-                    >
-                      <PrintIcon
-                        sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
-                      />
-                      Print
-                    </Button>
-                  </Tooltip>
-                )}
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  padding: "8px",
-                  flexWrap: "wrap",
-                }}
-              >
-                <Scheduler onRefresh={refreshPlans} />
-              </Box>
+                      // Save all selected rows
+                      sessionStorage.setItem(
+                        "txnData",
+                        JSON.stringify(selectedRows)
+                      );
+
+                      // Open receipt page in a new tab
+                      window.open("/print-dmt2", "_blank");
+                    }}
+                    sx={{ ml: 1 }}
+                  >
+                    <PrintIcon
+                      sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
+                    />
+                    Print
+                  </Button>
+                </Tooltip>
+              )}
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                padding: "8px",
+                flexWrap: "wrap",
+              }}
+            >
+              <Scheduler onRefresh={refreshPlans} />
+            </Box>
           </>
         }
       />
