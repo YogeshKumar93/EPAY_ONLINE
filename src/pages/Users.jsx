@@ -39,6 +39,7 @@ import debounce from "lodash.debounce";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import ChangeRoleModal from "../components/ChangeRole";
 import ChangeParentModal from "./ChangeParentModal";
+import AddInst from "../components/User/AddInst";
 
 const roleLabels = {
   ret: "Retailer",
@@ -68,6 +69,7 @@ const Users = ({ query }) => {
   const [userToToggle, setUserToToggle] = useState(null);
   const [openCreateUser, setOpenCreateUser] = useState(false);
   const [createadmuser, setCreateAdmUser] = useState(false);
+  const [openAddInst, setOpenAddInst] = useState(false);
   const [openLeinModal, setOpenLeinModal] = useState(false);
   const [openWalletTranser, setOpenWalletTranser] = useState(false);
   const [openAssignPlans, setOpenAssignPlans] = useState(false);
@@ -79,6 +81,9 @@ const Users = ({ query }) => {
   const [openChangeRole, setOpenChangeRole] = useState(false);
   // const [selectedUser, setSelectedUser] = useState(null);
   const [openChangeParent, setOpenChangeParent] = useState(false);
+
+
+
   const handleOpenChangeParent = (row) => {
     setSelectedUser(row);
     setOpenChangeParent(true);
@@ -302,7 +307,22 @@ const Users = ({ query }) => {
           >
             <ListItemText>Lein Amount</ListItemText>
           </MenuItem>
+          {(user?.role === "adm" || user?.role === "sadm") && (
+
+              <MenuItem
+  key="add_inst"
+  onClick={() => {
+    setSelectedUser(row);   // <--- store selected user
+    setOpenAddInst(true);   // <--- open modal
+    handleMenuClose();
+  }}
+>
+  <ListItemText>Add InstId</ListItemText>
+</MenuItem>
+          )}
         </Menu>
+    
+
       </Box>
     );
   }
@@ -642,6 +662,8 @@ const Users = ({ query }) => {
                 onClick={() => setCreateAdmUser(true)}
               />
             )}
+   
+
 
             {/* <input
               type="text"
@@ -667,6 +689,15 @@ const Users = ({ query }) => {
           onFetchRef={refreshUsers}
         />
       )}
+      {openAddInst && selectedUser && (
+  <AddInst
+    open={openAddInst}
+    onClose={() => setOpenAddInst(false)}
+    userId={selectedUser.id}     // ✅ Pass userId here
+    onFetchRef={refreshUsers}
+  />
+)}
+
 
       {createadmuser && (
         <AdminCreateUser

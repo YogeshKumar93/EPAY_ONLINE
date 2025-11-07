@@ -334,7 +334,7 @@ const ApiEndpoints = {
   // WALLET_DELETE: "wallet/delete",
 
   // ****************************** NEW API'S ABOVE ******************************
-
+ ADD_INST_ID :"auth/insertInstId",
   SEND_OTP: "user/sendOtp",
   GET_API_TOKEN: "user/getApiToken",
   GET_API_KEY: "user/getApiKey",
