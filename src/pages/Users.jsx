@@ -82,8 +82,6 @@ const Users = ({ query }) => {
   // const [selectedUser, setSelectedUser] = useState(null);
   const [openChangeParent, setOpenChangeParent] = useState(false);
 
-
-
   const handleOpenChangeParent = (row) => {
     setSelectedUser(row);
     setOpenChangeParent(true);
@@ -296,16 +294,16 @@ const Users = ({ query }) => {
             >
               <ListItemText>Change Parent</ListItemText>
             </MenuItem>,
-                    <MenuItem
-  key="add_inst"
-  onClick={() => {
-    setSelectedUser(row);   // <--- store selected user
-    setOpenAddInst(true);   // <--- open modal
-    handleMenuClose();
-  }}
->
-  <ListItemText>Add InstId</ListItemText>
-</MenuItem>
+            <MenuItem
+              key="add_inst"
+              onClick={() => {
+                setSelectedUser(row); // <--- store selected user
+                setOpenAddInst(true); // <--- open modal
+                handleMenuClose();
+              }}
+            >
+              <ListItemText>Add InstId</ListItemText>
+            </MenuItem>,
           ]}
 
           <MenuItem
@@ -317,10 +315,7 @@ const Users = ({ query }) => {
           >
             <ListItemText>Lein Amount</ListItemText>
           </MenuItem>
-        
         </Menu>
-    
-
       </Box>
     );
   }
@@ -380,7 +375,7 @@ const Users = ({ query }) => {
         onSearch: (val) => setUserSearch(val),
         getOptionLabel: (option) => option?.label || "",
         isOptionEqualToValue: (option, value) => option.id === value.id, // ✅ this line keeps selection visible
-        roles: ["adm,sadm"],
+        roles: ["adm", "sadm"],
       },
       {
         id: "parent_id",
@@ -661,8 +656,6 @@ const Users = ({ query }) => {
                 onClick={() => setCreateAdmUser(true)}
               />
             )}
-   
-
 
             {/* <input
               type="text"
@@ -689,14 +682,13 @@ const Users = ({ query }) => {
         />
       )}
       {openAddInst && selectedUser && (
-  <AddInst
-    open={openAddInst}
-    onClose={() => setOpenAddInst(false)}
-    userId={selectedUser.id}     // ✅ Pass userId here
-    onFetchRef={refreshUsers}
-  />
-)}
-
+        <AddInst
+          open={openAddInst}
+          onClose={() => setOpenAddInst(false)}
+          userId={selectedUser.id} // ✅ Pass userId here
+          onFetchRef={refreshUsers}
+        />
+      )}
 
       {createadmuser && (
         <AdminCreateUser
