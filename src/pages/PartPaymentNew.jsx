@@ -246,17 +246,27 @@ const PartPaymentNew = ({
 
           {/* Input Fields */}
           <Box display="flex" flexDirection="column" gap={2}>
-            {billerDetails?.parameters?.map((param, index) => (
-              <TextField
-                key={index}
-                label={param.display_name || param.name}
-                placeholder={param.name}
-                required={param.isMandatory === "Y"}
-                value={inputValues[param.name] || ""}
-                onChange={(e) => handleInputChange(param.name, e.target.value)}
-                fullWidth
-              />
-            ))}
+            {billerDetails?.parameters?.map((param, index) => {
+              const isFirstParam = index === 0; // ✅ First parameter special handling
+              return (
+                <TextField
+                  key={index}
+                  label={
+                    isFirstParam
+                      ? "CA Number"
+                      : param.display_name || param.name
+                  }
+                  placeholder={isFirstParam ? "Enter CA Number" : param.name}
+                  required={param.isMandatory === "Y"}
+                  value={inputValues[param.name] || ""}
+                  onChange={(e) =>
+                    handleInputChange(param.name, e.target.value)
+                  }
+                  fullWidth
+                />
+              );
+            })}
+            ``
           </Box>
 
           <Button
