@@ -35,13 +35,10 @@ const AllTranscation = ({ query }) => {
   const [selectedTxn, setSelectedTxn] = useState(null);
   const [responseModalOpen, setResponseModalOpen] = useState(false);
   const [selectedApiResponse, setSelectedApiResponse] = useState("");
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [selectedForRefund, setSelectedForRefund] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [openLeinModal, setOpenLeinModal] = useState(false);
-  const [refundLoading, setRefundLoading] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [routes, setRoutes] = useState([]);
   const fetchUsersRef = useRef(null);
@@ -52,7 +49,6 @@ const AllTranscation = ({ query }) => {
     fetchUsersRef.current?.();
   };
 
-  // Fetch routes dynamically
   useEffect(() => {
     const fetchRoutes = async () => {
       try {
