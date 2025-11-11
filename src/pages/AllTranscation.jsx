@@ -52,12 +52,6 @@ const AllTranscation = ({ query }) => {
     fetchUsersRef.current?.();
   };
 
-
-    const fetchUsersRef = useRef(null);
-
-  const handleFetchRef = (fetchFn) => {
-    fetchUsersRef.current = fetchFn;
-  };
   // Fetch routes dynamically
   useEffect(() => {
     const fetchRoutes = async () => {
@@ -146,29 +140,9 @@ const AllTranscation = ({ query }) => {
         wrap: true,
         width: "190px",
       },
-      ...(user?.role === "adm" || user?.role === "sadm" ? [
-        {
-        name: "Route",
-        selector: (row) => (
-          <div style={{ fontSize: "10px", fontWeight: "600" }}>{row.route}</div>
-        ),
-        center: true,
-        width: "70px",
-      },
-      ] : []),
-       {
-        name: "User ID",
-        selector: (row) => (
-          <div style={{ fontSize: "10px", fontWeight: "600" }}>{row.user_id}</div>
-        ),
-        center: true,
-        width: "70px",
-      },
-     {
-        name: "Operator",
-        selector: (row) => (
-          <div style={{ fontSize: "10px", fontWeight: "600" }}>{row.operator_name}</div>
-        ),
+      {
+        name: "Service",
+        selector: (row) => <div>{row.service_name}</div>,
         center: true,
         width: "70px",
       },
@@ -178,61 +152,30 @@ const AllTranscation = ({ query }) => {
         center: true,
         width: "70px",
       },
-      
-    //   {
-    //     name: "Pf",
-    //     selector: (row) => {
-    //       let icon;
-    //       const pf = row.pf?.toLowerCase() || "";
-    //       if (pf.includes("windows"))
-    //         icon = <img src={windows2} style={{ width: 22 }} />;
-    //       else if (pf.includes("p2ape"))
-    //         icon = <img src={android2} style={{ width: 22 }} />;
-    //       else if (pf.includes("mac"))
-    //         icon = <img src={macintosh2} style={{ width: 22 }} />;
-    //       else if (pf.includes("linux"))
-    //         icon = <img src={linux2} style={{ width: 22 }} />;
-    //       else if (pf.includes("okhttp"))
-    //         icon = <img src={okhttp} style={{ width: 22 }} />;
-    //       else icon = <LaptopIcon sx={{ color: "blue", width: 22 }} />;
-    //       return (
-    //         <Box display="flex" alignItems="center" gap={2}>
-    //           {icon}
-    //         </Box>
-    //       );
-    //     },
-    //     width: "20px",
-    //   },
-      // Additional conditional columns based on roles
-    //   ...(user?.role !== "ret" && user?.role !== "dd"
-    //     ? [
-    //         {
-    //           name: "Est.",
-    //           selector: (row) => (
-    //             <div style={{ fontSize: 10, fontWeight: 600 }}>
-    //               {row.establishment}
-    //             </div>
-    //           ),
-    //           width: 70,
-    //           center: true,
-    //         },
-    //         {
-    //           name: "Txn ID /Ref",
-    //           selector: (row) => (
-    //             <div style={{ fontSize: 10, fontWeight: 600 }}>
-    //               {row.txn_id}
-    //               <br />
-    //               {row.client_ref}
-    //             </div>
-    //           ),
-    //           width: 100,
-    //         },
-    //       ]
-    //     : []),
-    //   {
-    //     name: "Aadhaar No.",
-    //     selector: (row) => <div>**** **** {row.aadhaar_number?.slice(-4)}</div>,
-    //   },
+      ...(user?.role === "adm" || user?.role === "sadm"
+        ? [
+            {
+              name: "Route",
+              selector: (row) => (
+                <div style={{ fontSize: "13px", fontWeight: "600" }}>
+                  {row.route}
+                </div>
+              ),
+              center: true,
+              width: "70px",
+            },
+          ]
+        : []),
+      {
+        name: "Operator",
+        selector: (row) => (
+          <div style={{ fontSize: "12px", fontWeight: "600" }}>
+            {row.operator_name}
+          </div>
+        ),
+        center: true,
+        width: "70px",
+      },
       {
         name: "Amount",
         selector: (row) => (
@@ -242,190 +185,91 @@ const AllTranscation = ({ query }) => {
         ),
         right: true,
       },
-       {
-        name: "Ret.Comm.",
-        selector: (row) => (
-          <div style={{ fontSize: "10px", fontWeight: "600" }}>{row.ret_comm}</div>
-        ),
-        center: true,
-        width: "70px",
-      },
 
       ...(user?.role === "adm" ||
-        user?.role === "di" ||
-        user?.role === "md" ||
-        user?.role === "sadm" ||
-        user?.role === "asm" ||
-        user?.role === "zsm"
+      user?.role === "di" ||
+      user?.role === "sadm" ||
+      user?.role === "md" ||
+      user?.role === "asm" ||
+      user?.role === "zsm"
         ? [
-       {
-        name: "Di. Comm.",
-        selector: (row) => (
-          <div style={{ fontSize: "10px", fontWeight: "600" }}>{row.di_comm}</div>
-        ),
-        center: true,
-        width: "70px",
-      },
-      ] : []),
+            {
+              name: "Di Comm",
+              selector: (row) => (
+                <div
+                  style={{
+                    textAlign: "right",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                  }}
+                >
+                  <div style={{ color: "green" }}>
+                    {parseFloat(row.di_comm).toFixed(2)}
+                  </div>
+                </div>
+              ),
+              right: true,
+              width: "60px",
+            },
+          ]
+        : []),
       ...(user?.role === "adm" ||
-        user?.role === "md" ||
-        user?.role === "sadm" ||
-        user?.role === "asm" ||
-        user?.role === "zsm"
-        ?[
-       {
-        name: "Md. Comm.",
-        selector: (row) => (
-          <div style={{ fontSize: "10px", fontWeight: "600" }}>{row.md_comm}</div>
-        ),
-        center: true,
-        width: "70px",
-      },
-      ] : []),
-       {
-        name: "Charge",
-        selector: (row) => (
-          <div style={{ fontSize: "10px", fontWeight: "600" }}>{row.charges}</div>
-        ),
-        center: true,
-        width: "70px",
-      },
-       {
+      user?.role === "md" ||
+      user?.role === "sadm" ||
+      user?.role === "asm" ||
+      user?.role === "zsm"
+        ? [
+            {
+              name: "Md Comm",
+              selector: (row) => (
+                <div
+                  style={{
+                    textAlign: "right",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                  }}
+                >
+                  <div style={{ color: "green" }}>
+                    {parseFloat(row.md_comm).toFixed(2)}
+                  </div>
+                </div>
+              ),
+              right: true,
+              width: "60px",
+            },
+          ]
+        : []),
+      ...(user?.role === "adm" ||
+      user?.role === "md" ||
+      user?.role === "sadm" ||
+      user?.role === "asm" ||
+      user?.role === "zsm"
+        ? [
+            {
+              name: "Ret Comm",
+              selector: (row) => (
+                <div
+                  style={{
+                    textAlign: "right",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                  }}
+                >
+                  <div style={{ color: "green" }}>
+                    {parseFloat(row.ret_comm).toFixed(2)}
+                  </div>
+                </div>
+              ),
+              right: true,
+              width: "60px",
+            },
+          ]
+        : []),
+      {
         name: "Status",
-        selector: (row) => (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              minHeight: "50px",
-            }}
-          >
-            <CommonStatus value={row.status} />
-            <Tooltip title={`Operator ID: ${row?.operator_id || "N/A"}`} arrow>
-              <div
-                style={{
-                  fontSize: "11px",
-                  marginTop: "4px",
-                  fontWeight: "600",
-                  maxWidth: "80px",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  textAlign: "center",
-                }}
-              >
-                {row?.operator_id || "N/A"}
-              </div>
-            </Tooltip>
-          </div>
-        ),
+        selector: (row) => <CommonStatus value={row.status} />,
         center: true,
       },
-      // ...((user?.role === "adm" || user?.role === "sadm") &&
-      // user?.permissions?.txn_actions === 1
-      //   ? [
-      //       {
-      //         name: "Action",
-      //         selector: (row) => (
-      //           <ActionColumn
-      //             row={row}
-      //             // handleRefundClick={handleRefundClick}
-      //             handleOpenLein={handleOpenLein}
-      //           />
-      //         ),
-      //         center: true,
-      //         width: "100px",
-      //       },
-      //     ]
-      //   : []),
-      // {
-      //   name: "View",
-      //   selector: (row) => (
-      //     <Box
-      //       sx={{
-      //         display: "flex",
-      //         alignItems: "center",
-      //         justifyContent: "center",
-      //         minWidth: "80px",
-      //         gap: 1, // space between icons
-      //       }}
-      //     >
-      //       {/* View Transaction visible to all */}
-      //       <Tooltip title="View Transaction">
-      //         <IconButton
-      //           color="info"
-      //           onClick={() => {
-      //             setSelectedRow(row);
-      //             setDrawerOpen(true);
-      //           }}
-      //           size="small"
-      //           sx={{ backgroundColor: "transparent" }}
-      //         >
-      //           <VisibilityIcon />
-      //         </IconButton>
-      //       </Tooltip>
-
-      //       {/* Print Aeps visible only to ret and dd */}
-      //       {(user?.role === "ret" || user?.role === "dd") && (
-      //         <Tooltip title="Print Aeps">
-      //           <IconButton
-      //             color="secondary"
-      //             size="small"
-      //             onClick={() => {
-      //               // Save individual transaction data
-      //               sessionStorage.setItem("txnData", JSON.stringify(row));
-
-      //               // Open receipt page in a new tab
-      //               window.open("/print-aeps", "_blank");
-      //             }}
-      //             sx={{ backgroundColor: "transparent" }}
-      //           >
-      //             <PrintIcon />
-      //           </IconButton>
-      //         </Tooltip>
-      //       )}
-      //     </Box>
-      //   ),
-      //   width: "100px",
-      //   center: true,
-      // },
-      // ...(user?.role === "ret" || user?.role === "dd"
-      //   ? [
-      //       {
-      //         name: "Actions",
-      //         selector: (row) => (
-      //           <div
-      //             style={{
-      //               fontSize: "10px",
-      //               fontWeight: "600",
-      //               display: "flex",
-      //               gap: "4px",
-      //               justifyContent: "center",
-      //               alignItems: "center",
-      //             }}
-      //           >
-      //             {/* FAILED or REFUND: Refresh */}
-      //             {/* {row?.status === "REFUNDPENDING" && (
-      //               <Tooltip title="REFUND TXN">
-      //                 <ReplayIcon
-      //                   sx={{
-      //                     color: "orange",
-      //                     fontSize: 25,
-      //                     cursor: "pointer",
-      //                   }}
-      //                   onClick={() => handleRefundTxn(row)}
-      //                 />
-      //               </Tooltip>
-      //             )} */}
-      //           </div>
-      //         ),
-      //         center: true,
-      //         width: "70px",
-      //       },
-      //     ]
-      //   : []),
     ],
     []
   );
@@ -466,13 +310,11 @@ const AllTranscation = ({ query }) => {
         queryParam={query || ""}
         enableActionsHover
         enableSelection={false}
-         
+        enableExcelExport={true}
         selectedRows={selectedRows}
         onSelectionChange={setSelectedRows}
-         
-         enableExcelExport={true}
-          exportFileName="AllTransactions"
-          exportEndpoint={ApiEndpoints.GET_ALL_TXN}
+        exportFileName="Alltxns"
+        exportEndpoint={ApiEndpoints.GET_ALL_TXN}
         customHeader={
           <>
             <Box

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React from "react";
 import CommonTabs from "../components/common/CommonTabs";
 
 // Import your transaction components
@@ -20,21 +20,10 @@ import { Wallet } from "@mui/icons-material";
 import Wallet2WalletTransfer from "./Wallet2WalletTransfer";
 import CreditCardTxn from "../components/Transactions/CreditCardTxn";
 import AllTranscation from "./AllTranscation";
-import AuthContext from "../contexts/AuthContext";
 
 export const Transaction = () => {
- const [tab, setTab] = useState(0);
-  const authCtx = useContext(AuthContext);
-  const user = authCtx?.user;
-
-  const handleChange = (event, newValue) => {
-    setTab(newValue);
-  };
-
-
   const tabItems = [
-    ...(user?.role === "adm" || user?.role === "sadm" ? [
-     {
+    {
       label: (
         <div
           style={{
@@ -51,7 +40,6 @@ export const Transaction = () => {
       ),
       component: <AllTranscation />,
     },
-    ] : []),
     {
       label: (
         <div
