@@ -16,6 +16,7 @@ import { useToast } from "../utils/ToastContext";
 import CommonModal from "../components/common/CommonModal";
 import CommonMpinModal from "../components/common/CommonMpinModal";
 import AuthContext from "../contexts/AuthContext";
+import { convertNumberToWordsIndian } from "../utils/NumberUtil";
 
 const W2wTransfer = ({ handleFetchRef, type }) => {
   const [mobile, setMobile] = useState("");
@@ -51,7 +52,11 @@ const navigate = useNavigate();
   api: "/api/dashboard",
 };
 const userRole = user?.role;
-
+ const amountInWords = amount
+    ? `${convertNumberToWordsIndian(amount).replace(/\b\w/g, (char) =>
+        char.toUpperCase()
+      )} Only`
+    : "";
 
   // 🟢 Fetch user profile and get W1 balance
   useEffect(() => {
@@ -334,6 +339,17 @@ const userRole = user?.role;
                 error={Boolean(amountError)}
                 helperText={amountError}
               />
+                  {amount && (
+                                    <Typography
+                                      variant="body2"
+                                      sx={{
+                                        color: "#555",
+                                        fontWeight: 500,
+                                      }}
+                                    >
+                                      {amountInWords}
+                                    </Typography>
+                                  )}
 
               <TextField
                 label="Remark"

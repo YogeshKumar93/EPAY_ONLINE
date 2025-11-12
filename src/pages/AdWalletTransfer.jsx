@@ -23,6 +23,7 @@ import { CurrencyRupee } from "@mui/icons-material";
 import CommonLoader from "../components/common/CommonLoader";
 import { useToast } from "../utils/ToastContext";
 import AuthContext from "../contexts/AuthContext";
+import { convertNumberToWordsIndian } from "../utils/NumberUtil";
 
 const AdWalletTransfer = ({ row, open, onClose }) => {
   const [mpinModalOpen, setMpinModalOpen] = useState(false);
@@ -39,6 +40,12 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
+
+   const amountInWords = amount
+      ? `${convertNumberToWordsIndian(amount).replace(/\b\w/g, (char) =>
+          char.toUpperCase()
+        )} Only`
+      : "";
 
   // Fetch receiver details from mobile number
   const fetchReceiver = async () => {
@@ -253,6 +260,17 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
               margin="normal"
               sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 }, mb: 2 }}
             />
+             {amount && (
+                                                <Typography
+                                                  variant="body2"
+                                                  sx={{
+                                                    color: "#555",
+                                                    fontWeight: 500,
+                                                  }}
+                                                >
+                                                  {amountInWords}
+                                                </Typography>
+                                              )}
             <TextField
               label="Remark (Optional)"
               variant="outlined"

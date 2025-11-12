@@ -53,7 +53,7 @@ const Prepaid = () => {
   const { showToast } = useToast();
   const [resetMpinModalOpen, setResetMpinModalOpen] = useState(false);
   const authCtx = useContext(AuthContext);
-  const username = `TRANS${authCtx?.user?.id}`;
+  const username = `P2PAE${authCtx?.user?.id}`;
   const loadUserProfile = authCtx.loadUserProfile;
   const [rechargeResponse, setRechargeResponse] = useState(null);
   const [w1Limit, setW1Limit] = useState(null); // store max allowed amount
