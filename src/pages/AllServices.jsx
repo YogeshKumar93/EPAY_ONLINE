@@ -88,6 +88,7 @@ import LevinUpiTransfer from "./LevinUpiTransfer";
 import SoliTechPayout from "./SoliTechPayout/SoliTechPayout";
 import PartPayment from "../components/common/PartPayment";
 import PartPaymentNew from "./PartPaymentNew";
+import { LevinDmt } from "./LevinDmt/LevinDmt";
 
 const MenuCard = ({ icon, label, onClick, isActive, user }) => {
   return (
@@ -291,6 +292,14 @@ export default function AllServices() {
       label: "Money Transfer",
       icon: sendmoney,
       subMenu: [
+        hasPermission("DMT3") && {
+          key: "dmt3",
+          label: "Airtel Dmt L",
+          icon: FINO,
+          component: LevinDmt,
+          type: "mobile",
+          title: "Dmt2",
+        },
         hasPermission("DMT1") && {
           key: "dmt1",
           label: "Airtel Dmt",
