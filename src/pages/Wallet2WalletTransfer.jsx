@@ -239,7 +239,7 @@ const Wallet2WalletTransfer = ({}) => {
         type: "textfield",
         roles: ["adm", "sadm"],
       },
-            // { id: "amount", label: "Amount", type: "textfield" },
+      // { id: "amount", label: "Amount", type: "textfield" },
       {
         id: "date_range",
         // label: "Date Range",
@@ -283,7 +283,22 @@ const Wallet2WalletTransfer = ({}) => {
         wrap: true,
         width: "190px",
       },
-
+      ...(user?.role === "adm" || user?.role === "sadm"
+        ? [] // ❌ hide for ret and dd
+        : [
+            {
+              name: "Txn ID",
+              selector: (row) => (
+                <Tooltip title={row.txn_id}>
+                  <div style={{ fontWeight: 500, textAlign: "left" }}>
+                    {row.txn_id}
+                  </div>
+                </Tooltip>
+              ),
+              wrap: true,
+              width: "100px",
+            },
+          ]),
       {
         name: "Pf",
         selector: (row) => {
@@ -359,18 +374,23 @@ const Wallet2WalletTransfer = ({}) => {
         wrap: true,
         left: true,
       },
-      {
-        name: "Sender",
-        selector: (row) => (
-          <div
-            style={{ textAlign: "left", fontSize: "14px", fontWeight: "600" }}
-          >
-            {row.sender_est || "N/A"}
-          </div>
-        ),
-        wrap: true,
-        width: "80px",
-      },
+
+      ...(user?.role === "adm" || user?.role === "sadm"
+        ? [] // ❌ hide for ret and dd
+        : [
+            {
+              name: "Sender",
+              selector: (row) => (
+                <Tooltip title={row.sender_est}>
+                  <div style={{ fontWeight: 500, textAlign: "left" }}>
+                    {row.sender_est}
+                  </div>
+                </Tooltip>
+              ),
+              wrap: true,
+              width: "100px",
+            },
+          ]),
       {
         name: "Reciever",
         selector: (row) => (
@@ -426,22 +446,7 @@ const Wallet2WalletTransfer = ({}) => {
               width: "100px",
             },
           ]),
-      ...(user?.role === "adm" || user?.role === "sadm"
-        ? [] // ❌ hide for ret and dd
-        : [
-            {
-              name: "Txn ID",
-              selector: (row) => (
-                <Tooltip title={row.txn_id}>
-                  <div style={{ fontWeight: 500, textAlign: "left" }}>
-                    {row.txn_id}
-                  </div>
-                </Tooltip>
-              ),
-              wrap: true,
-              width: "100px",
-            },
-          ]),
+
       {
         name: "Amount",
         selector: (row) => {

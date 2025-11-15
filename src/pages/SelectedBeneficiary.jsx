@@ -108,25 +108,26 @@ const SelectedBeneficiary = ({
       splitAmount(parseFloat(amount));
     }
   }, [amount]);
-  useEffect(() => {
-    if (open) {
-      // only call when modal actually opens
-      const fetchUuid = async () => {
-        try {
-          const { error, response } = await getUuid();
-          if (response) {
-            setUuid(response);
-          } else if (error) {
-            showToast(error?.message || "Failed to generate UUID", "error");
-            onBack();
-          }
-        } catch (err) {
-          showToast("Error while generating UUID", "error");
-        }
-      };
-      fetchUuid();
-    }
-  }, [open]); // 👈 triggers every time `open` changes
+
+  // useEffect(() => {
+  //   if (open) {
+  //     // only call when modal actually opens
+  //     const fetchUuid = async () => {
+  //       try {
+  //         const { error, response } = await getUuid();
+  //         if (response) {
+  //           setUuid(response);
+  //         } else if (error) {
+  //           showToast(error?.message || "Failed to generate UUID", "error");
+  //           onBack();
+  //         }
+  //       } catch (err) {
+  //         showToast("Error while generating UUID", "error");
+  //       }
+  //     };
+  //     fetchUuid();
+  //   }
+  // }, [open]); // 👈 triggers every time `open` changes
 
   useEffect(() => {
     const allCompleted = amountRows.every((row) => row.submitted);
@@ -234,6 +235,7 @@ const SelectedBeneficiary = ({
               : r
           )
         );
+        setUuid(response?.data?.uuid);
       }
     } catch (err) {
       showToast(err, "error");
@@ -243,6 +245,8 @@ const SelectedBeneficiary = ({
       );
     }
   };
+  console.log("uuid", uuid);
+
   // const handleSubmitRow = async (rowId) => {
   //   // ✅ Accept rowId parameter
   //   const row = amountRows.find((r) => r.id === rowId);
@@ -395,7 +399,8 @@ const SelectedBeneficiary = ({
 
       if (error) {
         showToast(error?.message, "error");
-        onBack();
+        setUuid(error?.errors?.uuid);
+        console.log("error uuid set", error?.errors?.uuid);
       } else if (response?.status && response?.data?.message === "Success") {
         showToast(`Transaction of ₹${row.amount} successful!`, "success");
         setAmountRows((prev) =>

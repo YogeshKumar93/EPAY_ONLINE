@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -13,6 +13,7 @@ import {
   InputAdornment,
   IconButton,
   Divider,
+  Autocomplete,
 } from "@mui/material";
 import { useToast } from "../../utils/ToastContext";
 import { apiCall } from "../../api/apiClient";
@@ -21,15 +22,37 @@ import SearchIcon from "@mui/icons-material/Search";
 import RegisterRemitter from "./LevinRegisterRem";
 import LevinDmtRemitter2Fa from "./LevinDmtRemitter2Fa.jsx";
 import LevinDmtBeneficiaryList from "./LevinDmtBeneficiaryList.jsx";
+import LevinDmtSenderDetails from "./LevinDmtSenderDetails.jsx";
+import CommonLoader from "../../components/common/CommonLoader.jsx";
+
 export const LevinDmt = () => {
   const [mobileNumber, setMobileNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [senderData, setSenderData] = useState(null);
+  const [sender, setSender] = useState(null);
   const [showRegistration, setShowRegistration] = useState(false);
   const [registrationData, setRegistrationData] = useState(null);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otpData, setOtpData] = useState(null);
+  const [history, setHistory] = useState([]);
   const { showToast } = useToast();
+
+  // 🧠 Load saved mobile numbers on mount
+  useEffect(() => {
+    const saved = JSON.parse(
+      localStorage.getItem("levinMobileNumbers") || "[]"
+    );
+    setHistory(saved);
+  }, []);
+
+  // 🧩 Save a number to history if new
+  const saveMobileToHistory = (number) => {
+    if (!history.includes(number)) {
+      const updated = [...history, number];
+      setHistory(updated);
+      localStorage.setItem("levinMobileNumbers", JSON.stringify(updated));
+    }
+  };
 
   const handleFetchSender = async (number = mobileNumber) => {
     if (!number || number.length !== 10) {
@@ -55,16 +78,17 @@ export const LevinDmt = () => {
         const data = response?.data || response?.response?.data;
         const message = response?.message || "";
 
-        console.log("Sender API Response:", response); // Debug log
+        console.log("Sender API Response:", response);
 
         if (
           response?.status === "success" ||
           response?.message === "Remitter Found" ||
           message === "Success"
         ) {
-          // Handle both response structures
           const beneficiaryData = data?.beneficiary_dmt || data;
+          const senderDatas = response?.data;
           setSenderData(beneficiaryData);
+          setSender(senderDatas);
           showToast("Sender found successfully!", "success");
         } else if (message === "Sender Not Found") {
           setRegistrationData({
@@ -80,10 +104,9 @@ export const LevinDmt = () => {
           message ===
           "OTP has successfully sent on your registered mobile number"
         ) {
-          // Handle OTP case - open OTP modal
           setOtpData({
             mobileNumber: number,
-            token: data, // This is your "aff667d3-0d96-4f80-bd1f-c85d3d6832ac"
+            token: data,
             encrypted_data: response.encrypted_data,
           });
           setShowOtpModal(true);
@@ -118,7 +141,6 @@ export const LevinDmt = () => {
   const handleOtpSuccess = (token) => {
     setShowOtpModal(false);
     setOtpData(null);
-    // After OTP verification, refetch sender data
     handleFetchSender(mobileNumber);
     showToast(
       "OTP verified successfully! Fetching sender details...",
@@ -134,7 +156,6 @@ export const LevinDmt = () => {
   const handleRegistrationSuccess = () => {
     setShowRegistration(false);
     setRegistrationData(null);
-    // Optionally refetch sender data after successful registration
     handleFetchSender(mobileNumber);
   };
 
@@ -143,74 +164,95 @@ export const LevinDmt = () => {
     setRegistrationData(null);
   };
 
-  // Handler for when beneficiary operations succeed
   const handleBeneficiarySuccess = (mobileNumber) => {
-    // Refresh sender data to get updated beneficiary list
     handleFetchSender(mobileNumber);
     showToast("Operation completed successfully!", "success");
   };
 
-  // Handler for when payout is successful
   const handlePayoutSuccess = () => {
     showToast("Payout completed successfully!", "success");
-    // You can add any additional logic here after successful payout
   };
 
-  const handleMobileChange = (e) => {
-    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+  const handleMobileInputChange = (event, newValue) => {
+    const value = (newValue || "").replace(/\D/g, "").slice(0, 10);
     setMobileNumber(value);
     if (value.length === 10) {
+      saveMobileToHistory(value);
       handleFetchSender(value);
+    } else {
+      // Clear data if mobile number is incomplete
+      setSenderData(null);
+      setShowRegistration(false);
+      setShowOtpModal(false);
+    }
+  };
+
+  const handleMobileSelect = (event, newValue) => {
+    if (newValue && newValue.length === 10) {
+      setMobileNumber(newValue);
+      saveMobileToHistory(newValue);
+      handleFetchSender(newValue);
     }
   };
 
   const handleManualSearch = () => {
     if (mobileNumber.length === 10) {
+      saveMobileToHistory(mobileNumber);
       handleFetchSender();
     }
   };
 
   return (
-    <Box sx={{ maxWidth: 800, margin: "auto", p: 2 }}>
-      <Box
-        display="flex"
-        flexDirection={{ xs: "column", sm: "row" }}
-        gap={2}
-        alignItems={{ sm: "flex-end" }}
-      >
-        <TextField
-          label="Mobile Number"
-          variant="outlined"
-          value={mobileNumber}
-          onChange={handleMobileChange}
-          placeholder="Enter 10-digit mobile number"
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  onClick={handleManualSearch}
-                  disabled={loading || mobileNumber.length !== 10}
-                  edge="end"
-                >
-                  <SearchIcon />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-          inputProps={{
-            maxLength: 10,
-            inputMode: "numeric",
-          }}
-          sx={{ flex: 1 }}
-          autoComplete="tel"
-          error={mobileNumber.length > 0 && mobileNumber.length !== 10}
-          helperText={
-            mobileNumber.length > 0 && mobileNumber.length !== 10
-              ? "Mobile number must be 10 digits"
-              : "Enter 10-digit mobile number to search automatically"
-          }
-        />
-        {loading && (
+    <>
+      <CommonLoader loading={loading} />
+
+      <Box sx={{ width: "100%", margin: "auto", p: 2 }}>
+        {/* Search Section with Autocomplete */}
+        <Box
+          display="flex"
+          flexDirection={{ xs: "column", sm: "row" }}
+          gap={2}
+          alignItems={{ sm: "flex-end" }}
+          sx={{ mb: 2 }}
+        >
+          <Autocomplete
+            freeSolo
+            options={history}
+            value={mobileNumber}
+            onInputChange={handleMobileInputChange}
+            onChange={handleMobileSelect}
+            sx={{ flex: 1 }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Mobile Number"
+                variant="outlined"
+                placeholder="Enter 10-digit mobile number"
+                inputProps={{
+                  ...params.inputProps,
+                  maxLength: 10,
+                  inputMode: "numeric",
+                }}
+                error={mobileNumber.length > 0 && mobileNumber.length !== 10}
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={handleManualSearch}
+                        disabled={loading || mobileNumber.length !== 10}
+                        edge="end"
+                      >
+                        <SearchIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            )}
+          />
+
+          {/* {loading && (
           <Box
             sx={{
               display: "flex",
@@ -223,43 +265,50 @@ export const LevinDmt = () => {
               Searching...
             </Typography>
           </Box>
-        )}
-      </Box>
-
-      {showRegistration && registrationData && (
-        <RegisterRemitter
-          mobileNumber={registrationData.mobileNumber}
-          encryptedData={registrationData}
-          onRegistrationSuccess={handleRegistrationSuccess}
-          onBack={handleBackFromRegistration}
-        />
-      )}
-
-      {showOtpModal && otpData && (
-        <LevinDmtRemitter2Fa
-          open={showOtpModal}
-          onClose={handleOtpClose}
-          mobileNumber={otpData.mobileNumber}
-          registrationData={{
-            data: otpData.token, // Pass the token
-            encrypted_data: otpData.encrypted_data,
-          }}
-          onSuccess={handleOtpSuccess}
-        />
-      )}
-
-      {/* Display Sender Information */}
-      {senderData && (
-        <Box sx={{ mt: 3 }}>
-          {/* Beneficiary List Component */}
-          <LevinDmtBeneficiaryList
-            sender={senderData}
-            onSuccess={handleBeneficiarySuccess}
-            onPayoutSuccess={handlePayoutSuccess}
-            mobileNumber={mobileNumber}
-          />
+        )} */}
         </Box>
-      )}
-    </Box>
+
+        {/* Registration Modal */}
+        {showRegistration && registrationData && (
+          <RegisterRemitter
+            mobileNumber={registrationData.mobileNumber}
+            encryptedData={registrationData}
+            onRegistrationSuccess={handleRegistrationSuccess}
+            onBack={handleBackFromRegistration}
+          />
+        )}
+
+        {/* OTP Modal */}
+        {showOtpModal && otpData && (
+          <LevinDmtRemitter2Fa
+            open={showOtpModal}
+            onClose={handleOtpClose}
+            mobileNumber={otpData.mobileNumber}
+            registrationData={{
+              data: otpData.token,
+              encrypted_data: otpData.encrypted_data,
+            }}
+            onSuccess={handleOtpSuccess}
+          />
+        )}
+
+        {/* Beneficiary List - This will now use full width */}
+        <Box display="flex" flexDirection="column" gap={2}>
+          <Box width="100%">
+            <LevinDmtSenderDetails sender={sender} />
+          </Box>
+          {senderData && (
+            <Box sx={{ width: "100%" }}>
+              <LevinDmtBeneficiaryList
+                sender={senderData}
+                onSuccess={handleBeneficiarySuccess}
+                onPayoutSuccess={handlePayoutSuccess}
+                mobileNumber={mobileNumber}
+              />
+            </Box>
+          )}
+        </Box>
+      </Box>
+    </>
   );
 };

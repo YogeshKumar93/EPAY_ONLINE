@@ -54,29 +54,36 @@ import {
   yes2,
 } from "../../utils/iconsImports";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import BeneficiaryDetails from "../BeneficiaryDetails";
 import { useToast } from "../../utils/ToastContext";
 import AuthContext from "../../contexts/AuthContext";
-import LevinBeneficiaryDetails from "./LevinBeneficiaryDetails";
+import { convertNumberToWordsIndian } from "../../utils/NumberUtil";
+import LevinBeneficiaryDetails from "./LevinBeneficiaryDetails.jsx";
 
-const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNumber}) => {
+const LevinDmtBeneficiaryList = ({
+  sender,
+  onSuccess,
+  onPayoutSuccess,
+  mobileNumber,
+}) => {
   console.log("THe sender in ben list is ", sender);
   const theme = useTheme();
-
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { location } = useContext(AuthContext);
+  const [open, setOpen] = useState(true);
   const [openModal, setOpenModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [openList, setOpenList] = useState(true);
   const [searchText, setSearchText] = useState("");
-  const [verifyOpen, setVerifyOpen] = useState(false); // 🔑 verify modal state
-  const [verifyUpiOpen, setVerifyUpiOpen] = useState(false); // 🔑 verify modal state
+  const [verifyOpen, setVerifyOpen] = useState(false);
+  const [verifyUpiOpen, setVerifyUpiOpen] = useState(false);
   const [mpinDigits, setMpinDigits] = useState(Array(6).fill(""));
   const [pendingPayload, setPendingPayload] = useState(null);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
   const [openPayModal, setOpenPayModal] = useState(false);
-  const [tupResponse, setTupResponse] = useState(null); // 🔑 TUP response state
-  const [verifyingBeneficiary, setVerifyingBeneficiary] = useState(null); // 🔑 Track which beneficiary is being verified
+  const [tupResponse, setTupResponse] = useState(null);
+  const [verifyingBeneficiary, setVerifyingBeneficiary] = useState(null);
+  const [amountInputs, setAmountInputs] = useState({});
+  const [amountInWords, setAmountInWords] = useState({});
+
   const { schema, formData, handleChange, errors, setErrors, loading } =
     useSchemaForm(ApiEndpoints.ADD_BENEFICIARY_SCHEMA, openModal, {
       sender_id: sender?.id,
@@ -84,6 +91,60 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
   const { showToast } = useToast();
 
   console.log("THe formdat is ", schema);
+
+  // ✅ Handle Amount Change with limit validation
+  const handleAmountChange = (beneficiaryId, value) => {
+    const numericValue = value.replace(/[^\d.]/g, "");
+    const amount = parseFloat(numericValue);
+    const limit = parseFloat(sender?.limitTotal || 0);
+
+    if (limit && amount > limit) {
+      showToast(`Amount cannot exceed your limit of ₹${limit}`, "error");
+      return;
+    }
+
+    setAmountInputs((prev) => ({
+      ...prev,
+      [beneficiaryId]: numericValue,
+    }));
+
+    if (numericValue && !isNaN(numericValue)) {
+      const words = convertNumberToWordsIndian(numericValue);
+      setAmountInWords((prev) => ({
+        ...prev,
+        [beneficiaryId]:
+          words.charAt(0).toUpperCase() + words.slice(1) + " Only",
+      }));
+    } else {
+      setAmountInWords((prev) => ({
+        ...prev,
+        [beneficiaryId]: "",
+      }));
+    }
+  };
+
+  // ✅ Handle Send Money with amount
+  const handleSendMoney = (beneficiary) => {
+    const amount = amountInputs[beneficiary.id] || "";
+
+    if (!amount || parseFloat(amount) <= 0) {
+      showToast("Please enter a valid amount");
+      return;
+    }
+
+    // Set selected beneficiary with entered amount
+    setSelectedBeneficiary({
+      ...beneficiary,
+      enteredAmount: parseFloat(amount),
+    });
+    setOpenPayModal(true);
+
+    // Clear the amount input after sending
+    setAmountInputs((prev) => ({
+      ...prev,
+      [beneficiary.id]: "",
+    }));
+  };
 
   const handleAddAndVerifyBeneficiary = () => {
     setErrors({});
@@ -116,14 +177,10 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
           value.toString().trim() !== ""
         );
       }
-      return true; // not required field
+      return true;
     });
   }, [formData, schema]);
-  const handleOpenPay = (beneficiary) => {
-    setSelectedBeneficiary(beneficiary);
-    setOpenPayModal(true);
-  };
-  
+
   const handleVerifyExistingBeneficiary = (beneficiary) => {
     setVerifyingBeneficiary(beneficiary);
 
@@ -143,6 +200,7 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
     setPendingPayload(payload);
     setVerifyOpen(true);
   };
+
   const handleVerify = async () => {
     if (mpinDigits.some((d) => !d)) {
       showToast("Please enter all 6 digits of MPIN", "error");
@@ -153,7 +211,6 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
     try {
       setSubmitting(true);
 
-      // 🔹 Step 1: Verify
       const verifyPayload = {
         ...pendingPayload,
         mpin,
@@ -184,16 +241,14 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
         (verifyResponse?.data?.statuscode === "TUP" ||
           verifyResponse?.message?.includes("Transaction Under Process"))
       ) {
-        // Close MPIN modal and open TUP confirmation modal
-        setTupResponse(verifyResponse); // Store the TUP response
-        setVerifyOpen(false); // Close MPIN modal
+        setTupResponse(verifyResponse);
+        setVerifyOpen(false);
         setSubmitting(false);
-        setMpinDigits(Array(6).fill("")); // Reset MPIN
+        setMpinDigits(Array(6).fill(""));
         setVerifyingBeneficiary(null);
         return;
       }
 
-      // ✅ If we're verifying an existing beneficiary, just close modal
       if (verifyingBeneficiary) {
         showToast(verifyResponse?.message, "success");
         setVerifyOpen(false);
@@ -201,7 +256,6 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
         setVerifyingBeneficiary(null);
         onSuccess?.(sender.mobileNumber);
       } else {
-        // ✅ Normal flow - adding new beneficiary
         const verifiedName = verifyResponse?.data || verifyResponse?.message;
         const encryptedData = verifyResponse?.encrypted_data;
 
@@ -211,9 +265,9 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
           ...restFormData,
           sender_id: sender.id,
           type: "BANK",
-          beneficiary_name: verifiedName || formData.beneficiary_name, // Fallback to typed name
+          beneficiary_name: verifiedName || formData.beneficiary_name,
           mobile_number: mobileNumber,
-         is_verified: new Date().toISOString(), // ✅ Set as verified since verification was successful
+          is_verified: new Date().toISOString(),
         };
 
         const { error: addError, response: addResponse } = await apiCall(
@@ -241,6 +295,7 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
       setSubmitting(false);
     }
   };
+
   const handleVerifyUpi = async () => {
     if (mpinDigits.some((d) => !d)) {
       showToast("Please enter all 6 digits of MPIN", "error");
@@ -251,7 +306,6 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
     try {
       setSubmitting(true);
 
-      // 🔹 Step 1: Verify
       const verifyPayload = {
         ...pendingPayload,
         mpin,
@@ -279,8 +333,6 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
         setVerifyUpiOpen(false);
         setMpinDigits(Array(6).fill(""));
       }
-
-      console.log(":THe verfi repsonve is", verifyResponse);
     } catch (err) {
       showToast(err, "error");
     } finally {
@@ -292,17 +344,16 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
     try {
       setSubmitting(true);
 
-      // Original TUP flow for new beneficiary only
       const { beneficiary_name, ...restFormData } = formData;
 
       const addPayload = {
         ...restFormData,
         sender_id: sender.id,
         type: "BANK",
-        beneficiary_name: formData.beneficiary_name, // Use the originally typed name
+        beneficiary_name: formData.beneficiary_name,
         mobile_number: mobileNumber,
-        tup_reference: tupResponse?.data?.txnReferenceId, // Include TUP reference if available
-       is_verified: new Date().toISOString(), // ✅ Set as unverified since verification is pending
+        tup_reference: tupResponse?.data?.txnReferenceId,
+        is_verified: new Date().toISOString(),
       };
 
       const { error: addError, response: addResponse } = await apiCall(
@@ -317,7 +368,7 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
             "Beneficiary added successfully (Verification Pending)",
           "success"
         );
-        setTupResponse(null); // Close TUP modal
+        setTupResponse(null);
         setOpenModal(false);
         setMpinDigits(Array(6).fill(""));
         onSuccess?.(sender.mobileNumber);
@@ -394,7 +445,7 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
     }
   };
 
-  // show actual list or placeholder N/A
+  // Normalize beneficiaries
   const beneficiaries =
     sender?.length > 0
       ? sender
@@ -404,7 +455,7 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
             beneficiary_name: "No beneficiaries added",
             ifsc_code: "N/A",
             account_number: "N/A",
-           is_verified: new Date().toISOString(),
+            is_verified: new Date().toISOString(),
             bank_name: null,
           },
         ];
@@ -423,85 +474,68 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
     <Card
       sx={{
         borderRadius: 2,
-        width: "100%",
         boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
         border: "1px solid",
         borderColor: "divider",
         overflow: "hidden",
       }}
     >
+      {/* Header - Same design as first component */}
       <Box
-        display="flex"
-        justifyContent={isMobile ? "flex-start" : "space-between"}
-        alignItems="center"
         sx={{
+          bgcolor: "#6C4BC7",
+          color: "#fff",
           py: 1,
           px: 2,
-          background: "#6C4BC7",
-          borderBottom: openList ? "1px solid" : "none",
-          borderColor: "divider",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          cursor: "pointer",
         }}
+        onClick={() => setOpen((prev) => !prev)}
       >
-        <Box display="flex" alignItems="center" gap={1} flexGrow={1}>
-          <Typography variant="subtitle2" fontWeight="600" color="#fff">
-            Beneficiary List
-            {sender && <>({beneficiaries?.length || 0})</>}
-          </Typography>
+        <Typography variant="subtitle1" fontWeight="bold">
+          Beneficiary List ({beneficiaries?.length || 0})
+        </Typography>
 
-          <Box ml={isMobile ? 1 : "auto"}>
-            {sender && (
-              <Button
-                variant="contained"
-                size="small"
-                onClick={() => setOpenModal(true)}
-                startIcon={<PersonAddIcon sx={{ fontSize: 14 }} />}
-                sx={{
-                  minWidth: "auto",
-                  px: 0.8,
-                  py: 0.3,
-                  fontSize: "0.65rem",
-                  borderRadius: 1,
-                  textTransform: "none",
-                  fontWeight: 500,
-                  boxShadow: "none",
-                  color: "#000",
-                  backgroundColor: "#fff",
-                }}
-              >
-                Add Beneficiary
-              </Button>
-            )}
-          </Box>
+        <Box ml={isMobile ? 1 : "auto"}>
+          {sender && (
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => setOpenModal(true)}
+              startIcon={<PersonAddIcon sx={{ fontSize: 16 }} />}
+              sx={{
+                color: "#000",
+                backgroundColor: "#fff",
+                textTransform: "none",
+                fontSize: "0.7rem",
+              }}
+            >
+              Add Beneficiary
+            </Button>
+          )}
         </Box>
-
         {isMobile && (
-          <IconButton
-            onClick={() => setOpenList((prev) => !prev)}
-            size="small"
-            sx={{
-              transform: openList ? "rotate(180deg)" : "rotate(0deg)",
-              transition: "transform 0.3s",
-              color: "text.secondary",
-              ml: 1,
-            }}
-          >
-            <ExpandMoreIcon />
+          <IconButton size="small" sx={{ color: "white" }}>
+            {open ? <ExpandLess /> : <ExpandMore />}
           </IconButton>
         )}
       </Box>
 
-      <Collapse in={openList}>
+      {/* Collapse wrapper - Same design as first component */}
+      <Collapse in={open} timeout="auto" unmountOnExit>
         <CardContent sx={{ p: 2 }}>
           <Box mb={2}>
             <TextField
               fullWidth
               size="small"
-              placeholder="Search beneficiary by name or account number "
+              placeholder="Search beneficiary by name or account number"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />
           </Box>
-          <List dense sx={{ py: 0, maxHeight: 300, overflowY: "auto" }}>
+          <List dense sx={{ py: 0 }}>
             {filteredBeneficiaries.map((b) => (
               <ListItem
                 key={b.id}
@@ -520,31 +554,11 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
                 }}
                 secondaryAction={
                   b.id !== "na" && (
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      {/* Verified text with tick */}
-                      {b.is_verified === 1 && (
-                        <Box display="flex" alignItems="center" gap={0.3}>
-                          <CheckCircleIcon
-                            sx={{ fontSize: 16, color: "success.main" }}
-                          />
-                          <Typography
-                            variant="caption"
-                            color="success.main"
-                            fontWeight="500"
-                            sx={{ fontSize: "0.75rem" }}
-                          >
-                            Verified
-                          </Typography>
-                        </Box>
-                      )}
-
-                      {/* Verify button for unverified beneficiaries */}
-                      {b.is_verified === 0 && (
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      {b.is_verified === 0 ? (
                         <Button
                           size="small"
                           variant="outlined"
-                          color="warning"
-                          // onClick={() => handleVerifyExistingBeneficiary(b)}
                           onClick={() => {
                             setSelectedBeneficiary(b);
                             setVerifyUpiOpen(true);
@@ -563,7 +577,10 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
                             });
                           }}
                           sx={{
+                            backgroundColor: "#ff9d4d",
+                            color: "#fff",
                             borderRadius: 1,
+                            border: "none",
                             textTransform: "none",
                             fontSize: "0.75rem",
                             px: 1,
@@ -572,19 +589,54 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
                         >
                           Verify
                         </Button>
+                      ) : (
+                        <Box display="flex" alignItems="center" gap={0.3}>
+                          <CheckCircleIcon
+                            sx={{ fontSize: 16, color: "success.main" }}
+                          />
+                          <Typography
+                            variant="caption"
+                            color="success.main"
+                            fontWeight="500"
+                            sx={{ fontSize: "0.75rem" }}
+                          >
+                            Verified
+                          </Typography>
+                        </Box>
                       )}
 
-                      {/* Pay button */}
+                      <TextField
+                        size="small"
+                        placeholder="Amount"
+                        value={amountInputs[b.id] || ""}
+                        onChange={(e) =>
+                          handleAmountChange(b.id, e.target.value)
+                        }
+                        inputProps={{
+                          style: {
+                            width: "90px",
+                            textAlign: "center",
+                            fontSize: "0.75rem",
+                          },
+                        }}
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            height: "32px",
+                          },
+                        }}
+                      />
+
+                      {/* ✅ Send Money Button */}
                       <Button
                         size="small"
                         variant="contained"
-                        // color="primary"
-                        onClick={() => handleOpenPay(b)} // ✅ open modal with this beneficiary
+                        color="primary"
+                        onClick={() => handleSendMoney(b)}
                         sx={{
-                          backgroundColor: "#5c3ac8",
+                          backgroundColor: "#6C4BC7",
                           borderRadius: 1,
                           textTransform: "none",
-                          fontSize: "0.75rem",
+                          fontSize: isMobile ? "0.6rem" : "0.75rem",
                           px: 1,
                           py: 0.2,
                         }}
@@ -592,7 +644,6 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
                         Send Money
                       </Button>
 
-                      {/* Delete button */}
                       <IconButton
                         edge="end"
                         size="small"
@@ -600,11 +651,6 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteBeneficiary(b.id);
-                        }}
-                        sx={{
-                          backgroundColor: "error.light",
-                          "&:hover": { backgroundColor: "error.main" },
-                          color: "white",
                         }}
                       >
                         <Tooltip title="Delete Beneficiary">
@@ -615,16 +661,12 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
                   )
                 }
               >
-                <Box
-                  display="flex"
-                  alignItems="flex-start"
-                  gap={1.5}
-                  width="100%"
-                >
-                  {bankImageMapping[b.bank_name] ? (
+                <Box display="flex" alignItems="center" gap={1.5} width="100%">
+                  {/* Bank logo */}
+                  {bankImageMapping[b.ifsc_code?.slice(0, 4)] ? (
                     <Box
                       component="img"
-                      src={bankImageMapping[b.bank_name]}
+                      src={bankImageMapping[b.ifsc_code.slice(0, 4)]}
                       alt={b.bank_name}
                       sx={{
                         width: 36,
@@ -650,6 +692,7 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
                     </Avatar>
                   )}
 
+                  {/* Details */}
                   <Box flexGrow={1} minWidth={0}>
                     <Box display="flex" alignItems="center" gap={1} mb={0.5}>
                       <Typography
@@ -657,7 +700,7 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
                         fontWeight="500"
                         noWrap
                         sx={{
-                          fontSize: isMobile ? "0.9rem" : "1rem",
+                          fontSize: isMobile ? "0.7rem" : "0.8rem",
                           color:
                             b.id === "na" ? "text.secondary" : "text.primary",
                         }}
@@ -665,7 +708,6 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
                         {b.beneficiary_name}
                       </Typography>
                     </Box>
-
                     <Stack
                       direction={isMobile ? "column" : "row"}
                       spacing={isMobile ? 0.5 : 2}
@@ -728,26 +770,26 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
           loading={loading || submitting}
           footerButtons={[
             {
-              text: submitting ? "Saving..." : "Verify and Add Beneficiary",
+              text: submitting ? "Processing..." : "Add & Verify",
               variant: "contained",
               color: "primary",
               onClick: handleAddAndVerifyBeneficiary,
-              disabled: submitting || !isFormValid,
+              disabled: submitting,
               sx: { borderRadius: 1 },
             },
             {
-              text: submitting ? "Saving..." : "Add Beneficiary",
+              text: submitting ? "Processing..." : "Add",
               variant: "contained",
               color: "primary",
               onClick: handleTUPConfirmation,
-              disabled: submitting || !isFormValid,
+              disabled: submitting,
               sx: { borderRadius: 1 },
             },
           ]}
         />
       )}
 
-      {/* MPIN Verification Modal */}
+      {/* Verify Beneficiary - MPIN Modal */}
       {verifyOpen && (
         <CommonModal
           open={verifyOpen}
@@ -800,7 +842,7 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
           </Grid>
         </CommonModal>
       )}
-      {/* function for normal verify  */}
+
       {verifyUpiOpen && (
         <CommonModal
           open={verifyUpiOpen}
@@ -853,7 +895,8 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
           </Grid>
         </CommonModal>
       )}
-      {/* TUP Confirmation Modal - SEPARATE from MPIN modal */}
+
+      {/* TUP Confirmation Modal */}
       {tupResponse && (
         <CommonModal
           open={!!tupResponse}
@@ -896,6 +939,7 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
           </Box>
         </CommonModal>
       )}
+
       {openPayModal && (
         <LevinBeneficiaryDetails
           open={openPayModal}
@@ -904,11 +948,11 @@ const LevinDmtBeneficiaryList = ({ sender, onSuccess, onPayoutSuccess ,mobileNum
           sender={sender}
           senderId={sender?.id}
           senderMobile={sender?.mobile_number}
-          onPayoutSuccess={onPayoutSuccess} // ✅ pass the callback
+          onPayoutSuccess={onPayoutSuccess}
+          amount={selectedBeneficiary?.enteredAmount} // Pass the entered amount
         />
       )}
     </Card>
   );
 };
-
 export default LevinDmtBeneficiaryList;
