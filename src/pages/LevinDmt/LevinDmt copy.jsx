@@ -20,7 +20,6 @@ import ApiEndpoints from "../../api/ApiEndpoints";
 import SearchIcon from "@mui/icons-material/Search";
 import RegisterRemitter from "./LevinRegisterRem";
 import LevinDmtRemitter2Fa from "./LevinDmtRemitter2Fa.jsx";
-import LevinDmtBeneficiaryList from "./LevinDmtBeneficiaryList.jsx";
 export const LevinDmt = () => {
   const [mobileNumber, setMobileNumber] = useState("");
   const [loading, setLoading] = useState(false);
@@ -59,12 +58,9 @@ export const LevinDmt = () => {
 
         if (
           response?.status === "success" ||
-          response?.message === "Remitter Found" ||
-          message === "Success"
+          response?.message === "Remitter Found"
         ) {
-          // Handle both response structures
-          const beneficiaryData = data?.beneficiary_dmt || data;
-          setSenderData(beneficiaryData);
+          setSenderData(data);
           showToast("Sender found successfully!", "success");
         } else if (message === "Sender Not Found") {
           setRegistrationData({
@@ -87,6 +83,7 @@ export const LevinDmt = () => {
             encrypted_data: response.encrypted_data,
           });
           setShowOtpModal(true);
+          showToast("OTP sent to your registered mobile number", "success");
         } else {
           showToast(message || "Unexpected response", "error");
           setSenderData(null);
@@ -140,19 +137,6 @@ export const LevinDmt = () => {
   const handleBackFromRegistration = () => {
     setShowRegistration(false);
     setRegistrationData(null);
-  };
-
-  // Handler for when beneficiary operations succeed
-  const handleBeneficiarySuccess = (mobileNumber) => {
-    // Refresh sender data to get updated beneficiary list
-    handleFetchSender(mobileNumber);
-    showToast("Operation completed successfully!", "success");
-  };
-
-  // Handler for when payout is successful
-  const handlePayoutSuccess = () => {
-    showToast("Payout completed successfully!", "success");
-    // You can add any additional logic here after successful payout
   };
 
   const handleMobileChange = (e) => {
@@ -245,17 +229,6 @@ export const LevinDmt = () => {
           }}
           onSuccess={handleOtpSuccess}
         />
-      )}
-
-      {senderData && (
-        <Box sx={{ mt: 3 }}>
-          <LevinDmtBeneficiaryList
-            sender={senderData}
-            onSuccess={handleBeneficiarySuccess}
-            onPayoutSuccess={handlePayoutSuccess}
-            mobileNumber={mobileNumber}
-          />
-        </Box>
       )}
     </Box>
   );

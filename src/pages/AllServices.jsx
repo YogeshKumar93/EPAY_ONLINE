@@ -292,6 +292,14 @@ export default function AllServices() {
       label: "Money Transfer",
       icon: sendmoney,
       subMenu: [
+        hasPermission("DMT3") && {
+          key: "dmt3",
+          label: "Airtel Dmt L",
+          icon: FINO,
+          component: LevinDmt,
+          type: "mobile",
+          title: "Dmt2",
+        },
         hasPermission("DMT1") && {
           key: "dmt1",
           label: "Airtel Dmt",
@@ -305,14 +313,6 @@ export default function AllServices() {
           label: "Fino Dmt",
           icon: FINO,
           component: Dmt2,
-          type: "mobile",
-          title: "Dmt2",
-        },
-        hasPermission("DMT2") && {
-          key: "dmt3",
-          label: "Levin Dmt",
-          icon: FINO,
-          component: LevinDmt,
           type: "mobile",
           title: "Dmt2",
         },

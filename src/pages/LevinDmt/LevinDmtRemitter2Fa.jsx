@@ -20,6 +20,7 @@ import ApiEndpoints from "../../api/ApiEndpoints";
 import { useToast } from "../../utils/ToastContext";
 import AEPS2FAModal from "../../components/AEPS/AEPS2FAModal";
 import OtpInput from "../OtpInput";
+
 const LevinDmtRemitter2Fa = ({
   open,
   onClose,
@@ -38,28 +39,6 @@ const LevinDmtRemitter2Fa = ({
   const [biometricData, setBiometricData] = useState(null);
   const [aadhaar, setAadhaar] = useState("");
   const { showToast } = useToast();
-
-  // Reset state when modal closes
-  useEffect(() => {
-    if (!open) {
-      setHasSentOtp(false);
-      setOtp("");
-      setToken("");
-      setRegistrationEncryptedData("");
-      setFinalToken("");
-      setShowBiometricModal(false);
-      setBiometricData(null);
-    }
-  }, [open]);
-
-  // Send OTP when component opens - FIXED: Handle errors properly
-  useEffect(() => {
-    if (open && registrationData && !hasSentOtp) {
-      console.log("Sending OTP because modal opened");
-      setHasSentOtp(true);
-      handleSendOtp();
-    }
-  }, [open]); // Only depend on open
 
   const handleSendOtp = async () => {
     setOtpLoading(true);
@@ -156,8 +135,6 @@ const LevinDmtRemitter2Fa = ({
         payload.encrypted_data = registrationEncryptedData;
       }
 
-      console.log("Validating OTP with payload:", payload);
-
       const { error, response } = await apiCall(
         "post",
         ApiEndpoints.LEVIN_DMT_VALIDATE_SEND_OTP,
@@ -210,25 +187,27 @@ const LevinDmtRemitter2Fa = ({
       const sessionKey = scanData.sessionKey;
       const srno = scanData.srno;
 
-      // Convert to XML format
-      const piDataXml = `<?xml version="1.0" encoding="UTF-8"?>
-<PidData type="${pidDataType}" ci="${ci}" dc="${dc}" mc="${mc}" mi="${mi}" srno="${srno}">
-  <Resp errInfo="${errInfo || ""}" fCount="${fCount || ""}" nmPoints="${
-        nmPoints || ""
-      }" qScore="${qScore || ""}">
-    <DeviceInfo dpId="${dpId || ""}" rdsId="${rdsId || ""}" rdsVer="${
-        rdsVer || ""
-      }" />
-    <Skey>${sessionKey || ""}</Skey>
-    <Hmac>${hmac || ""}</Hmac>
-    <Data>${pidData || ""}</Data>
-  </Resp>
-</PidData>`;
-
       const payload = {
         token: finalToken,
         mobile_number: mobileNumber,
-        piData: piDataXml, // Use the XML formatted piData
+        pidData: pidData || "",
+        piData: pidData || "",
+        pidDataType: pidDataType || "",
+        ci: ci || "",
+        dc: dc || "",
+        dpId: dpId || "",
+        fCount: fCount || "",
+        hmac: hmac || "",
+        mc: mc || "",
+        errInfo: errInfo || "",
+        mi: mi || "",
+        nmPoints: nmPoints || "",
+        qScore: qScore || "",
+        rdsId: rdsId || "",
+        rdsVer: rdsVer || "",
+        sessionKey: sessionKey || "",
+        srno: srno || "",
+        pf: "web",
         operator: 16,
       };
 
@@ -264,8 +243,8 @@ const LevinDmtRemitter2Fa = ({
           biometricVerified: true,
         });
 
-        setShowBiometricModal(false);
-        onClose();
+        // setShowBiometricModal(false);
+        // onClose();
       } else if (error) {
         showToast(error?.message || "Biometric verification failed", "error");
       }
@@ -283,31 +262,6 @@ const LevinDmtRemitter2Fa = ({
     const value = e.target.value.replace(/\D/g, "").slice(0, 6);
     setOtp(value);
   };
-
-  // Add resend OTP functionality
-  const handleResendOtp = async () => {
-    await handleSendOtp();
-  };
-
-  // Biometric modal buttons configuration
-  const biometricButtons = [
-    {
-      label: "Cancel",
-      variant: "outlined",
-      onClick: handleBiometricClose,
-      bgcolor: "#f44336",
-      color: "white",
-    },
-    {
-      label: "Retry Scan",
-      variant: "contained",
-      onClick: () => {
-        /* Retry logic handled in AEPS2FAModal */
-      },
-      bgcolor: "#ff9800",
-      color: "white",
-    },
-  ];
 
   return (
     <>
@@ -342,10 +296,6 @@ const LevinDmtRemitter2Fa = ({
           >
             <Typography variant="h6" gutterBottom>
               Enter OTP
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              We've sent an OTP to your mobile number ending with{" "}
-              {mobileNumber.slice(-4)}
             </Typography>
 
             <TextField

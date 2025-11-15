@@ -395,6 +395,9 @@ const ApiEndpoints = {
   LEVIN_DMT_SEND_OTP: "dmt/remitterSendOtp",
   LEVIN_DMT_VALIDATE_SEND_OTP: "dmt/ValidateSendOtp",
   LEVIN_DMT_REGISTER_2FA: "dmt/register2Fa",
+  LEVIN_DMT_TXN_OTP: "dmt/txnOtp",
+  LEVIN_DMT_TRANSATION2: "dmt/dmtTxn2",
+  LEVIN_DMT_ADD_BENEFICIARY: "dmt/addBeneficiarydmt2",
 
   GET_TIME: "https://timeapi.io/api/time/current/zone?timeZone=Asia%2FKolkata",
 };
