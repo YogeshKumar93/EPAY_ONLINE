@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import dayjs from "dayjs";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
@@ -17,6 +17,7 @@ import {
   DialogActions,
   TextField,
 } from "@mui/material";
+import AuthContext from "../contexts/AuthContext";
 
 const CreateFundRequest = ({ open, handleClose, handleSave }) => {
   const {
@@ -34,8 +35,10 @@ const CreateFundRequest = ({ open, handleClose, handleSave }) => {
   const [agreed, setAgreed] = useState(true);
   const [termsOpen, setTermsOpen] = useState(false);
   const { showToast } = useToast();
-  const [imagePreview, setImagePreview] = useState(null);
+  const [uuidNumber, setUuidNumber] = useState(null); // ✅ store generated UUID
 
+  const [imagePreview, setImagePreview] = useState(null);
+  const { getUuid } = useContext(AuthContext);
   // ✅ Prefill today's date when opened
   useEffect(() => {
     if (open && !formData.date) {
@@ -101,6 +104,28 @@ const CreateFundRequest = ({ open, handleClose, handleSave }) => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+  useEffect(() => {
+    const fetchUuid = async () => {
+      try {
+        const { error, response } = await getUuid();
+        if (error || !response) {
+          showToast(error?.message, "error");
+          handleClose();
+        } else {
+          setUuidNumber(response); // store UUID
+        }
+      } catch (err) {
+        console.error("❌ UUID fetch failed:", err);
+        showToast("Error fetching transaction ID", "error");
+      }
+    };
+
+    if (open) {
+      fetchUuid();
+    } else {
+      setUuidNumber(null); // reset when modal closes
+    }
+  }, [open, getUuid, showToast]);
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
@@ -115,6 +140,8 @@ const CreateFundRequest = ({ open, handleClose, handleSave }) => {
       Object.entries(formData).forEach(([key, value]) => {
         data.append(key, value);
       });
+      data.append("client_ref", uuidNumber);
+
       if (receipt) {
         data.append("receipt", receipt); // ✅ append file properly
       }
@@ -135,6 +162,7 @@ const CreateFundRequest = ({ open, handleClose, handleSave }) => {
         handleClose();
       } else {
         showToast(error?.message || "Failed to create fund request", "error");
+        handleClose();
       }
     } catch (err) {
       console.error("❌ Upload failed:", err);

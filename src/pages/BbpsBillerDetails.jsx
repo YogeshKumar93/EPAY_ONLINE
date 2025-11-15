@@ -35,7 +35,7 @@ const BbpsBillerDetails = ({
   const [payingBill, setPayingBill] = useState(false);
   const [mpinModalOpen, setMpinModalOpen] = useState(false);
   const { showToast } = useToast();
-  const { location, ip } = useContext(AuthContext);
+  const { location, ip, getUuid } = useContext(AuthContext);
   const authCtx = useContext(AuthContext);
   const loadUserProfile = authCtx.loadUserProfile;
 
@@ -89,6 +89,15 @@ const BbpsBillerDetails = ({
 
   // ✅ Fetch Bill
   const handleFetchBill = async () => {
+    const { error: uuidError, response: uuidNumber } = await getUuid();
+
+    if (uuidError || !uuidNumber) {
+      showToast(
+        uuidError?.message || "Failed to generate transaction ID",
+        "error"
+      );
+      return;
+    }
     setFetchingBill(true);
     try {
       const payload = {
@@ -97,6 +106,7 @@ const BbpsBillerDetails = ({
         ip: ip || "0.0.0.0",
         latitude: location?.lat,
         longitude: location?.long,
+        client_ref: uuidNumber,
       };
 
       const { error, response } = await apiCall(
@@ -108,6 +118,10 @@ const BbpsBillerDetails = ({
       if (response) {
         const billInfo = response?.data || response;
         setBillData(billInfo);
+        const { error: payUuidError, response: payUuid } = await getUuid();
+        if (!payUuidError && payUuid) {
+          setInputValues((prev) => ({ ...prev, nextClientRef: payUuid })); // store next uuid
+        }
       } else if (error) {
         showToast(error?.message || "Failed to fetch bill", "error");
       }
@@ -120,6 +134,15 @@ const BbpsBillerDetails = ({
 
   // ✅ Pay Bill
   const handlePayBill = async (mpin) => {
+    const { error: uuidError, response: uuidNumber } = await getUuid();
+
+    if (uuidError || !uuidNumber) {
+      showToast(
+        uuidError?.message || "Failed to generate transaction ID",
+        "error"
+      );
+      return;
+    }
     const payload = {
       billerId: billerId,
       biller_name: billerDetails?.billerInfo?.name,
@@ -131,6 +154,7 @@ const BbpsBillerDetails = ({
       enquiryReferenceId: billData?.enquiryReferenceId || "",
       amount: billData?.BillAmount || inputValues?.amount,
       mpin,
+      client_ref: uuidNumber,
     };
 
     // dynamic params

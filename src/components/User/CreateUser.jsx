@@ -48,12 +48,14 @@ const CreateUser = ({ open, onClose, onFetchRef }) => {
     "api",
   ];
 
-  // Filter roles based on logged in user
   const getFilteredRoles = () => {
     if (loggedInUserRole === "di") {
-      return ["ret", "dd"]; // Only show Retailer and Direct Dealer for Distributor
+      return ["ret"]; // Distributor can create Retailer and Direct Dealer
+    } else if (loggedInUserRole === "md") {
+      return ["di"]; // Master Distributor can ONLY create Distributor
+    } else {
+      return allRolesList; // Show all roles for other users (sadm, adm, etc.)
     }
-    return allRolesList; // Show all roles for other users
   };
 
   const rolesList = getFilteredRoles();

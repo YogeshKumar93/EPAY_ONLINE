@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import {
   Card,
@@ -56,7 +56,6 @@ import { apiCall } from "../api/apiClient";
 import { apiErrorToast, okSuccessToast } from "../utils/ToastUtil";
 import DeleteBeneficiaryModal from "./DeleteBeneficiaryModal";
 import AuthContext from "../contexts/AuthContext";
-import SelectedBeneficiary from "./SelectedBeneficiary";
 import { useToast } from "../utils/ToastContext";
 import { convertNumberToWordsIndian } from "../utils/NumberUtil";
 
@@ -75,14 +74,42 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
   const [pendingPayload, setPendingPayload] = useState(null);
   const { showToast } = useToast();
   const [amountInputs, setAmountInputs] = useState({});
-  const { location } = useContext(AuthContext);
+  const { location, getUuid } = useContext(AuthContext);
   const [amountInWords, setAmountInWords] = useState({});
   // console.log("limit", sender?.limitTotal);
+  const [uuid, setUuid] = useState(null); // ✅ new state
 
   const { schema, formData, handleChange, errors, setErrors, loading } =
     useSchemaForm(ApiEndpoints.ADD_DMT1_SCHEMA, openModal, {
       sender_id: sender?.id,
     });
+  useEffect(() => {
+    if (verifyOpen || verifyUpiOpen) {
+      const fetchUuid = async () => {
+        try {
+          const { error, response } = await getUuid();
+          if (response) {
+            setUuid(response);
+          } else if (error) {
+            showToast(error?.message || "Failed to generate UUID", "error");
+
+            // 🔹 Conditionally close whichever modal is open
+            if (verifyOpen) setVerifyOpen(false);
+            if (verifyUpiOpen) setVerifyUpiOpen(false);
+          }
+        } catch (err) {
+          showToast("Error while generating UUID", "error");
+
+          // 🔹 Conditionally close whichever modal is open
+          if (verifyOpen) setVerifyOpen(false);
+          if (verifyUpiOpen) setVerifyUpiOpen(false);
+        }
+      };
+
+      fetchUuid();
+    }
+  }, [verifyOpen, verifyUpiOpen]);
+  console.log("uuid", uuid);
 
   const handleAmountChange = (beneficiaryId, value) => {
     // Allow only numbers and decimal
@@ -153,6 +180,7 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
       latitude: location?.lat || "",
       longitude: location?.long || "",
       pf: "WEB",
+      client_ref: uuid,
     };
     setPendingPayload(payload); // 🔹 save payload
     setVerifyOpen(true); // 🔹 open MPIN modal
@@ -172,6 +200,7 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
       const verifyPayload = {
         ...pendingPayload,
         mpin,
+        client_ref: uuid,
       };
 
       const { error: verifyError, response: verifyResponse } = await apiCall(
@@ -242,6 +271,7 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
       const verifyPayload = {
         ...pendingPayload,
         mpin,
+        client_ref: uuid,
       };
 
       const { error: verifyError, response: verifyResponse } = await apiCall(
@@ -481,7 +511,7 @@ const Beneficiaries = ({ beneficiaries, onSelect, sender, onSuccess }) => {
               <TextField
                 fullWidth
                 size="small"
-                placeholder="Search beneficiary by name"
+                placeholder="Search beneficiary by name or account number"
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
               />

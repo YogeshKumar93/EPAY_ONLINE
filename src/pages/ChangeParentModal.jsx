@@ -160,6 +160,7 @@ const ChangeParentModal = ({ open, onClose, user, onSuccess }) => {
       onClose();
     }
   };
+  const noParentRequired = user?.role && !roleMapping.hasOwnProperty(user.role);
 
   return (
     <Dialog
@@ -297,32 +298,38 @@ const ChangeParentModal = ({ open, onClose, user, onSuccess }) => {
           <Divider sx={{ my: 1 }} />
 
           {/* New Parent Selection */}
-          <Box>
-            <Typography
-              variant="subtitle1"
-              fontWeight={600}
-              color="text.primary"
-              gutterBottom
-            >
-              Select New Parent
-            </Typography>
-            <Autocomplete
-              loading={loading}
-              options={parentOptions}
-              getOptionLabel={(opt) => opt.fullLabel}
-              value={selectedParent}
-              onChange={(e, val) => {
-                setSelectedParent(val);
-                setError("");
-              }}
-              renderOption={(props, option) => (
-                <li {...props} key={option.id}>
-                  <Box>
-                    <Typography variant="body1" fontWeight={500}>
-                      {option.label}
-                    </Typography>
-                    <Box display="flex" gap={1} alignItems="center" mt={0.5}>
-                      {/* <Chip
+          {noParentRequired ? (
+            <Alert severity="info" sx={{ borderRadius: 2, mt: 2 }}>
+              No parent required for the role{" "}
+              <strong>{user?.role?.toUpperCase()}</strong>.
+            </Alert>
+          ) : (
+            <Box>
+              <Typography
+                variant="subtitle1"
+                fontWeight={600}
+                color="text.primary"
+                gutterBottom
+              >
+                Select New Parent
+              </Typography>
+              <Autocomplete
+                loading={loading}
+                options={parentOptions}
+                getOptionLabel={(opt) => opt.fullLabel}
+                value={selectedParent}
+                onChange={(e, val) => {
+                  setSelectedParent(val);
+                  setError("");
+                }}
+                renderOption={(props, option) => (
+                  <li {...props} key={option.id}>
+                    <Box>
+                      <Typography variant="body1" fontWeight={500}>
+                        {option.label}
+                      </Typography>
+                      <Box display="flex" gap={1} alignItems="center" mt={0.5}>
+                        {/* <Chip
                         label={option.role?.toUpperCase?.()}
                         size="small"
                         variant="outlined"
@@ -334,51 +341,52 @@ const ChangeParentModal = ({ open, onClose, user, onSuccess }) => {
                           borderColor: getRoleColor(option.role),
                         }}
                       /> */}
-                      {/* {option.email && (
+                        {/* {option.email && (
                         <Typography variant="caption" color="text.secondary">
                           {option.email}
                         </Typography>
                       )} */}
+                      </Box>
                     </Box>
-                  </Box>
-                </li>
-              )}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Search parent user"
-                  size="medium"
-                  placeholder="Type to search..."
-                  fullWidth
-                  InputProps={{
-                    ...params.InputProps,
-                    startAdornment: (
-                      <SupervisorAccount
-                        sx={{ color: "text.secondary", mr: 1, ml: 0.5 }}
-                      />
-                    ),
-                    endAdornment: (
-                      <>
-                        {loading ? <CircularProgress size={20} /> : null}
-                        {params.InputProps.endAdornment}
-                      </>
-                    ),
-                  }}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 2,
-                      backgroundColor: "white",
-                    },
-                  }}
-                />
-              )}
-              sx={{
-                "& .MuiAutocomplete-popupIndicator": {
-                  transform: "none",
-                },
-              }}
-            />
-          </Box>
+                  </li>
+                )}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Search parent user"
+                    size="medium"
+                    placeholder="Type to search..."
+                    fullWidth
+                    InputProps={{
+                      ...params.InputProps,
+                      startAdornment: (
+                        <SupervisorAccount
+                          sx={{ color: "text.secondary", mr: 1, ml: 0.5 }}
+                        />
+                      ),
+                      endAdornment: (
+                        <>
+                          {loading ? <CircularProgress size={20} /> : null}
+                          {params.InputProps.endAdornment}
+                        </>
+                      ),
+                    }}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: 2,
+                        backgroundColor: "white",
+                      },
+                    }}
+                  />
+                )}
+                sx={{
+                  "& .MuiAutocomplete-popupIndicator": {
+                    transform: "none",
+                  },
+                }}
+              />
+            </Box>
+          )}
 
           {/* Selection Preview */}
           {selectedParent && (
@@ -433,7 +441,7 @@ const ChangeParentModal = ({ open, onClose, user, onSuccess }) => {
           onClick={handleSubmit}
           variant="contained"
           color="primary"
-          disabled={submitting || !selectedParent}
+          disabled={submitting || !selectedParent || noParentRequired}
           startIcon={
             submitting ? <CircularProgress size={16} /> : <CheckCircle />
           }

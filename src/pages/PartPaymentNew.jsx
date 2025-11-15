@@ -23,7 +23,7 @@ const PartPaymentNew = ({
   billerImage,
 }) => {
   const { showToast } = useToast();
-  const { ip, location, user } = useContext(AuthContext);
+  const { ip, location, user, getUuid } = useContext(AuthContext);
 
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [billerDetails, setBillerDetails] = useState(null);
@@ -81,12 +81,22 @@ const PartPaymentNew = ({
   const handleSubmit = async () => {
     setFetchingBill(true);
     try {
+      const { error: uuidError, response: uuidNumber } = await getUuid();
+
+      if (uuidError || !uuidNumber) {
+        showToast(
+          uuidError?.message || "Failed to generate transaction ID",
+          "error"
+        );
+        return;
+      }
       const payload = {
         biller_id: billerId,
         ...inputValues,
         ip: ip || "0.0.0.0",
         latitude: location?.lat,
         longitude: location?.long,
+        client_ref: uuidNumber,
       };
 
       console.log("📤 Fetch Bill Payload:", payload);
@@ -128,6 +138,15 @@ const PartPaymentNew = ({
     setProcessingPayment(true);
 
     try {
+      const { error: uuidError, response: uuidNumber } = await getUuid();
+
+      if (uuidError || !uuidNumber) {
+        showToast(
+          uuidError?.message || "Failed to generate transaction ID",
+          "error"
+        );
+        return;
+      }
       const firstParamKey = Object.keys(inputValues)[0];
       const param1 = inputValues[firstParamKey] || "";
 
@@ -145,6 +164,7 @@ const PartPaymentNew = ({
         latitude: location?.lat,
         enquiryReferenceId: billData?.enquiryReferenceId || "",
         longitude: location?.long,
+        client_ref: uuidNumber,
       };
 
       console.log("💰 Final Part Payment Payload:", payload);

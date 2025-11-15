@@ -1,14 +1,12 @@
 import React, { useContext, useState, useEffect } from "react";
-import { Box, Typography, Button, TextField } from "@mui/material";
+import { Box, Typography, TextField } from "@mui/material";
 import OTPInput from "react-otp-input";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
 import AuthContext from "../contexts/AuthContext";
 import { useToast } from "../utils/ToastContext";
-import ResetMpin from "../components/common/ResetMpin";
 import CommonModal from "../components/common/CommonModal";
-
 import { convertNumberToWordsIndian } from "../utils/NumberUtil";
 import Loader from "../components/common/Loader";
 
@@ -16,36 +14,31 @@ const UpiBeneficiaryDetails = ({
   open,
   onClose,
   beneficiary,
-  senderMobile,
   senderId,
   sender,
 }) => {
   const [amount, setAmount] = useState("");
-    const [submitting, setSubmitting] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [otpRef, setOtpRef] = useState(null);
-  const [otp, setOtp] = useState("");
-  const [mpin, setMpin] = useState("");
   const [purposes, setPurposes] = useState([]);
   const [selectedPurpose, setSelectedPurpose] = useState("");
   const [loadingPurposes, setLoadingPurposes] = useState(false);
-  const [resendLoading, setResendLoading] = useState(false);
-  const [openResetModal, setOpenResetModal] = useState(false);
+  const [openMpinModal, setOpenMpinModal] = useState(false);
+  const [mpin, setMpin] = useState("");
+  const [uuid, setUuid] = useState(null);
 
-  const authCtx = useContext(AuthContext);
-  const user = authCtx?.user;
-  const { location } = useContext(AuthContext);
+  const { location, getUuid, user } = useContext(AuthContext);
   const { showToast } = useToast();
-  console.log("limit", sender?.rem_limit);
 
   const amountInWords = amount
     ? `${convertNumberToWordsIndian(amount).replace(/\b\w/g, (char) =>
         char.toUpperCase()
       )} Only`
     : "";
-  if (!beneficiary) return null;
-  const username = `GURU1${user?.id}`;
 
+  if (!beneficiary) return null;
+
+  // fetch purposes
   useEffect(() => {
     const fetchPurposes = async () => {
       setLoadingPurposes(true);
@@ -54,14 +47,14 @@ const UpiBeneficiaryDetails = ({
           "post",
           ApiEndpoints.GET_PURPOSES
         );
-        if (error) apiErrorToast(error);
+        if (error) showToast(error?.message, "error");
         else {
           const purposesData = response?.data || [];
           setPurposes(purposesData);
           if (purposesData.length > 0) setSelectedPurpose(purposesData[0].id);
         }
       } catch (err) {
-        apiErrorToast(err);
+        showToast(err);
       } finally {
         setLoadingPurposes(false);
       }
@@ -69,10 +62,49 @@ const UpiBeneficiaryDetails = ({
     fetchPurposes();
   }, []);
 
-  const handleProceed = async () => {
+  // fetch UUID when main modal opens
+  useEffect(() => {
+    if (openMpinModal) {
+      const fetchUuid = async () => {
+        try {
+          const { error, response } = await getUuid();
+          if (response) {
+            setUuid(response);
+          } else if (error) {
+            showToast(error?.message || "Failed to generate UUID", "error");
+            setOpenMpinModal(false);
+          }
+        } catch (err) {
+          showToast("Error while generating UUID", "error");
+        }
+      };
+      fetchUuid();
+    }
+  }, [openMpinModal]);
+
+  // handle amount change
+  const handleChange = (e) => {
+    const val = e.target.value;
+    if (/^\d*$/.test(val)) {
+      if (parseFloat(val) > parseFloat(sender?.rem_limit || 0)) {
+        showToast("Exceeds Rem Limit", "error");
+        return;
+      }
+      setAmount(val);
+    }
+  };
+
+  // step 1: open M-PIN modal
+  const handleProceed = () => {
+    if (!amount) return showToast("Please enter amount", "error");
+    setOpenMpinModal(true);
+  };
+
+  // step 2: call payout API
+  const handleConfirmMpin = async () => {
     if (!mpin || mpin.length !== 6)
-      return apiErrorToast("Please enter the 6-digit M-PIN");
- setSubmitting(true);
+      return showToast("Please enter the 6-digit M-PIN", "error");
+    setSubmitting(true);
     setLoading(true);
     try {
       const payload = {
@@ -90,6 +122,7 @@ const UpiBeneficiaryDetails = ({
         mop: "UPI",
         mpin,
         purpose_id: selectedPurpose,
+        client_ref: uuid,
       };
 
       const { error, response } = await apiCall(
@@ -97,33 +130,26 @@ const UpiBeneficiaryDetails = ({
         ApiEndpoints.PAYOUT,
         payload
       );
+
       if (response) {
-        okSuccessToast("Payout successful!");
+        okSuccessToast(response?.message);
         setAmount("");
-        setOtp("");
         setMpin("");
-        setOtpRef(null);
+        setOpenMpinModal(false);
         onClose();
       } else {
         showToast(error?.message || "Something went wrong", "error");
+        setOpenMpinModal(false);
+        setMpin("");
       }
     } catch (err) {
       apiErrorToast(err);
     } finally {
-       setSubmitting(false);
+      setSubmitting(false);
       setLoading(false);
     }
   };
-  const handleChange = (e) => {
-    const val = e.target.value;
-    if (/^\d*$/.test(val)) {
-      if (parseFloat(val) > parseFloat(sender?.rem_limit || 0)) {
-        showToast("Exceeds Rem Limit", "error");
-        return;
-      }
-      setAmount(val);
-    }
-  };
+
   const customContent = (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <Box sx={{ bgcolor: "#f0f8ff", p: 2, borderRadius: 2 }}>
@@ -171,79 +197,95 @@ const UpiBeneficiaryDetails = ({
         fullWidth
         value={amount}
         onChange={handleChange}
-        // onChange={(e) => {
-        //   const val = e.target.value;
-        //   if (/^\d*$/.test(val)) {
-        //     // allow only numbers
-        //     setAmount(val);
-        //   }
-        // }}
       />
+
       {amount && (
-        <Typography
-          variant="body2"
-          sx={{
-            color: "#555",
-            fontWeight: 500,
-          }}
-        >
+        <Typography variant="body2" sx={{ color: "#555", fontWeight: 500 }}>
           {amountInWords}
         </Typography>
       )}
-
-      <Box>
-        <Typography variant="body2" mb={0.5}>
-          Enter M-PIN
-        </Typography>
-        <OTPInput
-          value={mpin}
-          onChange={setMpin}
-          numInputs={6}
-          inputType="password"
-            submitting={submitting}
-          renderInput={(props) => <input {...props} />}
-          inputStyle={{
-            width: "40px",
-            height: "40px",
-            margin: "0 5px",
-            fontSize: "18px",
-            border: "1px solid #D0D5DD",
-            borderRadius: "6px",
-            textAlign: "center",
-          }}
-        />
-        {/* <Button variant="text" size="small" onClick={() => setOpenResetModal(true)}>Reset M-PIN</Button> */}
-      </Box>
     </Box>
   );
 
   return (
     <>
       <Loader loading={submitting || loading}>
-      <CommonModal
-        open={open}
-        onClose={onClose}
-        title="Send Money"
-        iconType="info"
-        size="small"
-        customContent={customContent}
-         loading={loading || submitting}
-        footerButtons={[
-          {
-            text: "Cancel",
-            variant: "outlined",
-            onClick: onClose,
-            disabled: loading,
-          },
-          {
-            text: loading ? "Processing..." : "Proceed",
-            variant: "contained",
-            color: "success",
-            onClick: handleProceed,
-            disabled: loading,
-          },
-        ]}
-      />
+        {/* Main modal */}
+        <CommonModal
+          open={open}
+          onClose={onClose}
+          title="Send Money"
+          iconType="info"
+          size="small"
+          customContent={customContent}
+          footerButtons={[
+            {
+              text: "Cancel",
+              variant: "outlined",
+              onClick: onClose,
+              disabled: loading || submitting,
+            },
+            {
+              text: loading || submitting ? "Processing..." : "Proceed",
+              variant: "contained",
+              color: "success",
+              onClick: handleProceed,
+              disabled: loading || submitting || !amount,
+            },
+          ]}
+        />
+
+        {/* MPIN confirmation modal */}
+        <CommonModal
+          open={openMpinModal}
+          onClose={() => setOpenMpinModal(false)}
+          title="Enter M-PIN"
+          iconType="lock"
+          size="small"
+          customContent={
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              gap={2}
+            >
+              <Typography variant="body2">
+                Please enter your 6-digit M-PIN to confirm transaction
+              </Typography>
+              <OTPInput
+                value={mpin}
+                onChange={setMpin}
+                numInputs={6}
+                inputType="password"
+                renderInput={(props) => <input {...props} />}
+                inputStyle={{
+                  width: "40px",
+                  height: "40px",
+                  margin: "0 5px",
+                  fontSize: "18px",
+                  border: "1px solid #D0D5DD",
+                  borderRadius: "6px",
+                  textAlign: "center",
+                }}
+              />
+            </Box>
+          }
+          footerButtons={[
+            {
+              text: "Cancel",
+              variant: "outlined",
+              onClick: () => setOpenMpinModal(false),
+              disabled: loading,
+            },
+            {
+              text: loading ? "Processing..." : "Confirm",
+              variant: "contained",
+              color: "success",
+              onClick: handleConfirmMpin,
+              disabled: loading || mpin.length !== 6,
+            },
+          ]}
+        />
       </Loader>
     </>
   );

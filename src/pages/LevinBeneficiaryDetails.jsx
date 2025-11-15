@@ -6,19 +6,15 @@ import {
   Radio,
   RadioGroup,
   FormControlLabel,
-  Button,
-  InputAdornment,
 } from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
-import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
-import AuthContext from "../contexts/AuthContext";
-import OTPInput from "react-otp-input";
 import { useToast } from "../utils/ToastContext";
+import AuthContext from "../contexts/AuthContext";
 import CommonModal from "../components/common/CommonModal";
-import ResetMpin from "../components/common/ResetMpin";
-import { convertNumberToWordsIndian } from "../utils/NumberUtil";
+import OTPInput from "react-otp-input";
 import Loader from "../components/common/Loader";
+import { convertNumberToWordsIndian } from "../utils/NumberUtil";
 
 const LevinBeneficiaryDetails = ({
   open,
@@ -30,59 +26,25 @@ const LevinBeneficiaryDetails = ({
   onLevinSuccess,
 }) => {
   const [transferMode, setTransferMode] = useState("IMPS");
-    const [submitting, setSubmitting] = useState(false);
   const [amount, setAmount] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [otpRef, setOtpRef] = useState(null);
-  const [otp, setOtp] = useState("");
-  const [mpin, setMpin] = useState("");
-  const { location } = useContext(AuthContext);
-  const { showToast } = useToast();
-  const [resendLoading, setResendLoading] = useState(false);
   const [purposes, setPurposes] = useState([]);
   const [selectedPurpose, setSelectedPurpose] = useState("");
   const [loadingPurposes, setLoadingPurposes] = useState(false);
-  const [resetMpinModalOpen, setResetMpinModalOpen] = useState(false);
-  console.log("location", location);
+  const [loading, setLoading] = useState(false);
+  // const [openMpinModal, setMpinModalOpen] = useState(false);
+  const [mpinModalOpen, setMpinModalOpen] = useState(false);
+  const [mpinError, setMpinError] = useState("");
+
+  const { location, getUuid } = useContext(AuthContext);
+  const { showToast } = useToast();
+
+  const [uuid, setUuid] = useState(null);
+  const [mpin, setMpin] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   if (!beneficiary) return null;
 
-  // --- API Calls ---
-  // const handleGetOtp = async () => {
-  //   if (!amount || parseFloat(amount) <= 0) {
-  //     apiErrorToast("Please enter a valid amount");
-  //     return;
-  //   }
-  //   setLoading(true);
-  //   try {
-  //     const payload = {
-  //       mobile_number: senderMobile,
-  //       beneficiary_id: beneficiary.id,
-  //       amount,
-  //     };
-  //     const { error, response } = await apiCall(
-  //       "post",
-  //       ApiEndpoints.PAYOUT_OTP,
-  //       payload
-  //     );
-  //     if (error) apiErrorToast(error);
-  //     else {
-  //       showToast("OTP sent successfully!", "success");
-  //       setOtpRef(response?.data?.otp_ref || null);
-  //     }
-  //   } catch (err) {
-  //     apiErrorToast(err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  const amountInWords = amount
-    ? `${convertNumberToWordsIndian(amount).replace(/\b\w/g, (char) =>
-        char.toUpperCase()
-      )} Only`
-    : "";
-
+  // Fetch purposes
   useEffect(() => {
     const fetchPurposes = async () => {
       setLoadingPurposes(true);
@@ -95,9 +57,9 @@ const LevinBeneficiaryDetails = ({
           const purposesData = response?.data || [];
           setPurposes(purposesData);
           if (purposesData.length > 0) setSelectedPurpose(purposesData[0].id);
-        } else apiErrorToast(error);
+        } else showToast(error?.message || "Failed to load purposes", "error");
       } catch (err) {
-        apiErrorToast(err);
+        showToast("Error while loading purposes", "error");
       } finally {
         setLoadingPurposes(false);
       }
@@ -105,19 +67,70 @@ const LevinBeneficiaryDetails = ({
     fetchPurposes();
   }, []);
 
-  const handleProceed = async () => {
-    // if (!otp || otp.length !== 6)
-    //   return apiErrorToast("Please enter the 6-digit OTP");
-    if (!mpin || mpin.length !== 6) {
-      return showToast("Please enter the 6-digit M-PIN", "error");
+  const amountInWords = amount
+    ? `${convertNumberToWordsIndian(amount).replace(/\b\w/g, (c) =>
+        c.toUpperCase()
+      )} Only`
+    : "";
+
+  const handleChange = (e) => {
+    const val = e.target.value;
+    if (/^\d*$/.test(val)) {
+      if (parseFloat(val) > parseFloat(sender?.rem_limit || 0)) {
+        showToast("Exceeds Rem Limit", "error");
+        return;
+      }
+      setAmount(val);
     }
-setSubmitting(true);
-    setLoading(true);
+  };
+
+  // ✅ Trigger MPIN modal
+  const handleProceed = () => {
+    if (!amount || parseFloat(amount) <= 0)
+      return showToast("Please enter a valid amount", "error");
+    setMpinModalOpen(true);
+  };
+
+  // ✅ When M-PIN modal opens, fetch UUID
+  useEffect(() => {
+    if (mpinModalOpen) {
+      const fetchUuid = async () => {
+        try {
+          const { error, response } = await getUuid();
+          if (response) {
+            setUuid(response);
+          } else if (error) {
+            showToast(error?.message || "Failed to generate UUID", "error");
+            setMpinModalOpen(false);
+          }
+        } catch (err) {
+          showToast("Error while generating UUID", "error");
+        }
+      };
+      fetchUuid();
+    }
+  }, [mpinModalOpen]);
+  const handleMpinChange = (value) => {
+    // Check if the input contains non-numeric characters
+    if (/[^0-9]/.test(value)) {
+      setMpinError("Only numbers are allowed in MPIN");
+    } else {
+      setMpinError("");
+    }
+
+    // Remove any non-numeric characters
+    const numericValue = value.replace(/\D/g, "");
+    setMpin(numericValue);
+  };
+  // ✅ Final API call after M-PIN entered
+  const handleConfirmMpin = async () => {
+    if (!mpin || mpin.length !== 6)
+      return showToast("Please enter a 6-digit M-PIN", "error");
+
+    setSubmitting(true);
     try {
       const selectedPurposeType =
         purposes.find((p) => p.id === Number(selectedPurpose))?.type || "N/A";
-
-      console.log("Selected Purpose Type:", selectedPurposeType);
 
       const payload = {
         sender_id: senderId,
@@ -131,11 +144,10 @@ setSubmitting(true);
         latitude: location?.lat || "",
         longitude: location?.long || "",
         amount,
-        // otp,
-        // otp_ref: otpRef,
         mop: transferMode,
         mpin,
         purpose: selectedPurposeType,
+        client_ref: uuid,
       };
 
       const { error, response } = await apiCall(
@@ -143,51 +155,33 @@ setSubmitting(true);
         ApiEndpoints.LEVIN_TXN,
         payload
       );
+
       if (response) {
         showToast(response?.message || "Payout successful!", "success");
-        const purposeType =
-          purposes.find((p) => p.id === selectedPurpose)?.type || "N/A";
-
-        const payoutData = {
+        onLevinSuccess({
           ...(response || {}),
           beneficiary,
           senderMobile,
           purpose: selectedPurposeType,
           transferMode,
-        };
-        console.log("DATA SENT TO PARENT:", payoutData);
-        console.log("Purpose being sent to parent:", purposeType); // ✅ log purpose
-
-        onLevinSuccess(payoutData); // send to parent
+        });
         setAmount("");
-        setOtp("");
         setMpin("");
-        setOtpRef(null);
+        setMpinModalOpen(false);
         onClose();
       } else {
-
-        showToast(error?.message || "Payout unsuccessfull", "error");
+        showToast(error?.message || "Payout failed", "error");
+        setMpinModalOpen(false);
+        setMpin("");
       }
     } catch (err) {
-      showToast(err);
+      showToast("Something went wrong", "error");
     } finally {
       setSubmitting(false);
-      setLoading(false);
     }
   };
 
-  const handleChange = (e) => {
-    const value = e.target.value;
-    if (/^\d*$/.test(value)) {
-      if (parseFloat(value) > parseFloat(sender?.rem_limit || 0)) {
-        showToast("Exceeds Rem Limit", "error");
-        return;
-      }
-      setAmount(value);
-    }
-  };
-
-  // --- Custom Content ---
+  // --- Main Modal Content ---
   const customContent = (
     <Box display="flex" flexDirection="column" gap={2}>
       {/* Beneficiary Info */}
@@ -197,8 +191,8 @@ setSubmitting(true);
           { label: "Account Number", value: beneficiary.account_number },
           { label: "Bank", value: beneficiary.bank_name },
           { label: "IFSC", value: beneficiary.ifsc_code },
-        ].map((item, index) => (
-          <Box key={index} display="flex" mb={1}>
+        ].map((item, i) => (
+          <Box key={i} display="flex" mb={1}>
             <Typography
               variant="body2"
               fontWeight={500}
@@ -252,7 +246,7 @@ setSubmitting(true);
         </Box>
       </Box>
 
-      {/* Amount with OTP button */}
+      {/* Amount */}
       <TextField
         label="Amount"
         type="text"
@@ -262,86 +256,140 @@ setSubmitting(true);
         value={amount}
         onChange={handleChange}
       />
+
       {amount && (
-        <Typography
-          variant="body2"
-          sx={{
-            color: "#555",
-            fontWeight: 500,
-          }}
-        >
+        <Typography variant="body2" sx={{ color: "#555", fontWeight: 500 }}>
           {amountInWords}
         </Typography>
       )}
+    </Box>
+  );
 
-      <Box>
-        <Typography variant="body2" mb={0.5}>
-          Enter M-PIN
-        </Typography>
-        <OTPInput
-          value={mpin}
-          onChange={setMpin}
-          numInputs={6}
-          inputType="password"
-          renderInput={(props) => <input {...props} />}
-          inputStyle={{
-            width: "40px",
-            height: "40px",
-            margin: "0 5px",
-            fontSize: "18px",
-            border: "1px solid #D0D5DD",
-            borderRadius: "6px",
-            textAlign: "center",
-          }}
-        />
-      </Box>
-      {/* <Box sx={{ display: "flex", justifyContent: "center", ml: 32 }}>
-          <Button
-            variant="contained"
-            size="small"
-            sx={{ fontSize: "11px" }}
-            onClick={() => setResetMpinModalOpen(true)}
-          >
-            Reset MPIN
-          </Button>
-        </Box>
-        {resetMpinModalOpen && (
-          <ResetMpin
-            open={resetMpinModalOpen}
-            onClose={() => setResetMpinModalOpen(false)}
-            username={username}
-          />
-        )} */}
+  // --- MPIN Modal Content ---
+  const mpinContent = (
+    <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+      <Typography variant="body1" fontWeight={600}>
+        Enter 6-digit M-PIN to Confirm
+      </Typography>
+      <OTPInput
+        value={mpin}
+        onChange={setMpin}
+        numInputs={6}
+        inputType="password"
+        renderInput={(props) => <input {...props} />}
+        inputStyle={{
+          width: "40px",
+          height: "40px",
+          margin: "0 5px",
+          fontSize: "18px",
+          border: "1px solid #D0D5DD",
+          borderRadius: "6px",
+          textAlign: "center",
+        }}
+      />
     </Box>
   );
 
   return (
-     <Loader loading={submitting || loading}>
-    <CommonModal
-      open={open}
-      onClose={onClose}
-      title="Send Money"
-      iconType="info"
-      size="small"
-      customContent={customContent}
-         loading={loading || submitting}
-      footerButtons={[
-        {
-          text: "Cancel",
-          variant: "outlined",
-          onClick: onClose,
-          disabled: loading,
-        },
-        {
-          text: loading ? "Processing..." : "Proceed",
-          variant: "contained",
-          color: "success",
-          onClick: handleProceed,
-          disabled: loading,
-        },
-      ]}
-    />
-    </Loader>
+    <>
+      <Loader loading={submitting || loading}>
+        <CommonModal
+          open={open}
+          onClose={onClose}
+          title="Send Money"
+          iconType="info"
+          size="small"
+          customContent={customContent}
+          loading={loading || submitting}
+          footerButtons={[
+            {
+              text: "Cancel",
+              variant: "outlined",
+              onClick: onClose,
+              disabled: loading,
+            },
+            {
+              text: loading ? "Processing..." : "Proceed",
+              variant: "contained",
+              color: "success",
+              onClick: () => setMpinModalOpen(true), // ✅ open MPIN modal instead of direct call
+              disabled:
+                loading || submitting || !amount || parseFloat(amount) <= 0,
+            },
+          ]}
+        />
+      </Loader>
+
+      {/* ✅ MPIN Modal */}
+      <CommonModal
+        open={mpinModalOpen}
+        onClose={() => setMpinModalOpen(false)}
+        title="Enter M-PIN"
+        iconType="lock"
+        size="small"
+        customContent={
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            gap={2}
+          >
+            <Typography variant="body2">
+              Please enter your 6-digit M-PIN to confirm transaction
+            </Typography>
+            <div>
+              <OTPInput
+                value={mpin}
+                onChange={handleMpinChange}
+                numInputs={6}
+                inputType="password"
+                isInputNum={true}
+                renderInput={(props) => <input {...props} />}
+                inputStyle={{
+                  width: "40px",
+                  height: "40px",
+                  margin: "0 5px",
+                  fontSize: "18px",
+                  border: mpinError ? "1px solid #ff0000" : "1px solid #D0D5DD",
+                  borderRadius: "6px",
+                  textAlign: "center",
+                  backgroundColor: mpinError ? "#fff5f5" : "white",
+                }}
+              />
+              {mpinError && (
+                <Typography
+                  variant="caption"
+                  color="error"
+                  sx={{
+                    display: "block",
+                    mt: 1,
+                    textAlign: "center",
+                    fontSize: "0.75rem",
+                  }}
+                >
+                  {mpinError}
+                </Typography>
+              )}
+            </div>
+          </Box>
+        }
+        footerButtons={[
+          {
+            text: "Cancel",
+            variant: "outlined",
+            onClick: () => setMpinModalOpen(false),
+            disabled: loading,
+          },
+          {
+            text: loading ? "Processing..." : "Confirm",
+            variant: "contained",
+            color: "success",
+            onClick: handleConfirmMpin,
+            disabled: loading || mpin.length !== 6,
+          },
+        ]}
+      />
+    </>
   );
 };
 

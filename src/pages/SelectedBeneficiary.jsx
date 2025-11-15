@@ -77,10 +77,11 @@ const SelectedBeneficiary = ({
   onBack,
   amount,
 }) => {
-  const { location } = useContext(AuthContext);
+  const { location, getUuid } = useContext(AuthContext);
   const authCtx = useContext(AuthContext);
 
   const loadUserProfile = authCtx.loadUserProfile;
+  const [uuid, setUuid] = useState(null); // ✅ new state
 
   const user = authCtx?.user;
   const theme = useTheme();
@@ -107,6 +108,26 @@ const SelectedBeneficiary = ({
       splitAmount(parseFloat(amount));
     }
   }, [amount]);
+  useEffect(() => {
+    if (open) {
+      // only call when modal actually opens
+      const fetchUuid = async () => {
+        try {
+          const { error, response } = await getUuid();
+          if (response) {
+            setUuid(response);
+          } else if (error) {
+            showToast(error?.message || "Failed to generate UUID", "error");
+            onBack();
+          }
+        } catch (err) {
+          showToast("Error while generating UUID", "error");
+        }
+      };
+      fetchUuid();
+    }
+  }, [open]); // 👈 triggers every time `open` changes
+
   useEffect(() => {
     const allCompleted = amountRows.every((row) => row.submitted);
     const successfulTxns = amountRows.filter(
@@ -363,6 +384,7 @@ const SelectedBeneficiary = ({
         type: mode, // ✅ type from button click
         mpin: row.mpin, // optional
         pf: "web",
+        client_ref: uuid,
       };
 
       const { response, error } = await apiCall(
@@ -372,7 +394,8 @@ const SelectedBeneficiary = ({
       );
 
       if (error) {
-        showToast(error, "error");
+        showToast(error?.message, "error");
+        onBack();
       } else if (response?.status && response?.data?.message === "Success") {
         showToast(`Transaction of ₹${row.amount} successful!`, "success");
         setAmountRows((prev) =>

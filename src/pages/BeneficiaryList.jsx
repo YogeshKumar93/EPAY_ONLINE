@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import {
   Box,
   Card,
@@ -62,7 +62,7 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
   const theme = useTheme();
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const { location } = useContext(AuthContext);
+  const { location, getUuid } = useContext(AuthContext);
   const [openModal, setOpenModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [openList, setOpenList] = useState(true);
@@ -74,14 +74,35 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
   const [openPayModal, setOpenPayModal] = useState(false);
   const [tupResponse, setTupResponse] = useState(null); // 🔑 TUP response state
+  const [generatedUuid, setGeneratedUuid] = useState(null);
   const [verifyingBeneficiary, setVerifyingBeneficiary] = useState(null); // 🔑 Track which beneficiary is being verified
   const { schema, formData, handleChange, errors, setErrors, loading } =
     useSchemaForm(ApiEndpoints.ADD_BENEFICIARY_SCHEMA, openModal, {
       sender_id: sender?.id,
     });
   const { showToast } = useToast();
+  const [uuid, setUuid] = useState(null); // ✅ new state
 
   console.log("THe formdat is ", schema);
+  useEffect(() => {
+    if (verifyOpen) {
+      const fetchUuid = async () => {
+        try {
+          const { error, response } = await getUuid();
+          if (response) {
+            setUuid(response);
+          } else if (error) {
+            showToast(error?.message || "Failed to generate UUID", "error");
+            setVerifyOpen(false);
+          }
+        } catch (err) {
+          showToast("Error while generating UUID", "error");
+        }
+      };
+      fetchUuid();
+    }
+  }, [verifyOpen]); // 👈 triggers every time `open` changes
+  console.log("uuid ", uuid);
 
   const handleAddAndVerifyBeneficiary = () => {
     setErrors({});
@@ -97,6 +118,7 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
       latitude: location?.lat || "",
       longitude: location?.long || "",
       pf: "WEB",
+      client_ref: uuid,
     };
     setPendingPayload(payload);
     setVerifyOpen(true);
@@ -155,6 +177,7 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
       const verifyPayload = {
         ...pendingPayload,
         mpin,
+        client_ref: uuid,
       };
 
       const { error: verifyError, response: verifyResponse } = await apiCall(
@@ -253,6 +276,7 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
       const verifyPayload = {
         ...pendingPayload,
         mpin,
+        client_ref: generatedUuid,
       };
 
       const { error: verifyError, response: verifyResponse } = await apiCall(
@@ -267,9 +291,10 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
           "error"
         );
         setSubmitting(false);
-        setVerifyOpen(false);
         setMpinDigits(Array(6).fill(""));
         setVerifyingBeneficiary(null);
+        setVerifyOpen(false);
+        setVerifyUpiOpen(false);
         return;
       } else {
         showToast(verifyResponse?.message, "success");
@@ -380,6 +405,32 @@ const BeneficiaryList = ({ sender, onSuccess, onPayoutSuccess }) => {
     SCBL: stand2,
     JAKA: jk2,
   };
+  useEffect(() => {
+    const fetchUuid = async () => {
+      try {
+        const { response, error } = await getUuid();
+        if (error || !response) {
+          showToast(
+            error?.message || "Failed to generate transaction ID",
+            "error"
+          );
+          setVerifyUpiOpen(false);
+          return;
+        }
+        console.log("Generated UUID:", response);
+        setGeneratedUuid(response);
+      } catch (err) {
+        console.error("Error fetching UUID:", err);
+        showToast("Error generating transaction ID", "error");
+      }
+    };
+
+    if (verifyUpiOpen) {
+      fetchUuid();
+    } else {
+      setGeneratedUuid(null);
+    }
+  }, [verifyUpiOpen]);
 
   const handleMpinChange = (index, value) => {
     if (/^[0-9]?$/.test(value)) {

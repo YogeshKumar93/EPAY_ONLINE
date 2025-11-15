@@ -12,6 +12,7 @@ import ApiEndpoints from "../../api/ApiEndpoints";
 import { apiCall } from "../../api/apiClient";
 import { PATTERNS } from "../../utils/validators";
 import { apiErrorToast, okSuccessToast } from "../../utils/ToastUtil";
+import { useToast } from "../../utils/ToastContext";
 
 const modalStyle = {
   position: "absolute",
@@ -30,7 +31,7 @@ const ForgotPassword = ({ open, onClose, initialUsername = "" }) => {
   const [username, setUsername] = useState(initialUsername);
   const [loading, setLoading] = useState(false);
   const [isValid, setIsValid] = useState(true);
-
+  const { showToast } = useToast();
   useEffect(() => {
     if (open) {
       setUsername(initialUsername);
@@ -54,7 +55,7 @@ const ForgotPassword = ({ open, onClose, initialUsername = "" }) => {
       okSuccessToast("Password sent successfully", "success");
       onClose();
     } else {
-      apiErrorToast(error?.message || error || "Something went wrong");
+      showToast(error?.message || error || "Something went wrong", "error");
     }
 
     setLoading(false);

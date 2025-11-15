@@ -40,6 +40,7 @@ import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import ChangeRoleModal from "../components/ChangeRole";
 import ChangeParentModal from "./ChangeParentModal";
 import AddInst from "../components/User/AddInst";
+import { useToast } from "../utils/ToastContext";
 
 const roleLabels = {
   ret: "Retailer",
@@ -81,7 +82,7 @@ const Users = ({ query }) => {
   const [openChangeRole, setOpenChangeRole] = useState(false);
   // const [selectedUser, setSelectedUser] = useState(null);
   const [openChangeParent, setOpenChangeParent] = useState(false);
-
+  const { showToast } = useToast();
   const handleOpenChangeParent = (row) => {
     setSelectedUser(row);
     setOpenChangeParent(true);
@@ -195,6 +196,8 @@ const Users = ({ query }) => {
               label: u.establishment,
             }))
           );
+        } else {
+          showToast(error?.message, "error");
         }
       } catch (err) {
         console.error(err);
@@ -619,7 +622,7 @@ const Users = ({ query }) => {
               sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
               onClick={() => {
                 handleOpenWalletTransfer(row);
-                handleMenuClose();
+                // handleMenuClose();
               }}
             >
               <CurrencyRupee fontSize="small" sx={{ color: "green" }} />
@@ -644,12 +647,13 @@ const Users = ({ query }) => {
         enableActionsHover={true}
         customHeader={
           <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-            {userRole.role === "di" && (
+            {["di", "md"].includes(userRole.role) && (
               <ReButton
                 label="Add User"
                 onClick={() => setOpenCreateUser(true)}
               />
             )}
+
             {["adm", "sadm"].includes(userRole.role) && (
               <ReButton
                 label="Create User"

@@ -1,4 +1,4 @@
-import { useMemo, useState, useContext } from "react";
+import { useMemo, useState, useContext, useEffect } from "react";
 import {
   Box,
   Card,
@@ -82,11 +82,11 @@ const SoliTechBeneficiaryList = ({
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
   const [pendingBeneficiary, setPendingBeneficiary] = useState(null);
-  const { location } = useContext(AuthContext);
+  const { location, getUuid } = useContext(AuthContext);
   const [openPayoutModal, setOpenPayoutModal] = useState(false);
   const [selectedPayoutBeneficiary, setSelectedPayoutBeneficiary] =
     useState(null);
-
+  const [generatedUuid, setGeneratedUuid] = useState(null);
   const bankImageMapping = {
     SBI: sbi2,
     IBKL: idbi2,
@@ -136,6 +136,32 @@ const SoliTechBeneficiaryList = ({
     setPendingBeneficiary(beneficiaryData);
     setVerifyOpen(true);
   };
+  useEffect(() => {
+    const fetchUuid = async () => {
+      try {
+        const { response, error } = await getUuid();
+        if (error || !response) {
+          showToast(
+            error?.message || "Failed to generate transaction ID",
+            "error"
+          );
+          setVerifyOpen(false);
+          return;
+        }
+        console.log("Generated UUID:", response);
+        setGeneratedUuid(response);
+      } catch (err) {
+        console.error("Error fetching UUID:", err);
+        showToast("Error generating transaction ID", "error");
+      }
+    };
+
+    if (verifyOpen) {
+      fetchUuid();
+    } else {
+      setGeneratedUuid(null);
+    }
+  }, [verifyOpen]);
 
   const handleVerify = async () => {
     const mpin = mpinDigits.join("");
@@ -160,6 +186,7 @@ const SoliTechBeneficiaryList = ({
           operator: 18,
           type: "PAYOUT",
           is_verified: 1,
+          client_ref: generatedUuid, // 👈 include UUID here
         };
       } else {
         payload = {
@@ -174,6 +201,7 @@ const SoliTechBeneficiaryList = ({
           operator: 18,
           type: "PAYOUT",
           is_verified: 1,
+          client_ref: generatedUuid,
         };
       }
 
@@ -206,6 +234,8 @@ const SoliTechBeneficiaryList = ({
         }
       } else {
         showToast(error?.message, "error");
+        setVerifyOpen(false);
+        setMpinDigits(Array(6).fill(""));
       }
     } catch (error) {
       showToast(error, "error");

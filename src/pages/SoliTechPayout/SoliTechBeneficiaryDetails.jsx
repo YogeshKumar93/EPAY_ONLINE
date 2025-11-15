@@ -6,7 +6,6 @@ import {
   RadioGroup,
   FormControlLabel,
   TextField,
-  MenuItem,
 } from "@mui/material";
 import OTPInput from "react-otp-input";
 import AuthContext from "../../contexts/AuthContext";
@@ -21,19 +20,18 @@ const SoliTechBeneficiaryDetails = ({
   onClose,
   beneficiary,
   senderMobile,
-  senderId,
   sender,
   onPayoutSuccess,
 }) => {
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
-  const [mpin, setMpin] = useState("");
   const [transferMode, setTransferMode] = useState("IMPS");
   const [purposes, setPurposes] = useState([]);
   const [selectedPurpose, setSelectedPurpose] = useState("");
   const [loadingPurposes, setLoadingPurposes] = useState(false);
-
-  const { location, loadUserProfile } = useContext(AuthContext);
+  const [openMpinModal, setOpenMpinModal] = useState(false);
+  const [uuid, setUuid] = useState(null);
+  const { location, loadUserProfile, getUuid } = useContext(AuthContext);
   const { showToast } = useToast();
 
   if (!beneficiary) return null;
@@ -52,7 +50,7 @@ const SoliTechBeneficiaryDetails = ({
           setPurposes(data);
           if (data.length > 0) setSelectedPurpose(data[0].id);
         } else showToast(error || "Failed to load purposes", "error");
-      } catch (err) {
+      } catch {
         showToast("Error loading purposes", "error");
       } finally {
         setLoadingPurposes(false);
@@ -61,16 +59,46 @@ const SoliTechBeneficiaryDetails = ({
     fetchPurposes();
   }, []);
 
-  // Proceed payout
-  const handleProceed = async () => {
-    if (!mpin || mpin.length !== 6)
-      return showToast("Please enter the 6-digit M-PIN", "error");
+  // Handle amount input
+  const handleChangeAmount = (e) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {
+      if (
+        sender?.rem_limit &&
+        parseFloat(value) > parseFloat(sender.rem_limit)
+      ) {
+        showToast(
+          `Amount exceeds remaining limit of ${sender.rem_limit}`,
+          "warning"
+        );
+        return;
+      }
+      setAmount(value);
+    }
+  };
 
+  // Proceed clicked -> open MPIN modal
+  const handleProceed = async () => {
     if (!amount || parseFloat(amount) <= 0)
       return showToast("Please enter a valid amount", "error");
 
     if (!selectedPurpose) return showToast("Please select a purpose", "error");
 
+    try {
+      const { error, response } = await getUuid();
+      if (response) {
+        setUuid(response);
+        setOpenMpinModal(true); // ✅ open MPIN modal only now
+      } else {
+        showToast(error?.message || "Failed to generate UUID", "error");
+      }
+    } catch {
+      showToast("Error while generating UUID", "error");
+    }
+  };
+
+  // Submit payout (called from MPIN modal)
+  const handleMpinSubmit = async (mpin) => {
     setLoading(true);
     try {
       const selectedPurposeObj = purposes.find(
@@ -93,6 +121,7 @@ const SoliTechBeneficiaryDetails = ({
         mobile_number: senderMobile,
         purpose: purposeType,
         purpose_id: selectedPurpose,
+        client_ref: uuid,
       };
 
       const { error, response } = await apiCall(
@@ -104,15 +133,12 @@ const SoliTechBeneficiaryDetails = ({
       if (response) {
         showToast(response?.message || "Payout successful!", "success");
         loadUserProfile();
-
         const payoutData = {
           ...(response?.data || {}),
           purpose: purposeType,
         };
-
         onPayoutSuccess(payoutData);
         setAmount("");
-        setMpin("");
         onClose();
       } else {
         showToast(error?.message || "Payout failed", "error");
@@ -121,28 +147,11 @@ const SoliTechBeneficiaryDetails = ({
       showToast(err?.message || "Something went wrong", "error");
     } finally {
       setLoading(false);
+      setOpenMpinModal(false);
     }
   };
 
-  // Handle amount input
-  const handleChangeAmount = (e) => {
-    const value = e.target.value;
-    if (/^\d*$/.test(value)) {
-      if (
-        sender?.rem_limit &&
-        parseFloat(value) > parseFloat(sender.rem_limit)
-      ) {
-        showToast(
-          `Amount exceeds remaining limit of ${sender.rem_limit}`,
-          "warning"
-        );
-        return;
-      }
-      setAmount(value);
-    }
-  };
-
-  // Modal custom content
+  // Main Modal (No MPIN here)
   const customContent = (
     <Box display="flex" flexDirection="column" gap={2}>
       {/* Beneficiary Info */}
@@ -154,11 +163,7 @@ const SoliTechBeneficiaryDetails = ({
           { label: "IFSC", value: beneficiary.ifsc_code },
         ].map((item, index) => (
           <Box key={index} display="flex" mb={1}>
-            <Typography
-              variant="body2"
-              fontWeight={500}
-              sx={{ width: "160px" }}
-            >
+            <Typography variant="body2" fontWeight={500} sx={{ width: 160 }}>
               {item.label}
             </Typography>
             <Typography variant="body2">{item.value}</Typography>
@@ -191,7 +196,7 @@ const SoliTechBeneficiaryDetails = ({
             size="small"
             value={selectedPurpose}
             onChange={(e) => setSelectedPurpose(e.target.value)}
-            sx={{ minWidth: "180px" }}
+            sx={{ minWidth: 180 }}
             SelectProps={{ native: true }}
           >
             {loadingPurposes ? (
@@ -217,13 +222,56 @@ const SoliTechBeneficiaryDetails = ({
         value={amount}
         onChange={handleChangeAmount}
       />
+    </Box>
+  );
 
-      {/* M-PIN */}
-      {amount && parseFloat(amount) > 0 && (
-        <Box>
-          <Typography variant="body2" mb={0.5}>
-            Enter 6-digit M-PIN
-          </Typography>
+  return (
+    <Loader loading={loading}>
+      {/* Main modal */}
+      <CommonModal
+        open={open}
+        onClose={onClose}
+        title="Send Money"
+        iconType="info"
+        size="small"
+        customContent={customContent}
+        loading={loading}
+        footerButtons={[
+          { text: "Cancel", variant: "outlined", onClick: onClose },
+          {
+            text: "Proceed",
+            variant: "contained",
+            color: "success",
+            onClick: handleProceed,
+            disabled: loading || !amount || parseFloat(amount) <= 0,
+          },
+        ]}
+      />
+
+      {/* MPIN Modal */}
+      <MpinModal
+        open={openMpinModal}
+        onClose={() => setOpenMpinModal(false)}
+        onSubmit={handleMpinSubmit}
+      />
+    </Loader>
+  );
+};
+
+// 🔐 Separate MPIN Modal component
+const MpinModal = ({ open, onClose, onSubmit }) => {
+  const [mpin, setMpin] = useState("");
+
+  return (
+    <CommonModal
+      open={open}
+      onClose={onClose}
+      title="Enter M-PIN"
+      iconType="lock"
+      size="small"
+      customContent={
+        <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+          <Typography variant="body2">Enter your 6-digit M-PIN</Typography>
           <OTPInput
             value={mpin}
             onChange={setMpin}
@@ -241,37 +289,22 @@ const SoliTechBeneficiaryDetails = ({
             }}
           />
         </Box>
-      )}
-    </Box>
-  );
-
-  return (
-    <Loader loading={loading}>
-      <CommonModal
-        open={open}
-        onClose={onClose}
-        title="Send Money"
-        iconType="info"
-        size="small"
-        customContent={customContent}
-        loading={loading}
-        footerButtons={[
-          {
-            text: "Cancel",
-            variant: "outlined",
-            onClick: onClose,
-            disabled: loading,
+      }
+      footerButtons={[
+        { text: "Cancel", variant: "outlined", onClick: onClose },
+        {
+          text: "Confirm",
+          variant: "contained",
+          color: "success",
+          onClick: () => {
+            if (mpin.length !== 6)
+              return alert("Please enter a valid 6-digit MPIN");
+            onSubmit(mpin);
           },
-          {
-            text: loading ? "Processing..." : "Proceed",
-            variant: "contained",
-            color: "success",
-            onClick: handleProceed,
-            disabled: loading,
-          },
-        ]}
-      />
-    </Loader>
+          disabled: mpin.length !== 6,
+        },
+      ]}
+    />
   );
 };
 

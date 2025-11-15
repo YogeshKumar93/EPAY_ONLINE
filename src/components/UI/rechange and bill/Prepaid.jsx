@@ -17,6 +17,8 @@ import {
   Chip,
   Fade,
   Slide,
+  Modal,
+  Backdrop,
 } from "@mui/material";
 import {
   LocalAtm,
@@ -24,6 +26,7 @@ import {
   Payments,
   SimCard,
   CheckCircle,
+  Close,
 } from "@mui/icons-material";
 import { apiCall } from "../../../api/apiClient";
 import ApiEndpoints from "../../../api/ApiEndpoints";
@@ -32,11 +35,7 @@ import AuthContext from "../../../contexts/AuthContext";
 import operatorImages from "../../../assets/operators";
 import CommonLoader from "../../common/CommonLoader";
 import { useToast } from "../../../utils/ToastContext";
-import ResetMpin from "../../common/ResetMpin";
-import { Logo } from "../../../iconsImports";
 import { convertNumberToWordsIndian } from "../../../utils/NumberUtil";
-
-// import { useToast } from "../utils/ToastContext";
 
 const Prepaid = () => {
   const [services, setServices] = useState([]);
@@ -49,7 +48,7 @@ const Prepaid = () => {
   const [manualAmount, setManualAmount] = useState("");
   const [step, setStep] = useState(2); // start directly at plans step
   const [MpinCallBackVal, setMpinCallBackVal] = useState("");
-  const { location } = useContext(AuthContext);
+  const { location, getUuid } = useContext(AuthContext);
   const { showToast } = useToast();
   const [resetMpinModalOpen, setResetMpinModalOpen] = useState(false);
   const authCtx = useContext(AuthContext);
@@ -57,6 +56,9 @@ const Prepaid = () => {
   const loadUserProfile = authCtx.loadUserProfile;
   const [rechargeResponse, setRechargeResponse] = useState(null);
   const [w1Limit, setW1Limit] = useState(null); // store max allowed amount
+  const [uuidRef, setUuidRef] = useState("");
+  const [mpinModalOpen, setMpinModalOpen] = useState(false);
+  const [generatingUuid, setGeneratingUuid] = useState(false);
 
   const amountInWords = manualAmount
     ? `${convertNumberToWordsIndian(manualAmount).replace(/\b\w/g, (char) =>
@@ -89,6 +91,7 @@ const Prepaid = () => {
 
     fetchInitial();
   }, []);
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -122,43 +125,109 @@ const Prepaid = () => {
     setPlans(response?.data || []);
   };
 
-  // Handle recharge action
-  const handleRecharge = async () => {
-    setLoading(true);
-    if (!selectedPlan || !mobileNumber)
-      return apiErrorToast("Please select a plan and enter mobile number");
-    if (mobileNumber.length !== 10)
+  // Handle opening MPIN modal
+  const handleOpenMpinModal = async () => {
+    if (mobileNumber.length !== 10) {
       return apiErrorToast("Please enter valid 10-digit mobile number");
-    if (!MpinCallBackVal) return apiErrorToast("Please enter your MPIN");
-    if (!location?.lat || !location?.long) {
-      return apiErrorToast("Location not available, please enable GPS.");
     }
-    setLoading(true);
 
-    const payload = {
-      number: mobileNumber,
-      operator: selectedService?.id,
-      amount: selectedPlan.price,
-      latitude: location?.lat || "",
-      longitude: location?.long || "",
-      mpin: Number(MpinCallBackVal),
-    };
+    setGeneratingUuid(true);
 
-    const { error, response } = await apiCall(
-      "post",
-      ApiEndpoints.RECHARGE,
-      payload
-    );
-    setLoading(false);
-    if (error)
-      return showToast(
-        [error?.message, error?.errors?.response?.data],
+    // Generate UUID before opening modal
+    const { error: uuidError, response: uuidNumber } = await getUuid();
+
+    setGeneratingUuid(false);
+
+    if (uuidError || !uuidNumber) {
+      showToast(
+        uuidError?.message || "Failed to generate transaction ID",
         "error"
       );
-    setRechargeResponse(response); // ← store the response
-    loadUserProfile();
-    okSuccessToast(response?.message);
-    setStep(4); // Success step
+      return;
+    }
+
+    // Save UUID and open MPIN modal
+    setUuidRef(uuidNumber);
+    setMpinModalOpen(true);
+  };
+
+  // Handle recharge action
+  const handleRecharge = async () => {
+    // Start loader
+    setLoading(true);
+
+    try {
+      if (!selectedPlan || !mobileNumber) {
+        apiErrorToast("Please select a plan and enter mobile number");
+        setLoading(false);
+        setMpinModalOpen(false); // ❗ Close modal on error
+        return;
+      }
+
+      if (mobileNumber.length !== 10) {
+        apiErrorToast("Please enter valid 10-digit mobile number");
+        setLoading(false);
+        setMpinModalOpen(false); // ❗ Close modal on error
+        return;
+      }
+
+      if (!MpinCallBackVal) {
+        apiErrorToast("Please enter your MPIN");
+        setLoading(false);
+        setMpinModalOpen(false); // ❗ Close modal on error
+        return;
+      }
+
+      // if (!location?.lat || !location?.long) {
+      //   apiErrorToast("Location not available, please enable GPS.");
+      //   setLoading(false);
+      //   setMpinModalOpen(false); // ❗ Close modal on error
+      //   return;
+      // }
+
+      const payload = {
+        number: mobileNumber,
+        operator: selectedService?.id,
+        amount: selectedPlan.price,
+        latitude: location?.lat || "",
+        longitude: location?.long || "",
+        mpin: Number(MpinCallBackVal),
+        client_ref: uuidRef, // Pre-generated UUID
+      };
+
+      const { error, response } = await apiCall(
+        "post",
+        ApiEndpoints.RECHARGE,
+        payload
+      );
+
+      if (error) {
+        showToast([error?.message, error?.errors?.response?.data], "error");
+        setLoading(false);
+        setMpinModalOpen(false); // ❗ Close modal on API error
+        setMpinCallBackVal("");
+        return;
+      }
+
+      // SUCCESS FLOW
+      setRechargeResponse(response);
+      loadUserProfile();
+      okSuccessToast(response?.message || response?.status);
+
+      setStep(4); // Success step
+      setMpinModalOpen(false); // Close MPIN after success
+    } catch (err) {
+      apiErrorToast("Something went wrong. Please try again.");
+      setMpinModalOpen(false); // ❗ Close modal on crash
+    } finally {
+      setLoading(false); // Always stop loader
+    }
+  };
+
+  // Reset MPIN fields when modal closes
+  const handleCloseMpinModal = () => {
+    setMpinModalOpen(false);
+    setMpinCallBackVal("");
   };
 
   return (
@@ -322,18 +391,22 @@ const Prepaid = () => {
                       {/* Continue button */}
                       <Button
                         variant="contained"
-                        onClick={() => {
+                        onClick={async () => {
                           if (!manualAmount)
                             return apiErrorToast("Please enter amount");
+
                           if (w1Limit && Number(manualAmount) > w1Limit)
                             return apiErrorToast(
                               `Amount cannot exceed ₹${w1Limit}`
                             );
+
                           setSelectedPlan({
                             id: "custom",
                             name: "Custom Amount",
                             price: manualAmount,
                           });
+
+                          // Move to next step
                           setStep(3);
                         }}
                         disabled={!manualAmount}
@@ -552,148 +625,196 @@ const Prepaid = () => {
                   }}
                 />
 
-                {/* MPIN Field */}
+                {/* Pay Button - Opens MPIN Modal */}
                 {mobileNumber.length === 10 && (
                   <Box sx={{ textAlign: "center", mb: 2 }}>
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 1, fontWeight: 500, color: "gray" }}
-                    >
-                      Enter 6-digit MPIN
-                    </Typography>
-
-                    <Box
+                    <Button
+                      variant="contained"
+                      onClick={handleOpenMpinModal}
+                      disabled={generatingUuid}
                       sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        gap: 1,
-                        mb: 1.5,
+                        borderRadius: 2,
+                        fontWeight: "bold",
+                        fontSize: { xs: "0.9rem", sm: "1rem" },
+                        px: 4,
+                        py: 1.5,
                       }}
                     >
-                      {Array.from({ length: 6 }).map((_, index) => (
-                        <TextField
-                          key={index}
-                          type="password"
-                          inputProps={{
-                            maxLength: 1,
-                            style: {
-                              textAlign: "center",
-                              fontSize: 24,
-                              width: 35,
-                              padding: 8,
-                            },
-                          }}
-                          value={MpinCallBackVal[index] || ""}
-                          onChange={(e) => {
-                            const val = e.target.value.replace(/[^0-9]/g, "");
-
-                            let newMpin = MpinCallBackVal.split("");
-                            newMpin[index] = val; // can be "" too
-                            setMpinCallBackVal(newMpin.join(""));
-
-                            if (val && index < 5) {
-                              // move to next input if digit entered
-                              const next = document.getElementById(
-                                `mpin-${index + 1}`
-                              );
-                              if (next) next.focus();
-                            } else if (!val && index > 0) {
-                              // move back if deleted
-                              const prev = document.getElementById(
-                                `mpin-${index - 1}`
-                              );
-                              if (prev) prev.focus();
-                            }
-                          }}
-                          id={`mpin-${index}`}
-                        />
-                      ))}
-                    </Box>
-                    {/* <Box
-                      sx={{ display: "flex", justifyContent: "center", ml: 32 }}
-                    >
-                      <Button
-                        variant="contained"
-                        size="small"
-                        sx={{ fontSize: "11px" }}
-                        onClick={() => setResetMpinModalOpen(true)}
-                      >
-                        Reset MPIN
-                      </Button>
-                    </Box>
-                    {resetMpinModalOpen && (
-                      <ResetMpin
-                        open={resetMpinModalOpen}
-                        onClose={() => setResetMpinModalOpen(false)}
-                        username={username}
-                      />
-                    )} */}
+                      {generatingUuid ? (
+                        <CircularProgress size={24} color="inherit" />
+                      ) : (
+                        `Pay ₹${selectedPlan?.price}`
+                      )}
+                    </Button>
                   </Box>
                 )}
-
-                {/* Buttons - always visible, disabled until mobile is 10 digits and MPIN is complete */}
-                <Box display="flex" gap={2}>
-                  {/* <Button
-                    fullWidth
-                    variant="contained"
-                    sx={{
-                      borderRadius: 2,
-                      fontWeight: "bold",
-                      fontSize: { xs: "0.9rem", sm: "1rem" },
-                      background: "#fff",
-                      color: "#6C4BC7",
-                      "&:hover": {
-                        background: "#1e3c72",
-                        color: "#fff",
-                      },
-                    }}
-                    onClick={() => setStep(2)}
-                    disabled={
-                      !(
-                        mobileNumber.length === 10 &&
-                        MpinCallBackVal.length === 6
-                      )
-                    }
-                  >
-                    Back
-                  </Button> */}
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    onClick={handleRecharge}
-                    sx={{
-                      borderRadius: 2,
-                      fontWeight: "bold",
-                      fontSize: { xs: "0.9rem", sm: "1rem" },
-                      background: "#fff",
-                      color: "#6C4BC7",
-                      "&:hover": {
-                        background: "#1e3c72",
-                        color: "#fff",
-                      },
-                    }}
-                    disabled={
-                      !(
-                        mobileNumber.length === 10 &&
-                        MpinCallBackVal.length === 6
-                      )
-                    }
-                  >
-                    Pay ₹{selectedPlan?.price}
-                  </Button>
-                </Box>
               </Paper>
             </Box>
           </Box>
         </Fade>
       )}
 
+      {/* MPIN Modal */}
+      <Modal
+        open={mpinModalOpen}
+        onClose={handleCloseMpinModal}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}
+      >
+        <Fade in={mpinModalOpen}>
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 400,
+              bgcolor: "background.paper",
+              borderRadius: 2,
+              boxShadow: 24,
+              p: 4,
+            }}
+          >
+            {/* Modal Header */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 3,
+              }}
+            >
+              <Typography variant="h6" fontWeight="bold">
+                Enter MPIN
+              </Typography>
+              <Button
+                onClick={handleCloseMpinModal}
+                sx={{ minWidth: "auto", p: 0.5 }}
+              >
+                <Close />
+              </Button>
+            </Box>
+
+            {/* Transaction Details */}
+            <Paper sx={{ p: 2, mb: 3, bgcolor: "#f5f5f5" }}>
+              <Typography variant="body2" fontWeight="bold" gutterBottom>
+                Transaction Details
+              </Typography>
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography variant="body2">Amount:</Typography>
+                <Typography variant="body2" fontWeight="bold">
+                  ₹{selectedPlan?.price}
+                </Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography variant="body2">Mobile:</Typography>
+                <Typography variant="body2" fontWeight="bold">
+                  {mobileNumber}
+                </Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography variant="body2">Operator:</Typography>
+                <Typography variant="body2" fontWeight="bold">
+                  {selectedService?.name}
+                </Typography>
+              </Box>
+            </Paper>
+
+            {/* MPIN Input */}
+            <Box sx={{ textAlign: "center", mb: 3 }}>
+              <Typography
+                variant="body2"
+                sx={{ mb: 2, fontWeight: 500, color: "gray" }}
+              >
+                Enter 6-digit MPIN
+              </Typography>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: 1,
+                  mb: 2,
+                }}
+              >
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <TextField
+                    key={index}
+                    type="password"
+                    inputProps={{
+                      maxLength: 1,
+                      style: {
+                        textAlign: "center",
+                        fontSize: 24,
+                        width: 35,
+                        padding: 8,
+                      },
+                    }}
+                    value={MpinCallBackVal[index] || ""}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^0-9]/g, "");
+
+                      let newMpin = MpinCallBackVal.split("");
+                      newMpin[index] = val; // can be "" too
+                      setMpinCallBackVal(newMpin.join(""));
+
+                      if (val && index < 5) {
+                        // move to next input if digit entered
+                        const next = document.getElementById(
+                          `mpin-modal-${index + 1}`
+                        );
+                        if (next) next.focus();
+                      } else if (!val && index > 0) {
+                        // move back if deleted
+                        const prev = document.getElementById(
+                          `mpin-modal-${index - 1}`
+                        );
+                        if (prev) prev.focus();
+                      }
+                    }}
+                    id={`mpin-modal-${index}`}
+                  />
+                ))}
+              </Box>
+            </Box>
+
+            {/* Action Buttons */}
+            <Box display="flex" gap={2}>
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={handleCloseMpinModal}
+                sx={{
+                  borderRadius: 2,
+                  fontWeight: "bold",
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={handleRecharge}
+                disabled={MpinCallBackVal.length !== 6}
+                sx={{
+                  borderRadius: 2,
+                  fontWeight: "bold",
+                }}
+              >
+                Confirm Payment
+              </Button>
+            </Box>
+          </Box>
+        </Fade>
+      </Modal>
+
+      {/* Success Step */}
       {step === 4 && (
         <Fade in>
           <Box textAlign="center" maxWidth={600} mx="auto" py={4}>
-            {/* <CheckCircle sx={{ fontSize: 80, color: "success.main", mb: 2 }} /> */}
-
-            {/* Heading for Receipt */}
             <Typography
               variant="h6"
               fontWeight="bold"
@@ -708,10 +829,9 @@ const Prepaid = () => {
               textAlign="center"
               sx={{ mb: 2 }}
             >
-              Date:{new Date().toLocaleDateString("en-GB")}{" "}
-              {/* formats as DD/MM/YYYY */}
+              Date:{new Date().toLocaleDateString("en-GB")}
             </Typography>
-            {/* Table-style receipt */}
+
             <Paper sx={{ p: 2, mt: 1, textAlign: "left" }}>
               <table
                 id="receiptTable"
@@ -755,7 +875,6 @@ const Prepaid = () => {
                       {selectedService?.name || "---"}
                     </td>
                   </tr>
-
                   <tr>
                     <th
                       style={{
@@ -769,7 +888,10 @@ const Prepaid = () => {
                     <td
                       style={{ borderBottom: "1px solid #ccc", padding: "8px" }}
                     >
-                      ₹{rechargeResponse?.data?.transferAmount || "0"}
+                      ₹
+                      {rechargeResponse?.data?.transferAmount ||
+                        selectedPlan?.price ||
+                        "null"}
                     </td>
                   </tr>
                   <tr>
@@ -848,9 +970,8 @@ const Prepaid = () => {
         </head>
         <body>
           <h2>Recharge Receipt</h2>
-  <p>Date:${new Date().toLocaleDateString("en-GB")}</p> <!-- Current date -->
+  <p>Date:${new Date().toLocaleDateString("en-GB")}</p>
 
-          <!-- Horizontal table layout -->
           <table>
             <tr>
               <th>Mobile Number</th>
@@ -888,4 +1009,3 @@ const Prepaid = () => {
 };
 
 export default Prepaid;
-// sx={{ backgroundColor: "#6C4BC7" }}

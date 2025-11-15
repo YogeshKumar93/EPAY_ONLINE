@@ -194,6 +194,7 @@ const BbpxTxn = ({ query }) => {
 
       if (response?.status) {
         showToast(response.message || "Transaction refunded successfully!");
+        refreshPlans();
       } else {
         showToast(response?.error || "Refund failed. Please try again.");
       }
@@ -225,7 +226,7 @@ const BbpxTxn = ({ query }) => {
       },
       { id: "consumer_number", label: "Consumer Number", type: "textfield" },
       { id: "txn_id", label: "Txn ID", type: "textfield" },
-            { id: "amount", label: "Amount", type: "textfield" },
+      { id: "amount", label: "Amount", type: "textfield" },
       {
         id: "user_id",
         label: "User ID",
@@ -308,7 +309,7 @@ const BbpxTxn = ({ query }) => {
 
   const columns = useMemo(
     () => [
-       {
+      {
         name: "S.No",
         selector: (row) => row.serialNo,
         wrap: true,
@@ -867,7 +868,6 @@ const BbpxTxn = ({ query }) => {
         selectedRows={selectedRows}
         onSelectionChange={setSelectedRows}
         enableExcelExport={true}
-        
         exportFileName="BbpsTransactions"
         exportEndpoint={ApiEndpoints.GET_BBPS_TXN}
         customHeader={

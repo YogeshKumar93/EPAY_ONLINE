@@ -32,6 +32,7 @@ export const AuthProvider = ({ children }) => {
   const [nepalUser, setNepalUser] = useState(initialNepalUser);
   const [ifDocsUploaded, setIfDocsUploaded] = useState(docsData);
   const [sideNavs, setSideNavs] = useState([]);
+  const [uuidNumber, setUuidNumber] = useState();
   const [location, setLocation] = useState(
     JSON.parse(localStorage.getItem("location"))
   );
@@ -85,6 +86,7 @@ export const AuthProvider = ({ children }) => {
       throw err;
     }
   };
+
   // const getSideNavs = async () => {
   //   try {
   //     const { error, response } = await apiCall("post", ApiEndpoints.GET_SIDENAV);
@@ -134,6 +136,34 @@ export const AuthProvider = ({ children }) => {
       console.error("Failed to fetch colours:", err);
     }
   };
+  const getUuid = async () => {
+    try {
+      const { error, response } = await apiCall("get", ApiEndpoints.GET_UUID);
+
+      if (error) {
+        console.error("UUID API Error:", error);
+        return { error, response: null };
+      }
+
+      const uuidNumber = response?.uuid || response?.data?.uuid || null;
+
+      if (uuidNumber) {
+        localStorage.setItem("uuid_number", uuidNumber);
+        setUuidNumber(uuidNumber);
+        return { error: null, response: uuidNumber };
+      } else {
+        console.warn("Unexpected UUID response:", response);
+        return { error: { message: "Invalid UUID response" }, response: null };
+      }
+    } catch (err) {
+      console.error("Failed to fetch UUID:", err);
+      return {
+        error: { message: err.message || "Something went wrong" },
+        response: null,
+      };
+    }
+  };
+
   useEffect(() => {
     const fetchIp = async () => {
       try {
@@ -276,13 +306,13 @@ export const AuthProvider = ({ children }) => {
     user,
     loading,
     login: login,
-
+    getUuid,
+    uuidNumber,
     logout,
     saveUser,
     isAuthenticated: !!token,
     colours,
     loadColours,
-
     // New keys from second context
     token: token,
     nepalToken: nepalToken,

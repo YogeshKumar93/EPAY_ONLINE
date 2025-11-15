@@ -2,12 +2,13 @@ import React from "react";
 import { Box, Paper, Typography, Button } from "@mui/material";
 import { Logo } from "../iconsImports";
 
-const SolitechReceipt = ({ payoutResponse, onRepeat, onNewTxn }) => {
+const SolitechReceipt = ({ payoutResponse, onRepeat, onNewTxn, sender }) => {
   if (!payoutResponse) return null;
+  console.log("payoput response ", payoutResponse);
 
   const fields = [
     ["Sender Mobile", payoutResponse?.mobile_number || "N/A"],
-    ["Sender Name", payoutResponse?.sender_name || "N/A"],
+    ["Sender Name", sender?.sender_name || "N/A"],
     ["Beneficiary Name", payoutResponse?.beneficiary_name || "N/A"],
     ["Account Number", payoutResponse?.account_number || "N/A"],
     ["Amount", `₹${payoutResponse?.amount || "N/A"}`],
@@ -53,7 +54,7 @@ const SolitechReceipt = ({ payoutResponse, onRepeat, onNewTxn }) => {
 
     const values = [
       payoutResponse?.mobile_number || "---",
-      payoutResponse?.sender_name || "---",
+      sender?.sender_name || "---",
       payoutResponse?.beneficiary_name || "---",
       payoutResponse?.account_number || "---",
       `₹${payoutResponse?.amount || 0}`,

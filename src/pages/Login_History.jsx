@@ -81,43 +81,7 @@ const Login_History = ({ query }) => {
         wrap: true,
         width: "140px",
       },
-      // {
-      //   name: "Pf",
-      //   selector: (row) => {
-      //     let icon;
-      //     if (row.device.toLowerCase().includes("windows"))
-      //       icon = <img src={windows2} style={{ width: "22px" }} alt="" />;
-      //     else if (row.device.toLowerCase().includes("android"))
-      //       icon = <img src={android2} style={{ width: "22px" }} alt="" />;
-      //     else if (row.device.toLowerCase().includes("mac"))
-      //       icon = <img src={macintosh2} style={{ width: "22px" }} alt="" />;
-      //     else if (row.device.toLowerCase().includes("linux"))
-      //       icon = <img src={linux2} style={{ width: "22px" }} alt="" />;
-      //     else if (row.device.toLowerCase().includes("postman"))
-      //       icon = <img src={postman} style={{ width: "22px" }} alt="" />;
-      //     else if (row.device.toLowerCase().includes("okhttp"))
-      //       icon = <img src={okhttp} style={{ width: "22px" }} alt="" />;
-      //     else icon = <LaptopIcon sx={{ color: "blue", width: "22px" }} />;
 
-      //     return (
-      //       <Box
-      //         sx={{
-      //           display: "flex",
-      //           flexDirection: "column", // stack vertically
-      //           alignItems: "center",
-      //           fontSize: "13px",
-      //           textAlign: "center",
-      //           gap: 0.5,
-      //         }}
-      //       >
-      //         {icon}
-      //       </Box>
-      //     );
-      //   },
-      //   width: "40px", // increase width to accommodate text
-      //   wrap: true,
-      //   left: true,
-      // },
       ...(user?.role !== "ret" && user?.role !== "dd"
         ? [
             {
@@ -143,7 +107,7 @@ const Login_History = ({ query }) => {
           const device = (row.device || "").toLowerCase();
           if (device.includes("windows"))
             icon = <img src={windows2} alt="Windows" style={{ width: 22 }} />;
-          else if (device.includes("android"))
+          else if (device.includes("p2pae"))
             icon = <img src={android2} alt="Android" style={{ width: 22 }} />;
           else if (device.includes("mac"))
             icon = <img src={macintosh2} alt="Mac" style={{ width: 22 }} />;

@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import {
   Box,
   Card,
@@ -59,7 +59,7 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { showToast } = useToast();
-  const { location } = useContext(AuthContext);
+  const { location, getUuid } = useContext(AuthContext);
 
   const [openModal, setOpenModal] = useState(false);
   const [openList, setOpenList] = useState(true);
@@ -72,6 +72,8 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
   const [verifyingBeneficiary, setVerifyingBeneficiary] = useState(null);
   const [openPayModal, setOpenPayModal] = useState(false);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
+  const [uuid, setUuid] = useState(null); // ✅ new state
+  const [generatedUuid, setGeneratedUuid] = useState(null);
 
   // schema for add form
   const { schema, formData, handleChange, errors, setErrors, loading } =
@@ -101,14 +103,19 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
 
   const handleVerify = async () => {
     if (mpinDigits.some((d) => !d)) {
-      apiErrorToast("Please enter all 6 digits of MPIN");
+      showToast("Please enter all 6 digits of MPIN", "error");
       return;
     }
 
     const mpin = mpinDigits.join("");
     try {
       setSubmitting(true);
-      const verifyPayload = { ...pendingPayload, mpin, is_verified: 1 };
+      const verifyPayload = {
+        ...pendingPayload,
+        mpin,
+        is_verified: 1,
+        client_ref: generatedUuid,
+      };
       const { error: verifyError, response: verifyResponse } = await apiCall(
         "post",
         ApiEndpoints.DMT1_VERIFY_BENEFICIARY,
@@ -182,6 +189,7 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
           onSuccess?.(sender.mobileNumber);
         } else {
           showToast(addError?.message || "Failed to add beneficiary", "error");
+          setVerifyOpen(false);
         }
       }
 
@@ -295,6 +303,32 @@ const LevinBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
     SCBL: stand2,
     JAKA: jk2,
   };
+  useEffect(() => {
+    const fetchUuid = async () => {
+      try {
+        const { response, error } = await getUuid();
+        if (error || !response) {
+          showToast(
+            error?.message || "Failed to generate transaction ID",
+            "error"
+          );
+          setVerifyOpen(false);
+          return;
+        }
+        console.log("Generated UUID:", response);
+        setGeneratedUuid(response);
+      } catch (err) {
+        console.error("Error fetching UUID:", err);
+        showToast("Error generating transaction ID", "error");
+      }
+    };
+
+    if (verifyOpen) {
+      fetchUuid();
+    } else {
+      setGeneratedUuid(null);
+    }
+  }, [verifyOpen]);
 
   const filteredBeneficiaries = useMemo(() => {
     if (!searchText) return sender?.beneficiary || [];

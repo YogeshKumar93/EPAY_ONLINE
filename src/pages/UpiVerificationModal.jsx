@@ -1,5 +1,5 @@
 // components/UpiVerificationModal.jsx
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -10,6 +10,8 @@ import {
   Button,
   Typography,
 } from "@mui/material";
+import AuthContext from "../contexts/AuthContext";
+import { useToast } from "../utils/ToastContext";
 
 const UpiVerificationModal = ({
   open,
@@ -19,6 +21,9 @@ const UpiVerificationModal = ({
   setMpinDigits,
   submitting,
 }) => {
+  const { getUuid } = useContext(AuthContext);
+  const [uuid, setUuid] = useState(null); // ✅ new state
+  const { showToast } = useToast();
   const handleMpinChange = (index, value) => {
     if (/^[0-9]?$/.test(value)) {
       const updated = [...mpinDigits];
@@ -28,6 +33,25 @@ const UpiVerificationModal = ({
         document.getElementById(`verify-mpin-${index + 1}`)?.focus();
     }
   };
+
+  useEffect(() => {
+    if (open) {
+      const fetchUuid = async () => {
+        try {
+          const { error, response } = await getUuid();
+          if (response) {
+            setUuid(response);
+          } else if (error) {
+            showToast(error?.message || "Failed to generate UUID", "error");
+            onClose();
+          }
+        } catch (err) {
+          showToast("Error while generating UUID", "error");
+        }
+      };
+      fetchUuid();
+    }
+  }, [open]); // 👈 triggers every time `open` changes
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
@@ -83,7 +107,7 @@ const UpiVerificationModal = ({
           Cancel
         </Button>
         <Button
-          onClick={onVerify}
+          onClick={() => onVerify(uuid)} // ✅ pass uuid to parent
           variant="contained"
           sx={{ backgroundColor: "#5c3ac8", textTransform: "none" }}
           disabled={submitting}

@@ -7,7 +7,7 @@ import { useToast } from "../../utils/ToastContext";
 import CommonMpinModal from "../common/CommonMpinModal";
 
 const W2W1Transfer = ({ filters = [] }) => {
-  const { loadUserProfile } = useContext(AuthContext);
+  const { loadUserProfile, getUuid } = useContext(AuthContext);
   const { showToast } = useToast();
 
   const [loading, setLoading] = useState(true);
@@ -62,12 +62,22 @@ const W2W1Transfer = ({ filters = [] }) => {
 
     setCreating(true);
     setAmountError("");
+    const { error: uuidError, response: uuidNumber } = await getUuid();
+
+    if (uuidError || !uuidNumber) {
+      showToast(
+        uuidError?.message || "Failed to generate transaction ID",
+        "error"
+      );
+      return;
+    }
 
     const payload = {
       amount: parseFloat(amount),
       remark,
       operator: 79,
       mpin,
+      client_ref: uuidNumber,
     };
 
     const { response, error } = await apiCall(

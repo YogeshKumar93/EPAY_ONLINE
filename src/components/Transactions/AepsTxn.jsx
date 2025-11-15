@@ -148,7 +148,7 @@ const AepsTxn = ({ query }) => {
         roles: ["adm", "sadm"],
       },
       { id: "txn_id", label: "Txn ID", type: "textfield" },
-            { id: "amount", label: "Amount", type: "textfield" },
+      { id: "amount", label: "Amount", type: "textfield" },
       {
         id: "user_id",
         label: "User ID",
@@ -227,7 +227,7 @@ const AepsTxn = ({ query }) => {
 
   const columns = useMemo(
     () => [
-       {
+      {
         name: "S.No",
         selector: (row) => row.serialNo,
         wrap: true,
@@ -267,7 +267,7 @@ const AepsTxn = ({ query }) => {
           const pf = row.pf?.toLowerCase() || "";
           if (pf.includes("windows"))
             icon = <img src={windows2} style={{ width: 22 }} />;
-          else if (pf.includes("p2ape"))
+          else if (pf.includes("p2pae"))
             icon = <img src={android2} style={{ width: 22 }} />;
           else if (pf.includes("mac"))
             icon = <img src={macintosh2} style={{ width: 22 }} />;
@@ -290,9 +290,7 @@ const AepsTxn = ({ query }) => {
             {
               name: "Est.",
               selector: (row) => (
-                <div style={{ fontSize: 10, fontWeight: 600 }}>
-                  {row.establishment}
-                </div>
+                <div style={{ fontWeight: 600 }}>{row.establishment}</div>
               ),
               width: 70,
               center: true,
@@ -300,7 +298,7 @@ const AepsTxn = ({ query }) => {
             {
               name: "Txn ID /Ref",
               selector: (row) => (
-                <div style={{ fontSize: 10, fontWeight: 600 }}>
+                <div style={{ fontSize: 12, fontWeight: 600 }}>
                   {row.txn_id}
                   <br />
                   {row.client_ref}
@@ -470,67 +468,65 @@ const AepsTxn = ({ query }) => {
         queryParam={query || ""}
         enableActionsHover
         enableSelection={false}
-         enableExcelExport={true}
+        enableExcelExport={true}
         selectedRows={selectedRows}
         onSelectionChange={setSelectedRows}
-         
-          
-          exportFileName="DmtTransactions"
-          exportEndpoint={ApiEndpoints.GET_DMT_TXN}
+        exportFileName="DmtTransactions"
+        exportEndpoint={ApiEndpoints.GET_DMT_TXN}
         customHeader={
           <>
-           <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  padding: "8px",
-                }}
-              >
-                {selectedRows.length > 0 && (
-                  <Tooltip title="PRINT">
-                    <Button
-                      variant="contained"
-                      size="small"
-                      color="primary"
-                      onClick={() => {
-                        if (!selectedRows || selectedRows.length === 0) {
-                          alert(
-                            "Please select at least one transaction to print."
-                          );
-                          return;
-                        }
-
-                        // Save all selected rows
-                        sessionStorage.setItem(
-                          "txnData",
-                          JSON.stringify(selectedRows)
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                padding: "8px",
+              }}
+            >
+              {selectedRows.length > 0 && (
+                <Tooltip title="PRINT">
+                  <Button
+                    variant="contained"
+                    size="small"
+                    color="primary"
+                    onClick={() => {
+                      if (!selectedRows || selectedRows.length === 0) {
+                        alert(
+                          "Please select at least one transaction to print."
                         );
+                        return;
+                      }
 
-                        // Open receipt page in a new tab
-                        window.open("/print-dmt2", "_blank");
-                      }}
-                      sx={{ ml: 1 }}
-                    >
-                      <PrintIcon
-                        sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
-                      />
-                      Print
-                    </Button>
-                  </Tooltip>
-                )}
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  padding: "8px",
-                  flexWrap: "wrap",
-                }}
-              >
-                <Scheduler onRefresh={refreshPlans} />
-              </Box>
+                      // Save all selected rows
+                      sessionStorage.setItem(
+                        "txnData",
+                        JSON.stringify(selectedRows)
+                      );
+
+                      // Open receipt page in a new tab
+                      window.open("/print-dmt2", "_blank");
+                    }}
+                    sx={{ ml: 1 }}
+                  >
+                    <PrintIcon
+                      sx={{ fontSize: 20, color: "#e3e6e9ff", mr: 1 }}
+                    />
+                    Print
+                  </Button>
+                </Tooltip>
+              )}
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                padding: "8px",
+                flexWrap: "wrap",
+              }}
+            >
+              <Scheduler onRefresh={refreshPlans} />
+            </Box>
           </>
         }
       />

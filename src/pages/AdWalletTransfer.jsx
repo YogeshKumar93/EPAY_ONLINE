@@ -33,19 +33,20 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const loadUserProfile = authCtx.loadUserProfile;
-
+  const { getUuid } = useContext(AuthContext);
   const [amount, setAmount] = useState("");
   const [remark, setRemark] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
+  const [generatedUuid, setGeneratedUuid] = useState(null);
 
-   const amountInWords = amount
-      ? `${convertNumberToWordsIndian(amount).replace(/\b\w/g, (char) =>
-          char.toUpperCase()
-        )} Only`
-      : "";
+  const amountInWords = amount
+    ? `${convertNumberToWordsIndian(amount).replace(/\b\w/g, (char) =>
+        char.toUpperCase()
+      )} Only`
+    : "";
 
   // Fetch receiver details from mobile number
   const fetchReceiver = async () => {
@@ -71,6 +72,32 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    const fetchUuid = async () => {
+      try {
+        const { response, error } = await getUuid();
+        if (error || !response) {
+          showToast(
+            error?.message || "Failed to generate transaction ID",
+            "error"
+          );
+          setMpinModalOpen(false);
+          return;
+        }
+        console.log("Generated UUID:", response);
+        setGeneratedUuid(response);
+      } catch (err) {
+        console.error("Error fetching UUID:", err);
+        showToast("Error generating transaction ID", "error");
+      }
+    };
+
+    if (mpinModalOpen) {
+      fetchUuid();
+    } else {
+      setGeneratedUuid(null);
+    }
+  }, [mpinModalOpen]);
 
   useEffect(() => {
     if (open) {
@@ -99,6 +126,7 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
         remark,
         mpin,
         operator: transferType === "debit" ? 82 : 17, // 82 for debit, 17 for credit
+        client_ref: generatedUuid,
       };
 
       // Choose API endpoint based on transfer type
@@ -260,17 +288,17 @@ const AdWalletTransfer = ({ row, open, onClose }) => {
               margin="normal"
               sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 }, mb: 2 }}
             />
-             {amount && (
-                                                <Typography
-                                                  variant="body2"
-                                                  sx={{
-                                                    color: "#555",
-                                                    fontWeight: 500,
-                                                  }}
-                                                >
-                                                  {amountInWords}
-                                                </Typography>
-                                              )}
+            {amount && (
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "#555",
+                  fontWeight: 500,
+                }}
+              >
+                {amountInWords}
+              </Typography>
+            )}
             <TextField
               label="Remark (Optional)"
               variant="outlined"

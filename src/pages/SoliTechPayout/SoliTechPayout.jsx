@@ -167,6 +167,7 @@ const SoliTechPayout = () => {
       <SolitechReceipt
         payoutResponse={payoutResponse}
         onRepeat={() => setPayoutResponse(null)}
+        sender={sender}
       />
     );
   }

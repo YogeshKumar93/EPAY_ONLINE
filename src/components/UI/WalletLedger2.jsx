@@ -193,10 +193,9 @@ const WalletLedger2 = ({ query }) => {
           filters={filters}
           queryParam={queryParam}
           refresh={true}
-           enableExcelExport={true}
-                  exportFileName="PayoutTransactions"
-                  exportEndpoint={ApiEndpoints.GET_WALLETLEDGER_2}
-
+          enableExcelExport={true}
+          exportFileName="PayoutTransactions"
+          exportEndpoint={ApiEndpoints.GET_WALLETLEDGER_2}
         />
       )}
     </>

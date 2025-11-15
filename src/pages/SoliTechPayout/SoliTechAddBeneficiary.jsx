@@ -48,6 +48,8 @@ const SoliTechAddBeneficiary = ({
   const [loadingBanks, setLoadingBanks] = useState(false);
   const [loadingIfsc, setLoadingIfsc] = useState(false); // New state for IFSC loading
   const [verifyingDetails, setVerifyingDetails] = useState(false);
+  const [uuid, setUuid] = useState("");
+
   // Form validation
   const isFormValid = useMemo(() => {
     return (
@@ -58,6 +60,33 @@ const SoliTechAddBeneficiary = ({
       formData.ifsc_code?.trim()
     );
   }, [formData]);
+
+  // useEffect(() => {
+  //   if (open) {
+  //     const fetchUuid = async () => {
+  //       try {
+  //         const { response, error } = await apiCall(
+  //           "GET",
+  //           ApiEndpoints.GET_UUID
+  //         );
+  //         if (response) {
+  //           setUuid(response.uuid);
+  //         } else {
+  //           showToast(error?.message || "Failed to get UUID", "error");
+  //           onClose();
+  //         }
+  //       } catch (err) {
+  //         showToast("Error getting UUID", "error");
+  //       }
+  //     };
+
+  //     if (open) {
+  //       fetchUuid();
+  //     } else {
+  //       setUuid(""); // reset on close
+  //     }
+  //   }
+  // }, [open]);
 
   // Fetch banks when modal opens
   useEffect(() => {
@@ -181,6 +210,7 @@ const SoliTechAddBeneficiary = ({
       bank_name: formData.bank_name,
       ifsc_code: formData.ifsc_code, // This will be the IFSC from API response (e.g., "KKBK0005033")
       bank_code: formData.bank_code,
+      uuid, // 👈 include this
       is_verified: 1,
     };
 

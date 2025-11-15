@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Box,
   Card,
@@ -31,35 +31,12 @@ import VerifyUpiBene from "./VerifyUpiBene";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { okSuccessToast, apiErrorToast } from "../utils/ToastUtil";
-import {
-  sbi2,
-  idbi2,
-  axis2,
-  hdfc2,
-  icici2,
-  kotak2,
-  bob2,
-  pnb2,
-  bom2,
-  union2,
-  dbs2,
-  rbl2,
-  yes2,
-  indus2,
-  airtel2,
-  abhy2,
-  canara2,
-  bandhan2,
-  cbi2,
-  idib2,
-  stand2,
-  jk2,
-} from "../utils/iconsImports";
 import UpiBeneficiaryDetails from "./UpiBeneficiaryDetails";
 import { useToast } from "../utils/ToastContext";
 import { upi2 } from "../iconsImports";
 import CommonModal from "../components/common/CommonModal";
 import UpiVerificationModal from "./UpiVerificationModal";
+import AuthContext from "../contexts/AuthContext";
 
 const UpiBeneficiaryList = ({ sender, onSuccess }) => {
   const theme = useTheme();
@@ -84,6 +61,28 @@ const UpiBeneficiaryList = ({ sender, onSuccess }) => {
   const [pendingPayload, setPendingPayload] = useState(null);
   const [tupResponse, setTupResponse] = useState(null);
   const [verifyingBeneficiary, setVerifyingBeneficiary] = useState(null);
+  const { getUuid } = useContext(AuthContext);
+  const [uuid, setUuid] = useState(null); // ✅ new state
+
+  useEffect(() => {
+    if (verifyOpen) {
+      // only call when modal actually openModals
+      const fetchUuid = async () => {
+        try {
+          const { error, response } = await getUuid();
+          if (response) {
+            setUuid(response);
+          } else if (error) {
+            showToast(error?.message || "Failed to generate UUID", "error");
+            setOpenModal(false);
+          }
+        } catch (err) {
+          showToast("Error while generating UUID", "error");
+        }
+      };
+      fetchUuid();
+    }
+  }, [verifyOpen]); // 👈 triggers every time `open` changes
 
   const handleAddBeneficiary = async () => {
     // if (!beneficiaryName.trim() || !vpa.trim()) {
@@ -115,6 +114,8 @@ const UpiBeneficiaryList = ({ sender, onSuccess }) => {
         setOpenModal(false);
         setBeneficiaryName("");
         setVpa("");
+        setVpaSuffix("");
+        setVpaPrefix("");
         setCustomSuffix(""); // reset this too
         onSuccess?.(sender.mobile_number);
       } else {
@@ -140,6 +141,7 @@ const UpiBeneficiaryList = ({ sender, onSuccess }) => {
       latitude: location?.lat || "",
       longitude: location?.long || "",
       pf: "WEB",
+      client_ref: uuid,
     };
 
     setPendingPayload(payload);
@@ -165,7 +167,7 @@ const UpiBeneficiaryList = ({ sender, onSuccess }) => {
     setSubmitting(true);
 
     try {
-      const verifyPayload = { ...pendingPayload, mpin };
+      const verifyPayload = { ...pendingPayload, mpin, client_ref: uuid };
       const { response, error } = await apiCall(
         "post",
         ApiEndpoints.DMT1_VERIFY_BENEFICIARY,
@@ -231,7 +233,7 @@ const UpiBeneficiaryList = ({ sender, onSuccess }) => {
       setSubmitting(false);
     }
   };
-  const handleVerifyUpi = async () => {
+  const handleVerifyUpi = async (uuidValue) => {
     if (mpinDigits.some((d) => !d)) {
       apiErrorToast("Please enter all 6 digits of MPIN");
       return;
@@ -240,7 +242,12 @@ const UpiBeneficiaryList = ({ sender, onSuccess }) => {
     const mpin = mpinDigits.join("");
     try {
       setSubmitting(true);
-      const verifyPayload = { ...pendingPayload, mpin, type: "UPI" };
+      const verifyPayload = {
+        ...pendingPayload,
+        mpin,
+        type: "UPI",
+        client_ref: uuidValue || uuid, // ✅ include UUID from modal or parent
+      };
       const { error, response } = await apiCall(
         "post",
         ApiEndpoints.DMT1_VERIFY_BENEFICIARY,
@@ -355,6 +362,11 @@ const UpiBeneficiaryList = ({ sender, onSuccess }) => {
   const filteredBeneficiaries = beneficiaries.filter((b) =>
     b.beneficiary_name.toLowerCase().includes(searchText.toLowerCase())
   );
+  const isFormValid =
+    beneficiaryName.trim() &&
+    vpaPrefix.trim() &&
+    vpaSuffix.trim() &&
+    (vpaSuffix !== "other" || customSuffix.trim());
 
   return (
     <Card
@@ -624,7 +636,18 @@ const UpiBeneficiaryList = ({ sender, onSuccess }) => {
                 fullWidth
                 size="small"
                 value={vpaPrefix}
-                onChange={(e) => setVpaPrefix(e.target.value)}
+                onKeyPress={(e) => {
+                  // Prevent typing of special characters
+                  if (!/^[a-zA-Z0-9]$/.test(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Clean any special characters that might get through (like paste operations)
+                  const cleaned = value.replace(/[^a-zA-Z0-9]/g, "");
+                  setVpaPrefix(cleaned);
+                }}
                 placeholder="e.g. example"
               />
 
@@ -698,14 +721,14 @@ const UpiBeneficiaryList = ({ sender, onSuccess }) => {
           <Button
             variant="contained"
             onClick={handleAddBeneficiary}
-            disabled={submitting}
+            disabled={submitting || !isFormValid}
           >
             {submitting ? "Saving..." : "Add"}
           </Button>
           <Button
             variant="contained"
             onClick={handleAddAndVerifyBeneficiary}
-            disabled={submitting}
+            disabled={submitting || !isFormValid}
           >
             {submitting ? "Saving..." : "Verify & Add"}
           </Button>

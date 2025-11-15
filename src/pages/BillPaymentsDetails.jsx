@@ -35,7 +35,7 @@ const BillPaymentsDetails = ({
   const [payingBill, setPayingBill] = useState(false);
   const [mpinModalOpen, setMpinModalOpen] = useState(false);
   const { showToast } = useToast();
-  const { location, ip } = useContext(AuthContext);
+  const { location, ip, getUuid } = useContext(AuthContext);
   const authCtx = useContext(AuthContext);
   const loadUserProfile = authCtx.loadUserProfile;
   const [showReceipt, setShowReceipt] = useState(false);
@@ -91,13 +91,24 @@ const BillPaymentsDetails = ({
   // ✅ Fetch Bill
   const handleFetchBill = async () => {
     setFetchingBill(true);
+
     try {
+      const { error: uuidError, response: uuidNumber } = await getUuid();
+
+      if (uuidError || !uuidNumber) {
+        showToast(
+          uuidError?.message || "Failed to generate transaction ID",
+          "error"
+        );
+        return;
+      }
       const payload = {
         biller_id: billerId,
         ...inputValues,
         ip: ip || "0.0.0.0",
         latitude: location?.lat,
         longitude: location?.long,
+        client_ref: uuidNumber,
       };
 
       const { error, response } = await apiCall(
@@ -121,6 +132,15 @@ const BillPaymentsDetails = ({
 
   // ✅ Pay Bill
   const handlePayBill = async (mpin) => {
+    const { error: uuidError, response: uuidNumber } = await getUuid();
+
+    if (uuidError || !uuidNumber) {
+      showToast(
+        uuidError?.message || "Failed to generate transaction ID",
+        "error"
+      );
+      return;
+    }
     const payload = {
       billerId: billerId,
       biller_name: billerDetails?.billerInfo?.name,
@@ -132,6 +152,7 @@ const BillPaymentsDetails = ({
       enquiryReferenceId: billData?.enquiryReferenceId || "",
       amount: billData?.BillAmount || inputValues?.amount,
       mpin,
+      client_ref: uuidNumber,
     };
 
     // dynamic params

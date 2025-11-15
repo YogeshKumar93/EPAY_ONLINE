@@ -97,8 +97,9 @@ const AllTranscation = ({ query }) => {
         options: routes,
         roles: ["adm", "sadm"],
       },
-      { id: "txn_id", label: "Txn ID", type: "textfield" },
       { id: "amount", label: "Amount", type: "textfield" },
+      { id: "txn_id", label: "Txn ID", type: "textfield" },
+
       {
         id: "user_id",
         label: "User ID",
@@ -136,6 +137,20 @@ const AllTranscation = ({ query }) => {
         wrap: true,
         width: "190px",
       },
+      ...(user?.role === "adm" || user?.role === "sadm"
+        ? [
+            {
+              name: "User Id",
+              selector: (row) => (
+                <div style={{ fontSize: "13px", fontWeight: "600" }}>
+                  {row.user_id}
+                </div>
+              ),
+              center: true,
+              width: "70px",
+            },
+          ]
+        : []),
       // {
       //   name: "Service",
       //   selector: (row) => <div>{row.service_name}</div>,
@@ -209,6 +224,20 @@ const AllTranscation = ({ query }) => {
             },
           ]
         : []),
+      ...(user?.role === "adm" || user?.role === "sadm"
+        ? [
+            {
+              name: "Admin Comm",
+              selector: (row) => (
+                <div style={{ fontSize: "13px", fontWeight: "600" }}>
+                  {row.a_comm}
+                </div>
+              ),
+              center: true,
+              width: "70px",
+            },
+          ]
+        : []),
       ...(user?.role === "adm" ||
       user?.role === "md" ||
       user?.role === "sadm" ||
@@ -270,37 +299,37 @@ const AllTranscation = ({ query }) => {
     []
   );
 
-  const columnsWithSelection = useMemo(() => {
-    if (user?.role === "adm" || user?.role === "sadm") return columns;
-    return [
-      {
-        name: "",
-        selector: (row) => (
-          <input
-            type="checkbox"
-            checked={selectedRows.some((r) => r.id === row.id)}
-            disabled={row.status?.toLowerCase() === "failed"}
-            onChange={() => {
-              const isSelected = selectedRows.some((r) => r.id === row.id);
-              setSelectedRows(
-                isSelected
-                  ? selectedRows.filter((r) => r.id !== row.id)
-                  : [...selectedRows, row]
-              );
-            }}
-          />
-        ),
-        width: 40,
-      },
-      ...columns,
-    ];
-  }, [selectedRows, columns]);
+  // const columnsWithSelection = useMemo(() => {
+  //   if (user?.role === "adm" || user?.role === "sadm") return columns;
+  //   return [
+  //     {
+  //       name: "",
+  //       selector: (row) => (
+  //         <input
+  //           type="checkbox"
+  //           checked={selectedRows.some((r) => r.id === row.id)}
+  //           disabled={row.status?.toLowerCase() === "failed"}
+  //           onChange={() => {
+  //             const isSelected = selectedRows.some((r) => r.id === row.id);
+  //             setSelectedRows(
+  //               isSelected
+  //                 ? selectedRows.filter((r) => r.id !== row.id)
+  //                 : [...selectedRows, row]
+  //             );
+  //           }}
+  //         />
+  //       ),
+  //       width: 40,
+  //     },
+  //     ...columns,
+  //   ];
+  // }, [selectedRows, columns]);
 
   return (
     <>
       <CommonTable
         onFetchRef={handleFetchRef}
-        columns={columnsWithSelection}
+        columns={columns}
         endpoint={ApiEndpoints.GET_ALL_TXN}
         filters={filters}
         queryParam={query || ""}
@@ -321,7 +350,7 @@ const AllTranscation = ({ query }) => {
                 padding: "8px",
               }}
             >
-              {selectedRows.length > 0 && (
+              {/* {selectedRows.length > 0 && (
                 <Tooltip title="PRINT">
                   <Button
                     variant="contained"
@@ -352,7 +381,7 @@ const AllTranscation = ({ query }) => {
                     Print
                   </Button>
                 </Tooltip>
-              )}
+              )} */}
             </Box>
             <Box
               sx={{

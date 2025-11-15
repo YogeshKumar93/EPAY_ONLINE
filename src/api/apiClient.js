@@ -4,9 +4,12 @@ import { BASE_URL } from "./ApiEndpoints";
 import { getToken, clearToken } from "../contexts/AuthContext";
 import { forceLogout } from "../utils/forceLogout";
 
+const IV = import.meta.env.VITE_KEY_IV;
+const SECRET_KEY = import.meta.env.VITE_SECART_KEY;
+
 const apiClient = axios.create({
   baseURL: BASE_URL,
-  timeout: 180000,
+  timeout: 180000, // 3 minutes
   headers: {
     "Content-Type": "application/json",
   },
@@ -18,13 +21,6 @@ const apiClient = axios.create({
 const pendingRequests = new Map();
 const cache = new Map();
 const CACHE_TTL = 2000;
-
-// Helper to generate unique client_ref
-const generateClientRef = () => {
-  const timestampPart = String(Date.now()).slice(-8); // last 8 digits of timestamp
-  const randomPart = Math.floor(Math.random() * 1e6); // 6-digit random number
-  return `${timestampPart}${randomPart}`; // total <= 14 digits
-};
 
 apiClient.interceptors.request.use(
   (config) => {
@@ -47,28 +43,43 @@ apiClient.interceptors.response.use(
   }
 );
 
-export const apiCall = async (method, url, data = null, params = null) => {
+export const apiCall = async (
+  method,
+  url,
+  data = null,
+  params = null,
+  useClientRef = true
+) => {
   try {
     const token = getToken();
-    const clientRef = generateClientRef(); // generate unique client_ref
 
-    if (data) {
-      if (data instanceof FormData) {
-        data.append("api_token", token || "");
-        data.append("client_ref", clientRef);
-      } else {
-        data = { ...data, api_token: token || "", client_ref: clientRef };
-      }
+    // For GET requests: api_token goes in params (query string)
+    // For other requests: api_token goes in data (payload)
+    if (method.toLowerCase() === "get") {
+      // GET request - api_token in query params only
+      params = {
+        ...(params || {}),
+        api_token: token || "",
+      };
+      // Don't add api_token to data for GET requests
     } else {
-      // ensure client_ref is still passed even if no data
-      data = { api_token: token || "", client_ref: clientRef };
+      // Non-GET request (POST, PUT, DELETE, etc.) - api_token in payload only
+      if (data) {
+        if (data instanceof FormData) {
+          data.append("api_token", token || "");
+        } else {
+          data = {
+            ...data,
+            api_token: token || "",
+          };
+        }
+      } else {
+        data = {
+          api_token: token || "",
+        };
+      }
+      // Don't add api_token to params for non-GET requests
     }
-
-    params = {
-      ...(params || {}),
-      api_token: token || "",
-      client_ref: clientRef,
-    };
 
     const key = JSON.stringify({ method, url, data, params });
 
@@ -76,7 +87,7 @@ export const apiCall = async (method, url, data = null, params = null) => {
     if (cache.has(key)) {
       const { timestamp, response } = cache.get(key);
       if (Date.now() - timestamp < CACHE_TTL) {
-        return { error: null, response }; // serve from cache
+        return { error: null, response };
       } else {
         cache.delete(key);
       }
@@ -100,7 +111,7 @@ export const apiCall = async (method, url, data = null, params = null) => {
     })
       .then((res) => {
         const response = res.data;
-        cache.set(key, { response, timestamp: Date.now() }); // save in cache
+        cache.set(key, { response, timestamp: Date.now() });
         pendingRequests.delete(key);
         return { error: null, response };
       })
@@ -109,7 +120,6 @@ export const apiCall = async (method, url, data = null, params = null) => {
         return { error: err.response?.data || err.message, response: null };
       });
 
-    // 3. Store pending request
     pendingRequests.set(key, requestPromise);
 
     return requestPromise;

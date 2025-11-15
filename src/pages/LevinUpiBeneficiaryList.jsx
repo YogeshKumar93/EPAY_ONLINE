@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import {
   Box,
   Card,
@@ -39,7 +39,7 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { showToast } = useToast();
-  const { location } = useContext(AuthContext);
+  const { location, getUuid } = useContext(AuthContext);
 
   const [openModal, setOpenModal] = useState(false);
   const [openList, setOpenList] = useState(true);
@@ -64,6 +64,27 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
     suffix: "ybl",
   });
   const [errors, setErrors] = useState({});
+  const [uuid, setUuid] = useState(null); // ✅ new state
+
+  useEffect(() => {
+    if (verifyOpen) {
+      // only call when modal actually verifyOpens
+      const fetchUuid = async () => {
+        try {
+          const { error, response } = await getUuid();
+          if (response) {
+            setUuid(response);
+          } else if (error) {
+            showToast(error?.message || "Failed to generate UUID", "error");
+            setVerifyOpen(false);
+          }
+        } catch (err) {
+          showToast("Error while generating UUID", "error");
+        }
+      };
+      fetchUuid();
+    }
+  }, [verifyOpen]); // 👈 triggers every time `open` changes
 
   // ✅ Hardcoded suffix options
   const suffixOptions = [
@@ -105,6 +126,7 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
       latitude: location?.lat || "",
       longitude: location?.long || "",
       pf: "WEB",
+      client_ref: uuid,
     };
     setPendingPayload(payload);
     setVerifyOpen(true);
@@ -128,7 +150,7 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
     const mpin = mpinDigits.join("");
     try {
       setSubmitting(true);
-      const verifyPayload = { ...pendingPayload, mpin };
+      const verifyPayload = { ...pendingPayload, mpin, client_ref: uuid };
       const { error, response } = await apiCall(
         "post",
         ApiEndpoints.DMT1_VERIFY_BENEFICIARY,
@@ -199,7 +221,7 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
     }
   };
 
-  const handleVerifyUpi = async () => {
+  const handleVerifyUpi = async (uuidValue) => {
     if (mpinDigits.some((d) => !d)) {
       apiErrorToast("Please enter all 6 digits of MPIN");
       return;
@@ -208,7 +230,12 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
     const mpin = mpinDigits.join("");
     try {
       setSubmitting(true);
-      const verifyPayload = { ...pendingPayload, mpin, type: "UPI" };
+      const verifyPayload = {
+        ...pendingPayload,
+        mpin,
+        type: "UPI",
+        client_ref: uuidValue || uuid, // ✅ include UUID from modal or parent
+      };
       const { error, response } = await apiCall(
         "post",
         ApiEndpoints.DMT1_VERIFY_BENEFICIARY,
@@ -329,6 +356,10 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
         document.getElementById(`mpin-${index + 1}`).focus();
     }
   };
+  const isFormValid =
+    formData.beneficiary_name.trim() &&
+    formData.prefix.trim() &&
+    (formData.suffix !== "other" || formData.custom_suffix?.trim());
 
   return (
     <Card sx={{ borderRadius: 2, border: "1px solid", borderColor: "divider" }}>
@@ -559,7 +590,18 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
                   fullWidth
                   size="small"
                   value={formData.prefix}
-                  onChange={handleChange}
+                  onKeyPress={(e) => {
+                    // Prevent typing of special characters
+                    if (!/^[a-zA-Z0-9]$/.test(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Clean any special characters that might get through (like paste operations)
+                    const cleaned = value.replace(/[^a-zA-Z0-9]/g, "");
+                    setFormData((prev) => ({ ...prev, prefix: cleaned }));
+                  }}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -684,7 +726,7 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
               onClick={handleTUPConfirmation}
               variant="contained"
               sx={{ backgroundColor: "#5c3ac8" }}
-              disabled={submitting}
+              disabled={submitting || !isFormValid}
             >
               {submitting ? "Saving..." : "Add"}
             </Button>
@@ -692,7 +734,7 @@ const LevinUpiBeneficiaryList = ({ sender, onSuccess, onLevinSuccess }) => {
               onClick={handleAddAndVerifyBeneficiary}
               variant="contained"
               sx={{ backgroundColor: "#5c3ac8" }}
-              disabled={submitting}
+              disabled={submitting || !isFormValid}
             >
               {submitting ? "Saving..." : "Verify & Add"}
             </Button>
