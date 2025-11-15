@@ -20,7 +20,6 @@ import ApiEndpoints from "../../api/ApiEndpoints";
 import { useToast } from "../../utils/ToastContext";
 import AEPS2FAModal from "../../components/AEPS/AEPS2FAModal";
 import OtpInput from "../OtpInput";
-
 const LevinDmtRemitter2Fa = ({
   open,
   onClose,
@@ -38,10 +37,35 @@ const LevinDmtRemitter2Fa = ({
   const [showBiometricModal, setShowBiometricModal] = useState(false);
   const [biometricData, setBiometricData] = useState(null);
   const [aadhaar, setAadhaar] = useState("");
+  const [apiError, setApiError] = useState(false); // NEW: Track API errors
   const { showToast } = useToast();
+
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!open) {
+      setHasSentOtp(false);
+      setOtp("");
+      setToken("");
+      setRegistrationEncryptedData("");
+      setFinalToken("");
+      setShowBiometricModal(false);
+      setBiometricData(null);
+      setApiError(false); // RESET: Clear error state when modal closes
+    }
+  }, [open]);
+
+  // Send OTP when component opens - FIXED: Added apiError check
+  useEffect(() => {
+    if (open && registrationData && !hasSentOtp && !apiError) {
+      console.log("Sending OTP because modal opened");
+      setHasSentOtp(true);
+      handleSendOtp();
+    }
+  }, [open, apiError]); // ADDED: apiError dependency
 
   const handleSendOtp = async () => {
     setOtpLoading(true);
+    setApiError(false); // RESET: Clear any previous errors
     try {
       const payload = {
         mobile_number: mobileNumber,
@@ -67,6 +91,7 @@ const LevinDmtRemitter2Fa = ({
             "error"
           );
           setHasSentOtp(false); // Reset so OTP can be sent again if modal reopens
+          setApiError(true); // SET: Mark that there was an API error
           onClose(); // Close modal on error
           return;
         }
@@ -100,12 +125,14 @@ const LevinDmtRemitter2Fa = ({
         // Handle API error
         showToast(error?.message || "Failed to send OTP", "error");
         setHasSentOtp(false); // Reset so OTP can be sent again
+        setApiError(true); // SET: Mark that there was an API error
         onClose(); // Close modal on error
       }
     } catch (err) {
       console.error("Send OTP failed:", err);
       showToast("Failed to send OTP", "error");
       setHasSentOtp(false); // Reset so OTP can be sent again
+      setApiError(true); // SET: Mark that there was an API error
       onClose(); // Close modal on error
     } finally {
       setOtpLoading(false);
@@ -134,6 +161,8 @@ const LevinDmtRemitter2Fa = ({
       if (registrationEncryptedData) {
         payload.encrypted_data = registrationEncryptedData;
       }
+
+      console.log("Validating OTP with payload:", payload);
 
       const { error, response } = await apiCall(
         "post",
@@ -167,6 +196,7 @@ const LevinDmtRemitter2Fa = ({
       setOtpLoading(false);
     }
   };
+
   const handleBiometricSuccess = async (scanData) => {
     try {
       // Extract all the required fields with fallbacks
@@ -186,11 +216,12 @@ const LevinDmtRemitter2Fa = ({
       const rdsVer = scanData.rdsVer;
       const sessionKey = scanData.sessionKey;
       const srno = scanData.srno;
+      const lt = scanData.lt || "";
 
       const payload = {
         token: finalToken,
         mobile_number: mobileNumber,
-        pidData: pidData || "",
+        // pidData: pidData || "",
         piData: pidData || "",
         pidDataType: pidDataType || "",
         ci: ci || "",
@@ -204,6 +235,7 @@ const LevinDmtRemitter2Fa = ({
         nmPoints: nmPoints || "",
         qScore: qScore || "",
         rdsId: rdsId || "",
+        lt: lt || "",
         rdsVer: rdsVer || "",
         sessionKey: sessionKey || "",
         srno: srno || "",
@@ -243,8 +275,8 @@ const LevinDmtRemitter2Fa = ({
           biometricVerified: true,
         });
 
-        // setShowBiometricModal(false);
-        // onClose();
+        setShowBiometricModal(false);
+        onClose();
       } else if (error) {
         showToast(error?.message || "Biometric verification failed", "error");
       }
@@ -263,6 +295,31 @@ const LevinDmtRemitter2Fa = ({
     setOtp(value);
   };
 
+  // Add resend OTP functionality
+  const handleResendOtp = async () => {
+    await handleSendOtp();
+  };
+
+  // Biometric modal buttons configuration
+  const biometricButtons = [
+    {
+      label: "Cancel",
+      variant: "outlined",
+      onClick: handleBiometricClose,
+      bgcolor: "#f44336",
+      color: "white",
+    },
+    {
+      label: "Retry Scan",
+      variant: "contained",
+      onClick: () => {
+        /* Retry logic handled in AEPS2FAModal */
+      },
+      bgcolor: "#ff9800",
+      color: "white",
+    },
+  ];
+
   return (
     <>
       {/* OTP Modal */}
@@ -271,6 +328,7 @@ const LevinDmtRemitter2Fa = ({
         onClose={() => {
           if (!otpLoading) {
             setHasSentOtp(false); // Reset when manually closed
+            setApiError(false); // RESET: Clear error state when manually closed
             onClose();
           }
         }}
@@ -297,6 +355,10 @@ const LevinDmtRemitter2Fa = ({
             <Typography variant="h6" gutterBottom>
               Enter OTP
             </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              We've sent an OTP to your mobile number ending with{" "}
+              {mobileNumber.slice(-4)}
+            </Typography>
 
             <TextField
               fullWidth
@@ -318,6 +380,7 @@ const LevinDmtRemitter2Fa = ({
                 <Button
                   onClick={() => {
                     setHasSentOtp(false);
+                    setApiError(false); // RESET: Clear error state when manually closed
                     onClose();
                   }}
                   disabled={otpLoading}
@@ -333,6 +396,16 @@ const LevinDmtRemitter2Fa = ({
                   {otpLoading ? <CircularProgress size={24} /> : "Verify OTP"}
                 </Button>
               </Box>
+
+              {/* Add Resend OTP button */}
+              <Button
+                onClick={handleResendOtp}
+                disabled={otpLoading}
+                variant="text"
+                size="small"
+              >
+                Resend OTP
+              </Button>
             </Box>
           </Box>
         </Fade>

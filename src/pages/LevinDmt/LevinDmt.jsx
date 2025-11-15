@@ -87,6 +87,7 @@ export const LevinDmt = () => {
             encrypted_data: response.encrypted_data,
           });
           setShowOtpModal(true);
+          showToast("OTP sent to your registered mobile number", "success");
         } else {
           showToast(message || "Unexpected response", "error");
           setSenderData(null);
@@ -247,8 +248,10 @@ export const LevinDmt = () => {
         />
       )}
 
+      {/* Display Sender Information */}
       {senderData && (
         <Box sx={{ mt: 3 }}>
+          {/* Beneficiary List Component */}
           <LevinDmtBeneficiaryList
             sender={senderData}
             onSuccess={handleBeneficiarySuccess}
