@@ -770,6 +770,26 @@ if (filterConfig?.type === "roleuser" && val) {
                 value={appliedFilters[filter.id] || ""}
                 onChange={handleFilterChange}
             />
+          )
+           : filter.type === "dropdown" ? (
+            <FormControl>
+              <TextField
+                select
+                label={filter.label}
+                value={filterValues[filter.id] || "All"}
+                onChange={(e) => handleFilterChange(filter.id, e.target.value)}
+                size="small"
+                sx={{ minWidth: 120 }}
+              >
+                <MenuItem value="All">All</MenuItem>
+                {filter.options &&
+                  filter.options.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+              </TextField>
+            </FormControl>
           ) : filter.type === "date" ? (
             <TextField
               size="small"
