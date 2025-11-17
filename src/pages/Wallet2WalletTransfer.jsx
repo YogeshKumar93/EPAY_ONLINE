@@ -250,7 +250,7 @@ const Wallet2WalletTransfer = ({}) => {
         id: "user_id",
         label: "Select User by Role",
         type: "roleuser",
-        roles: ["adm", "sadm","di","md","ret","zsm","asm","dd","api"],
+        roles: ["adm", "sadm","di","md","ret","zsm","asm","dd"],
       },
        
       {
