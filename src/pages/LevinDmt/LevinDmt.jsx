@@ -94,7 +94,7 @@ export const LevinDmt = () => {
           const senderDatas = response?.data;
           setSenderData(beneficiaryData);
           setSender(senderDatas);
-          showToast("Sender found successfully!", "success");
+          // showToast("Sender found successfully!", "success");
         } else if (message === "Sender Not Found") {
           setRegistrationData({
             mobileNumber: number,
@@ -318,7 +318,7 @@ export const LevinDmt = () => {
             beneficiary={selectedBeneficiaryForPayout.beneficiary}
             sender={selectedBeneficiaryForPayout.sender}
             senderId={selectedBeneficiaryForPayout.senderId}
-            senderMobile={selectedBeneficiaryForPayout.senderMobile}
+            senderMobile={sender.mobile_number}
             onPayoutSuccess={handlePayoutSuccess}
             amount={selectedBeneficiaryForPayout.amount}
             showBackButton={true} // ✅ Add prop to show back button

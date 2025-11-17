@@ -3,9 +3,6 @@ import {
   Box,
   Typography,
   TextField,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
   Button,
   InputAdornment,
   useTheme,
@@ -95,29 +92,29 @@ const LevinBeneficiaryDetails = ({
   const [showSuccessSummary, setShowSuccessSummary] = useState(false);
   const maxLimit = 5000;
 
-  useEffect(() => {
-    const fetchPurposes = async () => {
-      setLoadingPurposes(true);
-      try {
-        const { error, response } = await apiCall(
-          "post",
-          ApiEndpoints.GET_PURPOSES
-        );
-        if (response) {
-          const data = response?.data || [];
-          setPurposes(data);
-          if (data.length > 0) setSelectedPurpose(data[0].id);
-        } else showToast(error || "Failed to load purposes", "error");
-      } catch (err) {
-        showToast("Error loading purposes", "error");
-      } finally {
-        setLoadingPurposes(false);
-      }
-    };
-    if (open) {
-      fetchPurposes();
-    }
-  }, [open]);
+  // useEffect(() => {
+  //   const fetchPurposes = async () => {
+  //     setLoadingPurposes(true);
+  //     try {
+  //       const { error, response } = await apiCall(
+  //         "post",
+  //         ApiEndpoints.GET_PURPOSES
+  //       );
+  //       if (response) {
+  //         const data = response?.data || [];
+  //         setPurposes(data);
+  //         if (data.length > 0) setSelectedPurpose(data[0].id);
+  //       } else showToast(error || "Failed to load purposes", "error");
+  //     } catch (err) {
+  //       showToast("Error loading purposes", "error");
+  //     } finally {
+  //       setLoadingPurposes(false);
+  //     }
+  //   };
+  //   if (open) {
+  //     fetchPurposes();
+  //   }
+  // }, [open]);
 
   useEffect(() => {
     if (amount && parseFloat(amount) > 0) {
@@ -167,7 +164,7 @@ const LevinBeneficiaryDetails = ({
         status: null,
         transferMode: "IMPS",
         rrn: "",
-        purpose: selectedPurpose,
+        // purpose: selectedPurpose,
       });
       remaining -= amt;
     }
@@ -215,10 +212,10 @@ const LevinBeneficiaryDetails = ({
         );
         return;
       }
-      const selectedPurposeObj = purposes.find(
-        (p) => p.id === Number(row.purpose || selectedPurpose)
-      );
-      const purposeType = selectedPurposeObj?.type || "N/A";
+      // const selectedPurposeObj = purposes.find(
+      //   (p) => p.id === Number(row.purpose || selectedPurpose)
+      // );
+      // const purposeType = selectedPurposeObj?.type || "N/A";
 
       const otpPayload = {
         ben_name: beneficiary.beneficiary_name,
@@ -231,8 +228,8 @@ const LevinBeneficiaryDetails = ({
         longitude: location?.long || "",
         amount: row.amount,
         mobile_number: beneficiary.mobile_number || "",
-        purpose: purposeType,
-        purpose_id: row.purpose || selectedPurpose,
+        // purpose: purposeType,
+        // purpose_id: row.purpose || selectedPurpose,
         sender_mobile: senderMobile,
         sender_id: senderId,
       };
@@ -296,7 +293,7 @@ const LevinBeneficiaryDetails = ({
         token: row.otpRef,
         encrypted_data: row.encrypted_data,
         type: mode || row.transferMode,
-        client_ref: row.uuidNumber, // ← FIXED
+        client_ref: row.uuidNumber,
       };
 
       const { error, response } = await apiCall(
@@ -319,13 +316,24 @@ const LevinBeneficiaryDetails = ({
               : r
           )
         );
-
         loadUserProfile();
       } else {
+        // TRANSACTION FAILED - COMPLETELY RESET TO GET OTP STATE
         showToast(error?.message || "Transaction failed", "error");
         setAmountRows((prev) =>
           prev.map((r) =>
-            r.id === rowId ? { ...r, submitted: true, status: "failed" } : r
+            r.id === rowId
+              ? {
+                  ...r,
+                  otp: "", // Clear OTP
+                  mpin: "", // Clear MPIN
+                  otpRef: null, // Remove OTP reference
+                  loading: false, // Stop loading
+                  status: null, // Clear status
+                  submitted: false, // Keep as not submitted
+                  // OTP payload and encrypted data remain for retry
+                }
+              : r
           )
         );
       }
@@ -333,16 +341,21 @@ const LevinBeneficiaryDetails = ({
       showToast(err?.message || "Something went wrong", "error");
       setAmountRows((prev) =>
         prev.map((r) =>
-          r.id === rowId ? { ...r, submitted: true, status: "failed" } : r
+          r.id === rowId
+            ? {
+                ...r,
+                otp: "", // Clear OTP
+                mpin: "", // Clear MPIN
+                otpRef: null, // Remove OTP reference
+                loading: false, // Stop loading
+                status: null, // Clear status
+                submitted: false, // Keep as not submitted
+              }
+            : r
         )
-      );
-    } finally {
-      setAmountRows((prev) =>
-        prev.map((r) => (r.id === rowId ? { ...r, loading: false } : r))
       );
     }
   };
-
   const handleModeClick = (rowId, mode) => {
     setAmountRows((prev) =>
       prev.map((r) => (r.id === rowId ? { ...r, transferMode: mode } : r))
@@ -987,7 +1000,7 @@ const LevinBeneficiaryDetails = ({
                         }}
                       />
 
-                      <TextField
+                      {/* <TextField
                         select
                         size="small"
                         fullWidth
@@ -1005,7 +1018,7 @@ const LevinBeneficiaryDetails = ({
                             </option>
                           ))
                         )}
-                      </TextField>
+                      </TextField> */}
                     </Box>
                   </Box>
                 </Box>
@@ -1142,6 +1155,15 @@ const LevinBeneficiaryDetails = ({
                           >
                             {row.loading ? "Sending OTP..." : "Get OTP"}
                           </Button>
+                          {row.status === "failed" && (
+                            <Typography
+                              variant="body2"
+                              color="error"
+                              sx={{ mt: 1, fontStyle: "italic" }}
+                            >
+                              Previous transaction failed. Please get OTP again.
+                            </Typography>
+                          )}
                         </Box>
                       ) : (
                         <Box

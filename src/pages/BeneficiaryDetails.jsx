@@ -296,9 +296,40 @@ const BeneficiaryDetails = ({
             alignItems="center"
             gap={2}
           >
+            {/* Transaction Summary */}
+            <Box
+              sx={{
+                bgcolor: "#f8f9fc",
+                p: 2,
+                mb: 1,
+                borderRadius: 2,
+                width: "100%",
+                textAlign: "center",
+                border: "1px solid #e0e0e0",
+              }}
+            >
+              <Typography variant="body2" fontWeight="600">
+                Confirm Transfer
+              </Typography>
+
+              <Typography variant="h6" fontWeight="bold" sx={{ mt: 1 }}>
+                ₹{amount}
+              </Typography>
+
+              <Typography variant="body2" sx={{ mt: 0.5, color: "#555" }}>
+                to <strong>{beneficiary.beneficiary_name}</strong>
+              </Typography>
+
+              <Typography variant="body2" sx={{ color: "#777" }}>
+                A/C: {beneficiary.account_number}
+              </Typography>
+            </Box>
+
+            {/* MPIN instructions */}
             <Typography variant="body2">
-              Please enter your 6-digit M-PIN to confirm transaction
+              Enter your 6-digit M-PIN to authorize this transaction
             </Typography>
+
             <OTPInput
               value={mpin}
               onChange={setMpin}

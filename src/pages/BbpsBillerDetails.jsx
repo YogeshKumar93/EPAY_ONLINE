@@ -520,7 +520,10 @@ const BbpsBillerDetails = ({
       <CommonMpinModal
         open={mpinModalOpen}
         setOpen={setMpinModalOpen}
-        title="Enter MPIN to Confirm Payment"
+        title={`Enter MPIN to Confirm Payment 
+Amount: ₹${billData?.BillAmount || inputValues?.amount}
+Customer: ${billData?.CustomerName || "-"}
+Bill No: ${billData?.BillNumber || "-"}`}
         mPinCallBack={handlePayBill}
       />
     </>

@@ -423,7 +423,10 @@ const W2wTransfer = ({ handleFetchRef, type }) => {
         <CommonMpinModal
           open={mpinModalOpen}
           setOpen={setMpinModalOpen}
-          title="Enter MPIN"
+          title={`Enter MPIN
+Amount: ₹${amount || 0}
+Receiver: ${receiver?.name || "-"}
+Mobile: ${receiver?.mobile || "-"}`}
           mPinCallBack={handleCreateTransfer}
         />
       </Box>
