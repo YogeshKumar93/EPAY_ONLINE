@@ -70,7 +70,8 @@ const ResetMpin = ({ open, onClose, username }) => {
         <TextField
           fullWidth
           variant="outlined"
-          label="Registered Mobile/Email"
+          label="Registered UserId"
+          disabled
           value={username}
           InputProps={{ readOnly: true }}
           sx={{
