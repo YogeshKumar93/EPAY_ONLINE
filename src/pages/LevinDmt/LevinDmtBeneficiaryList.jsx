@@ -377,7 +377,7 @@ const LevinDmtBeneficiaryList = ({
         beneficiary_name: formData.beneficiary_name,
         mobile_number: mobileNumber,
         tup_reference: tupResponse?.data?.txnReferenceId,
-        is_verified: new Date().toISOString(),
+        // is_verified: new Date().toISOString(),
       };
 
       const { error: addError, response: addResponse } = await apiCall(
