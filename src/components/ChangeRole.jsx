@@ -78,10 +78,11 @@ const ChangeRoleModal = ({ open, onClose, user, onSuccess }) => {
         ApiEndpoints.GET_USERS,
         {
           role: mappedRole,
+           export:1,
         }
       );
-      if (response?.data?.data) {
-        setParentList(response.data.data);
+      if (response?.data) {
+        setParentList(response.data);
       } else {
         showToast(error?.message || "Failed to fetch parent list", "error");
       }
@@ -136,6 +137,7 @@ const ChangeRoleModal = ({ open, onClose, user, onSuccess }) => {
     try {
       const payload = {
         user_id: user.id,
+       
         role,
       };
 
