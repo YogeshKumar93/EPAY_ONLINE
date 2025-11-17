@@ -376,9 +376,7 @@ const Wallet2WalletTransfer = ({}) => {
       },
 
       ...(user?.role === "adm" || user?.role === "sadm"
-        ? [] // ❌ hide for ret and dd
-        : [
-            {
+        ? [ {
               name: "Sender",
               selector: (row) => (
                 <Tooltip title={row.sender_est}>
@@ -389,7 +387,9 @@ const Wallet2WalletTransfer = ({}) => {
               ),
               wrap: true,
               width: "100px",
-            },
+            },] // ❌ hide for ret and dd
+        : [
+           
           ]),
       {
         name: "Reciever",
