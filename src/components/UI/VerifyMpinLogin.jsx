@@ -380,17 +380,11 @@ const VerifyMpinLogin = ({
           localStorage.setItem("user", JSON.stringify(userData));
 
           if (userData.role === "adm" || userData.role === "sadm") {
-            navigate("/admin/dashboard");
-          } else if (userData.role === "asm") {
-            navigate("/asm/dashboard");
-          } else if (userData.role === "di") {
-            navigate("/di/dashboard");
-          } else if (userData.role === "ret" || userData.role === "dd") {
-            navigate("/customer/allServices");
-          } else if (userData.role === "md") {
-            navigate("/md/dashboard");
+            navigate("/admin/banks");
+          
+          
           } else {
-            navigate("/other/dashboard");
+            navigate("/other/banks");
           }
         }
       }
@@ -455,7 +449,7 @@ const VerifyMpinLogin = ({
         minwidth: { xs: "90%", sm: "90%", md: "500px" }, // responsive width
         maxWidth: "100%",
         borderRadius: 3,
-        background: "#5210C1",
+          background: "linear-gradient(to right, #492077, rgba(73, 32, 119, 0.7))",
         color: "#fff",
         mx: "auto", // center horizontally
       }}

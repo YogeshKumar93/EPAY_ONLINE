@@ -155,22 +155,22 @@ const ProfilePage = () => {
       gradient: "#fff",
       hoverGradient: "linear-gradient(135deg, #ff758c, #ff7eb3)",
     },
-    {
-      id: 5,
-      label: "View Information",
-      icon: <Dashboard sx={{ fontSize: { xs: 18, sm: 20 } }} />,
-      onClick: () => setViewInfoModalOpen(true),
-      gradient: "#fff",
-      hoverGradient: "linear-gradient(135deg, #c9ffbf, #7bed9f)",
-    },
-    {
-      id: 6,
-      label: "Two FA",
-      icon: <Dashboard sx={{ fontSize: { xs: 18, sm: 20 } }} />,
-      onClick: () => setTwoFAModalOpen(true),
-      gradient: "#fff",
-      hoverGradient: "linear-gradient(135deg, #c9ffbf, #7bed9f)",
-    },
+    // {
+    //   id: 5,
+    //   label: "View Information",
+    //   icon: <Dashboard sx={{ fontSize: { xs: 18, sm: 20 } }} />,
+    //   onClick: () => setViewInfoModalOpen(true),
+    //   gradient: "#fff",
+    //   hoverGradient: "linear-gradient(135deg, #c9ffbf, #7bed9f)",
+    // },
+    // {
+    //   id: 6,
+    //   label: "Two FA",
+    //   icon: <Dashboard sx={{ fontSize: { xs: 18, sm: 20 } }} />,
+    //   onClick: () => setTwoFAModalOpen(true),
+    //   gradient: "#fff",
+    //   hoverGradient: "linear-gradient(135deg, #c9ffbf, #7bed9f)",
+    // },
   ].filter(
     (btn) => !btn.roles || btn.roles.includes(userRole) // filter buttons by role
   );
@@ -203,7 +203,7 @@ const ProfilePage = () => {
               p: { xs: 2, sm: 3, md: 4 },
               borderRadius: "12px 12px 0 0",
               mb: { xs: 2, sm: 3, md: 4 },
-              background: "linear-gradient(135deg, #9D72F0 0%, #7B4DE0 100%)",
+             background: "linear-gradient(to right, #492077, rgba(73, 32, 119, 0.7))",
               color: "white",
               position: "relative",
               overflow: "hidden",
@@ -343,7 +343,7 @@ const ProfilePage = () => {
                       variant={isSmallMobile ? "h4" : isMobile ? "h3" : "h3"}
                       fontWeight="bold"
                       sx={{
-                        color: "#000",
+                        color: "#FFF",
                         letterSpacing: "0.5px",
 
                         textAlign: { xs: "center", sm: "left" },

@@ -80,7 +80,7 @@ body {
 }
 
 .textFieldCustom .MuiOutlinedInput-root.Mui-focused {
-  border-color: #5210c1;
+  border-color: #492077;
   box-shadow: 0 0 0 2px rgba(151, 105, 255, 0.12);
 }
 
@@ -91,7 +91,7 @@ body {
 }
 
 .textFieldCustom .MuiInputLabel-root.Mui-focused {
-  color: #5210c1;
+  color: #492077;
 }
 
 .btnCustom {
@@ -176,7 +176,7 @@ body {
 
 .nav-link.active {
   background: #ebeef2;
-  color: #5210c1;
+  color: #492077;
 }
 
 .nav-icon {

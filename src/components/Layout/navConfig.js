@@ -10,8 +10,10 @@ import {
   complainImage,
   complainImageNew,
   dashboardImage,
+  failed_vdo,
   fundReqImage,
   loginHistoryImage,
+  paytm_img,
   profileNewImage,
   rechargeNew,
   riskImage,
@@ -20,8 +22,11 @@ import {
   serviceImage,
   settingImage,
   settingNew,
+  transaction,
   transImage,
+  upiWeb,
   usersImage,
+  virtuanAccountImage,
   walletLdgerImage,
   walletLedgerImg,
   walletTransferImage,
@@ -29,17 +34,17 @@ import {
 
 export const navConfig = [
   // Dashboard
-  {
-    title: "Dashboard",
-    icon: dashboardImage,
-    icon2: "📊",
-    to: {
-      adm: "/admin/dashboard",
-      sadm: "/admin/dashboard",
+  // {
+  //   title: "Dashboard",
+  //   icon: dashboardImage,
+  //   icon2: "📊",
+  //   to: {
+  //     adm: "/admin/dashboard",
+  //     sadm: "/admin/dashboard",
      
-    },
-    roles: ["sadm", "adm", ],
-  },
+  //   },
+  //   roles: ["sadm", "adm", ],
+  // },
 
   // Manage Users
   // {
@@ -89,7 +94,7 @@ export const navConfig = [
 
    {
     title: "Accounts",
-    icon: bankImage,
+    icon: virtuanAccountImage,
     icon2: "🏦",
     to: {
       adm: "/admin/accounts",
@@ -101,7 +106,7 @@ export const navConfig = [
  
  {
     title: "Unclaimed",
-    icon: bankImage,
+    icon: riskImage,
     icon2: "🏦",
     to: {
       adm: "/admin/unclaimed",
@@ -160,7 +165,7 @@ export const navConfig = [
 const roleHierarchy = {
   adm: {
     default: [
-      "Dashboard",
+      // "Dashboard",
       // "Manage Users",
       // "Fund Request",
       // "Transactions",
@@ -178,7 +183,7 @@ const roleHierarchy = {
   },
   sadm: {
     default: [
-     "Dashboard",
+    //  "Dashboard",
       // "Manage Users",
       // "Fund Request",
       // "Transactions",

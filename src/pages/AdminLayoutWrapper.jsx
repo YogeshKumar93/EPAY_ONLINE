@@ -30,7 +30,7 @@ const FOOTER_STYLES = {
   textAlign: "center",
   py: { xs: 1, sm: 1 }, // reduced vertical padding
   px: { xs: 1, sm: 1.5 }, // reduced horizontal padding
-  backgroundColor: "#7a4dff",
+    background: "linear-gradient(to right, #492077, rgba(73, 32, 119, 0.7))",
   color: "#d4e8e8",
   borderRadius: "8px", // slightly smaller radius
   mt: 2, // reduced margin top
@@ -87,7 +87,7 @@ const AdminLayoutWrapper = ({ desktopOpen }) => {
         >
           © 2025{" "}
           <Box component="span" sx={{ fontWeight: 700 }}>
-            PSPKA SERVICES PRIVATE LIMITED{" "}
+            PRAKASH SERVICES PRIVATE LIMITED{" "}
           </Box>{" "}
           All Rights Reserved.
         </Typography>

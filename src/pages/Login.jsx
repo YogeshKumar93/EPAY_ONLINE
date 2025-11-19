@@ -23,12 +23,14 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import PersonIcon from "@mui/icons-material/Person";
+import LockIcon from "@mui/icons-material/Lock";
 import * as Yup from "yup";
 import AuthContext from "../contexts/AuthContext";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { apiCall } from "../api/apiClient";
 import { ReTextField } from "../components/common/ReTextField";
-import backImg from "../assets/Images/Login1.png";
+import backImg from "../assets/Login/login second.png";
 import VerifyMpinLogin from "../components/UI/VerifyMpinLogin";
 import { getGeoLocation } from "../utils/GeoLocationUtil";
 import { okErrorToast } from "../utils/ToastUtil";
@@ -59,6 +61,7 @@ const Login = () => {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [captchaChecked, setCaptchaChecked] = useState(false);
   const captchaRef = useRef(null);
+    // const [agreedToTerms, setAgreedToTerms] = useState(false);
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
@@ -157,308 +160,321 @@ const Login = () => {
   };
 
   const mobileInputProps = {
-    style: { padding: 0, borderRadius: "10px" },
+    style: { padding: 0, borderRadius: "20px" },
     endAdornment: (
-      <img src={mobilelogin} alt="mobile" style={{ width: "57px" }} />
+      <img src={PersonIcon} alt="mobile" style={{ width: "57px" }} sx={{ color: "#757575" }} />
     ),
   };
 
   // InputProps for Password
   const passwordInputProps = (showPassword, setShowPassword) => ({
-    style: { padding: 0, borderRadius: "10px" },
+    style: { padding: 0, borderRadius: "20px", },
     endAdornment: (
       <InputAdornment position="end">
         <IconButton onClick={() => setShowPassword(!showPassword)}>
           {showPassword ? <Visibility /> : <VisibilityOff />}
         </IconButton>
-        <img
+        {/* <img
           src={lockicon}
           alt="lock"
           style={{ width: "57px", alignItems: "flex-end" }}
-        />
+        /> */}
       </InputAdornment>
     ),
   });
 
-  return (
-    <Grid
-      container
+return (
+  <Box
+    sx={{
+      width: "100vw",
+      height: "100vh",
+      position: "relative",
+      overflow: "hidden",
+    }}
+  >
+    {/* BACKGROUND IMAGE FULL WIDTH */}
+    <Box
+      component="img"
+      src={backImg}
+      alt="Background"
       sx={{
-        height: "100vh",
-        width: "100vw",
-        overflow: "hidden",
-        "&::-webkit-scrollbar": { display: "none" },
-        scrollbarWidth: "none",
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        position: "absolute",
+        top: 0,
+        left: 0,
+        zIndex: 1,
+      }}
+    />
+
+    {/* LOGIN FORM OVERLAY ON LEFT SIDE */}
+    <Box
+      sx={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        height: "100%",
+        width: { xs: "100%", md: "45%" }, // form left area on desktop
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: { xs: 3, md: 8 },
+        zIndex: 2, // keeps it above image
+        background: "rgba(255,255,255,0.0)",
+        boxSizing: "border-box",
       }}
     >
-      {/* Left Side - Background Image */}
-      <Grid
-        item
-        xs={false}
-        md={7}
-        sx={{
-          position: "relative",
-          display: { xs: "none", md: "block" },
-          width: "60%",
-          height: "100vh",
-
-          overflow: "hidden",
-        }}
-      >
+      {/* form container (keeps exact functionality) */}
+      <Box sx={{ width: "100%", maxWidth: 520 }}>
+        {/* Logo */}
         <Box
           component="img"
-          src={backImg}
-          alt="Background"
+          src={biggpayLogo}
+          alt="Logo"
           sx={{
             width: "100%",
-            height: "100%",
-
-            position: "absolute",
-            top: 0,
-            left: 0,
+            maxWidth: 330,
+            mb: 3,
+            objectFit: "contain",
+            cursor: "pointer",
+            display: "block",
+            mx: "auto",
           }}
+          onClick={() => window.open("https://p2pae.com")}
         />
-      </Grid>
 
-      {/* Right Side - Login Form */}
-      <Grid
-        item
-        xs={12}
-        md={5}
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          px: { xs: 4, sm: 3, md: 3 },
+        {/* Error */}
+        {loginError && (
+          <Typography color="error" align="center" sx={{ mb: 3 }}>
+            {loginError}
+          </Typography>
+        )}
 
-          height: "100vh",
-          boxSizing: "border-box",
-          width: { xs: "100%", md: "40%" },
-        }}
-      >
-        <Box sx={{ width: "100%", maxWidth: 500 }}>
-          {/* <a href="https://p2pae.com"> */}
-          <Box
-            component="img"
-            src={biggpayLogo}
-            alt="Logo"
-            sx={{
-              width: "100%",
-              maxWidth: 330,
-              mb: 3,
-              objectFit: "contain",
-              cursor: "pointer",
-              display: "block",
-              mx: "auto",
-            }}
-            onClick={() => window.open("https://p2pae.com")}
-          />
-          {/* </a> */}
+        {/* form */}
+        <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ width: "100%" }}>
+          {/* User ID */}
+       <ReTextField
+  fullWidth
+  size="medium"
+  sx={{
+    mt: 4,
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "15px", // ⭐ custom border radius
+    },
+    "& .MuiInputLabel-root": {
+      transform: "translate(14px, 12px) scale(1)",     // label inside
+    },
+    "& .MuiInputLabel-shrink": {
+      transform: "translate(14px, -9px) scale(0.75)", // label moves up on typing
+    },
+  }}
+  label="User ID"
+  {...register("mobile", {
+    onChange: (e) => setUsername(e.target.value),
+  })}
+  margin="normal"
+  error={!!errors.mobile}
+  helperText={errors.mobile?.message}
+  InputProps={{
+    startAdornment: (
+      <InputAdornment position="start">
+        <PersonIcon sx={{ color: "#757575" }} />
+      </InputAdornment>
+    ),
+  }}
+/>
 
-          {loginError && (
-            <Typography color="error" align="center" sx={{ mb: 3 }}>
-              {loginError}
-            </Typography>
-          )}
 
-          <Box
-            component="form"
-            onSubmit={handleSubmit(onSubmit)}
-            sx={{ width: "100%" }}
-          >
-            {/* User ID */}
-            <ReTextField
-              fullWidth
-              size="medium"
-              sx={{ mt: 4 }}
-              label="User ID"
-              {...register("mobile", {
-                onChange: (e) => setUsername(e.target.value),
-              })}
-              margin="normal"
-              error={!!errors.mobile}
-              helperText={errors.mobile?.message}
-              // InputProps={{
-              //   startAdornment: (
-              //     <InputAdornment position="start">
-              //       <PhoneAndroid color="action" />
-              //     </InputAdornment>
-              //   ),
-              // }}
-              InputProps={mobileInputProps}
-            />
+          {/* Password */}
+        <ReTextField
+  fullWidth
+  size="medium"
+  sx={{
+    mt: 5,
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "15px", // rounded input
+    },
+    "& .MuiInputLabel-root": {
+      transform: "translate(14px, 12px) scale(1)", // label inside
+    },
+    "& .MuiInputLabel-shrink": {
+      transform: "translate(14px, -9px) scale(0.75)", // label moves up
+    },
+  }}
+  label="Password"
+  type={showPassword ? "text" : "password"}
+  {...register("password")}
+  margin="normal"
+  error={!!errors.password}
+  helperText={errors.password?.message}
+  InputProps={{
+    ...passwordInputProps(showPassword, setShowPassword), // keep eye toggle
+    startAdornment: (
+      <InputAdornment position="start">
+        <LockIcon sx={{ color: "#757575" }} />
+        {/* OR your image:
+        <img
+          src={passwordIcon}
+          alt="password"
+          style={{ width: 20, height: 20, opacity: 0.7 }}
+        />
+        */}
+      </InputAdornment>
+    ),
+  }}
+/>
 
-            {/* Password */}
-            <ReTextField
-              fullWidth
-              size="medium"
-              sx={{ mt: 5 }}
-              label="Password"
-              type={showPassword ? "text" : "password"}
-              {...register("password")}
-              margin="normal"
-              error={!!errors.password}
-              helperText={errors.password?.message}
-              // InputProps={{
-              //   startAdornment: (
-              //     <InputAdornment position="start">
-              //       <Lock color="action" />
-              //     </InputAdornment>
-              //   ),
-              //   endAdornment: (
-              //     <InputAdornment position="end">
-              //       <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-              //         {showPassword ? <VisibilityOff /> : <Visibility />}
-              //       </IconButton>
-              //     </InputAdornment>
-              //   ),
-              // }}
-              InputProps={passwordInputProps(showPassword, setShowPassword)}
-            />
 
-            {/* Forgot Password */}
-            <Box display="flex" justifyContent="flex-end" mt={1.3}>
-              <Button
-                variant="text"
-                size="small"
-                sx={{
-                  textTransform: "none",
-                  fontWeight: 500,
-                  color: "#5210c1",
-                  "&:hover": { textDecoration: "underline" },
-                }}
-                onClick={handleForgotPassword}
-              >
-                Forgot Password?
-              </Button>
-            </Box>
-            {/* <ReCAPTCHA
-                    sitekey={import.meta.env.VITE_SITE_KEY}
-
-                    ref={captchaRef}
-                    onExpired={() => setCaptchaChecked(false)}
-                    onChange={captchaclickApi}
-                    style={{
-                      width: "100%",
-                      justifyContent: "center",
-                      display: "flex",
-                      alignItems:"center",
-                      mb:2,
-                    }}
-                  /> */}
-
-            {/* Terms & Conditions */}
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={agreedToTerms}
-                  onChange={(e) => setAgreedToTerms(e.target.checked)}
-                />
-              }
-              label={
-                <Typography variant="body2" color="textSecondary" fontSize={12}>
-                  I agree to the{" "}
-                  <Link
-                    href="/terms-conditions"
-                    underline="always"
-                    color="#4253F0"
-                    fontSize={12}
-                  >
-                    Terms and Conditions
-                  </Link>
-                </Typography>
-              }
-              sx={{ width: "100%", textAlign: "center", marginBottom: 0 }}
-            />
-
-            {/* Submit */}
+          {/* Forgot Password (right aligned) */}
+          <Box display="flex" justifyContent="flex-end" mt={1.3}>
             <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              size="large"
+              variant="text"
+              size="small"
               sx={{
-                mt: 2,
-                py: 1.5,
+                textTransform: "none",
+                fontWeight: 500,
+                color: "#5210c1",
+                "&:hover": { textDecoration: "underline" },
+              }}
+              onClick={handleForgotPassword}
+            >
+              Forgot Password?
+            </Button>
+          </Box>
+
+          {/* ReCAPTCHA - kept commented as in your original code */}
+          {/*
+            <ReCAPTCHA
+              sitekey={import.meta.env.VITE_SITE_KEY}
+              ref={captchaRef}
+              onExpired={() => setCaptchaChecked(false)}
+              onChange={captchaclickApi}
+              style={{ width: "100%", justifyContent: "center", display: "flex", alignItems:"center", mb:2 }}
+            />
+          */}
+
+          {/* Terms & Conditions (keeps state and link) */}
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={agreedToTerms}
+                onChange={(e) => setAgreedToTerms(e.target.checked)}
+              />
+            }
+            label={
+              <Typography variant="body2" color="textSecondary" fontSize={12}>
+                I agree to the{" "}
+                <Link
+                  href="/terms-conditions"
+                  underline="always"
+                  color="#4253F0"
+                  fontSize={12}
+                >
+                  Terms and Conditions
+                </Link>
+              </Typography>
+            }
+            sx={{ width: "100%", textAlign: "center", marginBottom: 0 }}
+          />
+
+          {/* Submit */}
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            size="large"
+            sx={{
+              mt: 2,
+              py: 1.5,
+              borderRadius: 2,
+              fontWeight: 600,
+             background: "linear-gradient(to right, #492077, rgba(73, 32, 119, 0.7))",
+
+              "&:hover": {
+                background: "#5210c1",
+              },
+            }}
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={24} /> : "Login"}
+          </Button>
+
+          {/* Back to QR button (keeps navigation)
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1.5 }}>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<ArrowBackIcon />}
+              sx={{
+                py: 0.5,
                 borderRadius: 2,
                 fontWeight: 600,
-                background: "linear-gradient(90deg,#731cdd)",
+                minWidth: 80,
+                color: "#5210c1",
+                borderColor: "#5210c1",
+                transition: "all 0.3s ease",
                 "&:hover": {
-                  background: "#5210c1",
+                  backgroundColor: "#5210c1",
+                  color: "#fff",
+                  borderColor: "#5210c1",
                 },
               }}
-              disabled={loading}
+              onClick={() => navigate("/qrLogin")}
             >
-              {loading ? <CircularProgress size={24} /> : "Login"}
+              Back to QR
             </Button>
-            <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1.5 }}>
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<ArrowBackIcon />}
-                sx={{
-                  py: 0.5,
-                  borderRadius: 2,
-                  fontWeight: 600,
-                  minWidth: 80,
-                  color: "#5210c1",
-                  borderColor: "#5210c1",
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    backgroundColor: "#5210c1",
-                    color: "#fff",
-                    borderColor: "#5210c1",
-                  },
-                }}
-                onClick={() => navigate("/qrLogin")}
-              >
-                Back to QR
-              </Button>
-            </Box>
+          </Box> */}
+
+          {/* Sign up link (keeps UX) */}
+          <Box sx={{ mt: 2 }}>
+            <Typography component="span" sx={{ mr: 1 }}>
+              or
+            </Typography>
+            <Link href="/signup" underline="hover" color="#5210c1">
+              Sign up
+            </Link>
           </Box>
         </Box>
-      </Grid>
+      </Box>
+    </Box>
 
-      {/* MPIN/OTP Modal */}
-      <Modal
-        open={isMpinRequired}
-        onClose={handleMpinVerificationClose}
-        aria-labelledby="verification-modal"
+    {/* MPIN / OTP Modal (unchanged) */}
+    <Modal open={isMpinRequired} onClose={handleMpinVerificationClose} aria-labelledby="verification-modal">
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: { xs: "90%", sm: 500, md: 600 },
+          p: 4,
+          borderRadius: 3,
+        }}
       >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
+        <VerifyMpinLogin
+          username={username}
+          password={password}
+          otpRef={otpRef}
+          secureValidate={secureValidate}
+          setIsOtpField={setIsMpinRequired}
+          onVerificationSuccess={handleMpinVerificationSuccess}
+          btn="Verify & Login"
+        />
+      </Box>
+    </Modal>
 
-            transform: "translate(-50%, -50%)",
-            width: { xs: "90%", sm: 500, md: 600 },
-            // boxShadow: 24,
-            p: 4,
-            borderRadius: 3,
-          }}
-        >
-          <VerifyMpinLogin
-            username={username}
-            password={password}
-            otpRef={otpRef}
-            secureValidate={secureValidate}
-            setIsOtpField={setIsMpinRequired}
-            onVerificationSuccess={handleMpinVerificationSuccess}
-            btn="Verify & Login"
-          />
-        </Box>
-      </Modal>
+    {/* Forgot Password Modal (unchanged) */}
+    <ForgotPassword
+      open={forgotModal}
+      onClose={() => setForgotModalOpen(false)}
+      initialUsername={username}
+    />
+  </Box>
+);
 
-      {/* Forgot Password Modal */}
-      <ForgotPassword
-        open={forgotModal}
-        onClose={() => setForgotModalOpen(false)}
-        initialUsername={username}
-      />
-    </Grid>
-  );
+
+
 };
 
 export default Login;
