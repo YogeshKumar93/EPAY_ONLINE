@@ -169,6 +169,7 @@ const CommonTable = ({
   const [dateRange, setDateRange] = useState([null, null]);
   const authCtx = useContext(AuthContext);
   const [exportFilters, setExportFilters] = useState({}); // ✅ Use state for export filters
+  const [resetKey, setResetKey] = useState(0);
 
   const user = authCtx?.user;
   // Use refs to track values without causing re-renders
@@ -410,14 +411,13 @@ const CommonTable = ({
   //   console.log("🧩 Updating filter value for:", id, newValue);
   //   setFilterValues((prev) => ({ ...prev, [id]: newValue }));
   // };
-const handleFilterChange = (id, value) => {
-  console.log("🟢 [Table] Filter change:", id, value);
-  
-  // Update both states
-  setFilterValues(prev => ({ ...prev, [id]: value }));
-  setAppliedFilters(prev => ({ ...prev, [id]: value }));
-};
+  const handleFilterChange = (id, value) => {
+    console.log("🟢 [Table] Filter change:", id, value);
 
+    // Update both states
+    setFilterValues((prev) => ({ ...prev, [id]: value }));
+    setAppliedFilters((prev) => ({ ...prev, [id]: value }));
+  };
 
   const applyFilters = useCallback(() => {
     console.log("🔍 [Table] applyFilters called with:", filterValues);
@@ -433,12 +433,13 @@ const handleFilterChange = (id, value) => {
         delete formattedFilters[key];
         return;
       }
-       // Add this case in the Object.keys(formattedFilters).forEach loop:
-if (filterConfig?.type === "roleuser" && val) {
-  // If val is an object with user_id, extract it, otherwise use as-is
-  formattedFilters[key] = typeof val === 'object' ? (val.id || val.id || val) : val;
-  return;
-}
+      // Add this case in the Object.keys(formattedFilters).forEach loop:
+      if (filterConfig?.type === "roleuser" && val) {
+        // If val is an object with user_id, extract it, otherwise use as-is
+        formattedFilters[key] =
+          typeof val === "object" ? val.id || val.id || val : val;
+        return;
+      }
       // 🧠 Extract ID or value for dropdown/autocomplete
       if (
         (filterConfig?.type === "dropdown" ||
@@ -506,13 +507,22 @@ if (filterConfig?.type === "roleuser" && val) {
 
   // ✅ Reset filters completely
   const resetFilters = useCallback(() => {
-    setFilterValues(initialFilterValues);
-    setAppliedFilters(initialFilterValues);
-    setExportFilters(initialFilterValues);
-    appliedFiltersRef.current = initialFilterValues;
+    // clear filters
+    const cleared = {};
+    Object.keys(initialFilterValues).forEach((key) => {
+      cleared[key] = null;
+    });
+
+    setFilterValues(cleared);
+    setAppliedFilters(cleared);
+    setExportFilters(cleared);
+    appliedFiltersRef.current = cleared;
+
+    // 🔥 FORCE RE-MOUNT ALL FILTER COMPONENTS
+    setResetKey((prev) => prev + 1);
 
     if (onFilterChange) {
-      onFilterChange(initialFilterValues);
+      onFilterChange(cleared);
     }
 
     setPage(0);
@@ -762,16 +772,14 @@ if (filterConfig?.type === "roleuser" && val) {
                 />
               )}
             />
-       ) :
-        filter.type === "roleuser" ? (
-   <RoleUserFilter
-                key={filter.id}
-                filter={filter}
-                value={appliedFilters[filter.id] || ""}
-                onChange={handleFilterChange}
+          ) : filter.type === "roleuser" ? (
+            <RoleUserFilter
+              key={resetKey}
+              filter={filter}
+              value={appliedFilters[filter.id] || ""}
+              onChange={handleFilterChange}
             />
-          )
-           : filter.type === "dropdown" ? (
+          ) : filter.type === "dropdown" ? (
             <FormControl>
               <TextField
                 select

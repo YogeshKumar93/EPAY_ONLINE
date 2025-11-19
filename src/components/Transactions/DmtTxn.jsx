@@ -184,6 +184,7 @@ const DmtTxn = ({ query }) => {
           { value: "success", label: "Success" },
           { value: "failed", label: "Failed" },
           { value: "refunded", label: "Refunded" },
+          { value: "refundpending", label: "Refund Pending" },
           { value: "pending", label: "Pending" },
         ],
         defaultValue: "pending",
@@ -197,7 +198,7 @@ const DmtTxn = ({ query }) => {
       },
 
       { id: "sender_mobile", label: "Sender Mobile", type: "textfield" },
-      
+
       { id: "amount", label: "Amount", type: "textfield" },
       { id: "txn_id", label: "Txn ID", type: "textfield" },
       {
@@ -822,7 +823,6 @@ const DmtTxn = ({ query }) => {
           onSelectionChange={setSelectedRows}
           onFilterChange={handleFilterChange}
           enableExcelExport={true}
-          
           exportFileName="DmtTransactions"
           exportEndpoint={ApiEndpoints.GET_DMT_TXN}
           customHeader={

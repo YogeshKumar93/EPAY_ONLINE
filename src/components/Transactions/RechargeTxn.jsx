@@ -180,7 +180,8 @@ const RechargeTxn = ({ query }) => {
         options: [
           { value: "success", label: "Success" },
           { value: "failed", label: "Failed" },
-          { value: "refund", label: "Refund" },
+          { value: "refunded", label: "Refunded" },
+          { value: "refundpending", label: "Refund Pending" },
           { value: "pending", label: "Pending" },
         ],
         defaultValue: "pending",
@@ -194,7 +195,7 @@ const RechargeTxn = ({ query }) => {
       },
       { id: "mobile_number", label: "Sender Number", type: "textfield" },
       { id: "txn_id", label: "Txn ID", type: "textfield" },
-            { id: "amount", label: "Amount", type: "textfield" },
+      { id: "amount", label: "Amount", type: "textfield" },
       {
         id: "user_id",
         label: "User ID",
@@ -208,7 +209,7 @@ const RechargeTxn = ({ query }) => {
 
   const columns = useMemo(
     () => [
-       {
+      {
         name: "S.No",
         selector: (row) => row.serialNo,
         wrap: true,

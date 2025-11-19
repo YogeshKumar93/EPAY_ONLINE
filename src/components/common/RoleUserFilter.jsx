@@ -97,87 +97,25 @@ export const RoleUserFilter = memo(
       if (onRoleSelect) onRoleSelect(!!newRole);
     };
 
-const handleUserChange = (event, newValue) => {
-  setSelectedUser(newValue);
+    const handleUserChange = (event, newValue) => {
+      setSelectedUser(newValue);
+      const selectedId = newValue?.id || "";
 
-  // Getting logged-in user role
-  
-
-  const selectedId = newValue?.id || "";
-
-  // -----------------------------------------
-  // 🔥 Combined Logic: Selected role + Login Role
-  // -----------------------------------------
-
-  // If login user role is super-admin type → treat as higher role
-  if (["sadm", "adm"].includes(userRole)) {
-      // Same logic for higher login roles
-      if (["sadm", "adm", "asm", "zsm", "dd"].includes(role)) {
-          onChange("user_id", selectedId);
-          onChange("receiver_id", "");
+      // Logged-in user decides what to send
+      if (["sadm", "adm"].includes(userRole)) {
+        // sadm/adm → always send user_id
+        onChange("user_id", selectedId);
+        onChange("reciever_id", ""); // correct spelling
+      } else if (["md", "di"].includes(userRole)) {
+        // md/di → always send reciever_id
+        onChange("reciever_id", selectedId);
+        onChange("user_id", "");
+      } else {
+        // Others
+        onChange("user_id", "");
+        onChange("reciever_id", "");
       }
-      else if (["md", "di", "ret"].includes(role)) {
-          onChange("receiver_id", selectedId);
-          onChange("user_id", "");
-      }
-      else {
-          onChange("user_id", "");
-          onChange("receiver_id", "");
-      }
-      return;
-  }
-
-  // -----------------------------------------
-  // Normal Role Based Logic (If not super-admin login)
-  // -----------------------------------------
-  if (["sadm", "adm", "asm", "zsm", "dd"].includes(role)) {
-    // Send only user_id
-    onChange("user_id", selectedId);
-    onChange("receiver_id", "");
-  } 
-  else if (["md", "di", "ret"].includes(role)) {
-    // Send only receiver_id
-    onChange("receiver_id", selectedId);
-    onChange("user_id", "");
-  } 
-  else {
-    // For all others
-    onChange("user_id", "");
-    onChange("receiver_id", "");
-  }
-};
-
-
-//     const handleUserChange = (event, newValue) => {
-//       setSelectedUser(newValue);
-
-//       // Always update filter id normally
-//       // if (onChange) {
-//       //   onChange(filter.id, newValue?.id || "");
-//       // }
-
-//      // When selecting value in filter
-// if (["sadm", "adm", "asm", "zsm", "dd"].includes(role)) {
-//   // 👉 Send ONLY user_id
-//   onChange("user_id", newValue?.id || "");
-
-//   // ❌ Clear receiver_id so it's not sent
-//   onChange("receiver_id", "");
-// } 
-// else if (["md", "di", "ret"].includes(role)) {
-//   // 👉 Send ONLY receiver_id
-//   onChange("receiver_id", newValue?.id || "");
-
-//   // ❌ Clear user_id so it's not sent
-//   onChange("user_id", "");
-// }
-// else {
-//   // 👉 For all other roles, clear both
-//   onChange("user_id", "");
-//   onChange("receiver_id", "");
-// }
-
-//     };
+    };
 
     if (availableRoles.length === 0) return null;
 
