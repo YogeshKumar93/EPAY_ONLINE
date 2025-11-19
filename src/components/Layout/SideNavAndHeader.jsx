@@ -46,13 +46,13 @@ import { Switch } from "@mui/material";
   /* App Bar with reduced height */
 }
 import RefreshIcon from "@mui/icons-material/Refresh";
-import Notification from "../Notification/Notification";
+// import Notification from "../Notification/Notification";
 import NotificationModal from "../Notification/NotificationModal";
 import { setTitleFunc } from "../../utils/HeaderTitleUtil";
 import TimelineIcon from "@mui/icons-material/Timeline";
-import defaultMaleAvatar from "../../assets/Images/male_avtar.jpg";
-import defaultMaleAvatar2 from "../../assets/Images/male_avtar2.jpg";
-import logo from "../../assets/Images/PPALogo.jpeg"; // adjust path
+// import defaultMaleAvatar from "../../assets/Images/male_avtar.jpg";
+// import defaultMaleAvatar2 from "../../assets/Images/male_avtar2.jpg";
+import logo from "../../assets/Images/PPALogo.jpeg"; 
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 // import ExpandMoreIcon from '@mui/icons-material/ExpandMore';

@@ -289,7 +289,7 @@ import { apiCall } from "../../api/apiClient";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import AuthContext from "../../contexts/AuthContext";
 import { useToast } from "../../utils/ToastContext";
-import QRLogin from "../QrLogin";
+// import QRLogin from "../QrLogin";
 
 const VerifyMpinLogin = ({
   username,

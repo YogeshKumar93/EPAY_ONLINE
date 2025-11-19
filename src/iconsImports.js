@@ -8,7 +8,7 @@ import failedVdo from "./assets/video/exclaimation.mp4";
 import smallLogo from "./assets/small_logo.jpeg";
 import outlet_reg_img from "./assets/outletreg.png";
 import background from "./assets/background.png";
-import fest from "./assets/FestivalImage.png";
+// import fest from "./assets/FestivalImage.png";
 
 //
 // import cms_1 from "./assets/dashboard_icons/cms (1).png";
@@ -542,7 +542,7 @@ export const android2 = android_1;
 export const macintosh2 = macintosh_1;
 export const windows2 = windows_1;
 export const linux2 = linux_1;
-export const festivalIMage = fest;
+// export const festivalIMage = fest;
 
 // *************New Icons******************************************
 export const bankImage = bank;

@@ -29,7 +29,7 @@ import AccountStatement from "../pages/AccountStatement";
  
 // import { SelectLayout } from "../pages/SelectLayout";
  
-import QrLoginPage from "../pages/QrLoginPage";
+// import QrLoginPage from "../pages/QrLoginPage";
  
 import Virtual_Accounts from "../pages/Virtual_Accounts";
 import Login_History from "../pages/Login_History";
@@ -103,7 +103,7 @@ export default function AppRoutes() {
 
         {/* <Route path="/aepsReceipt" element={<AepsReceipt />} /> */}
 
-        <Route path="/qrLogin" element={<QrLoginPage />} />
+        {/* <Route path="/qrLogin" element={<QrLoginPage />} /> */}
         <Route path="/login" element={<Login />} />
         {/* <Route path="/print-receipt" element={<DmtReceipt1 />} />
         <Route path="/print-dmt" element={<PrintDmt />} />

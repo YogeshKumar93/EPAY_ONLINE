@@ -16,7 +16,7 @@ import CommonModal from "../common/CommonModal";
 import { apiCall } from "../../api/apiClient";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import CommonLoader from "../common/CommonLoader";
-import defaultLayout from "../../assets/Images/defaultLayout.png";
+// import "defaultLayout" from "../../assets/Images/"defaultLayout".png";
 import servicelayout from "../../assets/Images/layout2.png";
 
 const ChangeLayoutModal = ({ open, onClose, onSuccess }) => {
@@ -110,7 +110,7 @@ const ChangeLayoutModal = ({ open, onClose, onSuccess }) => {
                       Default Layout
                     </Typography>
                     <img
-                      src={defaultLayout}
+                      src={"defaultLayout"}
                       alt="default layout"
                       style={{
                         width: 300,
