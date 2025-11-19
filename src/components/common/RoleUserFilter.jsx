@@ -102,14 +102,17 @@ export const RoleUserFilter = memo(({ filter, value, onChange, onRoleSelect }) =
     if (onRoleSelect) onRoleSelect(!!newRole);
   };
 
-  const handleUserChange = (event, newValue) => {
-    setSelectedUser(newValue);
+ const handleUserChange = (event, newValue) => {
+  setSelectedUser(newValue);
 
-    if (onChange) {
-      // 🔥 Send id — correct for your backend
-      onChange(filter.id, newValue?.id || "");
-    }
-  };
+  if (onChange) {
+    onChange(filter.id, {
+      id: newValue?.id || "",
+      est: newValue?.receiver_est || "",
+    });
+  }
+};
+
 
   if (availableRoles.length === 0) return null;
 

@@ -79,6 +79,14 @@ const Wallet2WalletTransfer = ({}) => {
     return () => clearTimeout(timer);
   }, []);
 
+  const updatedQueryParams = { ...appliedFilters, service: "W2W transfer" };
+
+if ((user?.role === "md" || user?.role === "di") && appliedFilters?.user_id) {
+  updatedQueryParams.receiver_est = appliedFilters.user_id.est;
+  delete updatedQueryParams.user_id;
+}
+
+
   const handleRefundTxn = async (row) => {
     try {
       const payload = { txn_id: row.txn_id };
@@ -252,6 +260,8 @@ const Wallet2WalletTransfer = ({}) => {
         type: "roleuser",
         roles: ["adm", "sadm","di","md","ret","zsm","asm","dd"],
       },
+
+      
        
       {
         id: "txn_id",
@@ -644,6 +654,7 @@ const Wallet2WalletTransfer = ({}) => {
           filters={filters}
           transformData={filterRows}
           queryParam={{ ...appliedFilters, service: "W2W transfer" }}
+          
           refresh={true}
           includeClientRef={false}
           enableSelection={false}
