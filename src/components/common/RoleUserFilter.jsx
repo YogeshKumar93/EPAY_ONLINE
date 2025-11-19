@@ -1,9 +1,4 @@
-import React, {
-  memo,
-  useEffect,
-  useState,
-  useContext,
-} from "react";
+import React, { memo, useEffect, useState, useContext } from "react";
 import {
   Box,
   TextField,
@@ -18,158 +13,156 @@ import { apiCall } from "../../api/apiClient";
 import ApiEndpoints from "../../api/ApiEndpoints";
 import AuthContext from "../../contexts/AuthContext";
 
-export const RoleUserFilter = memo(({ filter, value, onChange, onRoleSelect }) => {
-  const [role, setRole] = useState("");
-  const [userList, setUserList] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [loadingUsers, setLoadingUsers] = useState(false);
+export const RoleUserFilter = memo(
+  ({ filter, value, onChange, onRoleSelect }) => {
+    const [role, setRole] = useState("");
+    const [userList, setUserList] = useState([]);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [loadingUsers, setLoadingUsers] = useState(false);
 
-  const authCtx = useContext(AuthContext);
-  const userRole = authCtx?.user?.role;
+    const authCtx = useContext(AuthContext);
+    const userRole = authCtx?.user?.role;
 
-  // Available role full name
-  const roleFullNameMap = {
-    sadm: "Super Admin",
-    adm: "Admin",
-    zsm: "Zonal Sales Manager",
-    asm: "Area Sales Manager",
-    md: "Master Distributor",
-    di: "Distributor",
-    ret: "Retailer",
-    dd: "Direct Dealer",
-    api: "API User",
-  };
+    // Available role full name
+    const roleFullNameMap = {
+      sadm: "Super Admin",
+      adm: "Admin",
+      zsm: "Zonal Sales Manager",
+      asm: "Area Sales Manager",
+      md: "Master Distributor",
+      di: "Distributor",
+      ret: "Retailer",
+      dd: "Direct Dealer",
+      api: "API User",
+    };
 
-  // Role hierarchy
-  const hierarchy = {
-    sadm: ["sadm", "adm", "zsm", "asm", "md", "di", "ret", "dd", "api"],
-    adm: ["adm", "zsm", "asm", "md", "di", "ret", "dd", "api"],
-    zsm: ["asm", "md", "di", "ret", "dd"],
-    asm: ["md", "di", "ret", "dd"],
-    md: ["di", "ret"],
-    di: ["ret"],
-    ret: [],
-    dd: [],
-    api: [],
-  };
+    // Role hierarchy
+    const hierarchy = {
+      sadm: ["sadm", "adm", "zsm", "asm", "md", "di", "ret", "dd", "api"],
+      adm: ["adm", "zsm", "asm", "md", "di", "ret", "dd", "api"],
+      zsm: ["asm", "md", "di", "ret", "dd"],
+      asm: ["md", "di", "ret", "dd"],
+      md: ["di", "ret"],
+      di: ["ret"],
+      ret: [],
+      dd: [],
+      api: [],
+    };
 
-  const availableRoles = hierarchy[userRole] || [];
+    const availableRoles = hierarchy[userRole] || [];
 
-  // 🔥 RESET when parent resets appliedFilters
-  useEffect(() => {
-    if (!value) {
-      setRole("");
+    // 🔥 RESET when parent resets appliedFilters
+    useEffect(() => {
+      if (!value) {
+        setRole("");
+        setSelectedUser(null);
+        setUserList([]);
+      }
+    }, [value]);
+
+    // 🔥 Fetch users based on role
+    useEffect(() => {
+      if (!role) {
+        setUserList([]);
+        setSelectedUser(null);
+        return;
+      }
+
+      const fetchUsers = async () => {
+        setLoadingUsers(true);
+        try {
+          const { response } = await apiCall("POST", ApiEndpoints.GET_USERS, {
+            role,
+            export: 1,
+          });
+
+          const users = response?.data?.data || response?.data || [];
+          setUserList(users);
+        } catch (err) {
+          console.error("Error fetching users:", err);
+        } finally {
+          setLoadingUsers(false);
+        }
+      };
+
+      fetchUsers();
+    }, [role]);
+
+    const handleRoleChange = (e) => {
+      const newRole = e.target.value;
+      setRole(newRole);
       setSelectedUser(null);
       setUserList([]);
-    }
-  }, [value]);
 
-  // 🔥 Fetch users based on role
-  useEffect(() => {
-    if (!role) {
-      setUserList([]);
-      setSelectedUser(null);
-      return;
-    }
+      if (onRoleSelect) onRoleSelect(!!newRole);
+    };
 
-    const fetchUsers = async () => {
-      setLoadingUsers(true);
-      try {
-        const { response } = await apiCall(
-          "POST",
-          ApiEndpoints.GET_USERS,
-          { role, export: 1 }
-        );
+    const handleUserChange = (event, newValue) => {
+      setSelectedUser(newValue);
 
-        const users = response?.data?.data || response?.data || [];
-        setUserList(users);
-      } catch (err) {
-        console.error("Error fetching users:", err);
-      } finally {
-        setLoadingUsers(false);
+      if (onChange) {
+        // 🔥 Send id — correct for your backend
+        onChange(filter.id, newValue?.id || "");
       }
     };
 
-    fetchUsers();
-  }, [role]);
+    if (availableRoles.length === 0) return null;
 
-  const handleRoleChange = (e) => {
-    const newRole = e.target.value;
-    setRole(newRole);
-    setSelectedUser(null);
-    setUserList([]);
+    return (
+      <Box sx={{ display: "flex", gap: 1, alignItems: "flex-start" }}>
+        {/* 🔹 ROLE Selection */}
+        <FormControl size="small" sx={{ minWidth: 140 }}>
+          <InputLabel>User By Role</InputLabel>
+          <Select value={role} label="User By Role" onChange={handleRoleChange}>
+            {availableRoles.map((r) => (
+              <MenuItem key={r} value={r}>
+                {roleFullNameMap[r]}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
-    if (onRoleSelect) onRoleSelect(!!newRole);
-  };
-
-  const handleUserChange = (event, newValue) => {
-    setSelectedUser(newValue);
-
-    if (onChange) {
-      // 🔥 Send id — correct for your backend
-      onChange(filter.id, newValue?.id || "");
-    }
-  };
-
-  if (availableRoles.length === 0) return null;
-
-  return (
-    <Box sx={{ display: "flex", gap: 1, alignItems: "flex-start" }}>
-      
-      {/* 🔹 ROLE Selection */}
-      <FormControl size="small" sx={{ minWidth: 140 }}>
-        <InputLabel>User By Role</InputLabel>
-        <Select
-          value={role}
-          label="User By Role"
-          onChange={handleRoleChange}
-        >
-          {availableRoles.map((r) => (
-            <MenuItem key={r} value={r}>
-              {roleFullNameMap[r]}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-      {/* 🔹 USER Selection */}
-      {role && (
-        <Autocomplete
-          size="small"
-          sx={{ width: 350 }}
-          options={userList}
-          value={selectedUser}
-          onChange={handleUserChange}
-          loading={loadingUsers}
-          getOptionLabel={(option) =>
-            `${option.establishment || "Unknown"} - (P2PAE${option?.id || ""})`
-          }
-          isOptionEqualToValue={(option, value) => option.id === value.id}
-          noOptionsText={loadingUsers ? "Loading..." : "No users found"}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Select User"
-              InputProps={{
-                ...params.InputProps,
-                endAdornment: (
-                  <>
-                    {loadingUsers && (
-                      <CircularProgress color="inherit" size={20} />
-                    )}
-                    {params.InputProps.endAdornment}
-                  </>
-                ),
-              }}
-            />
-          )}
-          renderOption={(props, option) => (
-            <MenuItem {...props} key={option.id}>
-              {option.establishment || "Unknown"} - (P2PAE{option.id})
-            </MenuItem>
-          )}
-        />
-      )}
-    </Box>
-  );
-});
+        {/* 🔹 USER Selection */}
+        {role && (
+          <Autocomplete
+            size="small"
+            sx={{ width: 350 }}
+            options={userList}
+            value={selectedUser}
+            onChange={handleUserChange}
+            loading={loadingUsers}
+            getOptionLabel={(option) =>
+              `${option.establishment || "Unknown"} - (P2PAE${
+                option?.id || ""
+              })`
+            }
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            noOptionsText={loadingUsers ? "Loading..." : "No users found"}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Select User"
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <>
+                      {loadingUsers && (
+                        <CircularProgress color="inherit" size={20} />
+                      )}
+                      {params.InputProps.endAdornment}
+                    </>
+                  ),
+                }}
+              />
+            )}
+            renderOption={(props, option) => (
+              <MenuItem {...props} key={option.id}>
+                {option.establishment || "Unknown"} - (P2PAE{option.id})
+              </MenuItem>
+            )}
+          />
+        )}
+      </Box>
+    );
+  }
+);

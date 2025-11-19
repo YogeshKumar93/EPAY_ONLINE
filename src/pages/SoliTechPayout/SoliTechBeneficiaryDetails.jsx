@@ -14,6 +14,7 @@ import ApiEndpoints from "../../api/ApiEndpoints";
 import { useToast } from "../../utils/ToastContext";
 import CommonModal from "../../components/common/CommonModal";
 import Loader from "../../components/common/Loader";
+import { convertNumberToWordsIndian } from "../../utils/NumberUtil";
 
 const SoliTechBeneficiaryDetails = ({
   open,
@@ -76,6 +77,11 @@ const SoliTechBeneficiaryDetails = ({
       setAmount(value);
     }
   };
+  const amountInWords = amount
+    ? `${convertNumberToWordsIndian(amount).replace(/\b\w/g, (c) =>
+        c.toUpperCase()
+      )} Only`
+    : "";
 
   // Proceed clicked -> open MPIN modal
   const handleProceed = async () => {
@@ -222,6 +228,11 @@ const SoliTechBeneficiaryDetails = ({
         value={amount}
         onChange={handleChangeAmount}
       />
+      {amount && (
+        <Typography variant="body2" sx={{ color: "#555", fontWeight: 500 }}>
+          {amountInWords}
+        </Typography>
+      )}
     </Box>
   );
 

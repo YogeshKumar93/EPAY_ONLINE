@@ -13,6 +13,7 @@ import { okSuccessToast } from "../../utils/ToastUtil";
 import AuthContext from "../../contexts/AuthContext";
 import CommonModal from "./CommonModal";
 import { apiCall } from "../../api/apiClient";
+import { useToast } from "../../utils/ToastContext";
 const ChangeMpin = ({ open, onClose }) => {
   const [oldMpin, setOldMpin] = useState("");
   const [newMpin, setNewMpin] = useState("");
@@ -21,11 +22,11 @@ const ChangeMpin = ({ open, onClose }) => {
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const { logout } = useContext(AuthContext);
-
+  const { showToast } = useToast();
   const handleSubmit = async () => {
     // 🔹 Validations
     if (!oldMpin || !newMpin || !confirmMpin) {
-      errorToast("All fields are required");
+      showToast("All fields are required", "error");
       return;
     }
     if (
@@ -33,15 +34,15 @@ const ChangeMpin = ({ open, onClose }) => {
       newMpin.length !== 6 ||
       confirmMpin.length !== 6
     ) {
-      errorToast("All MPINs must be exactly 6 digits");
+      showToast("All MPINs must be exactly 6 digits", "error");
       return;
     }
     if (oldMpin === newMpin) {
-      errorToast("New MPIN cannot be the same as Old MPIN");
+      showToast("New MPIN cannot be the same as Old MPIN", "error");
       return;
     }
     if (newMpin !== confirmMpin) {
-      errorToast("New MPIN and Confirm MPIN do not match");
+      showToast("New MPIN and Confirm MPIN do not match", "error");
       return;
     }
 
@@ -66,7 +67,7 @@ const ChangeMpin = ({ open, onClose }) => {
       onClose(); // ✅ close modal after success
     }
     if (error) {
-      errorToast(error?.message || "Something went wrong");
+      showToast(error?.message || "Something went wrong", "error");
       console.error(error);
     }
   };

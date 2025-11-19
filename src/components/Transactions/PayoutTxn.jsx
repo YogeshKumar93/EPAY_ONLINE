@@ -181,7 +181,7 @@ const PayoutTxn = ({ query }) => {
     setSelectedTrancation(row);
   };
   const handleCloseLein = () => setOpenLeinModal(false);
-  
+
   const filters = useMemo(
     () => [
       {
@@ -191,7 +191,8 @@ const PayoutTxn = ({ query }) => {
         options: [
           { value: "success", label: "Success" },
           { value: "failed", label: "Failed" },
-          { value: "refund", label: "Refund" },
+          { value: "refunded", label: "Refunded" },
+          { value: "refundpending", label: "Refund Pending" },
           { value: "pending", label: "Pending" },
         ],
         defaultValue: "pending",

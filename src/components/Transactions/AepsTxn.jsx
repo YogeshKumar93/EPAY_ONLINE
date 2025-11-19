@@ -135,7 +135,8 @@ const AepsTxn = ({ query }) => {
         options: [
           { value: "success", label: "Success" },
           { value: "failed", label: "Failed" },
-          { value: "refund", label: "Refund" },
+          // { value: "refunded", label: "Refund" },
+          // { value: "refundpending", label: "Refund Pending" },
           { value: "pending", label: "Pending" },
         ],
         defaultValue: "pending",
