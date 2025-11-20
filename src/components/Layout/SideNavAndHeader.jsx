@@ -84,6 +84,7 @@ const themeSettings = {
   palette: {
     primary: {
       main: "#0037D7",
+ 
     },
     secondary: {
       main: "#dc004e",
@@ -211,6 +212,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             button
             onClick={() => handleNavigation(item, hasSubmenus)}
             sx={{
+             
               position: "relative",
               backgroundColor: isItemActive ? "#e6f0fb" : "transparent",
               "&::before": isItemActive
@@ -395,7 +397,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
       <AppBar
         position="fixed"
         sx={{
-          backgroundColor: "#FFFF",
+          backgroundColor: "#fff",
           boxShadow: " rgba(0,0,0,0.08)",
           // boxShadow: "none",
           width: {

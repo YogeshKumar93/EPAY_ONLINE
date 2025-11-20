@@ -9,6 +9,7 @@ const NavBar = () => {
         top: 0,
         width: "100%",
         background: "#292730ff",
+    
         color: "#96db15ff",
         zIndex: 1000,
         boxShadow: "0 2px 8px rgba(75, 214, 20, 0.1)",
