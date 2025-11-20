@@ -87,7 +87,7 @@ const AdminLayoutWrapper = ({ desktopOpen }) => {
         >
           © 2025{" "}
           <Box component="span" sx={{ fontWeight: 700 }}>
-            PRAKASH SERVICES PRIVATE LIMITED{" "}
+            EPAY ONLINE SERVICES PRIVATE LIMITED |{" "}
           </Box>{" "}
           All Rights Reserved.
         </Typography>

@@ -960,7 +960,7 @@ const CommonTable = ({
         {/* This is the main row with data */}
         <tr
           style={{
-            backgroundColor: "#fefefe",
+            backgroundColor: "rgba(254, 254, 254, 1)",
             boxShadow: "0px 2px 8px rgba(0,0,0,0.08)",
             borderRadius: "8px",
             marginBottom: "12px",
@@ -983,7 +983,7 @@ const CommonTable = ({
                 fontFamily: "DM Sans, sans-serif",
                 fontWeight: 600,
 
-                color: "#646e84",
+                color: "#7e51b2ff",
                 border: "none", // Remove default borders
               }}
             >
@@ -1024,9 +1024,9 @@ const CommonTable = ({
         <th
           key={index}
           style={{
-            backgroundColor: "#fefefe",
+            backgroundColor: "#ebecedff",
             boxShadow: " rgba(0,0,0,0.08)", // ✅ same as row
-            borderRadius: "8px",
+            // borderRadius: "8px",
             marginBottom: "12px",
             padding: "12px 16px",
             verticalAlign: "middle",
@@ -1035,7 +1035,7 @@ const CommonTable = ({
             lineHeight: "1.3",
             fontFamily: "DM Sans, sans-serif",
             fontWeight: 600,
-            color: "#526484", // header ka thoda dark color
+            color: "#492077", // header ka thoda dark color
             border: "none",
           }}
         >

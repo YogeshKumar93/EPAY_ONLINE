@@ -1,12 +1,12 @@
 import { useMemo, useContext, useState, useEffect, useRef } from "react";
-import { Tooltip, IconButton, Box, Typography } from "@mui/material";
+import { Tooltip, IconButton, Box, Typography, Button } from "@mui/material";
 import { Edit } from "@mui/icons-material";
 import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
 import AuthContext from "../contexts/AuthContext";
 import { dateToTime1, ddmmyy, ddmmyyWithTime } from "../utils/DateUtils";
 import CreateBankModal from "../components/Bank/CreateBanks";
-import ReButton from "../components/common/ReButton";
+// import ReButton from "../components/common/ReButton";
 import CommonStatus from "../components/common/CommonStatus";
 import CommonLoader from "../components/common/CommonLoader";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -204,7 +204,36 @@ const Banks = ({ filters = [] }) => {
             filters={filters}
             queryParam={queryParam}
             customHeader={
-              <ReButton label="Bank" onClick={() => setOpenCreate(true)} />
+          <Button
+  label="Bank"
+  onClick={() => setOpenCreate(true)}
+  variant="contained"
+  size="medium"
+  sx={{
+    background: "linear-gradient(135deg, #490277 0%, #6A1B9A 100%)",
+    color: "#FFFFFF",
+    textTransform: "none",
+    fontWeight: 600,
+    letterSpacing: "0.3px",
+    paddingX: 3,
+    paddingY: 1.2,
+    borderRadius: "10px",
+    boxShadow: "0px 4px 12px rgba(73, 2, 119, 0.3)",
+    transition: "all 0.3s ease",
+    "&:hover": {
+      background: "linear-gradient(135deg, #5A048F 0%, #7B2BB5 100%)",
+      boxShadow: "0px 6px 16px rgba(73, 2, 119, 0.45)",
+      transform: "translateY(-2px)",
+    },
+    "&:active": {
+      transform: "scale(0.98)",
+      boxShadow: "0px 2px 6px rgba(73, 2, 119, 0.2)",
+    },
+  }}
+>
+  Add Bank
+</Button>
+
             }
           />
 

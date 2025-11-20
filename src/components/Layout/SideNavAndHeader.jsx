@@ -38,7 +38,7 @@ import {
   AccountCircle,
 } from "@mui/icons-material";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
-
+import {newLogout} from "../../iconsImports";
 import AuthContext from "../../contexts/AuthContext";
 import { Switch } from "@mui/material";
 
@@ -337,10 +337,11 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
           }}
           sx={{
             width: "100%",
-            px: 4,
+            px: 3,
+            fontWeight:600,
             display: "flex",
             alignItems: "center",
-            color: "#6C4BC7",
+            color: "#492077",
             borderRadius: "4px",
             mb: 0,
             "&:hover": {
@@ -350,7 +351,11 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             gap: 4,
           }}
         >
-          <LogoutIcon fontSize="medium" /> Logout
+           <img
+    src={newLogout}
+    alt="logout"
+    style={{ width: 28, height: 28 }}
+  /> Logout
         </MenuItem>
 
         {/* App Version text */}
@@ -646,7 +651,11 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
 
               <MenuItem onClick={handleLogout}>
                 <ListItemIcon>
-                  <LogoutIcon fontSize="small" />
+                   <img
+    src={newLogout}
+    alt="logout"
+    style={{ width: 22, height: 22 }}
+  />
                 </ListItemIcon>
                 Sign Out
               </MenuItem>

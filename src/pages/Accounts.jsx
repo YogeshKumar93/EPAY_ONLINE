@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Box, IconButton, Tooltip, Typography } from "@mui/material";
+import { Box, Button, IconButton, Tooltip, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -215,12 +215,41 @@ const Accounts = () => {
             filters={filters}
             queryParam={appliedFilters} // only updates when Apply is clicked
             customHeader={
-              <ReButton
-                variant="contained"
+              // <ReButton
+              //   variant="contained"
+              //   label="Account"
+              //   startIcon={<AddIcon />}
+              //   onClick={() => setOpenCreate(true)}
+              // />
+                   <Button
                 label="Account"
-                startIcon={<AddIcon />}
-                onClick={() => setOpenCreate(true)}
-              />
+                 onClick={() => setOpenCreate(true)}
+                variant="contained"
+                size="medium"
+                sx={{
+                  background: "linear-gradient(135deg, #490277 0%, #6A1B9A 100%)",
+                  color: "#FFFFFF",
+                  textTransform: "none",
+                  fontWeight: 600,
+                  letterSpacing: "0.3px",
+                  paddingX: 3,
+                  paddingY: 1.2,
+                  borderRadius: "10px",
+                  boxShadow: "0px 4px 12px rgba(73, 2, 119, 0.3)",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    background: "linear-gradient(135deg, #5A048F 0%, #7B2BB5 100%)",
+                    boxShadow: "0px 6px 16px rgba(73, 2, 119, 0.45)",
+                    transform: "translateY(-2px)",
+                  },
+                  "&:active": {
+                    transform: "scale(0.98)",
+                    boxShadow: "0px 2px 6px rgba(73, 2, 119, 0.2)",
+                  },
+                }}
+              >
+                Add Account
+              </Button>
             }
           />
 
