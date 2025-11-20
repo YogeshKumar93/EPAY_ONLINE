@@ -39,7 +39,7 @@ import ResetMpin from "../common/ResetMpin";
 import ChangePassword from "../common/ChangePassword";
 import ChangeMpin from "../common/ChangeMpin";
 import NumberVerificationComponent from "../common/NumberVerificationComponent";
-import ChangeLayoutModal from "../Layout/ChangeLayoutModal";
+// import ChangeLayoutModal from "../Layout/ChangeLayoutModal";
 import { BusinessInformation } from "./BusinessInformation";
 import ProfileTabs from "./ProfileTabs";
 import TwoFA from "./TwoFA";

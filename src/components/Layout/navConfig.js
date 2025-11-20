@@ -1,35 +1,14 @@
 import { Avatar } from "@mui/material";
 import {
-  aeps1,
-  aepsImage,
+ 
   bankImage,
-  bbps_1,
-  bbps_2,
-  cms1,
-  cmsImage,
-  complainImage,
-  complainImageNew,
-  dashboardImage,
-  failed_vdo,
-  fundReqImage,
+  
   loginHistoryImage,
-  paytm_img,
-  profileNewImage,
-  rechargeNew,
+ 
   riskImage,
-  sendmoney,
-  sendmoney2,
-  serviceImage,
-  settingImage,
-  settingNew,
-  transaction,
-  transImage,
-  upiWeb,
-  usersImage,
+  
   virtuanAccountImage,
-  walletLdgerImage,
-  walletLedgerImg,
-  walletTransferImage,
+  
 } from "../../iconsImports";
 
 export const navConfig = [

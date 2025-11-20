@@ -48,7 +48,7 @@ const Unclaimed = () => {
         date_to: filters.date.end || "",
       }).toString();
 
-      const response = await apiCall.get(
+      const response = await apiCall(
         `${ApiEndpoints.GET_UNCLAIMED_ENTERIES}?${queryParams}`
       );
       if (response?.data?.success) {

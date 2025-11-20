@@ -47,7 +47,7 @@ import { Switch } from "@mui/material";
 }
 import RefreshIcon from "@mui/icons-material/Refresh";
 // import Notification from "../Notification/Notification";
-import NotificationModal from "../Notification/NotificationModal";
+// import NotificationModal from "../Notification/NotificationModal";
 import { setTitleFunc } from "../../utils/HeaderTitleUtil";
 import TimelineIcon from "@mui/icons-material/Timeline";
 // import defaultMaleAvatar from "../../assets/Images/male_avtar.jpg";
@@ -59,7 +59,7 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 
 import EmailIcon from "@mui/icons-material/Email";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
-import WalletCard from "../WalletCard";
+// import WalletCard from "../WalletCard";
 import { buildNavForRole } from "./navConfig";
 import AdminLayoutWrapper from "../../pages/AdminLayoutWrapper";
 

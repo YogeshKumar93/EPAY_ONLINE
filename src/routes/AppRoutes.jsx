@@ -1,23 +1,18 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "../pages/Login";
-import Dashboard from "../pages/Dashboard";
-// import Users from "../pages/Users";
+ 
 import SideNavAndHeader from "../components/Layout/SideNavAndHeader";
 import AuthContext from "../contexts/AuthContext";
 import { useContext } from "react";
  
-import Accounts from "../pages/Accounts";
-import Notification from "../components/Notification/Notification";
- 
-// import Templates from "../pages/Templates";
+import Accounts from "../pages/Accounts"; 
  
 import ProfilePage from "../components/MyProfile/Profile";
 import Banks from "../pages/Banks";
-// import { Transaction } from "../pages/Transaction";
-import Layouts from "../pages/Layouts";
+ 
  
 import { Banking } from "../pages/Banking";
-// import { Settings } from "../pages/Settings";
+ 
  
 import Navs from "../pages/Navs";
 
@@ -27,17 +22,12 @@ import Statements from "../pages/Statements";
 import BankStatements from "../pages/BankStatements";
 import AccountStatement from "../pages/AccountStatement";
  
-// import { SelectLayout } from "../pages/SelectLayout";
  
-// import QrLoginPage from "../pages/QrLoginPage";
  
 import Virtual_Accounts from "../pages/Virtual_Accounts";
 import Login_History from "../pages/Login_History";
  
  
- 
-// import AdminDistributorAgreement from "../pages/AdminDistributorAgreement";
-// import AdminAgreement from "../pages/AdminAgreement";
  
  
 
@@ -49,7 +39,7 @@ import OnBoarding from "../components/OnBoarding";
  
 import BankStatementDesign from "../components/AEPS/BankStatementDesign";
  
-import Terms from "../pages/Terms";
+// import Terms from "../pages/Terms";
 import DownloadExcel from "../pages/DownloadExcel";
 import UploadExcel from "../pages/UploadExcel";
 import Unclaimed from "../pages/Unclaimed";
@@ -139,10 +129,10 @@ export default function AppRoutes() {
           {/* ADMIN */}
           {isAdmin && (
             <>
-              <Route path="admin/dashboard" element={<Dashboard />} />
+              {/* <Route path="admin/dashboard" element={<Dashboard />} /> */}
               {/* <Route path="admin/users" element={<Users />} /> */}
               {/* <Route path="admin/transactions" element={<Transaction />} /> */}
-              <Route path="admin/notification" element={<Notification />} />
+              {/* <Route path="admin/notification" element={<Notification />} /> */}
               {/* <Route path="admin/fund-request" element={<FundRequest />} /> */}
               <Route path="admin/accounts" element={<Accounts />} />
               {/* <Route path="admin/services" element={<Services />} /> */}
@@ -169,12 +159,12 @@ export default function AppRoutes() {
                 path="admin/wallet-transfer"
                 element={<Wallet2WalletTransfer />}
               /> */}
-              <Route path="admin/layout" element={<Layouts />} />
+              {/* <Route path="admin/layout" element={<Layouts />} /> */}
               {/* <Route path="admin/commissionrule" element={<CommissionRule />} /> */}
               <Route path="admin/sidenav" element={<Navs />} />
               {/* <Route path="admin/selectlayout" element={<SelectLayout />} /> */}
               {/* <Route path="admin/aeps" element={<Aeps />} /> */}
-              <Route path="admin/selectlayout" element={<Layouts />} />
+              {/* <Route path="admin/selectlayout" element={<Layouts />} /> */}
 
               <Route path="admin/statements" element={<Statements />} />
               {/* <Route path="admin/complaint" element={<Complaint />} /> */}
