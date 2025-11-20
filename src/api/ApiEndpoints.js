@@ -25,39 +25,30 @@ const ApiEndpoints = {
   GET_USERS: "user/getUsers",
   GET_USERS_ACC: "",
   VERIFY_PIC: "admin/approveRejectKyc",
-  PAYOUT_BENES: "admin/payoutBene",
-  PAYOUT_BENE_KYC_DOCS: "admin/beneKycDoc",
+ 
+  
   GET_USER_BY_USERNAME: "auth/getUserByUsername",
   GET_USER_BY_ID: "admin/getUserById",
   // RESEND_OTP: "wallet/resendOtp",
   USER_PROFIT: "admin/userProfitability",
   DELETE_USER: "admin/deleteUser",
   API_USERS_CHARGES: "admin/charges",
-  ADMIN_PRABHU_CHARGES: "admin/psrabhuCharge",
+ 
   API_USERS_KEYS: "admin/userKeys",
   BLOCK_UNBLOCK: "admin/blockUnblock",
   GET_TRANSACTIONS: "admin/getTransactions",
   GET_ACC_TRANSACTIONS: "",
-  // GET_TRANSACTIONS: "admin/getTransactions",
-  CREATE_SERVICES: "admin/getRoutes",
-  CRED_REQ: "admin/getCrRequests",
-  CRED_REQ_APPROVE: "admin/crActions",
-  GET_OPERATOR: "admin/getOperators",
-  ACTIVE_INACTIVE_OPERATOR: "admin/changeOperatorStatus",
-  UPDATE_OPERATOR: "admin/updateOperator",
-  ADD_OPERATOR: "admin/createOperator",
+ 
+  
+ 
   ADD_BANK: "admin/createBank",
-  CHANGE_ROUTE_OPERATOR: "admin/changeRoute",
-  CHANGE_OPERATOR_PIPE: "admin/changePipe",
+ 
   GET_ROUTE: "admin/getRoutes",
   GET_CATEGORIES: "admin/getCategories",
-  BBPS_GET_CATEGORIES: "bbps/getCategories",
-  BBPS_GET_BILLERS: "bbps/getBillers",
-  BBPS_GET_BILLERS_DETAILS: "bbps/getBillerDetails",
-  BBPS_FETCH_BILL: "bbps/fetchBill",
+  
+ 
 
-  CREDIT_CARD_BILL_PAYMENT: "creditcard/payCreditCard",
-  GET_CREDIT_CARD: "/creditcard/getCreditCard",
+ 
 
   GET_BANK_BALANCE: "bank/getBankBalance",
   // whitelisted accputn apis
@@ -101,20 +92,14 @@ const ApiEndpoints = {
   GET_LOGS: "auditlog/getAuditLogs",
   DELETE_LOG: "auditlog/deleteAuditLog",
   GET_LOG: "auditlog/getAuditLog",
-  GET_WALLETLEDGER: "walletledger/getWalletLedgers",
-  GET_WALLETLEDGER_2: "walletledger/getWalletLedger2",
-  GET_WALLETLEDGER_3: "walletledger/getWalletLedger3",
-  GET_PURPOSES: "payout/getPurpose",
-  CREATE_PURPOSE: "payout/createPurpose",
-  AEPS2_SCHEMA: "aeps/aeps2Schema",
-  AEPS2_ONBOARDING: "aeps/onboardingAeps2",
+ 
+  
+ 
   GET_BY_TYPE: "business/getByType",
   UPDATE_BY_TYPE: "business/updateByType",
   GET_ALL_BY_USER: "business/getAllByUser",
   APPROVE_REJECT_DOCS: "business/approveReject",
-  GET_NEWS: "news/getNews",
-  CREATE_NEWS: "news/createNews",
-  DELETE_NEWS: "news/deleteNews",
+ 
 
   LOGIN_HISTORY: "userDevice/getUserDevice",
   GET_WEBHOOKS: "webhook/getWebhook",
