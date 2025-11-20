@@ -1,7 +1,7 @@
 import { Brightness2Rounded } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { bgImage, Logo } from "../iconsImports";
+// import { bgImage, Logo } from "../iconsImports";
 
 export const Toast = Swal.mixin({
   // toast: true,

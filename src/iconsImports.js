@@ -1,153 +1,31 @@
 import biggpayLogo from "./assets/PPALogor.png";
-// import biggpayLogo from "./assets/festivalVideo.mp4";
+ 
 import biggpayLogo_sm from "./assets/p2pae.png";
-// import airIndia from "./assets_travel/images/icons/AI.png";
+ 
 import closeicon from "./assets_travel/images/icons/close1.png";
  
-// import smallLogo from "./assets/small_logo.jpeg";
-// import outlet_reg_img from "./assets/outletreg.png";
+ 
 import background from "./assets/background.png";
-// import fest from "./assets/FestivalImage.png";
+ 
 
-//
-// import cms_1 from "./assets/dashboard_icons/cms (1).png";
-// import cms_1 from "./assets/dashboard_icons/cms2.png";
-// import wallet from "./assets/dashboard_icons/wallet.png";
-// import Nepal from "./assets/dashboard_icons/flag.png";
-// import aeps_1 from "./assets/new_dashboardIcon/aeps.png";
-// import bbpsOff from "./assets/new_dashboardIcon/bbpsOfline.png";
-// import settingnew from "./assets/new_dashboardIcon/setting.png";
-// import cmsNew from "./assets/new_dashboardIcon/cms.png";
-// import bbps2 from "./assets/new_dashboardIcon/bbps.png";
-// import dmt_1 from "./assets/dashboard_icons/rupee.png";
-// import elec_1 from "./assets/dashboard_icons/electrical.png";
-// import credit_1 from "./assets/dashboard_icons/credit-card.png";
-// import broadband1 from "./assets/dashboard_icons/wireless.png";
-// import gas1 from "./assets/dashboard_icons/gas-cylinder.png";
-// import water1 from "./assets/dashboard_icons/water-tap.png";
-// import insurance1 from "./assets/dashboard_icons/insurance (1).png";
-// import landline1 from "./assets/dashboard_icons/fax.png";
-// import bbps1 from "./assets/new_dashboardIcon/bbps2.png";
-// import dth1 from "./assets/dashboard_icons/dth1.png";
-// import plane1 from "./assets/dashboard_icons/airplan.png";
-// import bus1 from "./assets/dashboard_icons/shuttle-bus.png";
-// import hotel1 from "./assets/dashboard_icons/hotel.png";
-// import train1 from "./assets/dashboard_icons/train.png";
-// import vpay1 from "./assets/dashboard_icons/pay.png";
-// import prepaid1 from "./assets/dashboard_icons/using-phone.png";
-// import postpaid1 from "./assets/dashboard_icons/mobile (1).png";
-// import upi3 from "./assets/dashboard_icons/qr.png";
-// import blocked1 from "./assets/sidebar_icons/blocked.svg";
-// import sbi1 from "./assets/bankicons/sbi.png";
-// import pnb1 from "./assets/bankicons/pnb.png";
-// import axis1 from "./assets/bankicons/Axis.jpg";
-// import bom1 from "./assets/bankicons/BOM.png";
-// import bob1 from "./assets/bankicons/BOB.png";
-// import hdfc1 from "./assets/bankicons/hdfc.png";
-// import icici1 from "./assets/bankicons/Icici.jpg";
-// import kotak1 from "./assets/bankicons/Kotak.png";
-// import union1 from "./assets/bankicons/union.png";
-// import dbs1 from "./assets/bankicons/Dbs.jpg";
-// import idbi1 from "./assets/bankicons/Idbi.png";
-// import rbl1 from "./assets/bankicons/rbl.png";
-// import defbank1 from "./assets/bankicons/bank.jpg";
-// import upi12 from "./assets/bankicons/upi.jpg";
-// import yes1 from "./assets/bankicons/yes.png";
-// import indus1 from "./assets/bankicons/indus.jpg";
-// import airtel1 from "./assets/bankicons/airtel.jpg";
-// import abhy1 from "./assets/bankicons/ABHY.png";
-// import canara1 from "./assets/bankicons/canara.jpg";
-// import bandhan1 from "./assets/bankicons/bandhan.png";
-// import cbi1 from "./assets/bankicons/cbi.png";
-// import idib1 from "./assets/bankicons/idib.avif";
-// import stand1 from "./assets/bankicons/chartered.png";
-// import jk1 from "./assets/bankicons/jandk.jpg";
+ 
+ 
+ 
+ 
 import NewLogout from "../src/assets/exit.png";
-// import wallet from "./assets/wallet.png";
-// import bbps from "./assets/bbps.png";
-// import login_illustration from "./assets/loginIllustration.png";
-// import landingPageIllustration from "./assets/landing-page-assets/landingPageillustration.webp";
-// import contact from "./assets/sidebar_icons/contactUs.png";
-// import dash from "./assets/sidebar_icons/dashboard.svg";
-// import express from "./assets/sidebar_icons/ExpressTransfer.png";
-// import money from "./assets/sidebar_icons/moneyTransfer.png";
-// import rechargeicon from "./assets/sidebar_icons/recharge.png";
-// import txn from "./assets/sidebar_icons/transaction.png";
-// import upiTrans from "./assets/sidebar_icons/upiTransfer.png";
-// import hotel from "./assets/sidebar_icons/hotelbooking.svg";
-// import bus from "./assets/sidebar_icons/busbooking.svg";
-// import flight from "./assets/sidebar_icons/flightbooking.svg";
-// import footerbg from "./assets/footer-bg.png";
+ 
+ 
 import userAvatar from "./assets/user.webp";
 import i from "./assets/info.png";
-// import phone_login from "./assets/mobile.png";
-// import rupeeLogo from "./assets/rupee.png";
-// import upiImg from "./assets/upi.svg";
-// import finger_printsvg from "./assets/svg/fingerprint_new.svg";
-// import transaction_black from "./assets/transaction18.png";
-// import transaction_white from "./assets/transaction_white.png";
-// import successGif from "./assets/success.json";
-// import successGif2 from "./assets/successDone.json";
-// import chatBox from "./assets/chat.png";
-// import panda_illustration from "./assets/Panda.svg";
-// import paytm from "./assets/paytm.svg";
-// import about_us from "./assets/aboutus.webp";
-// import empty_table from "./assets/Panda.svg";
+ 
 import not_found_404 from "./assets/404_not_found.jpg";
 import unauthorizedNew from "./assets/401_Error_Unauthorized.png";
 import no_data_gif from "./assets/no_data.gif";
 import no_data_jpeg from "./assets/no_data.png";
-// import wave_bg from "./assets/wave-haikei.png";
-// import team from "./assets/teamwork.jpg";
-// import director from "./assets/director.jpeg";
+ 
 
-//bbps icons import
-// import broadband_svg from "./assets/svg/broadband.svg";
-// import broadband_invert_svg from "./assets/svg-invert/broadband.svg";
-// import card from "./assets/svg/credit_card.svg";
-// import card_invert from "./assets/svg-invert/credit_card.svg";
-// import car_svg from "./assets/svg/car.svg";
-// import car_invert_svg from "./assets/svg-invert/car_white.svg";
-// import clubs_svg from "./assets/svg/clubs.svg";
-// import clubs_svg_invert from "./assets/svg-invert/clubs.svg";
-// import dth_svg from "./assets/svg/dth.svg";
-// import dth_invert_svg from "./assets/svg-invert/dth.svg";
-// import electricity_invert_svg from "./assets/svg-invert/electricity.svg";
-// import fasttag_svg from "./assets/svg/toll_tax.svg";
-// import fasttag_invert from "./assets/svg-invert/toll.svg";
-// import gas_svg from "./assets/svg/gas.svg";
-// import gas_invert_svg from "./assets/svg-invert/gas.svg";
-// import health_svg from "./assets/svg/health.svg";
-// import health_invert_svg from "./assets/svg-invert/health_white.svg";
-// import hospital_svg from "./assets/svg/hospital.svg";
-// import hospital_svg_invert from "./assets/svg-invert/hospital.svg";
-// import housing_society_svg from "./assets/svg/housing_society.svg";
-// import housing_society_svg_invert from "./assets/svg-invert/housing_society.svg";
-// import piggy_bank_svg from "./assets/svg/piggy_bank.svg";
-// import recurring_deposit_svg_invert from "./assets/svg-invert/recurring_deposits.svg";
-// import recharge_white_svg from "./assets/svg/recharge_white.svg";
-// import recharge_white_invert_svg from "./assets/svg-invert/recharge_white.svg";
-// import subscriptions_svg from "./assets/svg/subscriptions.svg";
-// import subscriptions_svg_invert from "./assets/svg-invert/subscriptions.svg";
-// import taxes_svg from "./assets/svg/taxes.svg";
-// import taxes_svg_invert from "./assets/svg-invert/taxes.svg";
-// import water_drop_svg from "./assets/svg/water_drop.svg";
-// import water_drop_invert_svg from "./assets/svg-invert/water_drop.svg";
-// import mobile_recharge from "./assets/mobileRec.png";
-// import m_recharge from "./assets/recharge.webp";
-// import irctc from "./assets/irctc.png";
-// import qr_img from "./assets/qrCode.webp";
-// import recent_img from "./assets/recent.jpeg";
-// import aadharAtm from "./assets/atm.webp";
-// import money_t from "./assets/moneyT.png";
-// import join_us from "./assets/joinus.webp";
-// import join_us_img from "./assets/joinus2.webp";
-// import contact_img from "./assets/contactus.webp";
-// import certificateT from "./assets/certificatetop.png";
-// import certificateB from "./assets/certificatebottom.png";
-// import playstoreIcon from "../src/assets/playstore.png";
-// import appStoreIcon from "../src/assets/appstore.png";
-// import we_are from "./assets/whowe.jpg";
+ 
+ 
 import yellowinfo from "./assets/exclamation.png";
 import redinfo from "./assets/siren.png";
 import blueinfo from "./assets/info.svg";
@@ -156,128 +34,47 @@ import excelImage from "./assets/excel-file (2).png";
 import sample1 from "./assets/download.png";
 import upload1 from "./assets/upload-file.png";
 
-// import cable from "./assets/svg/Cabletv-svg-trans.svg";
-// import cableInverted from "./assets/svg-invert/Cabletv_white-svg-trans.svg";
-// import rupay from "./assets/rupay.png";
-// import master from "./assets/mastercard.png";
-// import visa from "./assets/visa.png";
-// import mo_vison from "./assets/illus14.png";
-// import mo_mission from "./assets/illus12.png";
-// import mo_values from "./assets/illus151.png";
+ 
 import location from "./assets/svg/location.png";
 import iphone from "./assets/svg/iphone.png";
 import message from "./assets/svg/message.png";
 import globe from "./assets/svg/globe.png";
 import stamp from "./assets/impsguru_stamp.png";
 import certificate from "./assets/svg/certificate_icon.png";
-// import prabhu from "./assets/prabhuMT.jpg";
-// import kycverification from "./assets/kyc_verification.webp";
-// import indNepal from "./assets/indo_nepal.webp";
+ 
 
-// import aepsAuth from "./assets/aepsAuth.webp";
+ 
 import processing from "./assets/processing.png";
-// import creditReqImg from "./assets/just_icons/creditReq.svg";
-// import complaintsImg2 from "./assets/just_icons/complaints.svg";
-// import complaintsImg from "./assets/just_icons/complaints.svg";
-// import BusImage from "./assets/busimage.jpg";
-// import TrainImage from "./assets/irctcimage.png";
-// import HotelImage from "./assets/hotelimage.jpg";
+ 
 import lock_icon from "./assets/lock.png";
 
 import bank from "./assets/new_dashboardIcon/fundRq.png";
-// import dashboardnew from "./assets/new_dashboardIcon/dashboard.png";
-// import walletLdgernew from "./assets/new_dashboardIcon/walletLedger.png";
-import users from "./assets/Images/Users2.svg";
-// import transctionNew from "./assets/new_dashboardIcon/fundTrnsfr.png";
-import bgimage from "./assets/Images/bgimage.png";
-// import fundReq from "./assets/new_dashboardIcon/rupee.png";
-// import walletTransfer from "./assets/Images/Transfer.svg";
-// import walletLdger from "./assets/Images/walletLedger.svg";
-// import complnImg from "./assets/new_dashboardIcon/complaint.png";
-// import setting from "./assets/ImageS/settings2.svg";
-// import service from "./assets/Images/Services.svg";
-// import rechargeNewImg from "./assets/new_dashboardIcon/rechargeNew.png";
-// import layout from "./assets/ImageS/layouts.svg";
-// import aeps from "./assets/ImageS/AEPS.svg";
-// import complain from "./assets/new_dashboardIcon/complaint.png";
+ 
+// import users from "./assets/Images/Users2.svg";
+ 
+// import bgimage from "./assets/Images/bgimage.png";
+ 
 import risk from "./assets/Images/warning.png";
 import virtualAccount from "./assets/sidenav/account.png";
 import loginHistory from "./assets/Images/track.png";
-// import aepsAeps from "./assets/sidenav/aeps1.svg";
+ 
 import sendmoney_1 from "./assets/new_dashboardIcon/rupee.png";
 import sendmoney_2 from "./assets/new_dashboardIcon/moneyTrnsfr.png";
-// import thumbPrint_1 from "./assets/svg/aeps.svg";
-// import mobileRech_1 from "./assets/new_dashboardIcon/moneyTrnsfr.png";
+ 
 import profile_New from "./assets/new_dashboardIcon/profileNew.png";
 
-// side nav images
-
-// import linkdinIcon from "../src/assets/linkdin.png";
-// import twitterIcon from "../src/assets/twitter.png";
-// import facebookIcon from "../src/assets/facebook.png";
-// import instaIcon from "../src/assets/insta.png";
-// import aboutUsNew from "../src/assets/aboutUs.png";
+ 
 import Admindash from "./assets/AdminDash (2).svg";
 import backButton from "./assets/back.png";
 import pay from "./assets/svg/pay.svg";
-// import flightlogo from "./assets/svg/flight.jpeg";
-// import neftlogo from "./assets/svg/neft_icon.svg";
-// import impslogo from "./assets/svg/imps_icon.svg";
-// import ChildPhoto from "./assets/Child.jpg";
-// import Admindashlogo from "./assets/logo(1).png";
-// import Admindashlogo from "./assets/FestivalLogo2.png";
-// import Upi from "./assets/svg/upi-icon.svg";
-// import Limiticon from "./assets/LimitAcc.png";
-// import Limit from "./assets/LimitTran.png";
-// import Nameicon from "./assets/Name.png";
-// import Callicon from "./assets/Call1.png";
-// import serviceDN from "../src/assets/serviceDown.jpg";
-// import unauth from "../src/assets/unauthorized.jpg";
-// import slide_one from "../src/assets/slide1.webp";
-// import slide_two from "../src/assets/slide2.webp";
-// import male_avatar from "../src/assets/maleAvatar.jpeg";
-// import female_avatar from "../src/assets/femaleAvatar.jpeg";
-// new nav
-// import ledgre from "../src/assets/sidebar_icons/accountledger.svg";
-// import purchase from "../src/assets/sidebar_icons/mypurchase.svg";
-// import khata from "../src/assets/sidebar_icons/khatabook.svg";
-// import complaints from "../src/assets/sidebar_icons/mycomplaints.svg";
+ 
+  
 import credit from "../src/assets/sidebar_icons/creditrequest.svg";
-// import tran from "../src/assets/sidebar_icons/mytransactions.svg";
-// import mRec from "../src/assets/sidebar_icons/mobile.svg";
-// import dthI from "../src/assets/sidebar_icons/DTH.svg";
-// import elec from "../src/assets/sidebar_icons/electricity.svg";
-// import ccard from "../src/assets/sidebar_icons/creditcard.svg";
-// import gasI from "../src/assets/sidebar_icons/gas.svg";
-// import bb from "../src/assets/sidebar_icons/broad band.svg";
+ 
 
-// import mtrans from "../src/assets/sidebar_icons/money transfer.svg";
-// import etrans from "../src/assets/sidebar_icons/express transfer.svg";
-// import strans from "../src/assets/sidebar_icons/super transfer.svg";
-// import ntrans from "../src/assets/sidebar_icons/nepal transfer.svg";
-// import utrans from "../src/assets/sidebar_icons/UPI transfer.svg";
-// import CMS from "../src/assets/sidebar_icons/CMS.svg";
-// import ftag from "../src/assets/sidebar_icons/fast tag.svg";
-// import gcyliner from "../src/assets/sidebar_icons/gas cylinder.svg";
-// import mpost from "../src/assets/sidebar_icons/mobile postpaid.svg";
-// import mpre from "../src/assets/sidebar_icons/mobile prepaid.svg";
-// import gpipe from "../src/assets/sidebar_icons/piped gas.svg";
-// import allbbps from "../src/assets/sidebar_icons/allbbps.svg"; ///
-// import bp_1 from "../src/assets/sidebar_icons/Billpayment.png"; ///
-// import lic from "../src/assets/sidebar_icons/LIC.svg"; ///
-// import land from "../src/assets/sidebar_icons/landline.svg"; ///
-// import water from "../src/assets/sidebar_icons/water.svg"; ///
-// import electricity from "./assets/svg/electricity.svg";
-// import drawer from "../src/assets/sidebar_icons/drawer.png";
-// import defaultL from "../src/assets/defaultLayoutNew.png";
-// import servicel from "../src/assets/defaultLayout.png";
-// import sbi from "../src/assets/just_icons/bank_img.png";
-// import cms from "./assets/just_icons/cms2.png";
-// import aepsGuidelines from "./assets/aeps-guidelines.png";
-// import aepsGuidelinesNew from "./assets/aeps-guidelines-new.png";
-// import creditReqGuidelines from "./assets/credit-request-disclaimer.png";
-// import irctcAuth from "./assets/irctc-auth.png";
-// import irctcTravel from "./assets_travel/images/irctc.jpg";
+ 
+ 
+ 
 import android_1 from "./assets/android1.png";
 import macintosh_1 from "./assets/macintosh.png";
 import windows_1 from "./assets/windows1.png";
@@ -285,146 +82,30 @@ import linux_1 from "./assets/linux.png";
 import pancard from "./assets/pancard.png";
 export const Logo = biggpayLogo;
 export const smLogo = biggpayLogo_sm;
-// export const TrainsImage = TrainImage;
-// export const HotelsImage = HotelImage;
-// export const BusesImage = BusImage;
+ 
 
-//bbps export
-// export const bbpsPng = bbps;
-// //services
-// export const cms1 = cms_1;
-// export const wallet1 = wallet;
-// export const Nepal1 = Nepal;
-// export const aeps1 = aeps_1;
-// export const dmt = dmt_1;
-// export const electricity1 = elec_1;
-// export const credit_card1 = credit_1;
-// export const broadband_1 = broadband1;
-// export const gas_1 = gas1;
-// export const water_1 = water1;
-// export const insurance_1 = insurance1;
-// export const landline_1 = landline1;
-// export const bbps_1 = bbps1;
-// export const dth_1 = dth1;
-// export const plane_1 = plane1;
-// export const bus_1 = bus1;
-// export const hotel_1 = hotel1;
-// export const train_1 = train1;
-// export const vapy_1 = vpay1;
-// export const prepaid_1 = prepaid1;
-// export const postpaid_1 = postpaid1;
-// export const upi_1 = upi3;
-// export const blocked = blocked1;
+ 
+ 
 export const panlink = pancard;
 
-//bank icons
-// export const sbi2 = sbi1;
-// export const pnb2 = pnb1;
-// export const rbl2 = rbl1;
-// export const axis2 = axis1;
-// export const hdfc2 = hdfc1;
-// export const icici2 = icici1;
-// export const kotak2 = kotak1;
-// export const bob2 = bob1;
-// export const bom2 = bom1;
-// export const union2 = union1;
-// export const dbs2 = dbs1;
-// export const idbi2 = idbi1;
-// export const defbank2 = defbank1;
-// export const upi2 = upi12;
-// export const yes2 = yes1;
-// export const indus2 = indus1;
-// export const airtel2 = airtel1;
-// export const abhy2 = abhy1;
-// export const canara2 = canara1;
-// export const bandhan2 = bandhan1;
-// export const cbi2 = cbi1;
-// export const idib2 = idib1;
-// export const stand2 = stand1;
-// export const jk2 = jk1;
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 
-// bbps icons . . .
-// export const electricity_svg = electricity;
-// export const electricity_invert = electricity_invert_svg;
-// export const broadband = broadband_svg;
-// export const broadband_invert = broadband_invert_svg;
-// export const car = car_svg;
-// export const carInvert = car_invert_svg;
-// export const clulbSvg = clubs_svg;
-// export const clulbSvgInvert = clubs_svg_invert;
-// export const dth = dth_svg;
-// export const dth_invert = dth_invert_svg;
-// export const fastTag = fasttag_svg;
-// export const fastTag_invert = fasttag_invert;
-// export const gas = gas_svg;
-// export const gas_invert = gas_invert_svg;
-// export const health = health_svg;
-// export const healthInvert = health_invert_svg;
-// export const hospitalSvg = hospital_svg;
-// export const hospitalSvgInvert = hospital_svg_invert;
-// export const housingSvg = housing_society_svg;
-// export const housingSvgInvert = housing_society_svg_invert;
-// export const piggyBankSvg = piggy_bank_svg;
-// export const rDepositSvgInvert = recurring_deposit_svg_invert;
-// export const recharge_white = recharge_white_svg;
-// export const recharge_white_invert = recharge_white_invert_svg;
-// export const subsciptionSvg = subscriptions_svg;
-// export const subsciptionSvgInvert = subscriptions_svg_invert;
-// export const taxSvg = taxes_svg;
-// export const taxSvgInvert = taxes_svg_invert;
-// export const water_drop = water_drop_svg;
-// export const water_drop_invert = water_drop_invert_svg;
-// export const credit_card = card;
-// export const credit_card_invert = card_invert;
-//my imports
-// export const irctcAuthImg = irctcAuth;
-// export const paytm_img = paytm;
-// export const success_gif = successGif;
-// export const success_gif2 = successGif2;
-// export const transactionBlack = transaction_black;
-// export const transactionWhite = transaction_white;
-// export const upiWeb = upiImg;
-// export const rupee = rupeeLogo;
-// export const info = i;
-// export const userAvt = userAvatar;
-// export const footerBg = footerbg;
-// export const contactus = contact;
-// export const dashboard = dash;
-// export const expressTransfer = express;
-// export const moneyTransfer = money;
-// export const recharge = rechargeicon;
-// export const transaction = txn;
-// export const upi = upiTrans;
-// export const hotelBooking = hotel;
-// export const flightBooking = flight;
-// export const busBooking = bus;
-// export const mobilelogin = phone_login;
-// export const lockicon = lock_icon;
-
-// export const lp_illustration = landingPageIllustration;
-// export const lg_illustration = login_illustration;
-// export const panda = panda_illustration;
-// export const aboutUs = about_us;
-// export const mobile = mobile_recharge;
-// export const mobileR_img = m_recharge;
-// export const irctc_img = irctc;
-// export const qrCode_img = qr_img;
-// export const recent = recent_img;
-// export const aadharAtm_img = aadharAtm;
-// export const mt = money_t;
-// export const emptyTable = empty_table;
+ 
+ 
 export const notFound404 = not_found_404;
 export const unauthorized401 = unauthorizedNew;
 export const noDataFoundGif = no_data_gif;
 export const noDataJpeg = no_data_jpeg;
-// export const waveBg = wave_bg;
-// export const joinus = join_us;
+ 
 
-// export const joinus2 = join_us_img;
-// export const contact_us = contact_img;
-// export const who_we_are = we_are;
-// export const teamWork = team;
-// export const impsDirectorsign = director;
+ 
 
 export const yellowNoti = yellowinfo;
 export const redNoti = redinfo;
@@ -433,157 +114,54 @@ export const api = api_img;
 export const excelIcon = excelImage;
 export const sample = sample1;
 export const upload = upload1;
-// export const CableIcon = cable;
-// export const CableInv = cableInverted;
-// export const playstore = playstoreIcon;
-// export const appstore = appStoreIcon;
-// export const linkdin = linkdinIcon;
-// export const twitter = twitterIcon;
-// export const facebook = facebookIcon;
-// export const insta = instaIcon;
-// export const rupayimg = rupay;
-// export const visaimg = visa;
-// export const masterimg = master;
-// export const ModrAboutus = aboutUsNew;
-// export const loginPage = Admindash;
+ 
+ 
 export const back = backButton;
 export const paylogo = pay;
-// export const flight1 = flightlogo;
-// export const Neftlogo = neftlogo;
-// export const Impslogo = impslogo;
-// export const Banner = ChildPhoto;
-// export const loginPage1 = Admindashlogo;
-// export const UpiLogo = Upi;
-// export const Name = Nameicon;
-// export const LimitAcc = Limiticon;
-// export const LimitTran = Limit;
-// export const Call1 = Callicon;
-// export const serviceDown = serviceDN;
-// export const unauthorized = unauth;
+ 
+ 
 
-// export const chat = chatBox;
-
-// export const moVision = mo_vison;
-// export const moMisson = mo_mission;
-// export const moValues = mo_values;
-
-// export const locIcon = location;
-// export const messIcon = message;
-// export const iphoneIcon = iphone;
-// export const globeIcon = globe;
+ 
+ 
 export const impsguruStamp = stamp;
 export const certificateIcon = certificate;
-// export const prabhuMoneyTransfer = prabhu;
-// export const kycVImg = kycverification;
-// export const indoNepal = indNepal;
+ 
 
-// export const slider1 = slide_one;
-// export const slider2 = slide_two;
+ 
+ 
 
-// export const account_ledgre = ledgre;
-// export const transactions = tran;
-// export const creditReq = credit;
-// export const creditReqBadgeIcon = creditReqImg;
-// export const complaintsBadgeIcon = complaintsImg;
-// export const khataBook = khata;
-// export const myComplaints = complaints;
-// export const myPurchase = purchase;
-// export const topDrawer = drawer;
-// export const defaultLayout = defaultL;
-// export const servicelayout = servicel;
-// export const sbiBank = sbi;
-
-// export const cTop = certificateT;
-// export const cBottom = certificateB;
-// export const aepsAuthImg = aepsAuth;
+ 
 export const processingImg = processing;
 
-// export const mrecIcon = mRec;
-// export const dthIcon = dthI;
-// export const elecIcon = elec;
-// export const cardIcon = ccard;
-// export const gasIcon = gasI;
-// export const bbIcon = bb;
-// export const aepsIcon = aeps;
-// export const mtIcon = mtrans;
-// export const etIcon = etrans;
-// export const stIcon = strans;
-// export const ntIcon = ntrans;
-// export const utIcon = utrans;
-// export const CMSIcon = CMS;
-// export const Electricity = elec;
-// export const FASTag = ftag;
-// export const Cylinder = gcyliner;
-// export const Postpaid = mpost;
-// export const Prepaid = mpre;
-// export const Gas = gpipe;
-// export const BBPS = allbbps;
-// export const bp = bp_1;
-// export const licIcon = lic;
-// export const landIcon = land;
-// export const waterIcon = water;
-// export const AirIndia = airIndia;
+ 
+ 
+ 
 export const closeIcon = closeicon;
 
-// export const fingerSvg = finger_printsvg;
-// export const cmsIcon = cms;
-// export const aepsGuidelinesImg = aepsGuidelines;
-// export const aepsGuidelinesNewImg = aepsGuidelinesNew;
-// export const creditReqGuidelinesImg = creditReqGuidelines;
-// export const irctcTravelImage = irctcTravel;
-// export const small_logo = smallLogo;
-// export const outletRegImg = outlet_reg_img;
-// export const backgroundMT = background;
-// export const maleAvatar = male_avatar;
-// export const femaleAvatar = female_avatar;
+ 
+ 
 export const android2 = android_1;
 export const macintosh2 = macintosh_1;
 export const windows2 = windows_1;
 export const linux2 = linux_1;
-// export const festivalIMage = fest;
+ 
 
 // *************New Icons******************************************
 export const bankImage = bank;
-// export const walletLedgerImg = walletLdgernew;
-// export const dashboardImage = dashboardnew;
-export const usersImage = users;
-export const bgImage = bgimage;
-// export const fundReqImage = fundReq;
-// export const walletTransferImage = walletTransfer;
-// export const walletLdgerImage = walletLdger;
-// export const settingImage = setting;
-// export const serviceImage = service;
-// export const layoutImage = layout;
-// export const aepsImage = aeps;
-// export const complainImage = complain;
-// export const riskImage = risk;
-// export const transImage = transctionNew;
+ 
+// export const usersImage = users;
+// export const bgImage = bgimage;
+ 
+ 
 
-// export const fundReqImage = fundReq;
-// export const complainImageNew = complnImg;
-// export const walletTransferImage = walletTransfer;
+ 
 
-// export const walletLdgerImage = walletLdger;
-// export const settingImage = setting;
-// export const serviceImage = service;
-// export const rechargeNew = rechargeNewImg;
-// export const layoutImage = layout;
-
-// export const aepsImage = aeps;
-// export const bbpsOfline = bbpsOff;
-// export const complainImage = complain;
-// export const settingNew = settingnew;
-// export const cmsImage = cmsNew;
-// export const bbps_2 = bbps2;
+ 
 export const riskImage = risk;
 
 export const virtuanAccountImage = virtualAccount;
 
 export const loginHistoryImage = loginHistory;
-// export const aepsaeps = aepsAeps;
-// export const sendmoney = sendmoney_1;
-// export const sendmoney2 = sendmoney_2;
-// export const thumbPrint = thumbPrint_1;
-// export const mobileRechargeNew = mobileRech_1;
+ 
 export const profileNewImage = profile_New;
 export const newLogout = NewLogout;
