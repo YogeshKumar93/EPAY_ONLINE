@@ -619,7 +619,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                 Manage Profile
               </MenuItem>
 
-              <MenuItem
+              {/* <MenuItem
                 onClick={() => {
                   if (user?.role === "adm") {
                     navigate("/logs");
@@ -634,7 +634,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                   <TimelineIcon fontSize="small" />
                 </ListItemIcon>
                 Activity Logs
-              </MenuItem>
+              </MenuItem> */}
 
               {/* <MenuItem>
     <ListItemIcon>

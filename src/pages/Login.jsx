@@ -35,7 +35,7 @@ import VerifyMpinLogin from "../components/UI/VerifyMpinLogin";
 import { getGeoLocation } from "../utils/GeoLocationUtil";
 import { okErrorToast } from "../utils/ToastUtil";
 import ForgotPassword from "../components/common/ForgotPassword";
-import biggpayLogo from "../assets/Images/PPALogo.svg";
+import biggpayLogo from "../assets/Images/PPALogo6.png";
 import lockicon from "../assets/lock.png";
 import mobilelogin from "../assets/mobile.png";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -237,11 +237,12 @@ return (
             maxWidth: 300,
             mb: 3,
             objectFit: "contain",
+          
             cursor: "pointer",
             display: "block",
             mx: "auto",
           }}
-          onClick={() => window.open("https://p2pae.com")}
+          // onClick={() => window.open("https://p2pae.com")}
         />
 
         {/* Error */}
@@ -257,6 +258,7 @@ return (
        <ReTextField
   fullWidth
   size="medium"
+  placeholder="Enter Username"
   sx={{
     mt: 4,
     "& .MuiOutlinedInput-root": {
@@ -290,6 +292,7 @@ return (
         <ReTextField
   fullWidth
   size="medium"
+  placeholder="Enter Password"
   sx={{
     mt: 5,
     "& .MuiOutlinedInput-root": {
@@ -312,7 +315,7 @@ return (
     ...passwordInputProps(showPassword, setShowPassword), // keep eye toggle
     startAdornment: (
       <InputAdornment position="start">
-        <LockIcon sx={{ color: "#757575" }} />
+        <LockIcon sx={{ color: "#757575", ml:2 }} />
         {/* OR your image:
         <img
           src={passwordIcon}

@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import React from "react";
-import biggpayLogo from "../../assets/Images/PPALogo.svg";
+import biggpayLogo from "../../assets/Images/PPALogo6.png";
 
 const CommonLoader = ({ loading, children }) => {
   return (

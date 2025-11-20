@@ -203,15 +203,37 @@ const CreateAccountStatement = ({
         </Grid>
       </Grid>
 
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleSubmit}
-        disabled={submitting}
-        sx={{ mt: 1 }}
-      >
-        {submitting ? "Submitting..." : "Add"}
-      </Button>
+      
+         <Button
+                      label="Account"
+                       onClick={handleSubmit}
+                      variant="contained"
+                       disabled={submitting}
+                      size="medium"
+                      sx={{
+                        background: "linear-gradient(135deg, #490277 0%, #6A1B9A 100%)",
+                        color: "#FFFFFF",
+                        textTransform: "none",
+                        fontWeight: 600,
+                        letterSpacing: "0.3px",
+                        paddingX: 3,
+                        paddingY: 1.2,
+                        borderRadius: "10px",
+                        boxShadow: "0px 4px 12px rgba(73, 2, 119, 0.3)",
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          background: "linear-gradient(135deg, #5A048F 0%, #7B2BB5 100%)",
+                          boxShadow: "0px 6px 16px rgba(73, 2, 119, 0.45)",
+                          transform: "translateY(-2px)",
+                        },
+                        "&:active": {
+                          transform: "scale(0.98)",
+                          boxShadow: "0px 2px 6px rgba(73, 2, 119, 0.2)",
+                        },
+                      }}
+                    >
+                      {submitting ? "Submitting..." : "Add"}
+                    </Button>
     </Box>
   );
 };

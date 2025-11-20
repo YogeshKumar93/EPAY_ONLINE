@@ -430,7 +430,7 @@ const handleUploadExcel = async (file) => {
                   size="small"
                   variant="contained"
                   sx={{
-                    backgroundColor: "#6C4BC7",
+                    backgroundColor: "#14bf48ff",
                     color: "#fff",
                     "&:hover": { backgroundColor: primaryColor() },
                   }}
