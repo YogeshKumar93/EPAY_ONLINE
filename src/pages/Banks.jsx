@@ -8,12 +8,13 @@ import { dateToTime1, ddmmyy, ddmmyyWithTime } from "../utils/DateUtils";
 import CreateBankModal from "../components/Bank/CreateBanks";
 // import ReButton from "../components/common/ReButton";
 import CommonStatus from "../components/common/CommonStatus";
-import CommonLoader from "../components/common/CommonLoader";
+ 
 import DeleteIcon from "@mui/icons-material/Delete";
 import UpdateBanks from "../components/Bank/UpdateBanks";
 import DeleteBank from "./DeleteBank";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { useNavigate } from "react-router-dom";
+import CommonLoader from "../components/common/CommonLoader";
 
 const Banks = ({ filters = [] }) => {
   const authCtx = useContext(AuthContext);
@@ -25,7 +26,7 @@ const Banks = ({ filters = [] }) => {
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [selectedBank, setSelectedBank] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const bank_name = location.state?.bank_name || "Bank";
   const acc_number = location.state?.acc_number || "Account Number";
 
@@ -198,6 +199,7 @@ const Banks = ({ filters = [] }) => {
       {!loading && (
         <>
           <CommonTable
+         
             onFetchRef={handleFetchRef}
             columns={columns}
             endpoint={ApiEndpoints.GET_BANKS}

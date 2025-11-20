@@ -52,7 +52,7 @@ import { setTitleFunc } from "../../utils/HeaderTitleUtil";
 import TimelineIcon from "@mui/icons-material/Timeline";
 // import defaultMaleAvatar from "../../assets/Images/male_avtar.jpg";
 // import defaultMaleAvatar2 from "../../assets/Images/male_avtar2.jpg";
-import logo from "../../assets/Images/PPALogo.jpeg"; 
+import logo from "../../assets/Images/PPALogo.svg"; 
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 // import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -242,9 +242,9 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
               primary={item.title} // ✅ Make sure title is not replaced
               sx={{
                 "& .MuiTypography-root": {
-                  color: isItemActive ? "#6C4BC7" : "#6e82a5",
+                  color: isItemActive ? "#492077" : "#7a89a4ff",
                   fontWeight: 550,
-                  fontSize: "15px",
+                  fontSize: "17px",
                 },
               }}
             />
@@ -298,9 +298,10 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             onClick={handleLogoClick}
             sx={{
               height: 35,
-              width: 120, //
+              width: 130, //
               cursor: "pointer",
               display: "block",
+               
             }}
           />
         )}
@@ -344,6 +345,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             color: "#492077",
             borderRadius: "4px",
             mb: 0,
+            mt:5,
             "&:hover": {
               backgroundColor: "#ebeef2",
               color: "#6C4BC7",
@@ -432,7 +434,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             sx={{
               mr: 2,
               display: { xs: "flex", sm: "flex", md: "none" }, // only show on xs/sm
-              color: "#6c4bc7",
+              color: "#492077",
             }}
           >
             <MenuIcon />
@@ -441,7 +443,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             variant="h5"
             noWrap
             component="div"
-            sx={{ flexGrow: 1, color: "#6C4BC7", fontWeight: 700 }}
+            sx={{ flexGrow: 1, color: "#492077", fontWeight: 700 }}
           >
             {title}
           </Typography>
@@ -464,7 +466,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
               )}
           </Box>
           <IconButton onClick={refreshUser}>
-            <RefreshIcon sx={{ color: "#6C4BC7" }} />
+            <RefreshIcon sx={{ color: "#492077" }} />
           </IconButton>
 
           {/* <IconButton onClick={colour}>
@@ -475,10 +477,10 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             sx={{
               display: "flex",
               alignItems: "center",
-              gap: 1,
+              gap: 3,
             }}
           >
-            <NotificationModal />
+            {/* <NotificationModal /> */}
             <IconButton
               color="inherit"
               onClick={handleUserMenuOpen}
@@ -488,7 +490,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                 sx={{
                   width: 30,
                   height: 30,
-                  bgcolor: "#6C4BC7",
+                  bgcolor: "#492077",
                 }}
               >
                 <PersonOutlineIcon sx={{ color: "#FFF", fontSize: 20 }} />
@@ -509,7 +511,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                 variant="caption"
                 sx={{
                   fontWeight: 500,
-                  color: "#6C4BC7",
+                  color: "#492077",
                   fontSize: "11px",
                   lineHeight: 1,
                 }}
@@ -538,7 +540,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                   variant="subtitle1"
                   sx={{
                     fontWeight: 600,
-                    color: "#6C4BC7",
+                    color: "#492077",
                     fontSize: "12px",
                     lineHeight: "16px",
                   }}
@@ -550,7 +552,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                   onClick={handleUserMenuOpen}
                   sx={{ p: 0, ml: 1, width: 20, height: 20 }}
                 >
-                  <ExpandMoreIcon sx={{ fontSize: 20, color: "#6C4BC7" }} />
+                  <ExpandMoreIcon sx={{ fontSize: 20, color: "#492077" }} />
                 </IconButton>
               </Box>
             </Box>
@@ -580,17 +582,17 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                 display: "flex",
                 alignItems: "center",
                 gap: 2,
-                color: "#3D0075",
+                color: "#492077",
 
                 bgcolor: "#EEE8FF",
 
-                borderTop: "3px solid #6C4BC7 ",
+                borderTop: "3px solid #492077 ",
               }}
             >
               <Avatar
                 alt={user?.name || "User Avatar"}
                 src={user?.avatar || ""}
-                sx={{ width: 48, height: 48, bgcolor: "#6C4BC7" }}
+                sx={{ width: 48, height: 48, bgcolor: "#492077" }}
               >
                 {user?.name?.[0]}
               </Avatar>

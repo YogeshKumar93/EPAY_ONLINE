@@ -595,7 +595,7 @@ const CommonModal = ({
       aria-labelledby="modal-title"
       PaperProps={{
         sx: {
-          borderRadius: { xs: 0, sm: 2 },
+          borderRadius: { xs: 0, sm: 4 },
           boxShadow: { xs: "none", sm: "0 10px 40px rgba(0,0,0,0.1)" },
           bgcolor: "#FFFFFF",
           fontFamily: '"DM Sans", sans-serif !important',
@@ -620,7 +620,7 @@ const CommonModal = ({
           sx={{
             height: "4px", // thickness of the line
             width: "100%", // full width
-            bgcolor: "#854fff", // purple color
+            bgcolor: "#261452ff", // purple color
           }}
         />
 
@@ -632,11 +632,11 @@ const CommonModal = ({
             alignItems: "center",
             borderBottom: dividers ? 1 : 0,
             borderColor: "divider",
-            backgroundColor: "#f8fafc",
+            backgroundColor: "#e0d8e6ff",
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
-            <Box sx={{ mr: 1.5, display: "flex", color: "#4f46e5" }}>
+            <Box sx={{ mr: 1.5, display: "flex", color: "#492077" }}>
               {getIcon()}
             </Box>
             <Typography
@@ -644,7 +644,7 @@ const CommonModal = ({
               component="h2"
               id="modal-title"
               sx={{
-                color: "#364a63",
+                color: "#492077",
                 fontWeight: 550,
                 fontSize: { xs: "1.25rem", sm: "1.5rem" },
               }}
@@ -657,7 +657,8 @@ const CommonModal = ({
               aria-label="close"
               onClick={onClose}
               sx={{
-                color: (theme) => theme.palette.grey[500],
+                color: (theme) => theme.palette.grey[900],
+                
                 "&:hover": { backgroundColor: "rgba(0,0,0,0.04)" },
               }}
             >
@@ -745,7 +746,7 @@ const CommonModal = ({
                   typeof button.text === "string" &&
                   button.text.toLowerCase() === "cancel"
                     ? "#8094ae !important"
-                    : "#854fff",
+                    : "#492077",
 
                 color: "#fff",
                 textTransform: "none",

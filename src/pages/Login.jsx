@@ -35,7 +35,7 @@ import VerifyMpinLogin from "../components/UI/VerifyMpinLogin";
 import { getGeoLocation } from "../utils/GeoLocationUtil";
 import { okErrorToast } from "../utils/ToastUtil";
 import ForgotPassword from "../components/common/ForgotPassword";
-import biggpayLogo from "../assets/Images/PPALogo.jpeg";
+import biggpayLogo from "../assets/Images/PPALogo.svg";
 import lockicon from "../assets/lock.png";
 import mobilelogin from "../assets/mobile.png";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -213,7 +213,7 @@ return (
       sx={{
         position: "absolute",
         top: 0,
-        left: 0,
+        left: 40,
         height: "100%",
         width: { xs: "100%", md: "45%" }, // form left area on desktop
         display: "flex",
@@ -234,7 +234,7 @@ return (
           alt="Logo"
           sx={{
             width: "100%",
-            maxWidth: 330,
+            maxWidth: 300,
             mb: 3,
             objectFit: "contain",
             cursor: "pointer",

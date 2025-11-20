@@ -24,7 +24,7 @@ const Accounts = () => {
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [accounts, setAccounts] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [userSearch, setUserSearch] = useState("");
   const [userOptions, setUserOptions] = useState([]);
   const fetchUsersRef = useRef(null);
@@ -202,7 +202,7 @@ const Accounts = () => {
 
   return (
     <>
-      <CommonLoader loading={loading} text="Loading Fund Requests" />
+      <CommonLoader loading={loading} text="Loading Accounts" />
 
       {!loading && (
         <Box>

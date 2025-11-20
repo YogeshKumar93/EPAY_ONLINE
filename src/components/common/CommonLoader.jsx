@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import React from "react";
-import { smLogo } from "../../iconsImports";
+import biggpayLogo from "../../assets/Images/PPALogo.svg";
 
 const CommonLoader = ({ loading, children }) => {
   return (
@@ -24,7 +24,7 @@ const CommonLoader = ({ loading, children }) => {
         >
           <div className="loader-container">
             <img
-              src={smLogo}
+              src={biggpayLogo}
               style={{
                 cursor: "pointer",
                 width: 80,
@@ -61,7 +61,7 @@ const CommonLoader = ({ loading, children }) => {
         .circle1 {
           width: 120px;
           height: 120px;
-          border: 5px solid #2563eb; /* Blue */
+          border: 5px solid #492077; /* Blue */
           animation: rotateAnimation1 3.2s linear infinite;
         }
 

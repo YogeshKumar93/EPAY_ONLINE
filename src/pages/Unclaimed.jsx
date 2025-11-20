@@ -20,7 +20,7 @@ import { secondaryColor } from "../utils/setThemeColor";
 
 const Unclaimed = () => {
   const [entries, setEntries] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({
     userId: "",
     status: "unclaimed",
@@ -35,6 +35,8 @@ const Unclaimed = () => {
   const refreshEntries = () => {
     if (fetchEntriesRef.current) fetchEntriesRef.current();
   };
+
+  
 
   const fetchEntries = async () => {
     setLoading(true);
@@ -124,7 +126,7 @@ const Unclaimed = () => {
       <CommonLoader loading={loading} text="Loading Unclaimed Entries..." />
 
       {!loading && (
-        <Box p={2}>
+        <Box >
           <Box
             mb={2}
             sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}
@@ -181,7 +183,7 @@ const Unclaimed = () => {
               onFetchRef={handleFetchRef}
               endpoint={`${ApiEndpoints.GET_UNCLAIMED_ENTERIES}`}
               columns={columns}
-              loading={loading}
+              // loading={loading}
               disableSelectionOnClick
             />
           </Box>

@@ -74,7 +74,7 @@ const UpdateAccount = ({ open, handleClose, onFetchRef, selectedAccount }) => {
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-      <DialogTitle sx={{ fontWeight: 600 }}>Update Account</DialogTitle>
+      <DialogTitle sx={{ fontWeight: 600, color:"#492077" }}>Update Account</DialogTitle>
       <DialogContent dividers>
         <Box display="flex" flexDirection="column" gap={2} mt={1}>
           <TextField
@@ -98,8 +98,9 @@ const UpdateAccount = ({ open, handleClose, onFetchRef, selectedAccount }) => {
         </Button>
         <Button
           onClick={handleSubmit}
-          variant="contained"
-          color="primary"
+        variant="contained"
+         
+        sx={{  backgroundColor:"#492077",  color:"primary"}}
           disabled={submitting}
         >
           {submitting ? (
