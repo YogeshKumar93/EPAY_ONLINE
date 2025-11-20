@@ -25,30 +25,30 @@ const ApiEndpoints = {
   GET_USERS: "user/getUsers",
   GET_USERS_ACC: "",
   VERIFY_PIC: "admin/approveRejectKyc",
- 
-  
+
+
   GET_USER_BY_USERNAME: "auth/getUserByUsername",
   GET_USER_BY_ID: "admin/getUserById",
   // RESEND_OTP: "wallet/resendOtp",
   USER_PROFIT: "admin/userProfitability",
   DELETE_USER: "admin/deleteUser",
   API_USERS_CHARGES: "admin/charges",
- 
+
   API_USERS_KEYS: "admin/userKeys",
   BLOCK_UNBLOCK: "admin/blockUnblock",
   GET_TRANSACTIONS: "admin/getTransactions",
   GET_ACC_TRANSACTIONS: "",
- 
-  
- 
+
+
+
   ADD_BANK: "admin/createBank",
- 
+
   GET_ROUTE: "admin/getRoutes",
   GET_CATEGORIES: "admin/getCategories",
-  
- 
 
- 
+
+
+
 
   GET_BANK_BALANCE: "bank/getBankBalance",
   // whitelisted accputn apis
@@ -92,21 +92,20 @@ const ApiEndpoints = {
   GET_LOGS: "auditlog/getAuditLogs",
   DELETE_LOG: "auditlog/deleteAuditLog",
   GET_LOG: "auditlog/getAuditLog",
- 
-  
- 
+
+
+
   GET_BY_TYPE: "business/getByType",
   UPDATE_BY_TYPE: "business/updateByType",
   GET_ALL_BY_USER: "business/getAllByUser",
   APPROVE_REJECT_DOCS: "business/approveReject",
- 
+
 
   LOGIN_HISTORY: "userDevice/getUserDevice",
   GET_WEBHOOKS: "webhook/getWebhook",
   GET_USER_DEBOUNCE: "user/getUserDebounce",
   GET_SENDER_UPI: "payout/getSenderUpi",
-  REGISTER_REMITTER_UPI: "payout/registerRemitterUpi",
-  VERIFY_REMITTER_UPI: "payout/verifyRemitterUpi",
+
   // ****************************** NEW API'S ABOVE ******************************
 
   // dashboard apis.
@@ -117,39 +116,27 @@ const ApiEndpoints = {
   GET_SERVICE_WISE_PROFIT_ADMIN: "dashboard/getServiceWiseProfitSummaryNew",
   // -------
 
-  GET_FUND_REQUESTS: "fundrequest/getFundRequests",
-  CREATE_FUND_REQUEST: "fundrequest/createFundRequest",
-  UPDATE_FUND_REQUEST: "fundrequest/updateFundRequest",
-  DELETE_FUND_REQUEST: "fundrequest/deleteFundRequest",
 
-  EDIT_FUND_REQUEST: "fundrequest/editFundRequest",
+
+
   GET_BANKS: "bank/getBanks",
 
   QR_LOGIN: "auth/generateQr",
   QR_STATUS: "auth/qrStatus",
-  BILL_PAYMENTS_CATEGORIES: "bbps/getCategoriesBillPayment",
-  BILL_PAYMENTS: "bbps/billPayment",
-  GET_COMPLAINS: "complains/getComplains",
-  CREATE_COMPLAINTS: "complains/createComplains",
-  UPDATE_COMPLAINTS: "complains/updateComplains",
-  AEPS_LOGIN: "aeps/outletLogin",
-  AEPS_LOGIN_STATUS: "aeps/outletLoginStatus",
-  AEPS_BALANCE_ENQUIRY: "/aeps/balanceEnquiry",
-  AEPS_CASHWITHDRAWAL: "/aeps/cashWithdrawl",
-  AEPS_MINI_STATEMENT: "/aeps/miniStatement",
-  AEPS_BANKS: "/aeps/getBanks",
-  BBPS_PAY_BILL: "/bbps/payBill",
 
-  WALLET_LEDGER_TXNDATA: "walletledger/getTxnData",
+
+
+
+
 
   // ****************************** NEW API'S ABOVE ******************************
-  GET_COMMISSION_RULE: "commission/getCommissions",
+  // GET_COMMISSION_RULE: "commission/getCommissions",
   // Notification apis
-  GET_NOTIFICATION: "notification/getNotification",
-  MARK_READ_NOTI: "notification/updateNotification",
-  ADMIN_NOTIFICATION: "notification/createNotification",
-  UPDATE_NOTIFICATION: "notification/updateNotification",
-  DELETE_NOTIFICATION: "notification/deleteNotification",
+  // GET_NOTIFICATION: "notification/getNotification",
+  // MARK_READ_NOTI: "notification/updateNotification",
+  // ADMIN_NOTIFICATION: "notification/createNotification",
+  // UPDATE_NOTIFICATION: "notification/updateNotification",
+  // DELETE_NOTIFICATION: "notification/deleteNotification",
   // -----
 
   // bank statement apis
@@ -171,14 +158,7 @@ const ApiEndpoints = {
   UPDATE_BANK: "bank/updateBank",
   DELETE_BANK: "bank/deleteBank",
 
-  GET_DMT_TXN: "dmt/getDmtTxns",
-  GET_BBPS_TXN: "bbps/getBbpsTxns",
-  GET_AEPS_TXN: "aeps/getAepsTxns",
-  GET_MATM_TXN: "matm/getMatmTxns",
-  GET_PAYOUT_TXN: "payout/getPayoutTxns",
-  GET_RECHARGE_TXN: "recharge/getRechargeTxns",
-  GET_IRCTC_TXN: "irctc/getIrctcTxns",
-  GET_FUNDREQUEST_SCHEMA: "fundrequest/getFundRequestsSchema",
+
   GET_ACCOUNT_SCHEMA: "account/getAccountSchema",
   GET_BANK_SCHEMA: "bank/getBankSchema",
   GET_NOTIFICATION_SCHEMA: "notification/getNotificationSchema",
@@ -186,37 +166,24 @@ const ApiEndpoints = {
   GET_COLOURS: "layout/getColours",
   CREATE_COLOUR: "layout/createColour",
   UPDATE_COLOUR: "layout/updateColour",
-  CREATE_COMMISSION_RULE: "commission/createCommissionRule",
-  GET_COMMISSION_SCHEMA: "commission/getCommissionSchema",
-  UPDATE_COMMISSION_RULE: "commission/updateCommissionRule",
+
   GET_SENDER: "payout/getSender",
 
-  LEVIN_SENDER: "payout/remitterStatus2",
-  LEVIN_REGISTER: "payout/registerRemitter",
-  LEVIN_VERIFY: "payout/verifyRemitter",
-  LEVIN_TXN: "payments/v2/payOut2",
+
   GET_UUID: "misc/getUuid",
   REFUND_TXN_BYADMIN: "refund/refundTxnByAdmin",
-  REGISTER_SENDER: "payout/registerSender",
-  REGISTER_SENDER_SCHEMA: "payout/registerSenderSchema",
-  VERIFY_SENDER_SCHEMA: "payout/verifySenderSchema",
-  VERIFY_SENDER: "payout/verifySender",
-  PAYOUT_OTP: "payout/otpExp",
-  ADD_BENEFICIARY_SCHEMA: "payout/getBeneficiarySchema",
-  CREATE_BENEFICIARY: "payout/createBeneficiary",
+
+
   REFUND_FAILED_TXN: "refund/failedTxn",
   REFUND_SUCCESS_TXN: "refund/successTxn",
-  DELETE_BENEFICIARY: "payout/deleteBeneficiary",
-  PAYOUT: "payments/v2/userPayOut",
-  PAYOUT_SCHEMA: "payments/v2/getPayoutSchema",
+
+
   UPDATE_USER_PERMISSIONS: "user/updateUserPermissions",
   GET_PLANS_BY_OPERATOR: "recharge/getPlansByOperator",
   RECHARGE: "recharge/recharge",
   GET_SIDENAV: "layout/getSideNav",
   GET_ACCOUNT_STATEMENT: "accountStatement/getStatements",
-  GET_PLANS: "plan/getPlans",
-  CREATE_PLAN: "plan/createPlan",
-  UPDATE_PLAN: "plan/updatePlan",
+
 
   ASSIGN_PLAN: "plan/asignPlan",
   GET_PLAN_SCHEMA: "plan/getPlanSchema",
@@ -224,37 +191,19 @@ const ApiEndpoints = {
   UPDATE_USER_STATUS: "user/blockAndUnblock",
 
   CHANGE_USER_LAYOUT: "user/changeLayout",
-  LEVIN_UPI_TRANSFER: "payments/v2/upiTxn",
-  DMT1: "dmt1/remitterStatus",
-  REGISTER_DMT1_BENEFICIARY: "dmt1/registerBeneficiary",
-  ADD_DMT1_SCHEMA: "dmt1/getBeneficiarySchema",
-  REMOVE_DMT1_BENEFICIARY: "dmt1/removeBeneficiary",
-  REMOVE_DMT1_BENEFICIARY_VERIFY: "dmt1/VerifyRemoveBeneficiary",
-  OTP_DMT1_BENEFICIARY: "dmt1/transactionOtpDmt1",
-  DMT1_TXN: "dmt1/dmtTxn",
-  DMT1_VERIFY_BENEFICIARY: "dmt1/accountVerification",
 
-  GET_ALL_TXN: "admin/getAllTxn",
 
-  DMT1_REGISTER_REMMITER: "dmt1/registerRemitter",
-  VALIDATE_REMITTER_DMT1: "dmt1/validateRemitter",
-  PART_PAYMENT: "bbps/partPayment",
-  DMT1_REGISTER_REMMITER_SCHEMA: "dmt1/getRegisterRemitterSchema",
-  DMT1_KYC_REMITTER: "dmt1/kycRemitter",
-  DMT2: "dmt2/remitterStatusDmt2",
-  OTP_DMT2: "dmt2/transactionOtpDmt2",
-  DMT2_ADD_BENE_SCHEMA: "dmt2/getBeneficiarySchemaDmt2",
-  DMT2_REGISTER_REMITTER: "dmt2/registerDmt2",
-  VERIFY_REMITTER_DMT2: "dmt2/verifyRemitterDmt2",
 
-  DMT2_TXN: "dmt2/dmt2Txn",
-  DMT2_REMOVE_BENEFICIARY: "dmt2/removeBeneficiaryDmt2",
-  REGISTER_DMT2_BENEFICIARY: "dmt2/registerBeneficiaryDmt2",
-  DMT2_VERIFY_BENEFICIARY: "dmt2/verifyRegisterBeneficiary",
+  // GET_ALL_TXN: "admin/getAllTxn",
+
+
+
+
+
   BLOCK_UNBLOCK_SERVICE: "service/blockUnblock",
   CREATE_USER: "signup/createUser",
   GET_SIGNUP_SCHEMA: "signup/getSignupSchema",
-  DMT1: "dmt1/remitterStatus",
+
   GET_ROUTES: "admin/getRoutes",
   DELETE_LAST_TXN: "bank/deleteLastTxn",
   DELETE_ACCOUNT_LAST: "account/deleteLastTxn",
@@ -267,19 +216,10 @@ const ApiEndpoints = {
   CREATE_KYC: "business/createKyc",
   CREATE_STATUS: "business/createStatus",
 
-  // solitech api's.
-  SOLITECH_GET_SENDER: "payout/getSender2",
-  SOLITECH_ADD_BENEFICIARY: "payout/addBeneficiary",
-  SOLITECH_GET_BANKS: "payout/getBanks",
-  SOLITECH_REMMITER_LOGIN: "payout/remitterLogin",
-  SOLITECH_PAYOUT: "payments/v2/payOut3",
-  SOLITECH_DELETE_BENEFICIARY: "payout/deleteBeneficiary2",
-  SOLITECH_CHECK_TRANSACTION_STATUS: "payout/checkTransactionStatus",
-  SOLITECH_BANK_IFSC: "payout/getIfsc",
-  SOLITECH_VERIFY_OTP: "payout/verifyRemitterLogin",
+
   // ---------
 
-  CHANGE_PARENT: "auth/changeParent",
+
   BASIC_SCHEMA: "business/basicSchema",
   CONTACT_SCHEMA: "business/contactSchema",
   ADDRESS_SCHEMA: "business/addressSchema",
@@ -289,34 +229,21 @@ const ApiEndpoints = {
   KYC_SCHEMA: "business/kycSchema",
   STATUS_SCHEMA: "business/statusSchema",
 
-  WALLET_LIST: "wallet/getW2WTransaction",
-  WALLET_GET_RECEIVER: "wallet/getReceiver",
-  WALLET_GET_W2W_TRANSACTION: "wallet/getW2WTransaction",
-  WALLET_CREATE: "wallet/createW2W",
-  WALLET2WALLET_DEBIT: "wallet/createDebit",
-  WALLET2_WALLET1: "/wallet/createW2W1",
-  WALLET3_WALLET1: "/wallet/createW3W1",
-  CREATE_ORDER_CMS_NEW: "cms/createOrderCms",
-  VERIFY_UPI_BENEFICIARY: "payout/upiVerifiaction",
-  DMT1_OUTLET_INITIATE: "aeps/initiateSignupAeps",
-  DMT1_OUTLET_INITIATE_SCHEMA: "aeps/getInitiateSchema",
-  VALIDATE_DMT1_OUTLET: "aeps/validateSignupAeps",
-  GET_ADMIN_COMMISSIONS: "commission/getAdminCommissions",
-  BLOCK_UNBLOCK_COMM: "commission/enableDisableCommRule",
-  BLOCK_UNBLOCK_ADMINCOMM: "commission/enableDisableAdminCommRule",
-  DELETE_ADMIN_RULE: "commission/deleteAdminCommRule",
-  DELETE_COMM_RULE: "commission/deleteCommRule",
+
+
+  // GET_ADMIN_COMMISSIONS: "commission/getAdminCommissions",
+  // BLOCK_UNBLOCK_COMM: "commission/enableDisableCommRule",
+  // BLOCK_UNBLOCK_ADMINCOMM: "commission/enableDisableAdminCommRule",
+  // DELETE_ADMIN_RULE: "commission/deleteAdminCommRule",
+  // DELETE_COMM_RULE: "commission/deleteCommRule",
 
   CREATE_ADMIN_COMMISSIONS: "commission/createAdminCommissionRule",
   UPDATE_ADMIN_COMMISSIONS: "commission/updateAdminCommissionRule",
   GET_ADMIN_COMMISSIONS_SCHEMA: "commission/getAdminCommissionSchema",
-  ADD_LEIN: "lien/addLien",
-  REMOVE_LEIN: "lien/removeLien",
-  GET_LEIN: "lien/getLien",
-  API_BALANCE: "misc/apiBalance",
+
   UPDATE_USER_PROFILE_NEW: "user/updateProfileImage",
-  // WALLET_UPDATE: "wallet/update",
-  // WALLET_DELETE: "wallet/delete",
+
+
 
   // ****************************** NEW API'S ABOVE ******************************
   ADD_INST_ID: "auth/insertInstId",
@@ -327,62 +254,37 @@ const ApiEndpoints = {
   RESET_API_KEY: "user/resetApiKey",
   GET_UNCLAIMED_ENTERIES: "bankStatement/getUnclaimedEntries",
   CHECK_STAUS: "",
-  BUSINESS_DETAILS: "business/getAllByUser",
-  REFUND_TXN: "refund/refundTxn",
+
   GET_SENDER_BY_ACC: "payout/getSenderByAcc",
 
   // wallet
   GET_NUMBER_INFO: "prepaid/getNumberInfo",
-  PREPAID_RECHARGE: "prepaid/prepaidRecharge",
-  // dmr
-  GET_REMMITTER_STATUS: "dmr/getRemitterStatus", // fast response
-  NEW_GET_REMMITTER_STATUS: "dmr/remitterStatusExpress",
-  DMT2_REM_STAT: "dmr/getRemitterStatusDmt2",
-  REF_REMMITTER_STATUS: "dmr/refreshRemitterStatus", //late response
-  REMOVE_BENE: "dmr/removeBeneficiary",
-  DMT2_REM_BENE: "dmr/removeBeneficiaryDmt2",
-  BENE_KYC: "dmr/beneKyc",
+
+
   VALIDATE_OTP: "dmr/validateRemitter",
   VALIDATE_DMT2: "dmr/validateRemitterDmt2",
   GET_USER_DEVICE: "userDevice/getUserDevice",
   NEW_VALIDATE_OTP: "dmr/verifyExpRemitter",
   VERIFY_REM_UPI: "dmr/verifyRemitterUpi",
   EKYC_INITIATE: "dmr/initiateEkyc",
-  GET_REMMITTER_STATUS_ACC: "dmr/getRemitterStatusByAcc",
+
   GET_BANK_DMR: "dmr/getBanks",
   // DMT2_BANK_LIST: "dmr/getBanksDmt2",
   DMT2_BANK_LIST: "dmr/getLiveBanksDmt2",
   ADD_BENE: "dmr/registerBeneficiary",
-  DMT2_ADD_BENE: "dmr/registerBeneficiaryDmt2",
-  ADD_REM: "dmr/registerRemitter",
 
-  DMT2_ADD_REM: "dmr/registerRemitterDmt2",
 
-  ADD_REM_EXPRESS: "dmr/registerExpRemitter",
-  ADD_REM_SUPER: "dmr/registerSupRemitter",
-  GET_REMITTER_STATUS_UPI: "dmr/remitterStatusUpi",
-  REMOVE_BENE_UPI: "dmr/deleteBenUpi",
-  ADD_REM_UPI: "dmr/registerRemitterUpi",
-  ADD_BENE_UPI: "dmr/addBenUpi",
-  EXP_TRANSFER: "dmr/expressTxn",
-  SUPER_TRANSFER: "dmr/superTransfer",
-  DMR_MONEY_TRANSFER: "dmr/transactionDmr",
+
+
+  // EXP_TRANSFER: "dmr/expressTxn",
+  // SUPER_TRANSFER: "dmr/superTransfer",
+
   VERIFY_ACC: "dmr/accountVerification",
-  DMT2_MT: "dmr/transactionDmt2",
 
-  ASM_PRODUCTION_SALE_DATA: "reports/asmReportAll",
-  GET_RET_PROD_SALE: "reports/getTertiaryDataServiceWise",
 
-  // LEVIN DTM API
 
-  LEVIN_DMT_SENDER: "dmt/getSender",
-  LEVIN_DMT_REGISTER_REM: "dmt/LevinDmtregisterRemitter",
-  LEVIN_DMT_SEND_OTP: "dmt/remitterSendOtp",
-  LEVIN_DMT_VALIDATE_SEND_OTP: "dmt/ValidateSendOtp",
-  LEVIN_DMT_REGISTER_2FA: "dmt/register2Fa",
-  LEVIN_DMT_TXN_OTP: "dmt/txnOtp",
-  LEVIN_DMT_TRANSATION2: "dmt/dmtTxn2",
-  LEVIN_DMT_ADD_BENEFICIARY: "dmt/addBeneficiarydmt2",
+
+
 
   GET_TIME: "https://timeapi.io/api/time/current/zone?timeZone=Asia%2FKolkata",
 };
