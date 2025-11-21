@@ -447,7 +447,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
           >
             {title}
           </Typography>
-          <Box sx={{ display: "flex", gap: 2, mr: 2 }}>
+          {/* <Box sx={{ display: "flex", gap: 2, mr: 2 }}>
             {getWallets(user?.role).map((wallet) => (
               <WalletCard
                 key={wallet}
@@ -464,7 +464,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                   amount={`₹${user.lien.toFixed(2)}`}
                 />
               )}
-          </Box>
+          </Box> */}
           <IconButton onClick={refreshUser}>
             <RefreshIcon sx={{ color: "#492077" }} />
           </IconButton>

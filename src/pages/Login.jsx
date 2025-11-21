@@ -429,7 +429,7 @@ return (
             </Button>
           </Box> */}
 
-          {/* Sign up link (keeps UX) */}
+          {/* Sign up link (keeps UX)
           <Box sx={{ mt: 2 }}>
             <Typography component="span" sx={{ mr: 1 }}>
               or
@@ -437,7 +437,9 @@ return (
             <Link href="/signup" underline="hover" color="#5210c1">
               Sign up
             </Link>
-          </Box>
+          </Box> */}
+
+          
         </Box>
       </Box>
     </Box>
