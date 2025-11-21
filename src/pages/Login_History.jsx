@@ -107,7 +107,7 @@ const Login_History = ({ query }) => {
           const device = (row.device || "").toLowerCase();
           if (device.includes("windows"))
             icon = <img src={windows2} alt="Windows" style={{ width: 22 }} />;
-          else if (device.includes("p2pae"))
+          else if (device.includes("EPAY"))
             icon = <img src={android2} alt="Android" style={{ width: 22 }} />;
           else if (device.includes("mac"))
             icon = <img src={macintosh2} alt="Mac" style={{ width: 22 }} />;

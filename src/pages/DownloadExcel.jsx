@@ -41,7 +41,7 @@ const DownloadExcel = ({ open, handleClose, onFetchRef, bankId }) => {
           debit: 0,
           mop: "OFFLINE",
           handle_by: "RAUSHAN",
-          particulars: "P2PAE",
+          particulars: "EPAY",
         },
         {
           date: new Date().toISOString().split("T")[0],

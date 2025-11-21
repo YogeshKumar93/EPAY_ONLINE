@@ -199,10 +199,10 @@ export default function AppRoutes() {
                 replace
                 to={
                   isAdmin
-                    ? "/admin/dashboard"
+                    ? "/admin/banks"
                     : isCustomer
-                    ? "/customer/dashboard"
-                    : "/qrLogin"
+                    ? "/customer/banks"
+                    : "/login"
                 }
               />
             }
@@ -210,7 +210,7 @@ export default function AppRoutes() {
         </Route>
 
         {/* Final catch-all for non-matching + not authed */}
-        <Route path="*" element={<Navigate to="/qrLogin" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   );
