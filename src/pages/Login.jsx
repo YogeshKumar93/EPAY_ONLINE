@@ -367,15 +367,15 @@ return (
             }
             label={
               <Typography variant="body2" color="textSecondary" fontSize={12}>
-                I agree to the{" "}
-                <Link
+                I agree  
+                {/* <Link
                   href="/terms-conditions"
                   underline="always"
                   color="#4253F0"
                   fontSize={12}
                 >
                   Terms and Conditions
-                </Link>
+                </Link> */}
               </Typography>
             }
             sx={{ width: "100%", textAlign: "center", marginBottom: 0 }}
