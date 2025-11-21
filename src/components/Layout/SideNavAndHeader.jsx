@@ -319,6 +319,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
       <List
         className="nav-list"
         sx={{
+           
           overflowY: "auto",
           flexGrow: 1,
           "&::-webkit-scrollbar": {
@@ -331,6 +332,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
       >
         {renderNavItems(navigationItems)}
 
+<Divider   />
         <MenuItem
           disableRipple
           onClick={() => {
@@ -353,6 +355,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             gap: 4,
           }}
         >
+          
            <img
     src={newLogout}
     alt="logout"
@@ -367,8 +370,8 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             textAlign: "center",
             mt: 1.5,
             mb: 1,
-            fontSize: "14px",
-            color: "#000",
+            fontSize: "15px",
+            color: "#68a708ff",
           }}
         >
           App Version 1.0.0
@@ -558,111 +561,207 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
             </Box>
           </Box>
 
-          <Menu
-            anchorEl={userMenuAnchor}
-            open={Boolean(userMenuAnchor)}
-            onClose={handleUserMenuClose}
-            transformOrigin={{ horizontal: "right", vertical: "right" }}
-            anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-            PaperProps={{
-              sx: {
-                mt: 1.5,
-                MozBorderRadiusBottom: "6px",
-                overflow: "hidden",
-                minWidth: 280,
-              },
+
+
+{/* ******************************************************************** */}
+
+
+<Menu
+  anchorEl={userMenuAnchor}
+  open={Boolean(userMenuAnchor)}
+  onClose={handleUserMenuClose}
+  transformOrigin={{ horizontal: "right", vertical: "top" }}
+  anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+  PaperProps={{
+    sx: {
+      mt: 2,
+      borderRadius: "24px",
+      overflow: "hidden",
+      minWidth: 400,
+      boxShadow: "0 30px 60px rgba(0,0,0,0.2)",
+      border: "2px solid #F1F5F9",
+      background: "#FFFFFF"
+    },
+  }}
+>
+  {/* Extra Large Profile Section */}
+  <Box
+    sx={{
+      px: 5,
+      py: 4,
+      display: "flex",
+      alignItems: "center",
+      gap: 4,
+      background: "linear-gradient(135deg, #492077 0%, #685d7aff 100%)",
+      color: "white",
+      position: "relative",
+      "&::after": {
+        content: '""',
+        position: "absolute",
+        top: 0,
+        right: 0,
+        width: "100%",
+        height: "100%",
+        background: "radial-gradient(circle at top right, rgba(255,255,255,0.1) 0%, transparent 60%)",
+      }
+    }}
+  >
+    <Avatar
+      alt={user?.name || "User Avatar"}
+      src={user?.avatar || ""}
+      sx={{ 
+        width: 80, 
+        height: 80, 
+        bgcolor: "rgba(255,255,255,0.9)",
+        color: "#1E40AF",
+        border: "4px solid rgba(255,255,255,0.3)",
+        fontWeight: 800,
+        fontSize: "2rem",
+        zIndex: 1
+      }}
+    >
+      {user?.name?.[0]?.toUpperCase()}
+    </Avatar>
+    <Box sx={{ zIndex: 1 }}>
+      <Typography sx={{ 
+        fontWeight: 800, 
+        fontSize: "1.5rem",
+        lineHeight: 1.2,
+        mb: 1
+      }}>
+        {user?.name || "Guest User"}
+      </Typography>
+      <Typography
+        sx={{ 
+          fontSize: "1.1rem", 
+          opacity: 0.9,
+          fontWeight: 400
+        }}
+      >
+        {user?.email || "guest@example.com"}
+      </Typography>
+    </Box>
+  </Box>
+
+  {/* Extra Large Menu Items */}
+  <Box sx={{ p: 4 }}>
+    <MenuItem 
+      onClick={() => navigate(roleRoutes[user?.role])}
+      sx={{
+        borderRadius: "16px",
+        py: 2.5,
+        px: 4,
+        mb: 3,
+        display: "flex",
+        alignItems: "center",
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        minHeight: "70px",
+        "&:hover": {
+          background: "linear-gradient(135deg, #cfceddff 0%, #7C3AED 100%)",
+          transform: "scale(1.02) translateX(10px)",
+          boxShadow: "0 10px 30px rgba(79, 70, 229, 0.3)",
+          "& .MuiTypography-root": {
+            color: "white",
+            fontWeight: 700
+          },
+          "& .MuiListItemIcon-root": {
+            color: "white"
+          }
+        }
+      }}
+    >
+      <ListItemIcon sx={{ minWidth: 60 }}>
+        <Box
+          sx={{
+            width: 32,
+            height: 32,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#20207cff",
+            fontSize: "1.5rem"
+          }}
+        >
+          <PersonIcon fontSize="large" />
+        </Box>
+      </ListItemIcon>
+      <Typography sx={{ 
+        fontWeight: 600, 
+        fontSize: "1.2rem",
+        color: "#1F2937",
+        ml: 2
+      }}>
+        Manage Profile
+      </Typography>
+    </MenuItem>
+
+    <Divider sx={{ 
+      my: 4, 
+      borderColor: "#E5E7EB",
+      borderWidth: "2px"
+    }} />
+
+    {/* Extra Large Sign Out */}
+    <MenuItem 
+      onClick={handleLogout}
+      sx={{
+        borderRadius: "16px",
+        py: 2.5,
+        px: 4,
+        display: "flex",
+        alignItems: "center",
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        minHeight: "70px",
+        background: "linear-gradient(135deg, #beb5b5ff 0%, #FEE2E2 100%)",
+        border: "3px solid #FECACA",
+        "&:hover": {
+          background: "linear-gradient(135deg, #da8080ff 0%, #B91C1C 100%)",
+          transform: "scale(1.02) translateX(10px)",
+          boxShadow: "0 10px 30px rgba(220, 38, 38, 0.3)",
+          border: "3px solid #DC2626",
+          "& .MuiTypography-root": {
+            color: "white",
+            fontWeight: 800
+          }
+        }
+      }}
+    >
+      <ListItemIcon sx={{ minWidth: 60 }}>
+        <Box
+          sx={{
+            width: 32,
+            height: 32,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          <img
+            src={newLogout}
+            alt="logout"
+            style={{ 
+              width: 26, 
+              height: 26
             }}
-          >
-            {/* Profile Header */}
-            <Box
-              sx={{
-                px: 3.5,
-                py: 2,
-                fontStyle: "revert",
-                display: "flex",
-                alignItems: "center",
-                gap: 2,
-                color: "#492077",
+          />
+        </Box>
+      </ListItemIcon>
+      <Typography sx={{ 
+        fontWeight: 700, 
+        fontSize: "1.2rem",
+        color: "#DC2626",
+        ml: 2
+      }}>
+        Sign Out
+      </Typography>
+    </MenuItem>
+  </Box>
+</Menu>
 
-                bgcolor: "#EEE8FF",
 
-                borderTop: "3px solid #492077 ",
-              }}
-            >
-              <Avatar
-                alt={user?.name || "User Avatar"}
-                src={user?.avatar || ""}
-                sx={{ width: 48, height: 48, bgcolor: "#492077" }}
-              >
-                {user?.name?.[0]}
-              </Avatar>
-              <Box>
-                <Typography sx={{ fontWeight: 600, fontSize: "0.95rem" }}>
-                  {user?.name || "Guest User"}
-                </Typography>
-                <Typography
-                  sx={{ fontSize: "0.8rem", color: "text.secondary" }}
-                >
-                  {user?.email || "guest@example.com"}
-                </Typography>
-              </Box>
-            </Box>
 
-            <Divider />
 
-            {/* Menu Items */}
-            <Box sx={{ width: "320px", p: 2.5 }}>
-              <MenuItem onClick={() => navigate(roleRoutes[user?.role])}>
-                <ListItemIcon>
-                  <PersonIcon fontSize="small" />
-                </ListItemIcon>
-                Manage Profile
-              </MenuItem>
-
-              {/* <MenuItem
-                onClick={() => {
-                  if (user?.role === "adm") {
-                    navigate("/logs");
-                  } else if (user?.role === "ret") {
-                    navigate("/customer/retailerlogs");
-                  } else {
-                    navigate(`/${user?.role}/logs`); // fallback for other roles
-                  }
-                }}
-              >
-                <ListItemIcon>
-                  <TimelineIcon fontSize="small" />
-                </ListItemIcon>
-                Activity Logs
-              </MenuItem> */}
-
-              {/* <MenuItem>
-    <ListItemIcon>
-      <DarkModeIcon fontSize="small" />
-    </ListItemIcon>
-    Dark Mode
-    <Switch
-      edge="end"
-      checked={darkMode}
-      onChange={toggleDarkMode}
-      sx={{ ml: "auto" }}
-    />
-  </MenuItem> */}
-
-              <Divider />
-
-              <MenuItem onClick={handleLogout}>
-                <ListItemIcon>
-                   <img
-    src={newLogout}
-    alt="logout"
-    style={{ width: 22, height: 22 }}
-  />
-                </ListItemIcon>
-                Sign Out
-              </MenuItem>
-            </Box>
-          </Menu>
+          {/* *************************************************** */}
         </Toolbar>
       </AppBar>
 

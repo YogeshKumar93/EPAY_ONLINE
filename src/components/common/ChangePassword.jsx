@@ -194,7 +194,7 @@ const ChangePassword = ({ open, onClose, username }) => {
             onClick={handleSubmit}
             fullWidth
             sx={{
-              bgcolor: "#8cc751",
+              bgcolor: "#492077",
               py: 1.5,
               fontSize: "15px",
               fontWeight: "bold",

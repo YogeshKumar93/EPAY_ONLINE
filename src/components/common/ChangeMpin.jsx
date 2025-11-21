@@ -165,7 +165,7 @@ const ChangeMpin = ({ open, onClose }) => {
           fullWidth
           onClick={handleSubmit}
           sx={{
-            bgcolor: "#EA5E5A",
+            bgcolor: "#492077",
             py: 1.25,
             fontWeight: "bold",
             borderRadius: 2,
