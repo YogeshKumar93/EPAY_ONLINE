@@ -29,7 +29,7 @@ const Banks = ({ filters = [] }) => {
   const [loading, setLoading] = useState(true);
   const bank_name = location.state?.bank_name || "Bank";
   const acc_number = location.state?.acc_number || "Account Number";
-    const [appliedFilters, setAppliedFilters] = useState({});
+    // const [appliedFilters, setAppliedFilters] = useState({});
 
   // ✅ keep a ref to CommonTable for refreshing
   const fetchBanksRef = useRef(null);
@@ -67,22 +67,22 @@ const Banks = ({ filters = [] }) => {
     return () => clearTimeout(timer);
   }, []);
 
-    const filters = useMemo(
-      () => [
-        { id: "mobile", label: "Mobile Number", type: "textfield" },
-        {
-          id: "user_id",
-          label: "Type Est.",
-          type: "autocomplete",
-          options: userOptions,
-          onSearch: (val) => setUserSearch(val),
-          getOptionLabel: (option) => option?.label || "",
-          isOptionEqualToValue: (option, value) => option.id === value.id, // ✅ this line keeps selection visible
-        },
-        { id: "asm", label: "Asm Id", type: "textfield" },
-      ],
-      [user?.role, userOptions, appliedFilters]
-    );
+    // const filters = useMemo(
+    //   () => [
+    //     { id: "mobile", label: "Mobile Number", type: "textfield" },
+    //     {
+    //       id: "user_id",
+    //       label: "Type Est.",
+    //       type: "autocomplete",
+    //       options: userOptions,
+    //       onSearch: (val) => setUserSearch(val),
+    //       getOptionLabel: (option) => option?.label || "",
+    //       isOptionEqualToValue: (option, value) => option.id === value.id, // ✅ this line keeps selection visible
+    //     },
+    //     { id: "asm", label: "Asm Id", type: "textfield" },
+    //   ],
+    //   [user?.role, userOptions, appliedFilters]
+    // );
 
   // memoized columns
   const columns = useMemo(
@@ -222,7 +222,7 @@ const Banks = ({ filters = [] }) => {
             columns={columns}
             endpoint={ApiEndpoints.GET_BANKS}
             filters={filters}
-            queryParam={appliedFilters}
+            queryParam={queryParam}
             customHeader={
           <Button
   label="Bank"
