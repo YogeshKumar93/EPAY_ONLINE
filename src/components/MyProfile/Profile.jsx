@@ -122,14 +122,14 @@ const ProfilePage = () => {
   const allowedRolesForNewNumber = ["adm", "sadm"];
 
   const actionButtons = [
-    {
-      id: 1,
-      label: "Reset MPIN",
-      icon: <LockReset sx={{ fontSize: { xs: 18, sm: 20 } }} />,
-      onClick: handleResetMpin,
-      gradient: "#fff",
-      hoverGradient: "linear-gradient(135deg, #36d1dc, #5b86e5)",
-    },
+    // {
+    //   id: 1,
+    //   label: "Reset MPIN",
+    //   icon: <LockReset sx={{ fontSize: { xs: 18, sm: 20 } }} />,
+    //   onClick: handleResetMpin,
+    //   gradient: "#fff",
+    //   hoverGradient: "linear-gradient(135deg, #36d1dc, #5b86e5)",
+    // },
     {
       id: 2,
       label: "Change Password",
@@ -147,14 +147,14 @@ const ProfilePage = () => {
       hoverGradient: "linear-gradient(135deg, #43e97b, #38f9d7)",
       roles: ["adm", "sadm"], // allowed roles
     },
-    {
-      id: 4,
-      label: "Change MPIN",
-      icon: <VerifiedUser sx={{ fontSize: { xs: 18, sm: 20 } }} />,
-      onClick: handleChangeMpin,
-      gradient: "#fff",
-      hoverGradient: "linear-gradient(135deg, #ff758c, #ff7eb3)",
-    },
+    // {
+    //   id: 4,
+    //   label: "Change MPIN",
+    //   icon: <VerifiedUser sx={{ fontSize: { xs: 18, sm: 20 } }} />,
+    //   onClick: handleChangeMpin,
+    //   gradient: "#fff",
+    //   hoverGradient: "linear-gradient(135deg, #ff758c, #ff7eb3)",
+    // },
     // {
     //   id: 5,
     //   label: "View Information",
@@ -584,13 +584,13 @@ const ProfilePage = () => {
         </Paper>
       </Slide>
       {/* Modals */}
-      {resetMpinModalOpen && (
+      {/* {resetMpinModalOpen && (
         <ResetMpin
           open={resetMpinModalOpen}
           onClose={() => setResetMpinModalOpen(false)}
           username={username}
         />
-      )}
+      )} */}
       {changePasswordModal && (
         <ChangePassword
           open={changePasswordModal}
