@@ -87,7 +87,7 @@ const AdminLayoutWrapper = ({ desktopOpen }) => {
         >
           © 2025{" "}
           <Box component="span" sx={{ fontWeight: 700 }}>
-            EPAY Solution |{" "}
+            EPAY Solutions |{" "}
           </Box>{" "}
           All Rights Reserved.
         </Typography>
