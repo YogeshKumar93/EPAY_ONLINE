@@ -136,16 +136,15 @@ const ProfilePage = () => {
     setEditedUser((prev) => ({ ...prev, [field]: value }));
   };
 
-  const userRole = authCtx.user.role;
-
-  const quickActions = [
-    {
-      id: 1,
-      label: "Reset MPIN",
-      icon: <LockReset />,
-      onClick: handleResetMpin,
-      color: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-    },
+  const actionButtons = [
+    // {
+    //   id: 1,
+    //   label: "Reset MPIN",
+    //   icon: <LockReset sx={{ fontSize: { xs: 18, sm: 20 } }} />,
+    //   onClick: handleResetMpin,
+    //   gradient: "#fff",
+    //   hoverGradient: "linear-gradient(135deg, #36d1dc, #5b86e5)",
+    // },
     {
       id: 2,
       label: "Change Password",
@@ -161,73 +160,32 @@ const ProfilePage = () => {
       color: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
       roles: ["adm", "sadm"],
     },
-    {
-      id: 4,
-      label: "2FA Security",
-      icon: <SecurityUpdateGood />,
-      onClick: handleTwoFAModalOpen,
-      color: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
-    },
-  ].filter((btn) => !btn.roles || btn.roles.includes(userRole));
-
-  const menuItems = [
-    { id: "profile", label: "Profile Overview", icon: <Person /> },
-    // { id: "security", label: "Security Center", icon: <Shield /> },
-    // { id: "preferences", label: "Preferences", icon: <Settings /> },
-    // { id: "business", label: "Business Info", icon: <Business /> },
-    { id: "activity", label: "Activity Log", icon: <History /> },
-  ];
-
-  const SecurityCard = ({ title, description, status, action, icon, color }) => (
-    <Card sx={{ 
-      p: 3, 
-      borderRadius: 3,
-      background: `linear-gradient(135deg, ${color}20 0%, ${color}10 100%)`,
-      border: `1px solid ${color}30`,
-      transition: 'all 0.3s ease',
-      '&:hover': {
-        transform: 'translateY(-4px)',
-        boxShadow: `0 8px 25px ${color}40`,
-      }
-    }}>
-      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-        <Box sx={{ 
-          p: 1.5, 
-          borderRadius: 2, 
-          background: color,
-          color: 'white',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          {icon}
-        </Box>
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="h6" fontWeight="600" gutterBottom>
-            {title}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {description}
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Chip 
-              label={status} 
-              size="small" 
-              color={status === 'Active' ? 'success' : 'default'}
-              variant="outlined"
-            />
-            <Button 
-              variant="outlined" 
-              size="small" 
-              onClick={action}
-              sx={{ borderRadius: 2 }}
-            >
-              Manage
-            </Button>
-          </Box>
-        </Box>
-      </Box>
-    </Card>
+    // {
+    //   id: 4,
+    //   label: "Change MPIN",
+    //   icon: <VerifiedUser sx={{ fontSize: { xs: 18, sm: 20 } }} />,
+    //   onClick: handleChangeMpin,
+    //   gradient: "#fff",
+    //   hoverGradient: "linear-gradient(135deg, #ff758c, #ff7eb3)",
+    // },
+    // {
+    //   id: 5,
+    //   label: "View Information",
+    //   icon: <Dashboard sx={{ fontSize: { xs: 18, sm: 20 } }} />,
+    //   onClick: () => setViewInfoModalOpen(true),
+    //   gradient: "#fff",
+    //   hoverGradient: "linear-gradient(135deg, #c9ffbf, #7bed9f)",
+    // },
+    // {
+    //   id: 6,
+    //   label: "Two FA",
+    //   icon: <Dashboard sx={{ fontSize: { xs: 18, sm: 20 } }} />,
+    //   onClick: () => setTwoFAModalOpen(true),
+    //   gradient: "#fff",
+    //   hoverGradient: "linear-gradient(135deg, #c9ffbf, #7bed9f)",
+    // },
+  ].filter(
+    (btn) => !btn.roles || btn.roles.includes(userRole) // filter buttons by role
   );
 
   return (
@@ -676,13 +634,13 @@ const ProfilePage = () => {
       </Drawer>
 
       {/* Modals */}
-      {resetMpinModalOpen && (
+      {/* {resetMpinModalOpen && (
         <ResetMpin
           open={resetMpinModalOpen}
           onClose={() => setResetMpinModalOpen(false)}
           username={username}
         />
-      )}
+      )} */}
       {changePasswordModal && (
         <ChangePassword
           open={changePasswordModal}
