@@ -220,17 +220,18 @@ const CreateBankStatement = ({ onFetchRef, bankId, balance }) => {
         variant="contained"
         size="medium"
         sx={{
-          background: "linear-gradient(135deg, #490277 0%, #6A1B9A 100%)",
-          color: "#FFFFFF",
-          textTransform: "none",
-          fontWeight: 600,
-          paddingX: 3,
-          paddingY: 1.2,
-          borderRadius: "10px",
-          "&:hover": {
-            background: "linear-gradient(135deg, #5A048F 0%, #7B2BB5 100%)",
-          },
-        }}
+  background: "grey",          // <-- your grey background
+ 
+  textTransform: "none",
+  fontWeight: 600,
+  paddingX: 1,
+  paddingY: 1,
+  borderRadius: "10px",
+  "&:hover": {
+   background: "linear-gradient(135deg, #5A048F 0%, #7B2BB5 100%)",        // <-- keep grey even on hover OR change if you want
+  },
+}}
+
       >
         + Add
       </Button>
