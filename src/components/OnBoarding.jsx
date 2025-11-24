@@ -25,7 +25,7 @@ import { useToast } from "../utils/ToastContext";
 const OnBoarding = () => {
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
-  const username = `TRANS${user?.id}`;
+  const username = `EPAY${user?.id}`;
   const { showToast } = useToast();
   const [successMessage, setSuccessMessage] = useState("");
   const [isEditing, setIsEditing] = useState(false);
