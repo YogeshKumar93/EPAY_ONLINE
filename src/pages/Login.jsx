@@ -122,8 +122,21 @@ const Login = () => {
      if (response) {
         const token = response.message.token;
         await authCtx.login(token);
-
-        if (user?.role === "adm") navigate("/admin/banks");
+        
+      const userResult = await apiCall("get", ApiEndpoints.GET_ME_USER);
+              if (userResult.response) {
+                const userData = userResult.response.data;
+                authCtx.saveUser(userData);
+                localStorage.setItem("user", JSON.stringify(userData));
+      
+                if (userData.role === "adm" || userData.role === "sadm") {
+                  navigate("/admin/banks");
+                
+                
+                } else {
+                  navigate("/other/banks");
+                }
+              }
         else navigate("/");
       } else {
         setLoginError("Unexpected response from server");
