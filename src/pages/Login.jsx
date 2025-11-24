@@ -122,6 +122,7 @@ const Login = () => {
      if (response) {
         const token = response.message.token;
         await authCtx.login(token);
+        localStorage.setItem("access_token", token);
 
         if (user?.role === "adm") navigate("/admin/banks");
         else navigate("/");
