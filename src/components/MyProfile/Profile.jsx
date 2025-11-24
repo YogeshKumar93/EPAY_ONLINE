@@ -2,7 +2,6 @@ import React, { useContext, useState, useEffect } from "react";
 import {
   Box,
   Paper,
-  Slide,
   Grid,
   Typography,
   Avatar,
@@ -12,10 +11,25 @@ import {
   useTheme,
   IconButton,
   Chip,
-  Divider,
   Card,
   CardContent,
   alpha,
+  Container,
+  Tabs,
+  Tab,
+  Stack,
+  Divider,
+  Badge,
+  Fab,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import {
   Person,
@@ -33,18 +47,38 @@ import {
   VpnKey,
   Settings,
   Dashboard,
+  Fingerprint,
+  Badge as BadgeIcon,
+  QrCode2,
+  Shield,
+  Key,
+  SmartphoneOutlined,
+  PasswordOutlined,
+  LockPersonOutlined,
+  SecurityOutlined,
+  Menu,
+  Close,
+  CameraAlt,
+  Notifications,
+  Language,
+  DarkMode,
+  Help,
+  Logout,
+  Business,
+  ReceiptLong,
+  History,
+  Payment,
+  SecurityUpdateGood,
 } from "@mui/icons-material";
 import AuthContext from "../../contexts/AuthContext";
 import ResetMpin from "../common/ResetMpin";
 import ChangePassword from "../common/ChangePassword";
 import ChangeMpin from "../common/ChangeMpin";
 import NumberVerificationComponent from "../common/NumberVerificationComponent";
-// import ChangeLayoutModal from "../Layout/ChangeLayoutModal";
 import { BusinessInformation } from "./BusinessInformation";
 import ProfileTabs from "./ProfileTabs";
 import TwoFA from "./TwoFA";
 import ProfileImageUploadModal from "./ProfileImageUploadModal";
-// import ProfileTabs from "./ProfileTabs";
 
 const ProfilePage = () => {
   const theme = useTheme();
@@ -59,18 +93,21 @@ const ProfilePage = () => {
   const [changeMpinModal, setChangeMpinModal] = useState(false);
   const [twoFAModalOpen, setTwoFAModalOpen] = useState(false);
   const [newNumberModal, setNewNumberModal] = useState(false);
-  const [changeLayout, setChangeLayout] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({ ...user });
   const [businessModal, setBusinessModal] = useState(false);
   const [viewInfoModalOpen, setViewInfoModalOpen] = useState(false);
   const [profileImageModalOpen, setProfileImageModalOpen] = useState(false);
+  const [activeView, setActiveView] = useState("profile");
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
   // Sync editedUser with user context when user changes
   useEffect(() => {
     setEditedUser({ ...user });
   }, [user]);
+  
   // Clear success message after 5 seconds
   useEffect(() => {
     if (successMessage) {
@@ -81,34 +118,15 @@ const ProfilePage = () => {
     }
   }, [successMessage]);
 
-  const handleResetMpin = () => {
-    setResetMpinModalOpen(true);
-  };
-
-  const handleChangePassword = () => {
-    setChangePasswordModal(true);
-  };
-  const handleTwoFAModalOpen = () => {
-    setTwoFAModalOpen(true);
-  };
-
+  const handleResetMpin = () => setResetMpinModalOpen(true);
+  const handleChangePassword = () => setChangePasswordModal(true);
+  const handleTwoFAModalOpen = () => setTwoFAModalOpen(true);
   const handleChangeMpin = () => setChangeMpinModal(true);
-
-  const handleNewNumber = () => {
-    setNewNumberModal(true);
-  };
-
-  const handleChangeLayout = () => {
-    setChangeLayout(true);
-  };
-
-  const handleBusinessInfo = () => {
-    setBusinessModal(true);
-  };
+  const handleNewNumber = () => setNewNumberModal(true);
+  const handleBusinessInfo = () => setBusinessModal(true);
 
   const handleEditToggle = () => {
     if (isEditing) {
-      // Save changes logic would go here
       setSuccessMessage("Profile updated successfully!");
     }
     setIsEditing(!isEditing);
@@ -117,44 +135,39 @@ const ProfilePage = () => {
   const handleInputChange = (field, value) => {
     setEditedUser((prev) => ({ ...prev, [field]: value }));
   };
-  const allowedRolesForLayout = ["dd", "ret"];
-  const userRole = authCtx.user.role; // assuming you have access to user role
-  const allowedRolesForNewNumber = ["adm", "sadm"];
 
   const actionButtons = [
-    {
-      id: 1,
-      label: "Reset MPIN",
-      icon: <LockReset sx={{ fontSize: { xs: 18, sm: 20 } }} />,
-      onClick: handleResetMpin,
-      gradient: "#fff",
-      hoverGradient: "linear-gradient(135deg, #36d1dc, #5b86e5)",
-    },
+    // {
+    //   id: 1,
+    //   label: "Reset MPIN",
+    //   icon: <LockReset sx={{ fontSize: { xs: 18, sm: 20 } }} />,
+    //   onClick: handleResetMpin,
+    //   gradient: "#fff",
+    //   hoverGradient: "linear-gradient(135deg, #36d1dc, #5b86e5)",
+    // },
     {
       id: 2,
       label: "Change Password",
-      icon: <VpnKey sx={{ fontSize: { xs: 18, sm: 20 } }} />,
+      icon: <PasswordOutlined />,
       onClick: handleChangePassword,
-      gradient: "#fff",
-      hoverGradient: "linear-gradient(135deg, #ff8e8e, #d35400)",
+      color: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
     },
     {
       id: 3,
       label: "Change Number",
-      icon: <Phone sx={{ fontSize: { xs: 18, sm: 20 } }} />,
+      icon: <SmartphoneOutlined />,
       onClick: handleNewNumber,
-      gradient: "#fff",
-      hoverGradient: "linear-gradient(135deg, #43e97b, #38f9d7)",
-      roles: ["adm", "sadm"], // allowed roles
+      color: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+      roles: ["adm", "sadm"],
     },
-    {
-      id: 4,
-      label: "Change MPIN",
-      icon: <VerifiedUser sx={{ fontSize: { xs: 18, sm: 20 } }} />,
-      onClick: handleChangeMpin,
-      gradient: "#fff",
-      hoverGradient: "linear-gradient(135deg, #ff758c, #ff7eb3)",
-    },
+    // {
+    //   id: 4,
+    //   label: "Change MPIN",
+    //   icon: <VerifiedUser sx={{ fontSize: { xs: 18, sm: 20 } }} />,
+    //   onClick: handleChangeMpin,
+    //   gradient: "#fff",
+    //   hoverGradient: "linear-gradient(135deg, #ff758c, #ff7eb3)",
+    // },
     // {
     //   id: 5,
     //   label: "View Information",
@@ -176,421 +189,458 @@ const ProfilePage = () => {
   );
 
   return (
-    <Box
-      sx={{
-        py: 1,
-        px: isSmallMobile ? 1 : 2,
-      }}
-    >
-      <Slide in={true} direction="up" timeout={500}>
-        <Paper
-          elevation={isMobile ? 1 : 4}
-          sx={{
-            borderRadius: { xs: 2, sm: 4 },
-            overflow: "hidden",
-            background: "linear-gradient(135deg, #f9f5ff 0%, #f0e8ff 100%)",
-            boxShadow: "0 10px 30px rgba(157, 114, 240, 0.15)",
-            transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease",
-            "&:hover": {
-              transform: "translateY(-5px)",
-              boxShadow: "0 15px 40px rgba(157, 114, 240, 0.25)",
-            },
-            fontFamily: '"DM Sans", sans-serif',
-          }}
-        >
-          <Box
-            sx={{
-              p: { xs: 2, sm: 3, md: 4 },
-              borderRadius: "12px 12px 0 0",
-              mb: { xs: 2, sm: 3, md: 4 },
-             background: "linear-gradient(to right, #492077, rgba(73, 32, 119, 0.7))",
-              color: "white",
-              position: "relative",
-              overflow: "hidden",
-              "&::before": {
-                content: '""',
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: "4px",
-                background: "#9D72F0",
-                zIndex: 1,
-              },
-            }}
-          >
-            {/* Decorative elements */}
+    <Box sx={{ 
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      py: 2
+    }}>
+      <Container maxWidth="xl">
+        {/* Success Message */}
+        {successMessage && (
+          <Fade in={true}>
             <Box
               sx={{
-                position: "absolute",
-                top: -20,
-                right: -20,
+                p: 2,
+                mb: 3,
+                background: "linear-gradient(90deg, #4caf50, #66bb6a)",
+                color: "white",
+                borderRadius: 3,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: 2,
+                animation: "pulse 2s infinite",
+              }}
+            >
+              <CheckCircle sx={{ mr: 1 }} />
+              <Typography fontWeight="500">
+                {successMessage}
+              </Typography>
+            </Box>
+          </Fade>
+        )}
+
+        <Grid container spacing={3}>
+          {/* Sidebar Navigation */}
+          <Grid item xs={12} lg={3}>
+            <Card sx={{ 
+              borderRadius: 3,
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              {/* Decorative Elements */}
+              <Box sx={{
+                position: 'absolute',
+                top: -50,
+                right: -50,
                 width: 150,
                 height: 150,
-                borderRadius: "50%",
-                background: "rgba(255,255,255,0.08)",
-              }}
-            />
-            <Box
-              sx={{
-                position: "absolute",
+                borderRadius: '50%',
+                background: 'rgba(255,255,255,0.1)'
+              }} />
+              <Box sx={{
+                position: 'absolute',
                 bottom: -30,
                 left: -30,
                 width: 100,
                 height: 100,
-                borderRadius: "50%",
-                background: "rgba(255,255,255,0.05)",
-              }}
-            />
-            {/* Profile Info */}
-            <Grid
-              container
-              spacing={3}
-              alignItems="center"
-              justifyContent={isMobile ? "center" : "flex-start"}
-            >
-              {/* Avatar */}
-              <Grid item xs={12} sm="auto" sx={{ position: "relative" }}>
-                <Box sx={{ position: "relative", display: "inline-block" }}>
-                  <Avatar
-                    src={user?.profile_image || ""}
-                    alt={user?.name || "User Avatar"}
-                    sx={{
-                      width: { xs: 100, sm: 120, md: 140 },
-                      height: { xs: 100, sm: 120, md: 140 },
-                      border: "4px solid rgba(255, 255, 255, 0.3)",
-                      bgcolor: "rgba(255,255,255,0.15)",
-                      mx: "auto",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      transition: "all 0.3s ease",
-                      objectFit: "cover",
-                      "&:hover": {
-                        transform: "scale(1.05)",
-                        border: "4px solid rgba(255, 215, 0, 0.8)",
-                        boxShadow: "0 0 25px rgba(255, 215, 0, 0.5)",
-                      },
-                    }}
-                  >
-                    {!user?.profile_image && (
-                      <Person
+                borderRadius: '50%',
+                background: 'rgba(255,255,255,0.05)'
+              }} />
+
+              <CardContent sx={{ p: 4, position: 'relative', zIndex: 1 }}>
+                {/* Profile Header */}
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 4 }}>
+                  <Badge
+                    overlap="circular"
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                    badgeContent={
+                      <IconButton
                         sx={{
-                          fontSize: { xs: 40, sm: 50, md: 60 },
-                          color: "white",
+                          background: 'linear-gradient(135deg, #ff8e53 0%, #fe6b8b 100%)',
+                          color: 'white',
+                          width: 32,
+                          height: 32,
+                          '&:hover': { background: '#fe6b8b' }
                         }}
-                      />
-                    )}
-                  </Avatar>
-
-                  <IconButton
-                    sx={{
-                      position: "absolute",
-                      bottom: 5,
-                      right: 5,
-                      backgroundColor: "rgba(255, 215, 0, 0.95)",
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-                      "&:hover": {
-                        backgroundColor: "#FFD700",
-                        transform: "scale(1.1)",
-                      },
-                      transition: "all 0.2s ease",
-                    }}
-                    onClick={() => setProfileImageModalOpen(true)}
+                        onClick={() => setProfileImageModalOpen(true)}
+                      >
+                        <CameraAlt sx={{ fontSize: 16 }} />
+                      </IconButton>
+                    }
                   >
-                    <Edit sx={{ fontSize: 16, color: "#1E3A8A" }} />
-                  </IconButton>
-                </Box>
-              </Grid>
-
-              {/* User Info */}
-              <Grid item xs={12} sm={8} md={9}>
-                {/* Name + Status */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    flexWrap: "wrap",
-                    justifyContent: { xs: "center", sm: "flex-start" },
-                    gap: 1,
-                    mb: 1,
-                  }}
-                >
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={editedUser.name || ""}
-                      onChange={(e) =>
-                        handleInputChange("name", e.target.value)
-                      }
-                      style={{
-                        background: "rgba(255,255,255,0.25)",
-                        border: "1px solid rgba(255,255,255,0.4)",
-                        borderRadius: "8px",
-                        padding: "10px 14px",
-                        color: "white",
-                        fontSize: isMobile ? "1.5rem" : "1.75rem",
-                        fontWeight: "bold",
-                        width: "100%",
-                        maxWidth: "300px",
-                        fontFamily: '"DM Sans", sans-serif',
-                        outline: "none",
-                      }}
-                      placeholder="Full Name"
-                    />
-                  ) : (
-                    <Typography
-                      variant={isSmallMobile ? "h4" : isMobile ? "h3" : "h3"}
-                      fontWeight="bold"
+                    <Avatar
+                      src={user?.profile_image || ""}
                       sx={{
-                        color: "#FFF",
-                        letterSpacing: "0.5px",
-
-                        textAlign: { xs: "center", sm: "left" },
-                        fontFamily: '"DM Sans", sans-serif',
-                        textShadow: "0 1px 2px rgba(0,0,0,0.1)",
+                        width: 100,
+                        height: 100,
+                        border: '3px solid rgba(255,255,255,0.3)',
+                        background: 'rgba(255,255,255,0.2)'
                       }}
                     >
-                      {user?.name}
-                    </Typography>
-                  )}
-                  <Chip
-                    icon={<AccountCircle sx={{ color: "#6C4BC7" }} />}
-                    label="Active User"
-                    size="small"
-                    sx={{
-                      background: "rgba(255, 255, 255, 0.9)",
-                      color: "#6C4BC7",
-                      fontWeight: "bold",
-                      fontFamily: '"DM Sans", sans-serif',
-                      ml: 1,
+                      {!user?.profile_image && <Person sx={{ fontSize: 48 }} />}
+                    </Avatar>
+                  </Badge>
+                  
+                  <Typography variant="h6" fontWeight="bold" sx={{ mt: 2, textAlign: 'center' }}>
+                    {user?.name}
+                  </Typography>
+                  <Typography variant="body2" sx={{ opacity: 0.8, textAlign: 'center' }}>
+                    {user?.email}
+                  </Typography>
+                  <Chip 
+                    icon={<AccountCircle />} 
+                    label="Verified Account" 
+                    size="small" 
+                    sx={{ 
+                      mt: 1, 
+                      background: 'rgba(255,255,255,0.2)',
+                      color: 'white',
+                      border: '1px solid rgba(255,255,255,0.3)'
                     }}
                   />
                 </Box>
 
-                {/* Email */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    mt: 2,
-                    justifyContent: { xs: "center", sm: "flex-start" },
-                  }}
-                >
-                  <Email sx={{ fontSize: 20, mr: 1.5, opacity: 0.9 }} />
-                  {isEditing ? (
-                    <input
-                      type="email"
-                      value={editedUser.email || ""}
-                      onChange={(e) =>
-                        handleInputChange("email", e.target.value)
-                      }
-                      style={{
-                        background: "rgba(255,255,255,0.25)",
-                        border: "1px solid rgba(255,255,255,0.4)",
-                        borderRadius: "6px",
-                        padding: "8px 12px",
-                        color: "white",
-                        width: "100%",
-                        maxWidth: "250px",
-                        fontFamily: '"DM Sans", sans-serif',
-                        outline: "none",
-                      }}
-                      placeholder="Email Address"
-                    />
-                  ) : (
-                    <Typography
-                      variant="body1"
+                {/* Navigation Menu */}
+                <List sx={{ mt: 2 }}>
+                  {menuItems.map((item) => (
+                    <ListItem
+                      key={item.id}
+                      button
+                      selected={activeView === item.id}
+                      onClick={() => setActiveView(item.id)}
                       sx={{
-                        opacity: 0.9,
-                        color: "white",
-                        fontFamily: '"DM Sans", sans-serif',
-                        fontWeight: 500,
+                        mb: 1,
+                        borderRadius: 2,
+                        background: activeView === item.id ? 'rgba(255,255,255,0.2)' : 'transparent',
+                        '&:hover': {
+                          background: 'rgba(255,255,255,0.1)',
+                        }
                       }}
                     >
-                      {user?.email}
-                    </Typography>
-                  )}
-                </Box>
+                      <ListItemIcon sx={{ color: 'white', minWidth: 40 }}>
+                        {item.icon}
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary={item.label}
+                        primaryTypographyProps={{
+                          fontSize: '0.9rem',
+                          fontWeight: activeView === item.id ? 600 : 400
+                        }}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
 
-                {/* Mobile */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    mt: 1.5,
-                    justifyContent: { xs: "center", sm: "flex-start" },
-                  }}
-                >
-                  <Smartphone sx={{ fontSize: 20, mr: 1.5, opacity: 0.9 }} />
-                  {isEditing ? (
-                    <input
-                      type="tel"
-                      value={editedUser.mobile || ""}
-                      onChange={(e) =>
-                        handleInputChange("mobile", e.target.value)
-                      }
-                      style={{
-                        background: "rgba(255,255,255,0.25)",
-                        border: "1px solid rgba(255,255,255,0.4)",
-                        borderRadius: "6px",
-                        padding: "8px 12px",
-                        color: "white",
-                        width: "100%",
-                        maxWidth: "200px",
-                        fontFamily: '"DM Sans", sans-serif',
-                        outline: "none",
-                      }}
-                      placeholder="Mobile Number"
-                    />
-                  ) : (
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        opacity: 0.9,
-                        color: "white",
-                        fontFamily: '"DM Sans", sans-serif',
-                        fontWeight: 500,
-                      }}
-                    >
-                      {user?.mobile}
-                    </Typography>
-                  )}
-                </Box>
-
-                {/* Username */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    mt: 1.5,
-                    justifyContent: { xs: "center", sm: "flex-start" },
-                    background: "rgba(255,255,255,0.15)",
-                    p: 1,
-                    borderRadius: 1,
-                    maxWidth: "fit-content",
-                  }}
-                >
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      opacity: 0.9,
-                      mr: 1,
-                      color: "white",
-                      fontFamily: '"DM Sans", sans-serif',
-                    }}
-                  >
-                    Username:
+                {/* Quick Stats */}
+                <Box sx={{ 
+                  mt: 3, 
+                  p: 2, 
+                  background: 'rgba(255,255,255,0.1)', 
+                  borderRadius: 2 
+                }}>
+                  <Typography variant="caption" sx={{ opacity: 0.8 }}>
+                    ACCOUNT STATUS
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    fontWeight="bold"
-                    sx={{
-                      color: "white",
-                      fontFamily: '"DM Sans", sans-serif',
-                    }}
-                  >
-                    {username}
-                  </Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+                    <Typography variant="body2">Security Level</Typography>
+                    <Typography variant="body2" fontWeight="bold">High</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+                    <Typography variant="body2">Member Since</Typography>
+                    <Typography variant="body2" fontWeight="bold">2024</Typography>
+                  </Box>
                 </Box>
-              </Grid>
-            </Grid>
-          </Box>
+              </CardContent>
+            </Card>
+          </Grid>
 
-          {/* Action Buttons Section */}
-          <Box
-            sx={{
-              p: { xs: 2, sm: 3 },
-              mt: 1,
-              borderRadius: 2,
-            }}
-          >
-            <Typography
-              variant="h5"
-              sx={{
-                mb: 2,
-                color: "#000",
-                fontFamily: '"DM Sans", sans-serif',
-                fontWeight: 600,
-                textAlign: "center",
-              }}
-            >
-              Account Actions
-            </Typography>
+          {/* Main Content Area */}
+          <Grid item xs={12} lg={9}>
+            {/* Profile Overview */}
+            {activeView === 'profile' && (
+              <Box>
+                <Card sx={{ borderRadius: 3, mb: 3 }}>
+                  <CardContent sx={{ p: 4 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                      <Typography variant="h4" fontWeight="bold" color="primary">
+                        Profile Overview
+                      </Typography>
+                      <Button
+                        variant="outlined"
+                        startIcon={<Edit />}
+                        onClick={handleEditToggle}
+                        sx={{ borderRadius: 2 }}
+                      >
+                        {isEditing ? 'Save Changes' : 'Edit Profile'}
+                      </Button>
+                    </Box>
 
-            <Grid container spacing={2} justifyContent={"center"}>
-              {actionButtons.map((button) => (
-                <Grid item xs={12} sm={6} md={4} key={button.id}>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    onClick={button.onClick}
-                    startIcon={button.icon}
-                    sx={{
-                      height: 50,
-                      minWidth: "100%",
-                      borderRadius: 2,
-                      textTransform: "none",
-                      fontWeight: "bold",
-                      fontSize: { xs: "0.9rem", sm: "1rem" },
-                      justifyContent: "flex-start",
-                      pl: 2,
-                      color: "#000",
-                      background: button.gradient,
+                    <Grid container spacing={4}>
+                      <Grid item xs={12} md={6}>
+                        <Stack spacing={3}>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                              FULL NAME
+                            </Typography>
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                value={editedUser.name || ""}
+                                onChange={(e) => handleInputChange("name", e.target.value)}
+                                style={{
+                                  width: "100%",
+                                  padding: "12px 16px",
+                                  border: "2px solid #e0e0e0",
+                                  borderRadius: "12px",
+                                  fontSize: "16px",
+                                  outline: "none",
+                                  transition: "all 0.3s ease",
+                                  background: "#f8f9fa"
+                                }}
+                              />
+                            ) : (
+                              <Typography variant="h6" fontWeight="500">
+                                {user?.name}
+                              </Typography>
+                            )}
+                          </Box>
 
-                      "&:hover": {
-                        // background: button.hoverGradient,
-                        transform: "translateY(-3px)",
-                      },
-                      transition: "all 0.25s ease",
-                      fontFamily: '"DM Sans", sans-serif',
-                    }}
-                  >
-                    {button.label}
-                  </Button>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                              EMAIL ADDRESS
+                            </Typography>
+                            {isEditing ? (
+                              <input
+                                type="email"
+                                value={editedUser.email || ""}
+                                onChange={(e) => handleInputChange("email", e.target.value)}
+                                style={{
+                                  width: "100%",
+                                  padding: "12px 16px",
+                                  border: "2px solid #e0e0e0",
+                                  borderRadius: "12px",
+                                  fontSize: "16px",
+                                  outline: "none",
+                                  background: "#f8f9fa"
+                                }}
+                              />
+                            ) : (
+                              <Typography variant="h6" fontWeight="500">
+                                {user?.email}
+                              </Typography>
+                            )}
+                          </Box>
+                        </Stack>
+                      </Grid>
 
-          {/* Success Message */}
-          {successMessage && (
-            <Fade in={true}>
-              <Box
-                sx={{
-                  p: 2,
-                  m: 2,
-                  background:
-                    "linear-gradient(90deg, #4caf50, #81c784, #66bb6a)",
-                  color: "white",
-                  borderRadius: 2,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  boxShadow: "0px 4px 12px rgba(76, 175, 80, 0.4)",
-                  textAlign: "center",
-                  animation: "pulse 2s infinite",
-                  fontFamily: '"DM Sans", sans-serif',
-                }}
-              >
-                <CheckCircle sx={{ mr: 1 }} />
-                <Typography fontWeight="500" fontFamily='"DM Sans", sans-serif'>
-                  {successMessage}
+                      <Grid item xs={12} md={6}>
+                        <Stack spacing={3}>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                              MOBILE NUMBER
+                            </Typography>
+                            {isEditing ? (
+                              <input
+                                type="tel"
+                                value={editedUser.mobile || ""}
+                                onChange={(e) => handleInputChange("mobile", e.target.value)}
+                                style={{
+                                  width: "100%",
+                                  padding: "12px 16px",
+                                  border: "2px solid #e0e0e0",
+                                  borderRadius: "12px",
+                                  fontSize: "16px",
+                                  outline: "none",
+                                  background: "#f8f9fa"
+                                }}
+                              />
+                            ) : (
+                              <Typography variant="h6" fontWeight="500">
+                                {user?.mobile}
+                              </Typography>
+                            )}
+                          </Box>
+
+                          <Box>
+                            <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                              USERNAME
+                            </Typography>
+                            <Typography variant="h6" fontWeight="500" sx={{ 
+                              background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                              backgroundClip: 'text',
+                              WebkitBackgroundClip: 'text',
+                              color: 'transparent',
+                              display: 'inline-block'
+                            }}>
+                              {username}
+                            </Typography>
+                          </Box>
+                        </Stack>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+
+                {/* Quick Actions */}
+                <Typography variant="h5" fontWeight="bold" sx={{ mb: 3, color: 'text.primary' }}>
+                  Quick Actions
                 </Typography>
+                <Grid container spacing={2}>
+                  {quickActions.map((action) => (
+                    <Grid item xs={12} sm={6} md={3} key={action.id}>
+                      <Card 
+                        sx={{ 
+                          p: 3,
+                          textAlign: 'center',
+                          borderRadius: 3,
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          background: action.color,
+                          color: 'white',
+                          '&:hover': {
+                            transform: 'translateY(-8px)',
+                            boxShadow: '0 12px 30px rgba(0,0,0,0.2)'
+                          }
+                        }}
+                        onClick={action.onClick}
+                      >
+                        <Box sx={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center',
+                          width: 60,
+                          height: 60,
+                          borderRadius: '50%',
+                          background: 'rgba(255,255,255,0.2)',
+                          margin: '0 auto 16px'
+                        }}>
+                          {action.icon}
+                        </Box>
+                        <Typography variant="body1" fontWeight="600">
+                          {action.label}
+                        </Typography>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
               </Box>
-            </Fade>
-          )}
-          {user?.status === 1 && <ProfileTabs />}
-        </Paper>
-      </Slide>
+            )}
+
+            {/* Security Center */}
+            {activeView === 'security' && (
+              <Box>
+                <Card sx={{ borderRadius: 3, mb: 3 }}>
+                  <CardContent sx={{ p: 4 }}>
+                    <Typography variant="h4" fontWeight="bold" color="primary" gutterBottom>
+                      Security Center
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                      Manage your account security settings and preferences
+                    </Typography>
+
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} md={6}>
+                        <SecurityCard
+                          title="Password Protection"
+                          description="Last changed 30 days ago"
+                          status="Active"
+                          action={handleChangePassword}
+                          icon={<PasswordOutlined />}
+                          color="#667eea"
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <SecurityCard
+                          title="MPIN Security"
+                          description="Transaction authentication"
+                          status="Active"
+                          action={handleChangeMpin}
+                          icon={<LockPersonOutlined />}
+                          color="#f093fb"
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <SecurityCard
+                          title="Two-Factor Auth"
+                          description="Extra layer of security"
+                          status="Inactive"
+                          action={handleTwoFAModalOpen}
+                          icon={<SecurityUpdateGood />}
+                          color="#4facfe"
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <SecurityCard
+                          title="Device Management"
+                          description="2 devices connected"
+                          status="Active"
+                          action={() => {}}
+                          icon={<SmartphoneOutlined />}
+                          color="#43e97b"
+                        />
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              </Box>
+            )}
+
+            {/* Other views would go here */}
+            {activeView === 'business' && user?.status === 1 && <ProfileTabs />}
+          </Grid>
+        </Grid>
+      </Container>
+
+      {/* Floating Action Button for Mobile */}
+      {isMobile && (
+        <Fab
+          color="primary"
+          sx={{
+            position: 'fixed',
+            bottom: 16,
+            right: 16,
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+          }}
+          onClick={() => setDrawerOpen(true)}
+        >
+          <Menu />
+        </Fab>
+      )}
+
+      {/* Mobile Drawer */}
+      <Drawer
+        anchor="right"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        PaperProps={{
+          sx: {
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            color: 'white'
+          }
+        }}
+      >
+        <Box sx={{ width: 280, p: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Typography variant="h6">Menu</Typography>
+            <IconButton onClick={() => setDrawerOpen(false)} sx={{ color: 'white' }}>
+              <Close />
+            </IconButton>
+          </Box>
+          {/* Mobile menu items would go here */}
+        </Box>
+      </Drawer>
+
       {/* Modals */}
-      {resetMpinModalOpen && (
+      {/* {resetMpinModalOpen && (
         <ResetMpin
           open={resetMpinModalOpen}
           onClose={() => setResetMpinModalOpen(false)}
           username={username}
         />
-      )}
+      )} */}
       {changePasswordModal && (
         <ChangePassword
           open={changePasswordModal}
@@ -604,7 +654,6 @@ const ProfilePage = () => {
           onClose={() => setChangeMpinModal(false)}
         />
       )}
-
       {newNumberModal && (
         <NumberVerificationComponent
           open={newNumberModal}
@@ -616,18 +665,6 @@ const ProfilePage = () => {
           username={user?.username}
         />
       )}
-
-      {/* {changeLayout && (
-        <ChangeLayoutModal
-          open={changeLayout}
-          onClose={() => setChangeLayout(false)}
-          onSuccess={(message) => {
-            setSuccessMessage(message);
-            setChangeLayout(false);
-          }}
-          username={user?.username}
-        />
-      )} */}
       {businessModal && (
         <BusinessInformation
           open={businessModal}
@@ -657,4 +694,5 @@ const ProfilePage = () => {
     </Box>
   );
 };
+
 export default ProfilePage;
