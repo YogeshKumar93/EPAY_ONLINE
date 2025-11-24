@@ -182,27 +182,30 @@ const Login = () => {
       }}
     >
       {/* BACKGROUND IMAGE FULL WIDTH */}
-      <Box
-        component="img"
-        src={backImg}
-        alt="Background"
-        sx={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          position: "absolute",
-          top: 0,
-          left: 0,
-          zIndex: 1,
-        }}
-      />
+    <Box
+  component="img"
+  src={backImg}
+  alt="Background"
+  sx={{
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    zIndex: 1,
+    display: { xs: "none", md: "block" }, // ⭐ Hide on mobile
+  }}
+/>
+
 
       {/* LOGIN FORM OVERLAY ON LEFT SIDE */}
       <Box
         sx={{
           position: "absolute",
           top: 0,
-          left: 40,
+        left: { xs: 0, md: 40 },
+
           height: "100%",
           width: { xs: "100%", md: "45%" }, // form left area on desktop
           display: "flex",
