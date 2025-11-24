@@ -143,22 +143,20 @@ const CreateBankStatement = ({ onFetchRef, bankId, balance }) => {
   };
 
   // Only show required fields from schema
-  const requiredFields = [
-    "mop",
-    "credit",
-    "handle_by",
-    // "remark",
-    "date",
-   
+ const requiredFields = [
+  "mop",
+  "credit",
+  "debit",
+  "handle_by",
+  "date",
+  "particulars", // debit is NOT required
+];
 
-    "particulars",
-  ];
-  const isFormValid = requiredToActivate.every(
-  (field) =>
-    formData[field] !== "" &&
-    formData[field] !== undefined &&
-    formData[field] !== null
-);
+const isFormValid = requiredFields.every((field) => {
+  const value = formData[field];
+  return value !== "" && value !== undefined && value !== null;
+});
+
   const visibleFields = schema.filter((f) => requiredFields.includes(f.name));
 
   return (
@@ -256,6 +254,7 @@ const CreateBankStatement = ({ onFetchRef, bankId, balance }) => {
 >
   + Add
 </Button>
+
 
     </Box>
   );
