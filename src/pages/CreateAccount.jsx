@@ -3,35 +3,82 @@ import React, { useState } from "react";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import CommonModal from "../components/common/CommonModal";
-import { useSchemaForm } from "../hooks/useSchemaForm";
 import { useToast } from "../utils/ToastContext";
-import { PATTERNS, isValid } from "../utils/validators";
 
 const CreateAccount = ({ open, handleClose, onFetchRef }) => {
-  // ✅ Load schema dynamically
-  const {
-    schema,
-    formData,
-    handleChange,
-    errors,
-    setErrors,
-    loading,
-  } = useSchemaForm(ApiEndpoints.GET_ACCOUNT_SCHEMA, open);
+  
+  const initialFormData = {
+    name: "",
+    mobile: "",
+    establishment: "",
+  };
 
+  const [formData, setFormData] = useState(initialFormData);
   const [submitting, setSubmitting] = useState(false);
   const { showToast } = useToast();
 
+  // Reset form function
+  const resetForm = () => {
+    setFormData(initialFormData);
+  };
 
-  // ✅ Submit handler
+  // Handle modal close with reset
+  const handleModalClose = () => {
+    resetForm();
+    handleClose();
+  };
+
+  // Handle change to update form data
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    let finalValue = value;
+
+    if (name === "mobile") {
+      finalValue = value.replace(/[^0-9]/g, "").slice(0, 10);
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: finalValue,
+    }));
+  };
+
+  // Submit function with validation and form reset
   const handleSubmit = () => {
+    if (!formData.name.trim()) {
+      showToast("Name is required", "error");
+      return;
+    }
+
+    if (!formData.mobile.trim()) {
+      showToast("Mobile number is required", "error");
+      return;
+    }
+
+    if (formData.mobile.length !== 10) {
+      showToast("Mobile number must be exactly 10 digits", "error");
+      return;
+    }
+
+    if (!formData.establishment.trim()) {
+      showToast("Establishment is required", "error");
+      return;
+    }
+    
+
     setSubmitting(true);
 
     apiCall("post", ApiEndpoints.CREATE_ACCOUNT, {
       ...formData,
     }).then(({ error, response }) => {
       if (response) {
-        showToast(response?.message || "Account created successfully", "success");
+        showToast(
+          response?.message || "Account created successfully",
+          "success"
+        );
         onFetchRef?.();
+        resetForm(); 
         handleClose();
       } else {
         showToast(error?.message || "Failed to create account", "error");
@@ -40,34 +87,54 @@ const CreateAccount = ({ open, handleClose, onFetchRef }) => {
     });
   };
 
-  // ✅ Optional: pick only visible fields from schema
-  const visibleFields = schema.filter((field) =>
-    [
-      "user_id",      
-      "credit_limit",
-    ].includes(field.name)
-  );
+  // Reset form when modal opens/closes
+  React.useEffect(() => {
+    if (open) {
+      resetForm();
+    }
+  }, [open]);
+
+  // 3 fields only
+  const visibleFields = [
+    {
+      name: "name",
+      label: "Name",
+      type: "text",
+      placeholder: "Enter Name",
+    },
+    {
+      name: "mobile",
+      label: "Mobile Number",
+      type: "text",
+      placeholder: "Enter Mobile Number",
+    },
+    {
+      name: "establishment",
+      label: "Establishment",
+      type: "text",
+      placeholder: "Enter Establishment",
+    },
+  ];
 
   return (
     <CommonModal
       open={open}
-      onClose={handleClose}
+      onClose={handleModalClose}
       title="Create Account"
       iconType="info"
       size="medium"
       dividers
-      fieldConfig={visibleFields} // schema-driven fields
+      fieldConfig={visibleFields}
       formData={formData}
       handleChange={handleChange}
-      errors={errors}
-      loading={loading || submitting}
+      errors={{}}
+      loading={submitting}
       layout="two-column"
       footerButtons={[
         {
           text: "Cancel",
           variant: "outlined",
-          onClick: handleClose,
-          disabled: submitting,
+          onClick: handleModalClose,
         },
         {
           text: submitting ? "Saving..." : "Save",
