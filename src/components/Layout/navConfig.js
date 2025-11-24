@@ -1,14 +1,9 @@
 import { Avatar } from "@mui/material";
 import {
- 
   bankImage,
-  
   loginHistoryImage,
- 
   riskImage,
-  
   virtuanAccountImage,
-  
 } from "../../iconsImports";
 
 export const navConfig = [
@@ -20,7 +15,7 @@ export const navConfig = [
   //   to: {
   //     adm: "/admin/dashboard",
   //     sadm: "/admin/dashboard",
-     
+
   //   },
   //   roles: ["sadm", "adm", ],
   // },
@@ -40,25 +35,6 @@ export const navConfig = [
   //   roles: ["adm", "sadm", "asm", "zsm", "md"],
   // },
 
-  
-
-  
-
-   
-
- 
-
-  
-
-  
-
- 
-
- 
- 
-
-  ,
-
   {
     title: "Banks",
     icon: bankImage,
@@ -71,7 +47,7 @@ export const navConfig = [
     roles: ["adm", "sadm"],
   },
 
-   {
+  {
     title: "Accounts",
     icon: virtuanAccountImage,
     icon2: "🏦",
@@ -82,8 +58,8 @@ export const navConfig = [
     permissionKey: "accounts",
     roles: ["adm", "sadm"],
   },
- 
- {
+
+  {
     title: "Unclaimed",
     icon: riskImage,
     icon2: "🏦",
@@ -94,7 +70,6 @@ export const navConfig = [
     permissionKey: "unclaimed",
     roles: ["adm", "sadm"],
   },
-  
 
   // Settings
   // {
@@ -109,10 +84,6 @@ export const navConfig = [
   //   roles: ["adm", "sadm"],
   // },
 
- 
-
-  
-
   // Login History
   {
     title: "Login History",
@@ -121,9 +92,8 @@ export const navConfig = [
     to: {
       adm: "/admin/login_history",
       sadm: "/admin/login_history",
-      
     },
-    roles: ["adm","sadm"],
+    roles: ["adm", "sadm"],
     permissionKey: "login_history",
   },
 
@@ -148,7 +118,7 @@ const roleHierarchy = {
       // "Manage Users",
       // "Fund Request",
       // "Transactions",
-       "Banks",
+      "Banks",
       "Accounts",
       "Unclaimed",
       // "Services",
@@ -162,7 +132,7 @@ const roleHierarchy = {
   },
   sadm: {
     default: [
-    //  "Dashboard",
+      //  "Dashboard",
       // "Manage Users",
       // "Fund Request",
       // "Transactions",
@@ -178,7 +148,6 @@ const roleHierarchy = {
     ],
     // 1: ["Services", "Transactions", "Wallet Ledger", "Risk"], // Layout 1
   },
- 
 };
 
 export const buildNavForRole = (role, permissions = {}, layout = "default") => {
