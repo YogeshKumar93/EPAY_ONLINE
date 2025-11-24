@@ -598,12 +598,12 @@ const ProfilePage = () => {
           username={username}
         />
       )}
-      {changeMpinModal && (
+      {/* {changeMpinModal && (
         <ChangeMpin
           open={changeMpinModal}
           onClose={() => setChangeMpinModal(false)}
         />
-      )}
+      )} */}
 
       {newNumberModal && (
         <NumberVerificationComponent
