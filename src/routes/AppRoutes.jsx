@@ -1,49 +1,35 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "../pages/Login";
- 
+
 import SideNavAndHeader from "../components/Layout/SideNavAndHeader";
 import AuthContext from "../contexts/AuthContext";
 import { useContext } from "react";
- 
-import Accounts from "../pages/Accounts"; 
- 
+
+import Accounts from "../pages/Accounts";
+
 import ProfilePage from "../components/MyProfile/Profile";
 import Banks from "../pages/Banks";
- 
- 
+
 import { Banking } from "../pages/Banking";
- 
- 
+
 import Navs from "../pages/Navs";
 
 import Statements from "../pages/Statements";
 
- 
 import BankStatements from "../pages/BankStatements";
 import AccountStatement from "../pages/AccountStatement";
- 
- 
- 
+
 import Virtual_Accounts from "../pages/Virtual_Accounts";
 import Login_History from "../pages/Login_History";
- 
- 
- 
- 
 
- 
-
- 
- 
 import OnBoarding from "../components/OnBoarding";
- 
+
 import BankStatementDesign from "../components/AEPS/BankStatementDesign";
- 
+
 // import Terms from "../pages/Terms";
 import DownloadExcel from "../pages/DownloadExcel";
 import UploadExcel from "../pages/UploadExcel";
 import Unclaimed from "../pages/Unclaimed";
-// import VpaQrGenerator from "../pages/VpaQrGenerator";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading, user } = useContext(AuthContext);
@@ -109,10 +95,6 @@ export default function AppRoutes() {
         <Route path="/terms-conditions" element={<Terms />} />
         <Route path="/bank-statement" element={<BankStatementDesign />} />
         <Route path="/adminagreement" element={<AdminAgreement />} /> */}
-       
-      
-
-         
 
         {/* Protected layout */}
         <Route
@@ -143,7 +125,7 @@ export default function AppRoutes() {
               {/* <Route path="admin/logs" element={<Logs />} /> */}
               <Route path="admin/profile" element={<ProfilePage />} />
               <Route path="admin/banks" element={<Banks />} />
-                <Route path="admin/unclaimed" element={<Unclaimed />} />
+              <Route path="admin/unclaimed" element={<Unclaimed />} />
               {/* <Route path="admin/wallet-ledger" element={<WalletLedgers />} /> */}
               {/* <Route path="admin/purpose" element={<Purposes />} /> */}
               <Route path="admin/downloadexcel" element={<DownloadExcel />} />
@@ -188,12 +170,6 @@ export default function AppRoutes() {
             </>
           )}
 
-        
-         
- 
-
-          
-
           {/* Fallback inside protected area */}
           <Route
             path="*"
@@ -203,8 +179,6 @@ export default function AppRoutes() {
                 to={
                   isAdmin
                     ? "/admin/banks"
-                    : isCustomer
-                    ? "/customer/banks"
                     : "/login"
                 }
               />
