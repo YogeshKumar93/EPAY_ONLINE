@@ -43,7 +43,7 @@ import BankStatementDesign from "../components/AEPS/BankStatementDesign";
 import DownloadExcel from "../pages/DownloadExcel";
 import UploadExcel from "../pages/UploadExcel";
 import Unclaimed from "../pages/Unclaimed";
-import VpaQrGenerator from "../pages/VpaQrGenerator";
+// import VpaQrGenerator from "../pages/VpaQrGenerator";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading, user } = useContext(AuthContext);
