@@ -88,65 +88,53 @@ const Login = () => {
       }
     );
   }, []);
+const onSubmit = async (data) => {
+  if (!location.lat || !location.long) {
+    setLoginError("Unable to detect location. Please enable GPS and try again.");
+    console.error("Login blocked: Missing location data", location);
+    return;
+  }
 
-  const onSubmit = async (data) => {
-    if (!location.lat || !location.long) {
-      setLoginError(
-        "Unable to detect location. Please enable GPS and try again."
-      );
-      console.error("Login blocked: Missing location data", location);
+  setLoading(true);
+  setLoginError("");
+  setUsername(data.mobile);
+  setPassword(data.password);
+
+  try {
+    const { error, response } = await apiCall("POST", ApiEndpoints.SIGN_IN, {
+      username: data.mobile,
+      password: data.password,
+      latitude: location.lat,
+      longitude: location.long,
+    });
+
+    if (error) {
+      setLoginError(error.message || "Login failed");
       return;
     }
-    // else if (!captchaChecked) {
-    //   return true;
-    // }
 
-    setLoading(true);
-    setLoginError("");
-    setUsername(data.mobile);
-    setPassword(data.password);
-
-    try {
-      const { error, response } = await apiCall("POST", ApiEndpoints.SIGN_IN, {
-        username: data.mobile,
-        password: data.password,
-        latitude: location.lat,
-        longitude: location.long,
-      });
-
-      if (error) {
-        setLoginError(error.message || "Login failed");
-        return;
-      }
-
-     if (response) {
-        const token = response.message.token;
-        await authCtx.login(token);
-        
-      const userResult = await apiCall("get", ApiEndpoints.GET_ME_USER);
-              if (userResult.response) {
-                const userData = userResult.response.data;
-                authCtx.saveUser(userData);
-                localStorage.setItem("user", JSON.stringify(userData));
+    if (response && response.status === "Success") {
+      const token = response.message.token;
+      const userData = response.message.user;
       
-                if (userData.role === "adm" || userData.role === "sadm") {
-                  navigate("/admin/banks");
-                
-                
-                } else {
-                  navigate("/other/banks");
-                }
-              }
-        else navigate("/");
+      // Login with both token and user data
+      await authCtx.login(token, userData);
+      
+      // Navigation based on role
+      if (userData.role === "adm" || userData.role === "sadm") {
+        navigate("/admin/banks");
       } else {
-        setLoginError("Unexpected response from server");
+        navigate("/other/banks");
       }
-    } catch (err) {
-      setLoginError(err.message || "Login failed");
-    } finally {
-      setLoading(false);
+    } else {
+      setLoginError(response?.data || "Unexpected response from server");
     }
-  };
+  } catch (err) {
+    setLoginError(err.message || "Login failed");
+  } finally {
+    setLoading(false);
+  }
+};
 
 
   const handleForgotPassword = () => setForgotModalOpen(true);
@@ -195,21 +183,21 @@ const Login = () => {
       }}
     >
       {/* BACKGROUND IMAGE FULL WIDTH */}
-    <Box
-  component="img"
-  src={backImg}
-  alt="Background"
-  sx={{
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-    position: "absolute",
-    top: 0,
-    left: 0,
-    zIndex: 1,
-    display: { xs: "none", md: "block" }, // ⭐ Hide on mobile
-  }}
-/>
+      <Box
+        component="img"
+        src={backImg}
+        alt="Background"
+        sx={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          zIndex: 1,
+          display: { xs: "none", md: "block" }, // ⭐ Hide on mobile
+        }}
+      />
 
 
       {/* LOGIN FORM OVERLAY ON LEFT SIDE */}
@@ -217,7 +205,7 @@ const Login = () => {
         sx={{
           position: "absolute",
           top: 0,
-        left: { xs: 0, md: 40 },
+          left: { xs: 0, md: 40 },
 
           height: "100%",
           width: { xs: "100%", md: "45%" }, // form left area on desktop
@@ -247,7 +235,7 @@ const Login = () => {
               display: "block",
               mx: "auto",
             }}
-            // onClick={() => window.open("https://p2pae.com")}
+          // onClick={() => window.open("https://p2pae.com")}
           />
 
           {/* Error */}
@@ -383,10 +371,10 @@ const Login = () => {
                 >
                   Terms and Conditions
                 </Link> */}
-                {/* </Typography>
+            {/* </Typography>
               }
               sx={{ width: "100%", textAlign: "center", marginBottom: 0 }}
-            /> */} 
+            /> */}
 
             {/* Submit */}
             <Button

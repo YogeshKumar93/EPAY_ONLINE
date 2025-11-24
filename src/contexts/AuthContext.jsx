@@ -194,22 +194,30 @@ export const AuthProvider = ({ children }) => {
 
     initializeAuth();
   }, []);
-
-  const login = async (token) => {
-    try {
-      setToken(token);
-      setTokenState(token);
-      localStorage.setItem("access_token", token);
-      const userProfile = await loadUserProfile();
-      await loadColours();
-      // await getSideNavs();          // Fetch side navs AFTER login
-      return userProfile;
-    } catch (err) {
-      clearToken();
-      clearUser();
-      throw err;
+const login = async (token, userData = null) => {
+  try {
+    setToken(token);
+    setTokenState(token);
+    localStorage.setItem("access_token", token);
+    
+    let userProfile;
+    if (userData) {
+      // Use provided user data
+      userProfile = userData;
+      saveUser(userData);
+    } else {
+      // Fetch user profile from API
+      userProfile = await loadUserProfile();
     }
-  };
+    
+    await loadColours();
+    return userProfile;
+  } catch (err) {
+    clearToken();
+    clearUser();
+    throw err;
+  }
+};
 
   const loginHandler = (token) => {
     setToken(token);
