@@ -15,7 +15,7 @@ const titleMap = {
       "/admin/unclaimed": "Unclaimed",
     "/admin/settings": "Settings",
     "/admin/messages": "Messages",
-    "/admin/services": "Services",
+    "/admin/claimed": "Claimed",
     "/admin/templates": "Templates",
     "/admin/commissionrule": "Commission Rules",
     "/admin/logs": "Logs",
@@ -61,6 +61,7 @@ export const setTitleFunc = (path, states = {}) => {
   if (path.startsWith("/admin/bankstatements/")) {
     return `Bank Statements : ${states.bank_name}  (${states.acc_number}) `;
   }
+  
 
   return title;
 };
