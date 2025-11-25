@@ -335,9 +335,14 @@ const handleUploadExcel = async (file) => {
     {
       name: "Status",
       selector: (row) => (
-        <div style={{ textAlign: "right", fontSize: "11px", fontWeight: 600 }}>
-          {row.status === 0 ? "UNCLAIMED" : "CLAIMED"}
-        </div>
+        <span
+      style={{
+        color: row.status === 0 ? "orange" : "red",
+        fontWeight: 600,
+      }}
+    >
+      {row.status === 0 ? "Unclaimed" : "Claimed"}
+    </span>
       ),
       center: true,
       width: "70px",

@@ -53,13 +53,13 @@ export const setTitleFunc = (path, states = {}) => {
   let title = roleMap[path] || "";
 
   if (path === "/admin/accountstatements") {
-    return `Account Statement ${states.establishment} (${states.mobile})`;
+    return `Account Statement : ${states.establishment} (${states.mobile})`;
   }
   if (path === "/customer/khata-statement") {
-    return `Khata Statement ${states.name} (${states.id})`;
+    return `Khata Statement : ${states.name} (${states.id})`;
   }
   if (path.startsWith("/admin/bankstatements/")) {
-    return `${states.bank_name}  (${states.acc_number}) Statement`;
+    return `Bank Statements : ${states.bank_name}  (${states.acc_number}) `;
   }
 
   return title;

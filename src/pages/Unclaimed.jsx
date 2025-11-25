@@ -115,10 +115,20 @@ const Unclaimed = () => {
     { name: "Balance", selector: (row) => currencySetter(row.balance) },
     { name: "Mode", selector: (row) => row.mop },
     { name: "Remark", selector: (row) => row.remark || "-" },
-    {
-      name: "Status",
-      selector: (row) => (row.status === 0 ? "Unclaimed" : "Claimed"),
-    },
+   {
+  name: "Status",
+  selector: (row) => (
+    <span
+      style={{
+        color: row.status === 0 ? "orange" : "red",
+        fontWeight: 600,
+      }}
+    >
+      {row.status === 0 ? "Unclaimed" : "Claimed"}
+    </span>
+  ),
+}
+
   ];
 
   return (
