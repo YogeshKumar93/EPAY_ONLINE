@@ -21,6 +21,7 @@ const CreateBankStatement = ({ onFetchRef, bankId, balance }) => {
     balance: 0,
     date: "",
     mop: "",
+    remark:"",
     // handle_by: "",
     particulars: "",
     credit: 0,
@@ -33,7 +34,7 @@ const CreateBankStatement = ({ onFetchRef, bankId, balance }) => {
     balance: balance || 0,
     date: new Date().toISOString().split("T")[0],
     mop: "",
-    //  "",
+    remark:"",
     particulars: "",
     credit: 0,
     debit: 0,
@@ -76,14 +77,15 @@ const CreateBankStatement = ({ onFetchRef, bankId, balance }) => {
   // VALIDATION LOGIC
   // -------------------------
   const isFormValid = () => {
-    const { mop, particulars, date, credit, debit } = formData;
+    const { mop, particulars, remark, date, credit, debit } = formData;
 
     // Required Fields
     const requiredFilled =
       mop.trim() !== "" &&
 
       particulars.trim() !== "" &&
-      date.trim() !== "";
+      date.trim() !== "" &&
+      remark.trim() !== "";
 
     // Credit/Debit old logic
     const creditDebitValid =
@@ -121,8 +123,9 @@ const CreateBankStatement = ({ onFetchRef, bankId, balance }) => {
       sx={{
         display: "flex",
         gap: 1,
-        alignItems: "center",
-        flexWrap: "nowrap",
+     alignItems: "flex-start",
+
+        flexWrap: "wrap",
       }}
     >
 
@@ -133,7 +136,7 @@ const CreateBankStatement = ({ onFetchRef, bankId, balance }) => {
         size="small"
         value={formData.particulars}
         onChange={handleChange}
-        sx={{ width: 350 }}
+        sx={{ width: 250 }}
       />
 
       {/* CREDIT */}
@@ -211,7 +214,15 @@ const CreateBankStatement = ({ onFetchRef, bankId, balance }) => {
         <MenuItem value="CREDIT">CREDIT</MenuItem>
       </TextField>
 
-
+  {/* REMARKS */}
+      <TextField
+        label="Remarks"
+        name="remark"
+        size="small"
+        value={formData.remark}
+        onChange={handleChange}
+         sx={{ width: 250 }}
+      />
 
       {/* ADD BUTTON */}
       <Button
@@ -220,7 +231,7 @@ const CreateBankStatement = ({ onFetchRef, bankId, balance }) => {
         variant="contained"
         size="medium"
         sx={{
-  background: "grey",          // <-- your grey background
+  background: "#492077",          // <-- your grey background
  
   textTransform: "none",
   fontWeight: 600,
