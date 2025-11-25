@@ -32,6 +32,7 @@ import UploadExcel from "../pages/UploadExcel";
 import Unclaimed from "../pages/Unclaimed";
 import Claimed from "../pages/Claimed";
 import PrintClaimedReceipt from "../pages/PrintClaimedReceipt";
+// import Users from "../pages/Users";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading, user } = useContext(AuthContext);
