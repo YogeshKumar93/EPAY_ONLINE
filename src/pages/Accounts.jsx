@@ -107,24 +107,22 @@ const Accounts = () => {
       { id: "mobile", label: "Mobile Number", type: "textfield" },
       {
         id: "user_id",
-        label: "Type Est.",
+        label: "User ID",
         type: "autocomplete",
         options: userOptions,
         onSearch: (val) => setUserSearch(val),
         getOptionLabel: (option) => option?.label || "",
         isOptionEqualToValue: (option, value) => option.id === value.id, // ✅ this line keeps selection visible
       },
-      { id: "asm", label: "Asm Id", type: "textfield" },
     ],
     [user?.role, userOptions, appliedFilters]
   );
   // ✅ Columns definition
   const columns = [
     { name: "Name", selector: (row) => row.name },
-    { name: "User ID", selector: (row) => row.user_id },
+    { name: "User ID", selector: (row) => row.id },
     { name: "Establishment", selector: (row) => row.establishment },
     { name: "Mobile", selector: (row) => row.mobile },
-    { name: "ASM", selector: (row) => row.asm || "-" },
     { name: "Credit Limit", selector: (row) => row.credit_limit },
     { name: "Balance", selector: (row) => row.balance },
     {
@@ -215,12 +213,6 @@ const Accounts = () => {
             filters={filters}
             queryParam={appliedFilters} // only updates when Apply is clicked
             customHeader={
-              // <ReButton
-              //   variant="contained"
-              //   label="Account"
-              //   startIcon={<AddIcon />}
-              //   onClick={() => setOpenCreate(true)}
-              // />
                    <Button
                 label="Account"
                  onClick={() => setOpenCreate(true)}
@@ -232,8 +224,8 @@ const Accounts = () => {
                   textTransform: "none",
                   fontWeight: 600,
                   letterSpacing: "0.3px",
-                  paddingX: 3,
-                  paddingY: 1.2,
+                  paddingX: 1.8,
+                  paddingY: 1,
                   borderRadius: "10px",
                   boxShadow: "0px 4px 12px rgba(73, 2, 119, 0.3)",
                   transition: "all 0.3s ease",
