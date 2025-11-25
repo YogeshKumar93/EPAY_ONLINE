@@ -149,15 +149,35 @@ const CreateAccountStatement = ({
               { id: "credit_option", bank_name: "Credit" },
               { id: "value_option", bank_name: "Value" },
               ...transactions,
-            ].map((opt) => (
-              <MenuItem key={opt.id} value={opt.id}>
-                {opt.id === "credit_option" || opt.id === "value_option"
-                  ? opt.bank_name
-                  : `${opt.created_at} / ${opt.particulars} / ${
-                      parseFloat(opt.credit) > 0 ? opt.credit : opt.debit
-                    }`}
-              </MenuItem>
-            ))}
+            ].map((opt) => {
+              const isStatic =
+                opt.id === "credit_option" || opt.id === "value_option";
+              const isCredit = !isStatic && parseFloat(opt.credit) > 0;
+              const isDebit = !isStatic && parseFloat(opt.debit) > 0;
+
+              return (
+                <MenuItem
+                  key={opt.id}
+                  value={opt.id}
+                  sx={{
+                    color: isStatic
+                      ? "inherit"
+                      : isCredit
+                      ? "green"
+                      : isDebit
+                      ? "red"
+                      : "inherit",
+                    fontWeight: 600,
+                  }}
+                >
+                  {isStatic
+                    ? opt.bank_name
+                    : `${opt.created_at} / ${opt.particulars} / ${
+                        isCredit ? opt.credit : opt.debit
+                      }`}
+                </MenuItem>
+              );
+            })}
           </TextField>
         </Grid>
 
@@ -203,37 +223,36 @@ const CreateAccountStatement = ({
         </Grid>
       </Grid>
 
-      
-         <Button
-                      label="Account"
-                       onClick={handleSubmit}
-                      variant="contained"
-                       disabled={submitting}
-                      size="medium"
-                      sx={{
-                        background: "linear-gradient(135deg, #490277 0%, #6A1B9A 100%)",
-                        color: "#FFFFFF",
-                        textTransform: "none",
-                        fontWeight: 600,
-                        letterSpacing: "0.3px",
-                        paddingX: 3,
-                        paddingY: 1.2,
-                        borderRadius: "10px",
-                        boxShadow: "0px 4px 12px rgba(73, 2, 119, 0.3)",
-                        transition: "all 0.3s ease",
-                        "&:hover": {
-                          background: "linear-gradient(135deg, #5A048F 0%, #7B2BB5 100%)",
-                          boxShadow: "0px 6px 16px rgba(73, 2, 119, 0.45)",
-                          transform: "translateY(-2px)",
-                        },
-                        "&:active": {
-                          transform: "scale(0.98)",
-                          boxShadow: "0px 2px 6px rgba(73, 2, 119, 0.2)",
-                        },
-                      }}
-                    >
-                      {submitting ? "Submitting..." : "Add"}
-                    </Button>
+      <Button
+        label="Account"
+        onClick={handleSubmit}
+        variant="contained"
+        disabled={submitting}
+        size="medium"
+        sx={{
+          background: "linear-gradient(135deg, #490277 0%, #6A1B9A 100%)",
+          color: "#FFFFFF",
+          textTransform: "none",
+          fontWeight: 600,
+          letterSpacing: "0.3px",
+          paddingX: 3,
+          paddingY: 1.2,
+          borderRadius: "10px",
+          boxShadow: "0px 4px 12px rgba(73, 2, 119, 0.3)",
+          transition: "all 0.3s ease",
+          "&:hover": {
+            background: "linear-gradient(135deg, #5A048F 0%, #7B2BB5 100%)",
+            boxShadow: "0px 6px 16px rgba(73, 2, 119, 0.45)",
+            transform: "translateY(-2px)",
+          },
+          "&:active": {
+            transform: "scale(0.98)",
+            boxShadow: "0px 2px 6px rgba(73, 2, 119, 0.2)",
+          },
+        }}
+      >
+        {submitting ? "Submitting..." : "Add"}
+      </Button>
     </Box>
   );
 };

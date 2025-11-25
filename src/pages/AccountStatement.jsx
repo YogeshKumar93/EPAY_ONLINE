@@ -525,6 +525,7 @@ const AccountStatement = () => {
         open={openDelete}
         handleClose={() => setOpenDelete(false)}
         handleConfirm={handleConfirmDelete}
+        account_id={account_id}
       />
     </Box>
   );
