@@ -34,7 +34,7 @@ import Claimed from "../pages/Claimed";
 import PrintClaimedReceipt from "../pages/PrintClaimedReceipt";
 import Users from "../pages/Users";
 import Claimed_with_Paid from "../pages/Claimed_with_Paid";
-import Print from "../pages/Print";
+ 
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading, user } = useContext(AuthContext);
@@ -88,7 +88,7 @@ export default function AppRoutes() {
         {/* <Route path="/qrLogin" element={<QrLoginPage />} /> */}
         <Route path="/login" element={<Login />} />
          <Route path="/print-claimedreceipt" element={<PrintClaimedReceipt />} />
-          <Route path="/print" element={<Print />} />
+       
         {/* <Route path="/print-receipt" element={<DmtReceipt1 />} />
         <Route path="/print-dmt" element={<PrintDmt />} />
         <Route path="/print-dmt2" element={<PrintDmt2 />} />
