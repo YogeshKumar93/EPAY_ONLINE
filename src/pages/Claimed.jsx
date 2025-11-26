@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef,useContext } from "react";
 import {
   Box,
   Button,
@@ -21,22 +21,27 @@ import PrintIcon from "@mui/icons-material/Print";
 import { useNavigate } from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteClaimed from "./DeleteClaimed";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import { useToast } from "../utils/ToastContext";
+import AuthContext from "../contexts/AuthContext";
 
 
 const Claimed = () => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(false);
-   const [openDelete, setOpenDelete] = useState(false);
-    const [selectedRow, setSelectedRow] = useState(null);
-    const [selectedClaim,setSelectedClaim] = useState(null);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedClaim, setSelectedClaim] = useState(null);
   const [filters, setFilters] = useState({
     userId: "",
     status: "unclaimed",
     date: {},
     dateVal: "",
   });
-
- const navigate = useNavigate();
+const authCtx = useContext(AuthContext);
+  const user = authCtx?.user;
+  const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const fetchEntriesRef = useRef(null);
   const handleFetchRef = (fetchFn) => {
@@ -46,21 +51,48 @@ const Claimed = () => {
     if (fetchEntriesRef.current) fetchEntriesRef.current();
   };
 
-   const refreshClaims = () => {
+  const refreshClaims = () => {
     if (fetchEntriesRef.current) {
       fetchEntriesRef.current();
     }
   };
+  const handleUpdateClaimed = async (row) => {
+    try {
+      const payload = {
+        api_token: user.api_token,
+        entries: [{ id: row.id }],
+      };
+
+      console.log("Sending payload:", payload);
+
+      const { response, error } = await apiCall(
+        "POST",
+        ApiEndpoints.UPDATE_CLAIMED_ENTRIES,
+        payload
+      );
+
+      if (error) {
+        showToast("error", error?.message || "API failed");
+        return;
+      }
+
+      showToast(response?.message || "Entry marked as claimed!","success");
+      refreshEntries();
+    } catch (err) {
+      console.error(err);
+      showToast(err?.message || "Something went wrong","error");
+    }
+  };
 
   const handlePrint = (row) => {
-  localStorage.setItem("PRINT_DATA", JSON.stringify(row));
-  window.open("/print-claimedreceipt", "_blank");
-};
+    localStorage.setItem("PRINT_DATA", JSON.stringify(row));
+    window.open("/print-claimedreceipt", "_blank");
+  };
 
-const handleDelete = (row) =>{
-setEntries(row);
-setOpenDelete(true);
-};
+  const handleDelete = (row) => {
+    setEntries(row);
+    setOpenDelete(true);
+  };
 
   const fetchEntries = async () => {
     setLoading(true);
@@ -139,45 +171,32 @@ setOpenDelete(true);
     { name: "Balance", selector: (row) => currencySetter(row.balance) },
     { name: "Mode", selector: (row) => row.mop },
     { name: "Remark", selector: (row) => row.remark || "-" },
-   {
-  name: "Status",
-  selector: (row) => (
-    <span
-      style={{
-        color: row.status === 0 ? "orange" : "red",
-        fontWeight: 600,
-      }}
-    >
-      {row.status === 0 ? "Unclaimed" : "Claimed"}
-    </span>
-  ),
-},
-
-// {
-//   name: "Actions",
-//   selector: (row) => (
-//      <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
-//     <IconButton
-//       size="small"
-//       onClick={() => handlePrint(row)}
-//       sx={{ color: "#7124caff" }}
-//     >
-//       <PrintIcon fontSize="small" />
-//     </IconButton>
-
-//      <IconButton
-//         size="small"
-//         onClick={() => handleDelete(row)}   // create this function
-//         sx={{ color: "red" }}
-//       >
-//         <DeleteIcon fontSize="small" />
-//       </IconButton>
-// </div>
-//   ),
-//   width: "80px",
-// }
-
-
+    {
+      name: "Status",
+      selector: (row) => (
+        <span
+          style={{
+            color: row.status === 0 ? "orange" : "red",
+            fontWeight: 600,
+          }}
+        >
+          {row.status === 0 ? "Unclaimed" : "Claimed"}
+        </span>
+      ),
+    },
+    {
+      name: "Action",
+      selector: (row) => (
+        <IconButton
+          color="primary"
+          onClick={() => handleUpdateClaimed(row)}
+          title="Mark as Claimed"
+        >
+          <CheckCircleOutlineIcon />
+        </IconButton>
+      ),
+      width: "90px",
+    },
   ];
 
   return (
@@ -185,70 +204,25 @@ setOpenDelete(true);
       <CommonLoader loading={loading} text="Loading Unclaimed Entries..." />
 
       {!loading && (
-        <Box >
+        <Box>
           <Box
             mb={2}
             sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}
           >
-            {/* <Box sx={{ display: "flex", gap: 1 }}>
-              <TextField
-                label="User ID"
-                name="userId"
-                value={filters.userId}
-                onChange={handleFilterChange}
-                size="small"
-              />
-              <TextField
-                select
-                label="Status"
-                name="status"
-                value={filters.status}
-                onChange={handleFilterChange}
-                size="small"
-              >
-                <MenuItem value="unclaimed">Unclaimed</MenuItem>
-                <MenuItem value="claimed">Claimed</MenuItem>
-              </TextField>
-              <Button variant="contained" onClick={fetchEntries}>
-                Search
-              </Button>
-              <Button onClick={handleReset}>Reset</Button>
-            </Box> */}
-            {/* 
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <Tooltip title="Download Sample Excel">
-                <IconButton
-                  size="small"
-                  sx={{
-                    backgroundColor: "#6C4BC7",
-                    color: "#fff",
-                    "&:hover": { backgroundColor: secondaryColor() },
-                  }}
-                  onClick={() => {
-                    const link = document.createElement("a");
-                    link.href = `${process.env.PUBLIC_URL}/sample_unclaimed.xlsx`;
-                    link.download = "sample_unclaimed.xlsx";
-                    link.click();
-                  }}
-                >
-                  <Icon path={mdiFileExcel} size={1} />
-                </IconButton>
-              </Tooltip>
-            </Box> */}
           </Box>
 
           <Box style={{ width: "100%" }}>
             <CommonTable
               onFetchRef={handleFetchRef}
               endpoint={`${ApiEndpoints.GET_ENTRIES}`}
-              queryParam={'status=1'}
+              queryParam={"status=1"}
               columns={columns}
               // loading={loading}
               disableSelectionOnClick
             />
 
-            <DeleteClaimed 
-             open={openDelete}
+            <DeleteClaimed
+              open={openDelete}
               handleClose={() => {
                 setOpenDelete(false);
                 setSelectedClaim(null);
@@ -256,7 +230,6 @@ setOpenDelete(true);
               selectedBank={selectedClaim}
               onFetchRef={refreshClaims}
             />
-
           </Box>
         </Box>
       )}
