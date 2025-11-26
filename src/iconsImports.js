@@ -50,7 +50,7 @@ import lock_icon from "./assets/lock.png";
 
 import bank from "./assets/new_dashboardIcon/fundRq.png";
  
- import users from "./assets/Images/user.png";
+ import users from "./assets/Images/group.png";
  
 // import bgimage from "./assets/Images/bgimage.png";
  
