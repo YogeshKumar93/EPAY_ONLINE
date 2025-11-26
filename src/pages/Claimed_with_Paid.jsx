@@ -165,7 +165,7 @@ const Claimed_with_Paid = () => {
             onFetchRef={handleFetchRef}
             endpoint={ApiEndpoints.GET_ENTRIES}
             columns={columns}
-            queryParam={`status = 2`}
+            queryParam={`status=2`}
           />
 
          
