@@ -125,7 +125,7 @@ const Claimed_with_Paid = () => {
       selector: (row) => (
         <span
           style={{
-            color: row.status === 2 ? "#988472ff" : "orange",
+            color: row.status === 2 ? "#0da310" : "orange",
             fontWeight: 600,
           }}
         >
