@@ -163,8 +163,9 @@ const Claimed_with_Paid = () => {
 
           <CommonTable
             onFetchRef={handleFetchRef}
-            endpoint={ApiEndpoints.GET_UNCLAIMED_ENTERIES}
+            endpoint={ApiEndpoints.GET_ENTRIES}
             columns={columns}
+            queryParam={`status = 2`}
           />
 
          
