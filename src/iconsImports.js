@@ -56,6 +56,7 @@ import bank from "./assets/new_dashboardIcon/fundRq.png";
  
 import risk from "./assets/Images/warning.png";
 import claimed from "./assets/Images/claimed.png";
+import paid from "./assets/Images/tax.png";
 import virtualAccount from "./assets/sidenav/account.png";
 import loginHistory from "./assets/Images/track.png";
  
@@ -160,6 +161,7 @@ export const usersImage = users;
  
 export const riskImage = risk;
 export const claimedImage = claimed;
+export const paidimage = paid;
 
 export const virtuanAccountImage = virtualAccount;
 
