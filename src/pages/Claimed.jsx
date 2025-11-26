@@ -153,29 +153,29 @@ setOpenDelete(true);
   ),
 },
 
-{
-  name: "Actions",
-  selector: (row) => (
-     <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
-    <IconButton
-      size="small"
-      onClick={() => handlePrint(row)}
-      sx={{ color: "#7124caff" }}
-    >
-      <PrintIcon fontSize="small" />
-    </IconButton>
+// {
+//   name: "Actions",
+//   selector: (row) => (
+//      <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+//     <IconButton
+//       size="small"
+//       onClick={() => handlePrint(row)}
+//       sx={{ color: "#7124caff" }}
+//     >
+//       <PrintIcon fontSize="small" />
+//     </IconButton>
 
-     <IconButton
-        size="small"
-        onClick={() => handleDelete(row)}   // create this function
-        sx={{ color: "red" }}
-      >
-        <DeleteIcon fontSize="small" />
-      </IconButton>
-</div>
-  ),
-  width: "80px",
-}
+//      <IconButton
+//         size="small"
+//         onClick={() => handleDelete(row)}   // create this function
+//         sx={{ color: "red" }}
+//       >
+//         <DeleteIcon fontSize="small" />
+//       </IconButton>
+// </div>
+//   ),
+//   width: "80px",
+// }
 
 
   ];

@@ -71,6 +71,18 @@ export const navConfig = [
     roles: ["adm", "sadm"],
   },
 
+   {
+    title: "Claimed/Paid",
+    icon: riskImage,
+    icon2: "🏦",
+    to: {
+      adm: "/admin/claimedwithpaid",
+      sadm: "/admin/claimedwithpaid",
+    },
+    permissionKey: "claimedwithpaid",
+    roles: ["adm", "sadm"],
+  },
+
   {
     title: "Unclaimed",
     icon: riskImage,
@@ -129,7 +141,7 @@ const roleHierarchy = {
       // "Dashboard",
       "Manage Users",
       
-"Claimed",
+ 
       // "Fund Request",
       // "Transactions",
       // "Users",
@@ -137,6 +149,7 @@ const roleHierarchy = {
       "Accounts",
       "Unclaimed",
          "Claimed",
+         "Claimed/Paid",
       // "Services",
       // "Wallet Ledger",
       // "Settings",
@@ -158,6 +171,7 @@ const roleHierarchy = {
       "Accounts",
       "Unclaimed",
          "Claimed",
+         "Claimed/Paid",
       // "Services",
       // "Wallet Ledger",
       // "Settings",
