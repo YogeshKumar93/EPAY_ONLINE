@@ -4,6 +4,7 @@ import {
   loginHistoryImage,
   riskImage,
   virtuanAccountImage,
+  usersImage
 } from "../../iconsImports";
 
 export const navConfig = [
@@ -20,20 +21,19 @@ export const navConfig = [
   //   roles: ["sadm", "adm", ],
   // },
 
-  // Manage Users
-  // {
-  //   title: "Manage Users",
-  //   icon: usersImage,
-  //   icon2: "👥",
-  //   to: {
-  //     adm: "/admin/users",
-  //     sadm: "/admin/users",
-  //     asm: "/asm/users",
-  //     zsm: "/zsm/users",
-  //     md: "/md/users",
-  //   },
-  //   roles: ["adm", "sadm", "asm", "zsm", "md"],
-  // },
+ 
+  {
+    title: "Manage Users",
+    icon: usersImage,
+    icon2: "👥",
+    to: {
+      adm: "/admin/users",
+      sadm: "/admin/users",
+    
+    },
+    roles: ["adm", "sadm", ],
+  },
+  
 
   {
     title: "Banks",
@@ -56,6 +56,18 @@ export const navConfig = [
       sadm: "/admin/accounts",
     },
     permissionKey: "accounts",
+    roles: ["adm", "sadm"],
+  },
+
+  {
+    title: "Claimed",
+    icon: riskImage,
+    icon2: "🏦",
+    to: {
+      adm: "/admin/claimed",
+      sadm: "/admin/claimed",
+    },
+    permissionKey: "unclaimed",
     roles: ["adm", "sadm"],
   },
 
@@ -115,12 +127,16 @@ const roleHierarchy = {
   adm: {
     default: [
       // "Dashboard",
-      // "Manage Users",
+      "Manage Users",
+      
+"Claimed",
       // "Fund Request",
       // "Transactions",
+      // "Users",
       "Banks",
       "Accounts",
       "Unclaimed",
+         "Claimed",
       // "Services",
       // "Wallet Ledger",
       // "Settings",
@@ -133,12 +149,15 @@ const roleHierarchy = {
   sadm: {
     default: [
       //  "Dashboard",
-      // "Manage Users",
+      "Manage Users",
       // "Fund Request",
       // "Transactions",
+      // "Manage Users",
+   
       "Banks",
       "Accounts",
       "Unclaimed",
+         "Claimed",
       // "Services",
       // "Wallet Ledger",
       // "Settings",

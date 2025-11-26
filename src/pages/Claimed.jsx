@@ -17,8 +17,11 @@ import { yyyymmdd } from "../utils/DateUtils";
 import { capitalize1 } from "../utils/TextUtil";
 import { currencySetter } from "../utils/Currencyutil";
 import { secondaryColor } from "../utils/setThemeColor";
+import PrintIcon from "@mui/icons-material/Print";
+import { useNavigate } from "react-router-dom";
 
-const Unclaimed = () => {
+
+const Claimed = () => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({
@@ -28,6 +31,8 @@ const Unclaimed = () => {
     dateVal: "",
   });
 
+ const navigate = useNavigate();
+
   const fetchEntriesRef = useRef(null);
   const handleFetchRef = (fetchFn) => {
     fetchEntriesRef.current = fetchFn;
@@ -36,7 +41,12 @@ const Unclaimed = () => {
     if (fetchEntriesRef.current) fetchEntriesRef.current();
   };
 
-  
+  const handlePrint = (row) => {
+  localStorage.setItem("PRINT_DATA", JSON.stringify(row));
+  window.open("/print-claimedreceipt", "_blank");
+};
+
+
 
   const fetchEntries = async () => {
     setLoading(true);
@@ -127,7 +137,22 @@ const Unclaimed = () => {
       {row.status === 0 ? "Unclaimed" : "Claimed"}
     </span>
   ),
+},
+
+{
+  name: "Actions",
+  selector: (row) => (
+    <IconButton
+      size="small"
+      onClick={() => handlePrint(row)}
+      sx={{ color: "#7124caff" }}
+    >
+      <PrintIcon fontSize="small" />
+    </IconButton>
+  ),
+  width: "80px",
 }
+
 
   ];
 
@@ -203,4 +228,4 @@ const Unclaimed = () => {
   );
 };
 
-export default Unclaimed;
+export default Claimed;

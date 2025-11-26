@@ -50,7 +50,7 @@ import lock_icon from "./assets/lock.png";
 
 import bank from "./assets/new_dashboardIcon/fundRq.png";
  
-// import users from "./assets/Images/Users2.svg";
+ import users from "./assets/Images/group.png";
  
 // import bgimage from "./assets/Images/bgimage.png";
  
@@ -149,7 +149,7 @@ export const linux2 = linux_1;
 // *************New Icons******************************************
 export const bankImage = bank;
  
-// export const usersImage = users;
+export const usersImage = users;
 // export const bgImage = bgimage;
  
  
