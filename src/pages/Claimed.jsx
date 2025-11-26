@@ -19,11 +19,16 @@ import { currencySetter } from "../utils/Currencyutil";
 import { secondaryColor } from "../utils/setThemeColor";
 import PrintIcon from "@mui/icons-material/Print";
 import { useNavigate } from "react-router-dom";
+import DeleteIcon from "@mui/icons-material/Delete";
+import DeleteClaimed from "./DeleteClaimed";
 
 
 const Claimed = () => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(false);
+   const [openDelete, setOpenDelete] = useState(false);
+    const [selectedRow, setSelectedRow] = useState(null);
+    const [selectedClaim,setSelectedClaim] = useState(null);
   const [filters, setFilters] = useState({
     userId: "",
     status: "unclaimed",
@@ -41,12 +46,21 @@ const Claimed = () => {
     if (fetchEntriesRef.current) fetchEntriesRef.current();
   };
 
+   const refreshClaims = () => {
+    if (fetchEntriesRef.current) {
+      fetchEntriesRef.current();
+    }
+  };
+
   const handlePrint = (row) => {
   localStorage.setItem("PRINT_DATA", JSON.stringify(row));
   window.open("/print-claimedreceipt", "_blank");
 };
 
-
+const handleDelete = (row) =>{
+setEntries(row);
+setOpenDelete(true);
+};
 
   const fetchEntries = async () => {
     setLoading(true);
@@ -142,6 +156,7 @@ const Claimed = () => {
 {
   name: "Actions",
   selector: (row) => (
+     <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
     <IconButton
       size="small"
       onClick={() => handlePrint(row)}
@@ -149,6 +164,15 @@ const Claimed = () => {
     >
       <PrintIcon fontSize="small" />
     </IconButton>
+
+     <IconButton
+        size="small"
+        onClick={() => handleDelete(row)}   // create this function
+        sx={{ color: "red" }}
+      >
+        <DeleteIcon fontSize="small" />
+      </IconButton>
+</div>
   ),
   width: "80px",
 }
@@ -221,6 +245,17 @@ const Claimed = () => {
               // loading={loading}
               disableSelectionOnClick
             />
+
+            <DeleteClaimed 
+             open={openDelete}
+              handleClose={() => {
+                setOpenDelete(false);
+                setSelectedClaim(null);
+              }}
+              selectedBank={selectedClaim}
+              onFetchRef={refreshClaims}
+            />
+
           </Box>
         </Box>
       )}
