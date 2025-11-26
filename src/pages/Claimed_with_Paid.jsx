@@ -125,11 +125,11 @@ const Claimed_with_Paid = () => {
       selector: (row) => (
         <span
           style={{
-            color: row.status === 1 ? "green" : "orange",
+            color: row.status === 2 ? "#988472ff" : "orange",
             fontWeight: 600,
           }}
         >
-          {row.status === 1 ? "Paid" : "Claimed"}
+          {row.status === 2 ? "Paid" : "Claimed"}
         </span>
       ),
     },
@@ -163,8 +163,9 @@ const Claimed_with_Paid = () => {
 
           <CommonTable
             onFetchRef={handleFetchRef}
-            endpoint={ApiEndpoints.GET_UNCLAIMED_ENTERIES}
+            endpoint={ApiEndpoints.GET_ENTRIES}
             columns={columns}
+            queryParam={`status=2`}
           />
 
          
