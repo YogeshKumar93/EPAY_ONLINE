@@ -5,7 +5,8 @@ import {
   riskImage,
   virtuanAccountImage,
   usersImage,
-  claimedImage
+  claimedImage,
+  paidimage
 } from "../../iconsImports";
 
 export const navConfig = [
@@ -74,7 +75,7 @@ export const navConfig = [
 
    {
     title: "Paid",
-    icon: riskImage,
+    icon: paidimage,
     icon2: "🏦",
     to: {
       adm: "/admin/claimedwithpaid",
