@@ -6,7 +6,7 @@ import { useSchemaForm } from "../../hooks/useSchemaForm";
 import { PATTERNS, isValid } from "../../utils/validators";
 import { useToast } from "../../utils/ToastContext";
 
-const CreateBankModal = ({ open, onClose, onFetchRef }) => {
+const CreateBankModal = ({ open, onClose, onFetchRef, setGlobalLoader }) => {
   const { schema, formData, handleChange, errors, setErrors, loading } =
     useSchemaForm(ApiEndpoints.GET_BANK_SCHEMA, open);
 
@@ -95,6 +95,10 @@ const CreateBankModal = ({ open, onClose, onFetchRef }) => {
 
       if (response) {
         showToast(response?.message || "Bank created successfully", "success");
+        setGlobalLoader(true);
+
+        await new Promise((res) => setTimeout(res, 500));
+        onFetchRef?.(); // refresh list if callback exists
         onFetchRef?.();
         onClose();
       } else {
@@ -105,6 +109,7 @@ const CreateBankModal = ({ open, onClose, onFetchRef }) => {
       showToast("Something went wrong while creating bank", "error");
     } finally {
       setSubmitting(false);
+      setGlobalLoader(false);
     }
   };
 

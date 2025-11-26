@@ -29,6 +29,7 @@ const Banks = ({ filters = [] }) => {
   const [loading, setLoading] = useState(true);
   const bank_name = location.state?.bank_name || "Bank";
   const acc_number = location.state?.acc_number || "Account Number";
+  const [globalLoader, setGlobalLoader] = useState(false);
     // const [appliedFilters, setAppliedFilters] = useState({});
 
   // ✅ keep a ref to CommonTable for refreshing
@@ -264,6 +265,7 @@ const Banks = ({ filters = [] }) => {
               open={openCreate}
               onClose={() => setOpenCreate(false)}
               onFetchRef={refreshBanks}
+              setGlobalLoader={setLoading}
             />
           )}
 

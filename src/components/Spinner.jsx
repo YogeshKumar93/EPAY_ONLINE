@@ -1,6 +1,6 @@
 import React from "react";
 import styled, { keyframes } from "styled-components";
-import biggpayLogo from "../assets/Images/PPALogo.jpeg";
+import biggpayLogo from "../assets/Images/PPALogo6.png";
 // Spinner rotation animation
 const spin = keyframes`
   0% { transform: rotate(0deg); }

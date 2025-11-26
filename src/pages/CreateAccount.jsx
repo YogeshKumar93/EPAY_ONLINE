@@ -5,7 +5,7 @@ import ApiEndpoints from "../api/ApiEndpoints";
 import CommonModal from "../components/common/CommonModal";
 import { useToast } from "../utils/ToastContext";
 
-const CreateAccount = ({ open, handleClose, onFetchRef }) => {
+const CreateAccount = ({ open, handleClose, onFetchRef, setGlobalLoader }) => {
   
   const initialFormData = {
     name: "",
@@ -45,47 +45,38 @@ const CreateAccount = ({ open, handleClose, onFetchRef }) => {
   };
 
   // Submit function with validation and form reset
-  const handleSubmit = () => {
-    if (!formData.name.trim()) {
-      showToast("Name is required", "error");
-      return;
-    }
+ const handleSubmit = () => {
+  if (!formData.name.trim()) return showToast("Name is required", "error");
+  if (!formData.mobile.trim()) return showToast("Mobile is required", "error");
+  if (formData.mobile.length !== 10)
+    return showToast("Mobile must be 10 digits", "error");
+  if (!formData.establishment.trim())
+    return showToast("Establishment is required", "error");
 
-    if (!formData.mobile.trim()) {
-      showToast("Mobile number is required", "error");
-      return;
-    }
+  setSubmitting(true);
 
-    if (formData.mobile.length !== 10) {
-      showToast("Mobile number must be exactly 10 digits", "error");
-      return;
-    }
-
-    if (!formData.establishment.trim()) {
-      showToast("Establishment is required", "error");
-      return;
-    }
-    
-
-    setSubmitting(true);
-
-    apiCall("post", ApiEndpoints.CREATE_ACCOUNT, {
-      ...formData,
-    }).then(({ error, response }) => {
+  apiCall("post", ApiEndpoints.CREATE_ACCOUNT, { ...formData })
+    .then(async ({ error, response }) => {
       if (response) {
-        showToast(
-          response?.message || "Account created successfully",
-          "success"
-        );
+        showToast(response?.message || "Account created successfully", "success");
+
+        setGlobalLoader(true);
+
+        await new Promise((res) => setTimeout(res, 500));
+
         onFetchRef?.();
-        resetForm(); 
+
+        resetForm();
         handleClose();
       } else {
         showToast(error?.message || "Failed to create account", "error");
       }
+    })
+    .finally(() => {
       setSubmitting(false);
+      setGlobalLoader(false);
     });
-  };
+};
 
   // Reset form when modal opens/closes
   React.useEffect(() => {
