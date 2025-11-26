@@ -22,17 +22,17 @@ export const navConfig = [
   // },
 
  
-  // {
-  //   title: "Manage Users",
-  //   icon: usersImage,
-  //   icon2: "👥",
-  //   to: {
-  //     adm: "/admin/users",
-  //     sadm: "/admin/users",
+  {
+    title: "Manage Users",
+    icon: usersImage,
+    icon2: "👥",
+    to: {
+      adm: "/admin/users",
+      sadm: "/admin/users",
     
-  //   },
-  //   roles: ["adm", "sadm", ],
-  // },
+    },
+    roles: ["adm", "sadm", ],
+  },
   
 
   {
@@ -127,7 +127,7 @@ const roleHierarchy = {
   adm: {
     default: [
       // "Dashboard",
-      // "Manage Users",
+      "Manage Users",
       
 "Claimed",
       // "Fund Request",
@@ -149,7 +149,7 @@ const roleHierarchy = {
   sadm: {
     default: [
       //  "Dashboard",
-      // "Manage Users",
+      "Manage Users",
       // "Fund Request",
       // "Transactions",
       // "Manage Users",

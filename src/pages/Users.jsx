@@ -14,44 +14,39 @@ import AuthContext from "../contexts/AuthContext";
 import { dateToTime, ddmmyy } from "../utils/DateUtils";
 import CommonTable from "../components/common/CommonTable";
 import ApiEndpoints from "../api/ApiEndpoints";
-import PermissionsModal from "./PermissionsModal";
+// import PermissionsModal from "./PermissionsModal";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import BlockUnblockUser from "./BlockUnblockUser";
+// import BlockUnblockUser from "./BlockUnblockUser";
 import ReButton from "../components/common/ReButton";
-import CreateUser from "../components/User/createUser";
-import EditIcon from "@mui/icons-material/Edit";
+// import CreateUser from "../components/User/createUser";
+// import EditIcon from "@mui/icons-material/Edit";
 import { apiCall } from "../api/apiClient";
-import AdWalletTransfer from "./AdWalletTransfer";
+// import AdWalletTransfer from "./AdWalletTransfer";
 import CommonStatus from "../components/common/CommonStatus";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import EditUser from "./EditUser";
-import ViewDocuments from "./ViewDocuments";
+// import EditUser from "./EditUser";
+// import ViewDocuments from "./ViewDocuments";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Assignment, CurrencyRupee, VerifiedUser } from "@mui/icons-material";
-import { AssignPlans } from "./AssignPlans";
-import AdminCreateUser from "./AdminCreateUser";
-import AddLein from "./AddLein";
+// import { AssignPlans } from "./AssignPlans";
+// import AdminCreateUser from "./AdminCreateUser";
+// import AddLein from "./AddLein";
 import debounce from "lodash.debounce";
 // import { useNavigate } from "react-router-dom";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
-import ChangeRoleModal from "../components/ChangeRole";
-import ChangeParentModal from "./ChangeParentModal";
-import AddInst from "../components/User/AddInst";
+// import ChangeRoleModal from "../components/ChangeRole";
+// import ChangeParentModal from "./ChangeParentModal";
+// import AddInst from "../components/User/AddInst";
 import { useToast } from "../utils/ToastContext";
 
 const roleLabels = {
-  ret: "Retailer",
+ 
   adm: "Admin",
   sadm: "Super Admin",
-  di: "Distributor",
-  asm: "Area Sales Manager",
-  zsm: "Zonal Sales Manager",
-  api: "Api User",
-  dd: "Direct Dealer",
-  md: "Master Distributor",
+  
 };
 
 const Users = ({ query }) => {
@@ -83,37 +78,37 @@ const Users = ({ query }) => {
   // const [selectedUser, setSelectedUser] = useState(null);
   const [openChangeParent, setOpenChangeParent] = useState(false);
   const { showToast } = useToast();
-  const handleOpenChangeParent = (row) => {
-    setSelectedUser(row);
-    setOpenChangeParent(true);
-  };
-  const handleCloseChangeParent = () => {
-    setSelectedUser(null);
-    setOpenChangeParent(false);
-  };
+  // const handleOpenChangeParent = (row) => {
+  //   setSelectedUser(row);
+  //   setOpenChangeParent(true);
+  // };
+  // const handleCloseChangeParent = () => {
+  //   setSelectedUser(null);
+  //   setOpenChangeParent(false);
+  // };
 
-  const handleChangeRole = (row) => {
-    setSelectedUser(row); // store selected user details
-    setOpenChangeRole(true); // open the modal
-  };
+  // const handleChangeRole = (row) => {
+  //   setSelectedUser(row); // store selected user details
+  //   setOpenChangeRole(true); // open the modal
+  // };
 
-  const handleOpenAssignPlans = (user) => {
-    setSelectedUser(user);
-    setOpenAssignPlans(true);
-  };
-  const handleCloseAssignPlans = () => {
-    setSelectedUser(null);
-    setOpenAssignPlans(false);
-  };
+  // const handleOpenAssignPlans = (user) => {
+  //   setSelectedUser(user);
+  //   setOpenAssignPlans(true);
+  // };
+  // const handleCloseAssignPlans = () => {
+  //   setSelectedUser(null);
+  //   setOpenAssignPlans(false);
+  // };
 
-  const handleOpenLein = (row) => {
-    setOpenLeinModal(true);
-    setSelectedUser(row);
-  };
-  const handleOpenWalletTransfer = (row) => {
-    setOpenWalletTranser(true);
-    setSelectedUser(row);
-  };
+  // const handleOpenLein = (row) => {
+  //   setOpenLeinModal(true);
+  //   setSelectedUser(row);
+  // };
+  // const handleOpenWalletTransfer = (row) => {
+  //   setOpenWalletTranser(true);
+  //   setSelectedUser(row);
+  // };
   const handleCloseWalletTransfer = (row) => {
     setOpenWalletTranser(false);
   };
@@ -682,64 +677,64 @@ const Users = ({ query }) => {
         }
       />
 
-      {openCreateUser && (
+      {/* {openCreateUser && (
         <CreateUser
           open={openCreateUser}
           onClose={() => setOpenCreateUser(false)}
           onFetchRef={refreshUsers}
         />
-      )}
-      {openAddInst && selectedUser && (
+      )} */}
+      {/* {openAddInst && selectedUser && (
         <AddInst
           open={openAddInst}
           onClose={() => setOpenAddInst(false)}
           userId={selectedUser.id} // ✅ Pass userId here
           onFetchRef={refreshUsers}
         />
-      )}
+      )} */}
 
-      {createadmuser && (
+      {/* {createadmuser && (
         <AdminCreateUser
           open={createadmuser}
           onClose={() => setCreateAdmUser(false)}
           onFetchRef={refreshUsers}
         />
-      )}
+      )} */}
 
-      {openEditUser && selectedUser && (
+      {/* {openEditUser && selectedUser && (
         <EditUser
           open={openEditUser}
           onClose={handleCloseEditUser}
           user={selectedUser}
           onFetchRef={refreshUsers}
         />
-      )}
+      )} */}
 
-      {openPermissions && selectedUser && (
+      {/* {openPermissions && selectedUser && (
         <PermissionsModal
           open={openPermissions}
           handleClose={handleClosePermissions}
           user={selectedUser}
           onFetchRef={refreshUsers}
         />
-      )}
+      )} */}
 
-      {userToToggle && (
+      {/* {userToToggle && (
         <BlockUnblockUser
           open={lockModalOpen}
           handleClose={handleCloseLockModal}
           user={userToToggle}
           onSuccess={refreshUsers}
         />
-      )}
-      {openWalletTranser && (
+      )} */}
+      {/* {openWalletTranser && (
         <AdWalletTransfer
           open={openWalletTranser}
           row={selectedUser}
           onClose={handleCloseWalletTransfer}
         />
-      )}
-      {openLeinModal && (
+      )} */}
+      {/* {openLeinModal && (
         <AddLein
           open={openLeinModal}
           handleClose={handleCloseLein}
@@ -747,39 +742,39 @@ const Users = ({ query }) => {
           selectedRow={selectedUser}
           type="users"
         />
-      )}
+      )} */}
 
-      {openViewDocuments && selectedUser && (
+      {/* {openViewDocuments && selectedUser && (
         <ViewDocuments
           open={openViewDocuments}
           onClose={handleCloseViewDocuments}
           user={selectedUser}
         />
-      )}
-      {openAssignPlans && selectedUser && (
+      )} */}
+      {/* {openAssignPlans && selectedUser && (
         <AssignPlans
           open={openAssignPlans}
           onClose={handleCloseAssignPlans}
           row={selectedUser}
           onSuccess={refreshUsers} // refresh table after assigning
         />
-      )}
-      {openChangeRole && (
+      )} */}
+      {/* {openChangeRole && (
         <ChangeRoleModal
           open={openChangeRole}
           onClose={() => setOpenChangeRole(false)}
           user={selectedUser}
           onSuccess={refreshUsers} // refresh table after API success
         />
-      )}
-      {openChangeParent && (
+      )} */}
+      {/* {openChangeParent && (
         <ChangeParentModal
           open={openChangeParent}
           onClose={handleCloseChangeParent}
           user={selectedUser}
           onSuccess={refreshUsers}
         />
-      )}
+      )} */}
     </Box>
   );
 };

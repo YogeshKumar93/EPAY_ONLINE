@@ -32,7 +32,7 @@ import UploadExcel from "../pages/UploadExcel";
 import Unclaimed from "../pages/Unclaimed";
 import Claimed from "../pages/Claimed";
 import PrintClaimedReceipt from "../pages/PrintClaimedReceipt";
-// import Users from "../pages/Users";
+import Users from "../pages/Users";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading, user } = useContext(AuthContext);
@@ -117,7 +117,7 @@ export default function AppRoutes() {
           {isAdmin && (
             <>
               {/* <Route path="admin/dashboard" element={<Dashboard />} /> */}
-              {/* <Route path="admin/users" element={<Users />} /> */}
+              <Route path="admin/users" element={<Users />} />
               {/* <Route path="admin/transactions" element={<Transaction />} /> */}
               {/* <Route path="admin/notification" element={<Notification />} /> */}
               {/* <Route path="admin/fund-request" element={<FundRequest />} /> */}
