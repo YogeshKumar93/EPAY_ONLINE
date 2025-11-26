@@ -32,6 +32,7 @@ const Accounts = () => {
   const user = authCtx?.user;
   const navigate = useNavigate();
   const [appliedFilters, setAppliedFilters] = useState({}); // applied filter payload
+  const [globalLoader, setGlobalLoader] = useState(false);
 
   const handleFetchRef = (fetchFn) => {
     fetchUsersRef.current = fetchFn;
@@ -251,6 +252,7 @@ const Accounts = () => {
             handleClose={() => setOpenCreate(false)}
             handleSave={handleSaveCreate}
             onFetchRef={refreshUsers} // ✅ trigger fetch after create
+            setGlobalLoader={setLoading}
           />
 
           {/* ✅ Update Account Modal */}
