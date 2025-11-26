@@ -1,14 +1,10 @@
 import { Avatar } from "@mui/material";
 import {
- 
   bankImage,
-  
   loginHistoryImage,
- 
   riskImage,
-  
   virtuanAccountImage,
-  
+  usersImage
 } from "../../iconsImports";
 
 export const navConfig = [
@@ -20,12 +16,12 @@ export const navConfig = [
   //   to: {
   //     adm: "/admin/dashboard",
   //     sadm: "/admin/dashboard",
-     
+
   //   },
   //   roles: ["sadm", "adm", ],
   // },
 
-  // Manage Users
+ 
   // {
   //   title: "Manage Users",
   //   icon: usersImage,
@@ -33,31 +29,11 @@ export const navConfig = [
   //   to: {
   //     adm: "/admin/users",
   //     sadm: "/admin/users",
-  //     asm: "/asm/users",
-  //     zsm: "/zsm/users",
-  //     md: "/md/users",
+    
   //   },
-  //   roles: ["adm", "sadm", "asm", "zsm", "md"],
+  //   roles: ["adm", "sadm", ],
   // },
-
   
-
-  
-
-   
-
- 
-
-  
-
-  
-
- 
-
- 
- 
-
-  ,
 
   {
     title: "Banks",
@@ -71,7 +47,7 @@ export const navConfig = [
     roles: ["adm", "sadm"],
   },
 
-   {
+  {
     title: "Accounts",
     icon: virtuanAccountImage,
     icon2: "🏦",
@@ -82,8 +58,20 @@ export const navConfig = [
     permissionKey: "accounts",
     roles: ["adm", "sadm"],
   },
- 
- {
+
+  {
+    title: "Claimed",
+    icon: riskImage,
+    icon2: "🏦",
+    to: {
+      adm: "/admin/claimed",
+      sadm: "/admin/claimed",
+    },
+    permissionKey: "unclaimed",
+    roles: ["adm", "sadm"],
+  },
+
+  {
     title: "Unclaimed",
     icon: riskImage,
     icon2: "🏦",
@@ -94,7 +82,6 @@ export const navConfig = [
     permissionKey: "unclaimed",
     roles: ["adm", "sadm"],
   },
-  
 
   // Settings
   // {
@@ -109,10 +96,6 @@ export const navConfig = [
   //   roles: ["adm", "sadm"],
   // },
 
- 
-
-  
-
   // Login History
   {
     title: "Login History",
@@ -121,9 +104,8 @@ export const navConfig = [
     to: {
       adm: "/admin/login_history",
       sadm: "/admin/login_history",
-      
     },
-    roles: ["adm","sadm"],
+    roles: ["adm", "sadm"],
     permissionKey: "login_history",
   },
 
@@ -146,11 +128,15 @@ const roleHierarchy = {
     default: [
       // "Dashboard",
       // "Manage Users",
+      
+"Claimed",
       // "Fund Request",
       // "Transactions",
-       "Banks",
+      // "Users",
+      "Banks",
       "Accounts",
       "Unclaimed",
+         "Claimed",
       // "Services",
       // "Wallet Ledger",
       // "Settings",
@@ -162,13 +148,16 @@ const roleHierarchy = {
   },
   sadm: {
     default: [
-    //  "Dashboard",
+      //  "Dashboard",
       // "Manage Users",
       // "Fund Request",
       // "Transactions",
+      // "Manage Users",
+   
       "Banks",
       "Accounts",
       "Unclaimed",
+         "Claimed",
       // "Services",
       // "Wallet Ledger",
       // "Settings",
@@ -178,7 +167,6 @@ const roleHierarchy = {
     ],
     // 1: ["Services", "Transactions", "Wallet Ledger", "Risk"], // Layout 1
   },
- 
 };
 
 export const buildNavForRole = (role, permissions = {}, layout = "default") => {
@@ -196,7 +184,7 @@ export const buildNavForRole = (role, permissions = {}, layout = "default") => {
     .map((title) =>
       allowedItems.find((item) => {
         // If role is 'sadm', skip permission check completely
-        if (role === "sadm") return item.title === title;
+        if (role === "sadm"||role==="adm") return item.title === title;
 
         // Otherwise, check permission normally
         const hasPermission =

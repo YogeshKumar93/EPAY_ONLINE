@@ -123,7 +123,7 @@ const BankStatements = () => {
         Time: dateToTime1(row.created_at),
         "Handled By": row.handle_by,
         Particulars: row.particulars,
-        Remarks: row.remarks,
+        Remarks: row.remark,
         MOP: row.mop,
         Credit: row.credit,
         Debit: row.debit,
@@ -322,7 +322,7 @@ const handleUploadExcel = async (file) => {
             fontSize: "13px",
           }}
         >
-          {row.remarks ? capitalize1(row.remarks) : "-"}
+          {row.remark ? capitalize1(row.remark) : "-"}
         </div>
       ),
       width: "200px",
@@ -335,9 +335,14 @@ const handleUploadExcel = async (file) => {
     {
       name: "Status",
       selector: (row) => (
-        <div style={{ textAlign: "right", fontSize: "11px", fontWeight: 600 }}>
-          {row.status === 0 ? "UNCLAIMED" : "CLAIMED"}
-        </div>
+        <span
+      style={{
+        color: row.status === 0 ? "orange" : "red",
+        fontWeight: 600,
+      }}
+    >
+      {row.status === 0 ? "Unclaimed" : "Claimed"}
+    </span>
       ),
       center: true,
       width: "70px",
