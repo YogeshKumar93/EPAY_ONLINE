@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef,useContext } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import {
   Box,
   Button,
@@ -6,6 +6,10 @@ import {
   MenuItem,
   IconButton,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { DateRangePicker } from "rsuite";
 import CommonTable from "../components/common/CommonTable";
@@ -25,6 +29,46 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { useToast } from "../utils/ToastContext";
 import AuthContext from "../contexts/AuthContext";
 
+const ConfirmClaimModal = ({ open, handleClose, onConfirm, row }) => {
+  return (
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      fullWidth
+      maxWidth="sm" // options: xs, sm, md, lg, xl
+    >
+      <DialogTitle sx={{ fontSize: "1.4rem", fontWeight: 600 }}>
+        Confirm Action
+      </DialogTitle>
+
+      <DialogContent sx={{ mt: 1 }}>
+        <span style={{ fontSize: "1.2rem" }}>
+          Are you sure you want to make <b>ID {row?.id}</b> as paid?
+        </span>
+      </DialogContent>
+
+      <DialogActions sx={{ px: 3, pb: 2 }}>
+        <Button
+          onClick={handleClose}
+          color="error"
+          variant="outlined"
+          sx={{ fontSize: "1rem" }}
+        >
+          Cancel
+        </Button>
+
+        <Button
+          onClick={() => onConfirm(row)}
+          color="primary"
+          variant="contained"
+          sx={{ fontSize: "1rem" }}
+        >
+          Yes, I'm sure
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
 
 const Claimed = () => {
   const [entries, setEntries] = useState([]);
@@ -38,10 +82,12 @@ const Claimed = () => {
     date: {},
     dateVal: "",
   });
-const authCtx = useContext(AuthContext);
+  const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [rowToConfirm, setRowToConfirm] = useState(null);
 
   const fetchEntriesRef = useRef(null);
   const handleFetchRef = (fetchFn) => {
@@ -76,11 +122,11 @@ const authCtx = useContext(AuthContext);
         return;
       }
 
-      showToast(response?.message || "Entry marked as claimed!","success");
+      showToast(response?.message || "Entry marked as claimed!", "success");
       refreshEntries();
     } catch (err) {
       console.error(err);
-      showToast(err?.message || "Something went wrong","error");
+      showToast(err?.message || "Something went wrong", "error");
     }
   };
 
@@ -189,7 +235,10 @@ const authCtx = useContext(AuthContext);
       selector: (row) => (
         <IconButton
           color="primary"
-          onClick={() => handleUpdateClaimed(row)}
+          onClick={() => {
+            setRowToConfirm(row);
+            setOpenConfirm(true);
+          }}
           title="Mark as Claimed"
         >
           <CheckCircleOutlineIcon />
@@ -208,8 +257,7 @@ const authCtx = useContext(AuthContext);
           <Box
             mb={2}
             sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}
-          >
-          </Box>
+          ></Box>
 
           <Box style={{ width: "100%" }}>
             <CommonTable
@@ -229,6 +277,16 @@ const authCtx = useContext(AuthContext);
               }}
               selectedBank={selectedClaim}
               onFetchRef={refreshClaims}
+            />
+
+            <ConfirmClaimModal
+              open={openConfirm}
+              handleClose={() => setOpenConfirm(false)}
+              row={rowToConfirm}
+              onConfirm={(row) => {
+                setOpenConfirm(false);
+                handleUpdateClaimed(row);
+              }}
             />
           </Box>
         </Box>
