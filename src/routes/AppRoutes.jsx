@@ -43,7 +43,7 @@ import BankStatementDesign from "../components/AEPS/BankStatementDesign";
 import DownloadExcel from "../pages/DownloadExcel";
 import UploadExcel from "../pages/UploadExcel";
 import Unclaimed from "../pages/Unclaimed";
-import VpaQrGenerator from "../pages/VpaQrGenerator";
+
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading, user } = useContext(AuthContext);
@@ -149,7 +149,7 @@ export default function AppRoutes() {
               <Route path="admin/downloadexcel" element={<DownloadExcel />} />
               <Route path="admin/uploadexcel" element={<UploadExcel />} />
 
-               <Route path="admin/vpaqr" element={<VpaQrGenerator />} />
+             
               <Route
                 path="admin/bankstatements/:id"
                 element={<BankStatements />}
