@@ -86,6 +86,7 @@ const ApiEndpoints = {
   DELETE_LOG: "auditlog/deleteAuditLog",
   GET_LOG: "auditlog/getAuditLog",
 
+  UPDATE_CLAIMED_ENTRIES: "bankStatement/updateClaimedEntries",
 
 
   GET_BY_TYPE: "business/getByType",
