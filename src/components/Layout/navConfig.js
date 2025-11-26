@@ -73,7 +73,7 @@ export const navConfig = [
   },
 
    {
-    title: "Claimed/Paid",
+    title: "Paid",
     icon: riskImage,
     icon2: "🏦",
     to: {
@@ -150,7 +150,7 @@ const roleHierarchy = {
       "Accounts",
       "Unclaimed",
          "Claimed",
-         "Claimed/Paid",
+         "Paid",
       // "Services",
       // "Wallet Ledger",
       // "Settings",
@@ -172,7 +172,7 @@ const roleHierarchy = {
       "Accounts",
       "Unclaimed",
          "Claimed",
-         "Claimed/Paid",
+         "Paid",
       // "Services",
       // "Wallet Ledger",
       // "Settings",
