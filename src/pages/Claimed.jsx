@@ -240,7 +240,7 @@ setOpenDelete(true);
           <Box style={{ width: "100%" }}>
             <CommonTable
               onFetchRef={handleFetchRef}
-              endpoint={`${ApiEndpoints.GET_CLAIMED_ENTRIES}`}
+              endpoint={`${ApiEndpoints.GET_ENTRIES}`}
               queryParam={'status=1'}
               columns={columns}
               // loading={loading}
