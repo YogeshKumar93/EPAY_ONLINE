@@ -16,6 +16,7 @@ const titleMap = {
     "/admin/settings": "Settings",
     "/admin/messages": "Messages",
     "/admin/claimed": "Claimed",
+     "/admin/claimedwithpaid": "Paid",
     "/admin/templates": "Templates",
     "/admin/commissionrule": "Commission Rules",
     "/admin/logs": "Logs",
