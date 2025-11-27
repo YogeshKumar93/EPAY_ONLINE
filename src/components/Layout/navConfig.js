@@ -33,7 +33,7 @@ export const navConfig = [
       sadm: "/admin/users",
     
     },
-    roles: ["adm", "sadm", ],
+    roles: [ "sadm" ],
   },
   
 
@@ -140,33 +140,26 @@ export const navConfig = [
 const roleHierarchy = {
   adm: {
     default: [
-      // "Dashboard",
-      "Manage Users",
+    
+      // "Manage Users",
       
  
-      // "Fund Request",
-      // "Transactions",
-      // "Users",
+     
       "Banks",
       "Accounts",
       "Unclaimed",
          "Claimed",
          "Paid",
-      // "Services",
-      // "Wallet Ledger",
-      // "Settings",
-      // "Complaint",
-      // "Risk",
+    
       "Login History",
     ],
-    // 1: ["Services", "Transactions", "Wallet Ledger", "Risk"], // Layout 1
+  
   },
   sadm: {
     default: [
-      //  "Dashboard",
+     
       "Manage Users",
-      // "Fund Request",
-      // "Transactions",
+    
       // "Manage Users",
    
       "Banks",
@@ -174,14 +167,10 @@ const roleHierarchy = {
       "Unclaimed",
          "Claimed",
          "Paid",
-      // "Services",
-      // "Wallet Ledger",
-      // "Settings",
-      // "Complaint",
-      // "Risk",
+   
       "Login History",
     ],
-    // 1: ["Services", "Transactions", "Wallet Ledger", "Risk"], // Layout 1
+  
   },
 };
 

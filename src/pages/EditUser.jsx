@@ -1,344 +1,337 @@
 import React, { useState, useEffect } from "react";
-import CommonModal from "../components/common/CommonModal";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+  Switch,
+  FormControlLabel,
+} from "@mui/material";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
-import { Tabs, Tab, Box, CircularProgress } from "@mui/material";
-import CommonLoader from "../components/common/CommonLoader";
 import { useToast } from "../utils/ToastContext";
+import { okSuccessToast } from "../utils/ToastUtil";
 
-const TAB_CONFIG = [
-  { key: "user_details", label: "User Details" },
-  { key: "basic", label: "Basic" },
-  { key: "address", label: "Address" },
-  { key: "kyc", label: "KYC" },
-];
-
-const formatLabel = (key) =>
-  key.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
-const EditUser = ({ open, onClose, user, onFetchRef }) => {
-  const [selectedTab, setSelectedTab] = useState("user_details");
-  const [formData, setFormData] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [originalData, setOriginalData] = useState({});
-  const [uploadedFiles, setUploadedFiles] = useState({});
+const EditUser = ({ open, onClose, row, onFetchRef }) => {
   const { showToast } = useToast();
+  const [submitting, setSubmitting] = useState(false);
 
-  // Define field configurations for each tab
-  const TAB_FIELDS = {
-    address: [
-      { name: "address_line1", label: "address_line1", type: "text" },
-      { name: "address_line2", label: "address_line2", type: "text" },
-      { name: "city", label: "city", type: "text" },
-      { name: "state", label: "state", type: "text" },
-      { name: "pincode", label: "pincode", type: "text" },
-    ],
-    kyc: [
-      { name: "aadhaar_front", label: "Aadhaar Front", type: "file" },
-      { name: "aadhaar_back", label: "Aadhaar Back", type: "file" },
-      { name: "pan_card", label: "PAN Card", type: "file" },
-      { name: "shop_image", label: "Shop Image", type: "file" },
-      { name: "photo", label: "Photo", type: "file" },
-    ],
-    basic: [
-      { name: "business_name", label: "Business Name", type: "text" },
-      { name: "business_type", label: "Business Type", type: "text" },
-      { name: "address", label: "Address", type: "text" },
-      // Add other business fields as needed
-    ],
-    user_details: [
-      { name: "name", label: " Name", type: "text" },
-      { name: "establishment", label: "Establishment", type: "text" },
-      { name: "mobile", label: "Mobile", type: "text" },
-    ],
-  };
+  // ROLE — Only adm & sadm
+  const [role, setRole] = useState("");
+  const rolesList = [
+    { value: "sadm", label: "Super Admin" },
+    { value: "adm", label: "Admin" },
+  ];
 
-  // Fetch data when modal opens or tab changes
+  // USER
+  const [user, setUser] = useState({
+    name: "",
+    email: "",
+    mobile: "",
+    pan: "",
+    gst: "",
+    start_date: "",
+    end_date: "",
+    status: false,
+  });
+
+  // BUSINESS
+  const [business, setBusiness] = useState({
+    business_name: "",
+  });
+
+  // BUSINESS ADDRESS
+  const [businessAddress, setBusinessAddress] = useState({
+    address_line1: "",
+    address_line2: "",
+    city: "",
+    state: "",
+    pincode: "",
+  });
+
+  // 🔥 Populate state from row when opening modal
   useEffect(() => {
-    if (!user || !open) return;
-    fetchBusinessDetails(selectedTab);
-  }, [user, open, selectedTab]);
+    if (row) {
+      setRole(row.role || "adm");
 
-  const fetchBusinessDetails = async (type) => {
-    setLoading(true);
-    try {
-      const res = await apiCall("post", ApiEndpoints.GET_BY_TYPE, {
-        user_id: user.id,
-        type: type,
-      });
-      const data = res?.data || res?.response?.data || {};
-
-      // Initialize form data with default values for all fields in the tab
-      const initializedData = {};
-      const tabFields = TAB_FIELDS[type] || [];
-
-      tabFields.forEach((field) => {
-        // Use API data if available, otherwise use empty string
-        initializedData[field.name] = data[field.name] || "";
+      setUser({
+        name: row.name || "",
+        email: row.email || "",
+        mobile: row.mobile || "",
+        pan: row.pan || "",
+        gst: row.gst || "",
+        start_date: row.start_date || "",
+        end_date: row.end_date || "",
+        status: row.status === 1, // convert to boolean
       });
 
-      setFormData(initializedData);
-      setOriginalData(initializedData);
-      setUploadedFiles({});
-    } catch (err) {
-      console.error("Error fetching business details:", err);
-
-      // Initialize with empty data if API fails
-      const tabFields = TAB_FIELDS[selectedTab] || [];
-      const emptyData = {};
-      tabFields.forEach((field) => {
-        emptyData[field.name] = "";
+      setBusiness({
+        business_name: row.business_name || "",
       });
-      setFormData(emptyData);
-      setOriginalData(emptyData);
-    } finally {
-      setLoading(false);
+
+      setBusinessAddress({
+        address_line1: row.address_line1 || "",
+        address_line2: row.address_line2 || "",
+        city: row.city || "",
+        state: row.state || "",
+        pincode: row.pincode || "",
+      });
+    } else {
+      // Reset to defaults if no row
+      setRole("sadm");
+      setUser({
+        name: "",
+        email: "",
+        mobile: "",
+        pan: "",
+        gst: "",
+        start_date: "",
+        end_date: "",
+        status: false,
+      });
+      setBusiness({
+        business_name: "",
+      });
+      setBusinessAddress({
+        address_line1: "",
+        address_line2: "",
+        city: "",
+        state: "",
+        pincode: "",
+      });
     }
+  }, [row]);
+
+  // Generic change handlers
+  const handleUserChange = (field, value) =>
+    setUser((prev) => ({ ...prev, [field]: value }));
+
+  const handleBusinessChange = (field, value) =>
+    setBusiness((prev) => ({ ...prev, [field]: value }));
+
+  const handleBusinessAddressChange = (field, value) =>
+    setBusinessAddress((prev) => ({ ...prev, [field]: value }));
+
+  // Validation
+  const validate = () => {
+    const errors = [];
+    if (!user.name.trim()) errors.push("User name is required");
+    if (!user.email.trim()) errors.push("User email is required");
+    if (!user.mobile.trim()) errors.push("User mobile is required");
+    if (!business.business_name.trim()) errors.push("Business name is required");
+    if (!businessAddress.state.trim()) errors.push("Business state is required");
+    if (!businessAddress.pincode.trim()) errors.push("Business pincode is required");
+    return errors;
   };
 
-  const handleTabChange = (e, newValue) => {
-    setSelectedTab(newValue);
-    setErrors({});
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: "" }));
-  };
-
-  // Fixed file upload handler
-  // ✅ Store raw File object instead of base64
-  const handleFileUpload = (fieldName, file) => {
-    if (file) {
-      setFormData((prev) => ({
-        ...prev,
-        [fieldName]: file,
-      }));
-      setUploadedFiles((prev) => ({
-        ...prev,
-        [fieldName]: file,
-      }));
-    }
-  };
-
-  const getChangedFields = () => {
-    const changedFields = {};
-
-    // Include uploaded files
-    Object.keys(uploadedFiles).forEach((key) => {
-      if (uploadedFiles[key]) {
-        changedFields[key] = uploadedFiles[key];
-      }
-    });
-
-    // Include non-file fields that changed
-    Object.keys(formData).forEach((key) => {
-      if (uploadedFiles[key]) return; // skip already uploaded files
-
-      const isFileField =
-        TAB_FIELDS[selectedTab]?.find((f) => f.name === key)?.type === "file";
-
-      if (isFileField) return; // skip file fields not updated
-
-      if (formData[key] !== originalData[key]) {
-        changedFields[key] = formData[key];
-      }
-    });
-
-    return changedFields;
-  };
-
+  // Submit
   const handleSubmit = async () => {
-    setLoading(true);
+    const errors = validate();
+    if (errors.length > 0) {
+      errors.forEach((e) => showToast(e, "error"));
+      return;
+    }
+
+    const payload = {
+      id: row?.id,
+      role,
+      user: { ...user, status: user.status ? 1 : 0 }, // convert boolean to number
+      business,
+      business_address: businessAddress,
+    };
+
+    console.log("📌 FINAL UPDATE PAYLOAD →", payload);
+
+    setSubmitting(true);
     try {
-      const changedFields = getChangedFields();
-
-      if (Object.keys(changedFields).length === 0) {
-        showToast("No changes detected", "info");
-        setLoading(false);
-        return;
-      }
-
-      console.log("Sending changed fields:", Object.keys(changedFields));
-
-      // ✅ Create FormData
-      const formDataToSend = new FormData();
-      formDataToSend.append("id", user.id);
-      formDataToSend.append("user_id", user.id);
-      formDataToSend.append("type", selectedTab);
-
-      Object.entries(changedFields).forEach(([key, value]) => {
-        if (value instanceof File) {
-          formDataToSend.append(key, value); // ✅ binary file
-        } else {
-          formDataToSend.append(key, value);
-        }
-      });
-
-      // ✅ Call API (no manual Content-Type header)
-      const { error, response } = await apiCall(
-        "post",
-        ApiEndpoints.UPDATE_BY_TYPE,
-        formDataToSend
+      const { response, error } = await apiCall(
+        "POST",
+        `${ApiEndpoints.EDIT_USER}`,
+        payload
       );
 
       if (response) {
-        showToast(response?.message || "Update successful", "success");
+        okSuccessToast(response?.message || "User updated successfully");
         onFetchRef?.();
         onClose();
       } else {
-        showToast(error?.message || "Update failed", "error");
+        // Backend validation errors
+        if (error?.message && typeof error.message === "object") {
+          Object.values(error.message).forEach((msgs) => {
+            if (Array.isArray(msgs)) msgs.forEach((m) => showToast(m, "error"));
+            else showToast(String(msgs), "error");
+          });
+        } else {
+          showToast(error?.message || "Failed to update user", "error");
+        }
       }
     } catch (err) {
-      console.error("Error updating user:", err);
+      console.error("❌ Update Error:", err);
       showToast("Something went wrong while updating user", "error");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
-  // Get fields for current tab - always use predefined fields
-  const fields = TAB_FIELDS[selectedTab] || [];
-
   return (
-    <CommonModal
-      open={open}
-      onClose={onClose}
-      title="Edit User"
-      loading={loading}
-      footerButtons={[
-        { text: "Cancel", variant: "outlined", onClick: onClose },
-        { text: "Save", variant: "contained", onClick: handleSubmit },
-      ]}
-    >
-      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
-        <Tabs value={selectedTab} onChange={handleTabChange}>
-          {TAB_CONFIG.map((tab) => (
-            <Tab key={tab.key} value={tab.key} label={tab.label} />
-          ))}
-        </Tabs>
-      </Box>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle sx={{ pb: 1 }}>
+        <Typography variant="h6" fontWeight={600}>
+          Edit User
+        </Typography>
+      </DialogTitle>
 
-      <Box position="relative">
-        {loading && (
-          <Box
-            position="absolute"
-            top={0}
-            left={0}
-            right={0}
-            bottom={0}
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            bgcolor="rgba(255,255,255,0.6)"
-            zIndex={1}
-          >
-            <CommonLoader />
-          </Box>
-        )}
-        <Box opacity={loading ? 0.5 : 1}>
-          {fields.map((field) => {
-            const value = formData[field.name] || "";
-            const isImageField = field.type === "file";
-            const hasValue =
-              isImageField &&
-              typeof value === "string" &&
-              (value.startsWith("http://") ||
-                value.startsWith("https://") ||
-                value.startsWith("data:image"));
+      <Divider />
 
-            const isNewlyUploaded = uploadedFiles[field.name];
+      <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
+        {/* ROLE */}
+        <FormControl fullWidth size="small">
+          <InputLabel>Role</InputLabel>
+          <Select value={role} label="Role" onChange={(e) => setRole(e.target.value)}>
+            {rolesList.map((r) => (
+              <MenuItem key={r.value} value={r.value}>
+                {r.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
-            return (
-              <div
-                key={field.name}
-                style={{
-                  marginBottom: "15px",
-                  display: isImageField ? "flex" : "block",
-                  alignItems: "center",
-                  gap: "20px",
-                }}
-              >
-                <label style={{ fontWeight: 500, minWidth: "120px" }}>
-                  {field.label}
-                </label>
+        {/* USER DETAILS */}
+        <Typography fontWeight={600}>User Details</Typography>
+        <TextField
+          label="Name"
+          value={user.name}
+          onChange={(e) => handleUserChange("name", e.target.value)}
+          size="small"
+          fullWidth
+        />
+        <TextField
+          label="Email"
+          value={user.email}
+          onChange={(e) => handleUserChange("email", e.target.value)}
+          size="small"
+          fullWidth
+        />
+        <TextField
+          label="Mobile"
+          value={user.mobile}
+          onChange={(e) => handleUserChange("mobile", e.target.value)}
+          size="small"
+          fullWidth
+        />
+        <TextField
+          label="PAN"
+          value={user.pan}
+          onChange={(e) => handleUserChange("pan", e.target.value)}
+          size="small"
+          fullWidth
+        />
+        <TextField
+          label="GST"
+          value={user.gst}
+          onChange={(e) => handleUserChange("gst", e.target.value)}
+          size="small"
+          fullWidth
+        />
 
-                {isImageField ? (
-                  <>
-                    {hasValue && (
-                      <Box>
-                        <img
-                          src={value}
-                          alt={field.label}
-                          style={{
-                            maxWidth: "150px",
-                            maxHeight: "150px",
-                            border: "1px solid #ccc",
-                            borderRadius: "4px",
-                            objectFit: "cover",
-                          }}
-                        />
-                        {isNewlyUploaded && (
-                          <div
-                            style={{
-                              color: "green",
-                              fontSize: "12px",
-                              marginTop: "5px",
-                            }}
-                          >
-                            Newly uploaded
-                          </div>
-                        )}
-                      </Box>
-                    )}
+        {/* DATES */}
+        <TextField
+          label="Start Date"
+          type="date"
+          value={user.start_date}
+          onChange={(e) => handleUserChange("start_date", e.target.value)}
+          size="small"
+          InputLabelProps={{ shrink: true }}
+          fullWidth
+        />
+        <TextField
+          label="End Date"
+          type="date"
+          value={user.end_date}
+          onChange={(e) => handleUserChange("end_date", e.target.value)}
+          size="small"
+          InputLabelProps={{ shrink: true }}
+          fullWidth
+        />
 
-                    <Box>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files[0];
-                          handleFileUpload(field.name, file);
-                        }}
-                      />
-                    </Box>
-                  </>
-                ) : (
-                  <input
-                    type={field.type}
-                    name={field.name}
-                    value={value}
-                    onChange={handleChange}
-                    style={{ width: "100%", padding: "8px", marginTop: "5px" }}
-                  />
-                )}
-                {uploadedFiles[field.name] && (
-                  <img
-                    src={URL.createObjectURL(uploadedFiles[field.name])}
-                    alt="Preview"
-                    style={{
-                      maxWidth: "150px",
-                      maxHeight: "150px",
-                      border: "1px solid #ccc",
-                      borderRadius: "4px",
-                      objectFit: "cover",
-                      marginTop: "5px",
-                    }}
-                  />
-                )}
+        {/* STATUS */}
+        <FormControlLabel
+          control={
+            <Switch
+              checked={Boolean(user.status)}
+              onChange={(e) => handleUserChange("status", e.target.checked)}
+            />
+          }
+          label={user.status ? "Active" : "Inactive"}
+        />
 
-                {errors[field.name] && (
-                  <p style={{ color: "red", margin: 0 }}>
-                    {errors[field.name]}
-                  </p>
-                )}
-              </div>
-            );
-          })}
-        </Box>
-      </Box>
-    </CommonModal>
+        {/* BUSINESS */}
+        <Typography fontWeight={600}>Business Details</Typography>
+        <TextField
+          label="Business Name"
+          value={business.business_name}
+          onChange={(e) => handleBusinessChange("business_name", e.target.value)}
+          size="small"
+          fullWidth
+        />
+
+        {/* ADDRESS */}
+        <Typography fontWeight={600}>Business Address</Typography>
+        <TextField
+          label="Address Line 1"
+          value={businessAddress.address_line1}
+          onChange={(e) => handleBusinessAddressChange("address_line1", e.target.value)}
+          size="small"
+          fullWidth
+        />
+        <TextField
+          label="Address Line 2"
+          value={businessAddress.address_line2}
+          onChange={(e) => handleBusinessAddressChange("address_line2", e.target.value)}
+          size="small"
+          fullWidth
+        />
+        <TextField
+          label="City"
+          value={businessAddress.city}
+          onChange={(e) => handleBusinessAddressChange("city", e.target.value)}
+          size="small"
+          fullWidth
+        />
+        <TextField
+          label="State"
+          value={businessAddress.state}
+          onChange={(e) => handleBusinessAddressChange("state", e.target.value)}
+          size="small"
+          fullWidth
+        />
+        <TextField
+          label="Pincode"
+          value={businessAddress.pincode}
+          onChange={(e) => handleBusinessAddressChange("pincode", e.target.value)}
+          size="small"
+          fullWidth
+        />
+      </DialogContent>
+
+      <DialogActions sx={{ justifyContent: "space-between", p: 2 }}>
+        <Button onClick={onClose} disabled={submitting} color="inherit">
+          Cancel
+        </Button>
+        <Button variant="contained" onClick={handleSubmit} disabled={submitting}>
+          {submitting ? "Updating..." : "Update"}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
+
 export default EditUser;

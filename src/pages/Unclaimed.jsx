@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo, useContext } from "react";
 import {
   Box,
   Button,
@@ -16,17 +16,28 @@ import predefinedRanges from "../utils/predefinedRanges";
 import { yyyymmdd } from "../utils/DateUtils";
 import { capitalize1 } from "../utils/TextUtil";
 import { currencySetter } from "../utils/Currencyutil";
-import { secondaryColor } from "../utils/setThemeColor";
+import AuthContext from "../contexts/AuthContext";
+
 
 const Unclaimed = () => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [filters, setFilters] = useState({
-    userId: "",
-    status: "unclaimed",
-    date: {},
-    dateVal: "",
-  });
+
+const authCtx = useContext(AuthContext);
+  const user = authCtx?.user;
+ 
+  const [appliedFilters, setAppliedFilters] = useState({}); //
+
+    const filters = useMemo(
+      () => [
+        { id: "Bank_id", label: "Bank Id", type: "textfield" },
+      { id: "id", label: "Id", type: "textfield" },
+      { id: "particulars", label: "particulars", type: "textfield" },
+      { id: "handle_by", label: "Handle By", type: "textfield" },
+          { id: "daterange",  type: "daterange" },
+      ],
+      [user?.role,  appliedFilters]
+    );
 
   const fetchEntriesRef = useRef(null);
   const handleFetchRef = (fetchFn) => {
@@ -67,15 +78,7 @@ const Unclaimed = () => {
     fetchEntries();
   }, []);
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
-  };
 
-  const handleReset = () => {
-    setFilters({ userId: "", status: "unclaimed", date: {}, dateVal: "" });
-    fetchEntries();
-  };
 
   const columns = [
     { name: "ID", selector: (row) => row.id, width: "80px" },
@@ -110,8 +113,16 @@ const Unclaimed = () => {
     },
     { name: "Particulars", selector: (row) => capitalize1(row.particulars) },
     { name: "Handled By", selector: (row) => row.handle_by },
-    { name: "Credit", selector: (row) => currencySetter(row.credit) },
-    { name: "Debit", selector: (row) => currencySetter(row.debit) },
+    { name: "Credit", selector: (row) => (
+      <span style={{color:"green"}}>
+      {currencySetter(row.credit) }
+      </span>
+    )},
+    { name: "Debit", selector: (row) => (
+      <span style={{color:"red"}}>
+     { currencySetter(row.debit) }
+      </span>
+    )},
     { name: "Balance", selector: (row) => currencySetter(row.balance) },
     { name: "Mode", selector: (row) => row.mop },
     { name: "Remark", selector: (row) => row.remark || "-" },
@@ -137,62 +148,14 @@ const Unclaimed = () => {
 
       {!loading && (
         <Box >
-          <Box
-            mb={2}
-            sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}
-          >
-            {/* <Box sx={{ display: "flex", gap: 1 }}>
-              <TextField
-                label="User ID"
-                name="userId"
-                value={filters.userId}
-                onChange={handleFilterChange}
-                size="small"
-              />
-              <TextField
-                select
-                label="Status"
-                name="status"
-                value={filters.status}
-                onChange={handleFilterChange}
-                size="small"
-              >
-                <MenuItem value="unclaimed">Unclaimed</MenuItem>
-                <MenuItem value="claimed">Claimed</MenuItem>
-              </TextField>
-              <Button variant="contained" onClick={fetchEntries}>
-                Search
-              </Button>
-              <Button onClick={handleReset}>Reset</Button>
-            </Box> */}
-            {/* 
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <Tooltip title="Download Sample Excel">
-                <IconButton
-                  size="small"
-                  sx={{
-                    backgroundColor: "#6C4BC7",
-                    color: "#fff",
-                    "&:hover": { backgroundColor: secondaryColor() },
-                  }}
-                  onClick={() => {
-                    const link = document.createElement("a");
-                    link.href = `${process.env.PUBLIC_URL}/sample_unclaimed.xlsx`;
-                    link.download = "sample_unclaimed.xlsx";
-                    link.click();
-                  }}
-                >
-                  <Icon path={mdiFileExcel} size={1} />
-                </IconButton>
-              </Tooltip>
-            </Box> */}
-          </Box>
+      
 
           <Box style={{ width: "100%" }}>
             <CommonTable
               onFetchRef={handleFetchRef}
               endpoint={`${ApiEndpoints.GET_UNCLAIMED_ENTERIES}`}
               columns={columns}
+              filters={filters}
               // loading={loading}
               disableSelectionOnClick
             />

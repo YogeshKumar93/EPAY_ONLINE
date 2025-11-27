@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useState, useEffect, useRef, useContext, useMemo } from "react";
 import {
   Box,
   Button,
@@ -28,14 +28,19 @@ import DeleteClaimed from "./DeleteClaimed";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { useToast } from "../utils/ToastContext";
 import AuthContext from "../contexts/AuthContext";
+import SyncAltIcon from "@mui/icons-material/SyncAlt";
 
-const ConfirmClaimModal = ({ open, handleClose, onConfirm, row }) => {
+const ConfirmClaimModal = ({ open, handleClose, onConfirm, row, selectedRows }) => {
+  
+  // Normalize rows so it always becomes an array
+  const rowsArray = Array.isArray(row) ? row : row ? [row] : [];
+
   return (
     <Dialog
       open={open}
       onClose={handleClose}
       fullWidth
-      maxWidth="sm" // options: xs, sm, md, lg, xl
+      maxWidth="sm"
     >
       <DialogTitle sx={{ fontSize: "1.4rem", fontWeight: 600 }}>
         Confirm Action
@@ -43,7 +48,18 @@ const ConfirmClaimModal = ({ open, handleClose, onConfirm, row }) => {
 
       <DialogContent sx={{ mt: 1 }}>
         <span style={{ fontSize: "1.2rem" }}>
-          Are you sure you want to make <b>ID {row?.id}</b> as paid?
+          {rowsArray.length === 0 ? (
+            <>No row selected!</>
+          ) : rowsArray.length === 1 ? (
+            <>
+              Are you sure you want to make <b>ID {rowsArray[0]?.id}</b> as paid?
+            </>
+          ) : (
+            <>
+              Are you sure you want to make <b>{rowsArray.length} entries</b>{" "}
+              (IDs: {rowsArray.map((r) => r.id).join(", ")}) as paid?
+            </>
+          )}
         </span>
       </DialogContent>
 
@@ -58,7 +74,7 @@ const ConfirmClaimModal = ({ open, handleClose, onConfirm, row }) => {
         </Button>
 
         <Button
-          onClick={() => onConfirm(row)}
+          onClick={() => onConfirm(rowsArray)}
           color="primary"
           variant="contained"
           sx={{ fontSize: "1rem" }}
@@ -70,22 +86,24 @@ const ConfirmClaimModal = ({ open, handleClose, onConfirm, row }) => {
   );
 };
 
+
 const Claimed = () => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
-  const [selectedClaim, setSelectedClaim] = useState(null);
+  const [selectedRows, setSelectedRows] = useState([]);
   const [filters, setFilters] = useState({
     userId: "",
     status: "unclaimed",
     date: {},
     dateVal: "",
   });
+
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const [selectedClaim, setSelectedClaim] = useState(null);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [rowToConfirm, setRowToConfirm] = useState(null);
 
@@ -93,23 +111,23 @@ const Claimed = () => {
   const handleFetchRef = (fetchFn) => {
     fetchEntriesRef.current = fetchFn;
   };
+
   const refreshEntries = () => {
     if (fetchEntriesRef.current) fetchEntriesRef.current();
   };
-
   const refreshClaims = () => {
     if (fetchEntriesRef.current) {
       fetchEntriesRef.current();
     }
   };
-  const handleUpdateClaimed = async (row) => {
+
+  // ------------------ MARK SINGLE ROW AS CLAIMED ------------------
+  const handleUpdateClaimed = async (rows) => {
     try {
       const payload = {
         api_token: user.api_token,
-        entries: [{ id: row.id }],
+        entries: rows.map((r) => ({ id: r.id })),
       };
-
-      console.log("Sending payload:", payload);
 
       const { response, error } = await apiCall(
         "POST",
@@ -122,26 +140,19 @@ const Claimed = () => {
         return;
       }
 
-      showToast(response?.message || "Entry marked as claimed!", "success");
+      showToast("success", response?.message || "Updated successfully");
+
       refreshEntries();
+      setSelectedRows([]);
     } catch (err) {
-      console.error(err);
-      showToast(err?.message || "Something went wrong", "error");
+      showToast("error", "Something went wrong");
     }
   };
 
-  const handlePrint = (row) => {
-    localStorage.setItem("PRINT_DATA", JSON.stringify(row));
-    window.open("/print-claimedreceipt", "_blank");
-  };
-
-  const handleDelete = (row) => {
-    setEntries(row);
-    setOpenDelete(true);
-  };
-
+  // ------------------ FETCH ENTRIES ------------------
   const fetchEntries = async () => {
     setLoading(true);
+
     try {
       const queryParams = new URLSearchParams({
         user_id: filters.userId,
@@ -153,13 +164,14 @@ const Claimed = () => {
       const response = await apiCall(
         `${ApiEndpoints.GET_UNCLAIMED_ENTERIES}?${queryParams}`
       );
+
       if (response?.data?.success) {
         setEntries(response.data.entries || []);
       } else {
         setEntries([]);
       }
     } catch (error) {
-      console.error("Error fetching unclaimed entries:", error);
+      console.error("Fetch error:", error);
     } finally {
       setLoading(false);
     }
@@ -169,6 +181,7 @@ const Claimed = () => {
     fetchEntries();
   }, []);
 
+  // ------------------ FILTER CHANGE ------------------
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
@@ -179,74 +192,215 @@ const Claimed = () => {
     fetchEntries();
   };
 
-  const columns = [
-    { name: "ID", selector: (row) => row.id, width: "80px" },
-    { name: "Bank ID", selector: (row) => row.bank_id },
-    {
-      name: (
-        <DateRangePicker
-          showOneCalendar
-          placeholder="Date"
-          size="medium"
-          cleanable
-          ranges={predefinedRanges}
-          value={filters.dateVal}
-          onChange={(value) => {
-            if (!value) {
-              setFilters({ ...filters, date: {}, dateVal: "" });
+  // ------------------ TABLE COLUMNS ------------------
+  const columns = useMemo(() => {
+    const baseColumns = [
+      {
+        name: "ID",
+        selector: (row) => (
+          <div style={{ fontSize: "12px", fontWeight: 600 }}>{row.id}</div>
+        ),
+        width: "80px",
+        center: true,
+      },
+
+      {
+        name: "Bank ID",
+        selector: (row) => (
+          <div style={{ fontSize: "12px", fontWeight: 600 }}>{row.bank_id}</div>
+        ),
+        width: "100px",
+        center: true,
+      },
+
+      {
+        name: (
+          <DateRangePicker
+            showOneCalendar
+            placeholder="Date"
+            size="medium"
+            cleanable
+            ranges={predefinedRanges}
+            value={filters.dateVal}
+            onChange={(value) => {
+              if (!value) {
+                setFilters({ ...filters, date: {}, dateVal: "" });
+                fetchEntries();
+                return;
+              }
+              setFilters({
+                ...filters,
+                date: {
+                  start: yyyymmdd(value[0]),
+                  end: yyyymmdd(value[1]),
+                },
+                dateVal: value,
+              });
               fetchEntries();
-              return;
-            }
-            const dates = { start: value[0], end: value[1] };
-            setFilters({
-              ...filters,
-              date: { start: yyyymmdd(dates.start), end: yyyymmdd(dates.end) },
-              dateVal: value,
-            });
-            fetchEntries();
-          }}
-          style={{ width: 200 }}
-        />
-      ),
-      selector: (row) => row.date,
-    },
-    { name: "Particulars", selector: (row) => capitalize1(row.particulars) },
-    { name: "Handled By", selector: (row) => row.handle_by },
-    { name: "Credit", selector: (row) => currencySetter(row.credit) },
-    { name: "Debit", selector: (row) => currencySetter(row.debit) },
-    { name: "Balance", selector: (row) => currencySetter(row.balance) },
-    { name: "Mode", selector: (row) => row.mop },
-    { name: "Remark", selector: (row) => row.remark || "-" },
-    {
-      name: "Status",
-      selector: (row) => (
-        <span
-          style={{
-            color: row.status === 0 ? "orange" : "red",
-            fontWeight: 600,
-          }}
-        >
-          {row.status === 0 ? "Unclaimed" : "Claimed"}
-        </span>
-      ),
-    },
-    {
-      name: "Action",
-      selector: (row) => (
-        <IconButton
-          color="primary"
-          onClick={() => {
-            setRowToConfirm(row);
-            setOpenConfirm(true);
-          }}
-          title="Mark as Claimed"
-        >
-          <CheckCircleOutlineIcon />
-        </IconButton>
-      ),
-      width: "90px",
-    },
-  ];
+            }}
+            style={{ width: 200 }}
+          />
+        ),
+        selector: (row) => row.date,
+        width: "150px",
+      },
+
+      {
+        name: "Particulars",
+        selector: (row) => (
+          <div style={{ fontSize: "12px", fontWeight: 600 }}>
+            {capitalize1(row.particulars)}
+          </div>
+        ),
+        wrap: true,
+        minWidth: "120px",
+      },
+
+      {
+        name: "Handled By",
+        selector: (row) => (
+          <div style={{ fontSize: "12px", fontWeight: 600 }}>
+            {row.handle_by}
+          </div>
+        ),
+        wrap: true,
+        width: "120px",
+      },
+
+      {
+        name: "Credit",
+        selector: (row) => (
+          <span style={{ color: "green", fontWeight: 600 }}>
+            {currencySetter(row.credit)}
+          </span>
+        ),
+        right: true,
+        width: "100px",
+      },
+
+      {
+        name: "Debit",
+        selector: (row) => (
+          <span style={{ color: "red", fontWeight: 600 }}>
+            {currencySetter(row.debit)}
+          </span>
+        ),
+        right: true,
+        width: "100px",
+      },
+
+      {
+        name: "Balance",
+        selector: (row) => (
+          <div style={{ fontWeight: 600 }}>{currencySetter(row.balance)}</div>
+        ),
+        right: true,
+        width: "100px",
+      },
+
+      {
+        name: "Mode",
+        selector: (row) => (
+          <div style={{ fontSize: "12px", fontWeight: 600 }}>{row.mop}</div>
+        ),
+        width: "80px",
+        center: true,
+      },
+
+      {
+        name: "Remark",
+        selector: (row) => (
+          <div style={{ fontSize: "12px" }}>{row.remark || "-"}</div>
+        ),
+        wrap: true,
+        minWidth: "100px",
+      },
+
+      {
+        name: "Status",
+        selector: (row) => {
+          const statusConfig = {
+            0: {
+              label: "Unclaimed",
+              color: "#CC7000",
+              bg: "#FFF4E5",
+            },
+            1: {
+              label: "Claimed",
+              color: "#C40000",
+              bg: "#FFE5E5",
+            },
+          };
+
+          const cfg = statusConfig[row.status] || statusConfig[0];
+
+          return (
+            <button
+              style={{
+                padding: "4px 10px",
+                borderRadius: "8px",
+                fontSize: "12px",
+                fontWeight: 600,
+                border: "none",
+                backgroundColor: cfg.bg,
+                color: cfg.color,
+                cursor: "default",
+              }}
+            >
+              {cfg.label}
+            </button>
+          );
+        },
+        width: "140px",
+      },
+
+      {
+        name: "Action",
+        selector: (row) => (
+          <IconButton
+            color="primary"
+            onClick={() => {
+              setRowToConfirm(row);
+              setOpenConfirm(true);
+            }}
+            size="small"
+            title="Mark as Claimed"
+          >
+            <CheckCircleOutlineIcon />
+          </IconButton>
+        ),
+        center: true,
+        width: "90px",
+      },
+    ];
+
+    return [...baseColumns];
+  }, [filters, user]);
+
+  // ------------------ ADD SELECTION COLUMN ------------------
+  const columnsWithSelection = useMemo(() => {
+    return [
+      {
+        name: "",
+        width: "40px",
+        selector: (row) => (
+          <input
+            type="checkbox"
+            checked={selectedRows.some((r) => r.id === row.id)}
+            onChange={() => {
+              const exists = selectedRows.some((r) => r.id === row.id);
+              setSelectedRows(
+                exists
+                  ? selectedRows.filter((r) => r.id !== row.id)
+                  : [...selectedRows, row]
+              );
+            }}
+          />
+        ),
+      },
+      ...columns,
+    ];
+  }, [selectedRows, columns]);
 
   return (
     <>
@@ -254,41 +408,58 @@ const Claimed = () => {
 
       {!loading && (
         <Box>
-          <Box
-            mb={2}
-            sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}
-          ></Box>
+          <CommonTable
+            onFetchRef={handleFetchRef}
+            endpoint={ApiEndpoints.GET_ENTRIES}
+            queryParam={"status=1"}
+            columns={columnsWithSelection}
+            selectedRows={selectedRows}
+            onSelectionChange={setSelectedRows}
+            customHeader={
+              <Box sx={{ display: "flex", gap: 1, padding: "8px" }}>
+                {selectedRows.length > 0 && (
+                  <Tooltip title="Mark selected as claimed">
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color="secondary"
+                      onClick={() => {
+                        if (selectedRows.length === 0) {
+                          showToast("error", "Please select entries");
+                          return;
+                        }
 
-          <Box style={{ width: "100%" }}>
-            <CommonTable
-              onFetchRef={handleFetchRef}
-              endpoint={`${ApiEndpoints.GET_ENTRIES}`}
-              queryParam={"status=1"}
-              columns={columns}
-              // loading={loading}
-              disableSelectionOnClick
-            />
+                        setRowToConfirm(selectedRows); // store selected rows in state
+                        setOpenConfirm(true); // open modal
+                      }}
+                    >
+                      <SyncAltIcon sx={{ fontSize: 20, mr: 1 }} />
+                      TRANSFER CWP
+                    </Button>
+                  </Tooltip>
+                )}
+              </Box>
+            }
+          />
+          <DeleteClaimed
+            open={openDelete}
+            handleClose={() => {
+              setOpenDelete(false);
+              setSelectedClaim(null);
+            }}
+            selectedBank={selectedClaim}
+            onFetchRef={refreshClaims}
+          />
 
-            <DeleteClaimed
-              open={openDelete}
-              handleClose={() => {
-                setOpenDelete(false);
-                setSelectedClaim(null);
-              }}
-              selectedBank={selectedClaim}
-              onFetchRef={refreshClaims}
-            />
-
-            <ConfirmClaimModal
-              open={openConfirm}
-              handleClose={() => setOpenConfirm(false)}
-              row={rowToConfirm}
-              onConfirm={(row) => {
-                setOpenConfirm(false);
-                handleUpdateClaimed(row);
-              }}
-            />
-          </Box>
+          <ConfirmClaimModal
+            open={openConfirm}
+            handleClose={() => setOpenConfirm(false)}
+            row={rowToConfirm}
+            onConfirm={(rows) => {
+              setOpenConfirm(false);
+              handleUpdateClaimed(rows);
+            }}
+          />
         </Box>
       )}
     </>
