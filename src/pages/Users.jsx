@@ -587,12 +587,13 @@ const Users = ({ query }) => {
       )} */}
 
       {openEditUser && selectedUser && (
-        <EditUser
-          open={openEditUser}
-          onClose={handleCloseEditUser}
-          user={selectedUser}
-          onFetchRef={refreshUsers}
-        />
+       <EditUser
+  open={openEditUser}
+  onClose={handleCloseEditUser}
+  editData={selectedUser}
+  onFetchRef={refreshUsers}
+/>
+
       )}
 
       {/* {openPermissions && selectedUser && (
