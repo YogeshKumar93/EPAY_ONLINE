@@ -30,36 +30,38 @@ import { useToast } from "../utils/ToastContext";
 import AuthContext from "../contexts/AuthContext";
 import SyncAltIcon from "@mui/icons-material/SyncAlt";
 
-const ConfirmClaimModal = ({ open, handleClose, onConfirm, row,selectedRows }) => {
+const ConfirmClaimModal = ({ open, handleClose, onConfirm, row, selectedRows }) => {
+  
+  // Normalize rows so it always becomes an array
+  const rowsArray = Array.isArray(row) ? row : row ? [row] : [];
+
   return (
     <Dialog
       open={open}
       onClose={handleClose}
       fullWidth
-      maxWidth="sm" // options: xs, sm, md, lg, xl
+      maxWidth="sm"
     >
       <DialogTitle sx={{ fontSize: "1.4rem", fontWeight: 600 }}>
         Confirm Action
       </DialogTitle>
 
-     <DialogContent sx={{ mt: 1 }}>
-  <span style={{ fontSize: "1.2rem" }}>
-    {selectedRows?.length === 0 ? (
-      <>No row selected!</>
-    ) : selectedRows?.length === 1 ? (
-      <>
-        Are you sure you want to make <b>ID {selectedRows[0]?.id}</b> as paid?
-      </>
-    ) : (
-      <>
-        Are you sure you want to make 
-        <b> {selectedRows?.length} entries</b> 
-        (IDs: {selectedRows?.map((r) => r.id).join(", ")}) as paid?
-      </>
-    )}
-  </span>
-</DialogContent>
-
+      <DialogContent sx={{ mt: 1 }}>
+        <span style={{ fontSize: "1.2rem" }}>
+          {rowsArray.length === 0 ? (
+            <>No row selected!</>
+          ) : rowsArray.length === 1 ? (
+            <>
+              Are you sure you want to make <b>ID {rowsArray[0]?.id}</b> as paid?
+            </>
+          ) : (
+            <>
+              Are you sure you want to make <b>{rowsArray.length} entries</b>{" "}
+              (IDs: {rowsArray.map((r) => r.id).join(", ")}) as paid?
+            </>
+          )}
+        </span>
+      </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button
@@ -72,7 +74,7 @@ const ConfirmClaimModal = ({ open, handleClose, onConfirm, row,selectedRows }) =
         </Button>
 
         <Button
-          onClick={() => onConfirm(row)}
+          onClick={() => onConfirm(rowsArray)}
           color="primary"
           variant="contained"
           sx={{ fontSize: "1rem" }}
@@ -83,6 +85,7 @@ const ConfirmClaimModal = ({ open, handleClose, onConfirm, row,selectedRows }) =
     </Dialog>
   );
 };
+
 
 const Claimed = () => {
   const [entries, setEntries] = useState([]);
