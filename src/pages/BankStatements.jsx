@@ -332,21 +332,35 @@ const handleUploadExcel = async (file) => {
     { name: "Credit", selector: (row) => currencySetter(row.credit) },
     { name: "Debit", selector: (row) => currencySetter(row.debit) },
     { name: "Balance", selector: (row) => currencySetter(row.balance) },
-    {
-      name: "Status",
-      selector: (row) => (
-        <span
-      style={{
-        color: row.status === 0 ? "orange" : "red",
-        fontWeight: 600,
-      }}
-    >
-      {row.status === 0 ? "Unclaimed" : "Claimed"}
-    </span>
-      ),
-      center: true,
-      width: "70px",
-    },
+{
+  name: "Status",
+  selector: (row) => {
+    const isUnclaimed = row.status === 0;
+    return (
+      <span
+        style={{
+          padding: "6px 8px",
+          borderRadius: "12px",
+          fontSize: "12px",
+          fontWeight: 600,
+          backgroundColor: isUnclaimed ? "#FFF4E5" : "#FFE5E5",
+          color: isUnclaimed ? "#CC7000" : "#C40000",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "2px",
+          width:"95px "
+        }}
+      >
+        {isUnclaimed ? "🟠" : "🔴"}
+        {isUnclaimed ? "Unclaimed" : "Claimed"}
+      </span>
+    );
+  },
+  center: true,
+  width: "110px",
+}
+
+
   ];
 
   return (

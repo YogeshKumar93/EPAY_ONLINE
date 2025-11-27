@@ -50,11 +50,13 @@ import lock_icon from "./assets/lock.png";
 
 import bank from "./assets/new_dashboardIcon/fundRq.png";
  
- import users from "./assets/Images/user.png";
+ import users from "./assets/Images/group.png";
  
 // import bgimage from "./assets/Images/bgimage.png";
  
 import risk from "./assets/Images/warning.png";
+import claimed from "./assets/Images/claimed.png";
+import paid from "./assets/Images/tax.png";
 import virtualAccount from "./assets/sidenav/account.png";
 import loginHistory from "./assets/Images/track.png";
  
@@ -158,6 +160,8 @@ export const usersImage = users;
 
  
 export const riskImage = risk;
+export const claimedImage = claimed;
+export const paidimage = paid;
 
 export const virtuanAccountImage = virtualAccount;
 

@@ -4,7 +4,9 @@ import {
   loginHistoryImage,
   riskImage,
   virtuanAccountImage,
-  usersImage
+  usersImage,
+  claimedImage,
+  paidimage
 } from "../../iconsImports";
 
 export const navConfig = [
@@ -22,17 +24,17 @@ export const navConfig = [
   // },
 
  
-  // {
-  //   title: "Manage Users",
-  //   icon: usersImage,
-  //   icon2: "👥",
-  //   to: {
-  //     adm: "/admin/users",
-  //     sadm: "/admin/users",
+  {
+    title: "Manage Users",
+    icon: usersImage,
+    icon2: "👥",
+    to: {
+      adm: "/admin/users",
+      sadm: "/admin/users",
     
-  //   },
-  //   roles: ["adm", "sadm", ],
-  // },
+    },
+    roles: ["adm", "sadm", ],
+  },
   
 
   {
@@ -61,13 +63,25 @@ export const navConfig = [
 
   {
     title: "Claimed",
-    icon: riskImage,
+    icon: claimedImage,
     icon2: "🏦",
     to: {
       adm: "/admin/claimed",
       sadm: "/admin/claimed",
     },
     permissionKey: "unclaimed",
+    roles: ["adm", "sadm"],
+  },
+
+   {
+    title: "Paid",
+    icon: paidimage,
+    icon2: "🏦",
+    to: {
+      adm: "/admin/claimedwithpaid",
+      sadm: "/admin/claimedwithpaid",
+    },
+    permissionKey: "claimedwithpaid",
     roles: ["adm", "sadm"],
   },
 
@@ -127,9 +141,9 @@ const roleHierarchy = {
   adm: {
     default: [
       // "Dashboard",
-      // "Manage Users",
+      "Manage Users",
       
-"Claimed",
+ 
       // "Fund Request",
       // "Transactions",
       // "Users",
@@ -137,6 +151,7 @@ const roleHierarchy = {
       "Accounts",
       "Unclaimed",
          "Claimed",
+         "Paid",
       // "Services",
       // "Wallet Ledger",
       // "Settings",
@@ -149,7 +164,7 @@ const roleHierarchy = {
   sadm: {
     default: [
       //  "Dashboard",
-      // "Manage Users",
+      "Manage Users",
       // "Fund Request",
       // "Transactions",
       // "Manage Users",
@@ -158,6 +173,7 @@ const roleHierarchy = {
       "Accounts",
       "Unclaimed",
          "Claimed",
+         "Paid",
       // "Services",
       // "Wallet Ledger",
       // "Settings",

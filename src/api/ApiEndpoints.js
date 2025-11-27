@@ -30,7 +30,7 @@ const ApiEndpoints = {
 
   GET_USER_BY_USERNAME: "auth/getUserByUsername",
   GET_USER_BY_ID: "admin/getUserById",
-  // RESEND_OTP: "wallet/resendOtp",
+  
   USER_PROFIT: "admin/userProfitability",
   DELETE_USER: "admin/deleteUser",
   API_USERS_CHARGES: "admin/charges",
@@ -40,31 +40,23 @@ const ApiEndpoints = {
   GET_TRANSACTIONS: "admin/getTransactions",
   GET_ACC_TRANSACTIONS: "",
 
-
-
   ADD_BANK: "admin/createBank",
 
   GET_ROUTE: "admin/getRoutes",
   GET_CATEGORIES: "admin/getCategories",
 
-
-
-
-
   GET_BANK_BALANCE: "bank/getBankBalance",
-  // whitelisted accputn apis
+  
   CREATE_WHITE_LISTED_ACCOUNT: "risk/createWhiteListedAccount",
   UPDATE_WHITE_LISTED_ACCOUNT: "risk/updateWhiteListedAccount",
   DELETE_WHITE_LISTED_ACCOUNT: "risk/deleteWhiteListedAccount",
   GET_WHITE_LISTED_ACCOUNT: "risk/getWhiteListedAccount",
-  // -----
-
-  // blacklisted account apis
+   
   CREATE_BLACK_LISTED_ACCOUNT: "risk/createBlackListedAccount",
   UPDATE_BLACK_LISTED_ACCOUNT: "risk/updateBlackListedAccount",
   DELETE_BLACK_LISTED_ACCOUNT: "risk/deleteBlackListedAccount",
   GET_BLACK_LISTED_ACCOUNT: "risk/getBlackListedAccount",
-  // -------
+  
 
   CHANGE_TWO_FA: "auth/changeTwoFa",
   // ****************************** NEW API'S ******************************
@@ -94,6 +86,8 @@ const ApiEndpoints = {
   DELETE_LOG: "auditlog/deleteAuditLog",
   GET_LOG: "auditlog/getAuditLog",
 
+  UPDATE_CLAIMED_ENTRIES: "bankStatement/updateClaimedEntries",
+  GET_ENTRIES: "bankStatement/getEntries",
 
 
   GET_BY_TYPE: "business/getByType",
@@ -124,21 +118,8 @@ const ApiEndpoints = {
 
   QR_LOGIN: "auth/generateQr",
   QR_STATUS: "auth/qrStatus",
-
-
-
-
-
-
   // ****************************** NEW API'S ABOVE ******************************
-  // GET_COMMISSION_RULE: "commission/getCommissions",
-  // Notification apis
-  // GET_NOTIFICATION: "notification/getNotification",
-  // MARK_READ_NOTI: "notification/updateNotification",
-  // ADMIN_NOTIFICATION: "notification/createNotification",
-  // UPDATE_NOTIFICATION: "notification/updateNotification",
-  // DELETE_NOTIFICATION: "notification/deleteNotification",
-  // -----
+  
 
   // bank statement apis
   GET_BANK_STATEMENTS: "bankStatement/getBankStatement",
@@ -194,13 +175,6 @@ const ApiEndpoints = {
   CHANGE_USER_LAYOUT: "user/changeLayout",
 
 
-
-  // GET_ALL_TXN: "admin/getAllTxn",
-
-
-
-
-
   BLOCK_UNBLOCK_SERVICE: "service/blockUnblock",
   CREATE_USER: "signup/createUser",
   GET_SIGNUP_SCHEMA: "signup/getSignupSchema",
@@ -218,8 +192,6 @@ const ApiEndpoints = {
   CREATE_STATUS: "business/createStatus",
 
 
-  // ---------
-
 
   BASIC_SCHEMA: "business/basicSchema",
   CONTACT_SCHEMA: "business/contactSchema",
@@ -229,14 +201,7 @@ const ApiEndpoints = {
   DOCUMENTS_SCHEMA: "business/documentsSchema",
   KYC_SCHEMA: "business/kycSchema",
   STATUS_SCHEMA: "business/statusSchema",
-
-
-
-  // GET_ADMIN_COMMISSIONS: "commission/getAdminCommissions",
-  // BLOCK_UNBLOCK_COMM: "commission/enableDisableCommRule",
-  // BLOCK_UNBLOCK_ADMINCOMM: "commission/enableDisableAdminCommRule",
-  // DELETE_ADMIN_RULE: "commission/deleteAdminCommRule",
-  // DELETE_COMM_RULE: "commission/deleteCommRule",
+  
 
   CREATE_ADMIN_COMMISSIONS: "commission/createAdminCommissionRule",
   UPDATE_ADMIN_COMMISSIONS: "commission/updateAdminCommissionRule",
@@ -273,19 +238,9 @@ const ApiEndpoints = {
   // DMT2_BANK_LIST: "dmr/getBanksDmt2",
   DMT2_BANK_LIST: "dmr/getLiveBanksDmt2",
   ADD_BENE: "dmr/registerBeneficiary",
-
-
-
-
-  // EXP_TRANSFER: "dmr/expressTxn",
-  // SUPER_TRANSFER: "dmr/superTransfer",
+ 
 
   VERIFY_ACC: "dmr/accountVerification",
-
-
-
-
-
 
   GET_TIME: "https://timeapi.io/api/time/current/zone?timeZone=Asia%2FKolkata",
 };

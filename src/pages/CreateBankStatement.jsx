@@ -33,7 +33,7 @@ const CreateBankStatement = ({ onFetchRef, bankId, balance }) => {
     bank_id: bankId || "",
     balance: balance || 0,
     date: new Date().toISOString().split("T")[0],
-    mop: "",
+    mop: "UPI",
     remark:"",
     particulars: "",
     credit: 0,

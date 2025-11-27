@@ -32,7 +32,9 @@ import UploadExcel from "../pages/UploadExcel";
 import Unclaimed from "../pages/Unclaimed";
 import Claimed from "../pages/Claimed";
 import PrintClaimedReceipt from "../pages/PrintClaimedReceipt";
-// import Users from "../pages/Users";
+import Users from "../pages/Users";
+import Claimed_with_Paid from "../pages/Claimed_with_Paid";
+ 
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading, user } = useContext(AuthContext);
@@ -86,6 +88,7 @@ export default function AppRoutes() {
         {/* <Route path="/qrLogin" element={<QrLoginPage />} /> */}
         <Route path="/login" element={<Login />} />
          <Route path="/print-claimedreceipt" element={<PrintClaimedReceipt />} />
+       
         {/* <Route path="/print-receipt" element={<DmtReceipt1 />} />
         <Route path="/print-dmt" element={<PrintDmt />} />
         <Route path="/print-dmt2" element={<PrintDmt2 />} />
@@ -117,7 +120,8 @@ export default function AppRoutes() {
           {isAdmin && (
             <>
               {/* <Route path="admin/dashboard" element={<Dashboard />} /> */}
-              {/* <Route path="admin/users" element={<Users />} /> */}
+              <Route path="admin/users" element={<Users />} />
+             
               {/* <Route path="admin/transactions" element={<Transaction />} /> */}
               {/* <Route path="admin/notification" element={<Notification />} /> */}
               {/* <Route path="admin/fund-request" element={<FundRequest />} /> */}
@@ -131,6 +135,7 @@ export default function AppRoutes() {
               <Route path="admin/banks" element={<Banks />} />
               <Route path="admin/unclaimed" element={<Unclaimed />} />
                <Route path="admin/claimed" element={<Claimed />} />
+                <Route path="admin/claimedwithpaid" element={<Claimed_with_Paid />} />
               {/* <Route path="admin/wallet-ledger" element={<WalletLedgers />} /> */}
               {/* <Route path="admin/purpose" element={<Purposes />} /> */}
               <Route path="admin/downloadexcel" element={<DownloadExcel />} />

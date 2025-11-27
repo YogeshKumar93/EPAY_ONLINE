@@ -6,21 +6,48 @@ import { useSchemaForm } from "../../hooks/useSchemaForm";
 import { PATTERNS, isValid } from "../../utils/validators";
 import { useToast } from "../../utils/ToastContext";
 
-const CreateBankModal = ({ open, onClose, onFetchRef }) => {
+const CreateBankModal = ({ open, onClose, onFetchRef, setGlobalLoader }) => {
   const { schema, formData, handleChange, errors, setErrors, loading } =
     useSchemaForm(ApiEndpoints.GET_BANK_SCHEMA, open);
 
   const [submitting, setSubmitting] = useState(false);
   const { showToast } = useToast();
 
-  // ✅ Reset errors when modal opens fresh
+  // --------------------------
+  // NEW: USER DROPDOWN STATE
+  // --------------------------
+  const [users, setUsers] = useState([]);
+  const [userLoading, setUserLoading] = useState(false);
+
+  // Fetch users when modal opens
   useEffect(() => {
     if (open) {
       setErrors({});
+      fetchUsers();
     }
   }, [open, setErrors]);
 
-  // ✅ Validation using validators.js
+  const fetchUsers = async () => {
+    setUserLoading(true);
+    try {
+      const { response } = await apiCall("POST", ApiEndpoints.GET_USERS);
+      if (response?.data.data) {
+        setUsers(
+          response.data.data.map((u) => ({
+            label: u.name || u.username, 
+            value: u.id,
+          }))
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching users", error);
+      showToast("Failed to load user list", "error");
+    } finally {
+      setUserLoading(false);
+    }
+  };
+
+  // VALIDATION
   const validateForm = () => {
     const newErrors = {};
 
@@ -43,11 +70,18 @@ const CreateBankModal = ({ open, onClose, onFetchRef }) => {
       newErrors.balance = "Balance cannot be negative";
     }
 
+    // --------------------------
+    // NEW: handle_by validation
+    // --------------------------
+    if (!formData.handled_by) {
+      newErrors.id = "Please select a handler";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // ✅ Submit handler
+  // SUBMIT
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
@@ -61,24 +95,38 @@ const CreateBankModal = ({ open, onClose, onFetchRef }) => {
 
       if (response) {
         showToast(response?.message || "Bank created successfully", "success");
+        setGlobalLoader(true);
+
+        await new Promise((res) => setTimeout(res, 500));
         onFetchRef?.(); // refresh list if callback exists
+        onFetchRef?.();
         onClose();
       } else {
         showToast(error?.message || "Failed to create bank", "error");
-        // ❌ don’t auto-close on error
       }
     } catch (err) {
       console.error("Error creating bank:", err);
       showToast("Something went wrong while creating bank", "error");
     } finally {
       setSubmitting(false);
+      setGlobalLoader(false);
     }
   };
 
-  // ✅ Pick only required fields from schema
-  const visibleFields = schema.filter((field) =>
-    ["bank_name", "ifsc", "acc_number", "balance"].includes(field.name)
-  );
+  // PICK FIELDS FROM SCHEMA + ADD DROPDOWN
+  const visibleFields = [
+    ...schema.filter((field) =>
+      ["bank_name", "ifsc", "acc_number", "balance"].includes(field.name)
+    ),
+    {
+      name: "handled_by",
+      label: "Handled By",
+      type: "select",
+      options: users, // dropdown options
+      required: true,
+      disabled: userLoading,
+    },
+  ];
 
   return (
     <CommonModal
@@ -92,7 +140,7 @@ const CreateBankModal = ({ open, onClose, onFetchRef }) => {
       formData={formData}
       handleChange={handleChange}
       errors={errors}
-      loading={loading}
+      loading={loading || userLoading}
       footerButtons={[
         {
           text: "Cancel",
@@ -105,7 +153,8 @@ const CreateBankModal = ({ open, onClose, onFetchRef }) => {
           variant: "contained",
           color: "primary",
           onClick: handleSubmit,
-          disabled: submitting || loading || !schema.length, // disable until schema ready
+          disabled:
+            submitting || loading || userLoading || !schema.length,
         },
       ]}
     />
