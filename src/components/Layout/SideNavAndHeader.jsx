@@ -379,25 +379,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
       </List>
     </Box>
   );
-  const walletConfig = [
-    { match: ["di", "md"], wallets: ["w1", "w3"] },
-    { match: ["ret", "dd"], wallets: ["w1", "w2"] },
-    { match: ["api"], wallets: ["w1"] },
-    { match: ["lein"], wallets: ["lien"] },
-  ];
-
-  const getWallets = (role) => {
-    const found = walletConfig.find((cfg) =>
-      cfg.match.some((m) => role?.includes(m))
-    );
-    return found?.wallets || [];
-  };
-  const walletLabelMap = {
-    w1: "Main Balance",
-    w2: "AEPS Balance",
-    w3: "Comm Balance",
-    lien: "Lien",
-  };
+  
 
   return (
     <Box
@@ -548,7 +530,7 @@ const SideNavAndHeader = ({ userRole, userName = "User Name", userAvatar }) => {
                     lineHeight: "16px",
                   }}
                 >
-                  {user?.establishment || "N/A"}
+                  {user?.name || "N/A"}
                 </Typography>
 
                 <IconButton
