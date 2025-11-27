@@ -177,6 +177,7 @@ const ApiEndpoints = {
 
   BLOCK_UNBLOCK_SERVICE: "service/blockUnblock",
   CREATE_USER: "signup/createUser",
+  EDIT_USER: "signup/editUser",
   GET_SIGNUP_SCHEMA: "signup/getSignupSchema",
 
   GET_ROUTES: "admin/getRoutes",

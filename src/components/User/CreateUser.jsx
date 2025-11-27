@@ -1,13 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { apiCall } from "../../api/apiClient";
-import ApiEndpoints from "../../api/ApiEndpoints";
-import CommonModal from "../common/CommonModal";
-import { useSchemaForm } from "../../hooks/useSchemaForm";
-import { PATTERNS, isValid } from "../../utils/validators";
-import { useToast } from "../../utils/ToastContext";
+import React, { useState } from "react";
 import {
   Button,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -19,146 +12,126 @@ import {
   Select,
   TextField,
   Typography,
+  Switch,
+  FormControlLabel,
 } from "@mui/material";
+import { apiCall } from "../../api/apiClient";
+import ApiEndpoints from "../../api/ApiEndpoints";
+import { useToast } from "../../utils/ToastContext";
 import { okSuccessToast } from "../../utils/ToastUtil";
 
 const CreateUser = ({ open, onClose, onFetchRef }) => {
   const { showToast } = useToast();
-  const [role, setRole] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [schemaFields, setSchemaFields] = useState([]);
-  const [formData, setFormData] = useState({});
-  const [loadingSchema, setLoadingSchema] = useState(false);
 
-  // Get logged in user role from your authentication context or localStorage
-  const loggedInUserRole = "di"; // Replace this with actual logged in user role
-
-  console.log("The schema fields is ", schemaFields);
-
-  // Define all roles
-  const allRolesList = [
-    "sadm",
-    "adm",
-    "zsm",
-    "asm",
-    "md",
-    "di",
-    "ret",
-    "dd",
-    "api",
+  // ROLE — Only adm & sadm
+  const [role, setRole] = useState("sadm");
+  const rolesList = [
+    { value: "sadm", label: "Super Admin" },
+    { value: "adm", label: "Admin" },
   ];
 
-  const getFilteredRoles = () => {
-    if (loggedInUserRole === "di") {
-      return ["ret"]; // Distributor can create Retailer and Direct Dealer
-    } else if (loggedInUserRole === "md") {
-      return ["di"]; // Master Distributor can ONLY create Distributor
-    } else {
-      return allRolesList; // Show all roles for other users (sadm, adm, etc.)
-    }
+  // USER
+  const [user, setUser] = useState({
+    name: "",
+    email: "",
+    mobile: "",
+    pan: "",
+    gst: "",
+    start_date: "",
+    end_date: "",
+    status: false,
+  });
+
+  // BUSINESS
+  const [business, setBusiness] = useState({
+    business_name: "",
+  });
+
+  // BUSINESS ADDRESS
+  const [businessAddress, setBusinessAddress] = useState({
+    address_line1: "",
+    address_line2: "",
+    city: "",
+    state: "",
+    pincode: "",
+  });
+
+  // Generic change handlers
+  const handleUserChange = (field, value) =>
+    setUser((prev) => ({ ...prev, [field]: value }));
+
+  const handleBusinessChange = (field, value) =>
+    setBusiness((prev) => ({ ...prev, [field]: value }));
+
+  const handleBusinessAddressChange = (field, value) =>
+    setBusinessAddress((prev) => ({ ...prev, [field]: value }));
+
+  // VALIDATION
+  const validate = () => {
+    const errors = [];
+
+    if (!user.name.trim()) errors.push("User name is required");
+    if (!user.email.trim()) errors.push("User email is required");
+    if (!user.mobile.trim()) errors.push("User mobile is required");
+    if (!user.start_date) errors.push("User start date is required");
+    if (!user.end_date) errors.push("User end date is required");
+
+    if (!business.business_name.trim())
+      errors.push("Business name is required");
+    if (!businessAddress.state.trim()) errors.push("Business state is required");
+    if (!businessAddress.pincode.trim())
+      errors.push("Business pincode is required");
+
+    return errors;
   };
 
-  const rolesList = getFilteredRoles();
-
-  const roleFullNameMap = {
-    sadm: "Super Admin",
-    adm: "Admin",
-    zsm: "Zonal Sales Manager",
-    asm: "Area Sales Manager",
-    md: "Master Distributor",
-    di: "Distributor",
-    ret: "Retailer",
-    dd: "Direct Dealer",
-    api: "API User",
-  };
-
-  useEffect(() => {
-    setSchemaFields([]);
-    setFormData({});
-
-    if (role) {
-      fetchSchema();
-    }
-  }, [role]);
-
-  const fetchSchema = async () => {
-    try {
-      setLoadingSchema(true);
-      const { response, error } = await apiCall(
-        "post",
-        ApiEndpoints.GET_SIGNUP_SCHEMA,
-        {}
-      );
-      if (response) {
-        setSchemaFields(response.data.fields || []);
-        const initialData = {};
-        (response.data.fields || []).forEach((f) => {
-          initialData[f.name] = f.default || "";
-        });
-        setFormData(initialData);
-      } else {
-        showToast(error?.message || "Failed to fetch schema", "error");
-      }
-    } catch (err) {
-      console.error("Error fetching schema:", err);
-      showToast("Something went wrong while fetching schema", "error");
-    } finally {
-      setLoadingSchema(false);
-    }
-  };
-
-  const handleChange = (name, value) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const buildUserBusinessPayload = (flatObj) => {
-    const user = {};
-    const business = {};
-    const business_address = {};
-
-    Object.entries(flatObj).forEach(([key, value]) => {
-      if (key.startsWith("user.")) {
-        user[key.split(".")[1]] = value;
-      } else if (key.startsWith("business.")) {
-        business[key.split(".")[1]] = value;
-      } else if (key.startsWith("business_address.")) {
-        business_address[key.split(".")[1]] = value;
-      }
-    });
-
-    return { user, business, business_address };
-  };
-
+  // SUBMIT
   const handleSubmit = async () => {
-    if (!role) {
-      showToast("Please select a role", "error");
+    const errors = validate();
+    if (errors.length > 0) {
+      errors.forEach((e) => showToast(e, "error"));
       return;
     }
 
-    // Convert flat formData → user + business + business_address
-    const { user, business, business_address } =
-      buildUserBusinessPayload(formData);
+    const payload = {
+      role,
+      user: {
+        ...user,
+        status: user.status ? 1 : 0, // convert boolean to number
+      },
+      business,
+      business_address: businessAddress,
+    };
 
-    const payload = { role, user, business, business_address };
-
-    console.log("Payload sending to API:", payload); // debug
+    console.log("📌 Final Payload →", payload);
 
     setSubmitting(true);
+
     try {
       const { response, error } = await apiCall(
         "POST",
         ApiEndpoints.CREATE_USER,
         payload
       );
+
       if (response) {
         okSuccessToast(response?.message || "User created successfully");
         onFetchRef?.();
         onClose();
       } else {
-        showToast(error?.message || "Failed to create user", "error");
+        // Handle backend validation errors
+        if (error?.message && typeof error.message === "object") {
+          Object.values(error.message).forEach((msgs) => {
+            if (Array.isArray(msgs)) msgs.forEach((m) => showToast(m, "error"));
+            else showToast(String(msgs), "error");
+          });
+        } else {
+          showToast(error?.message || "Failed to create user", "error");
+        }
       }
     } catch (err) {
-      console.error("Error creating user:", err);
+      console.error("❌ Error creating user:", err);
       showToast("Something went wrong while creating user", "error");
     } finally {
       setSubmitting(false);
@@ -172,52 +145,145 @@ const CreateUser = ({ open, onClose, onFetchRef }) => {
           Create New User
         </Typography>
       </DialogTitle>
+
       <Divider />
-      <DialogContent
-        sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}
-      >
-        {/* Role Selection */}
-        <FormControl fullWidth variant="outlined" size="small">
+
+      <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
+        {/* ROLE */}
+        <FormControl fullWidth size="small">
           <InputLabel>Role</InputLabel>
-          <Select
-            value={role}
-            label="Role"
-            onChange={(e) => setRole(e.target.value)}
-          >
+          <Select value={role} label="Role" onChange={(e) => setRole(e.target.value)}>
             {rolesList.map((r) => (
-              <MenuItem key={r} value={r}>
-                {roleFullNameMap[r] || r.toUpperCase()}
+              <MenuItem key={r.value} value={r.value}>
+                {r.label}
               </MenuItem>
             ))}
           </Select>
         </FormControl>
 
-        {/* Schema Fields */}
-        {loadingSchema && <CircularProgress sx={{ alignSelf: "center" }} />}
-        {!loadingSchema &&
-          schemaFields.map((field) => (
-            <TextField
-              key={field.name}
-              label={field.label}
-              value={formData[field.name] || ""}
-              onChange={(e) => handleChange(field.name, e.target.value)}
-              fullWidth
-              size="small"
-              variant="outlined"
-              type={field.type || "text"}
+        {/* USER FIELDS */}
+        <Typography fontWeight={600}>User Details</Typography>
+        <TextField
+          label="Name"
+          value={user.name}
+          onChange={(e) => handleUserChange("name", e.target.value)}
+          size="small"
+          fullWidth
+        />
+        <TextField
+          label="Email"
+          value={user.email}
+          onChange={(e) => handleUserChange("email", e.target.value)}
+          size="small"
+          fullWidth
+          type="email"
+        />
+        <TextField
+          label="Mobile"
+          value={user.mobile}
+          onChange={(e) => handleUserChange("mobile", e.target.value)}
+          size="small"
+          fullWidth
+        />
+        <TextField
+          label="PAN"
+          value={user.pan}
+          onChange={(e) => handleUserChange("pan", e.target.value)}
+          size="small"
+          fullWidth
+        />
+        <TextField
+          label="GST"
+          value={user.gst}
+          onChange={(e) => handleUserChange("gst", e.target.value)}
+          size="small"
+          fullWidth
+        />
+
+        <TextField
+          label="Start Date"
+          type="date"
+          value={user.start_date}
+          onChange={(e) => handleUserChange("start_date", e.target.value)}
+          size="small"
+          InputLabelProps={{ shrink: true }}
+          fullWidth
+        />
+        <TextField
+          label="End Date"
+          type="date"
+          value={user.end_date}
+          onChange={(e) => handleUserChange("end_date", e.target.value)}
+          size="small"
+          InputLabelProps={{ shrink: true }}
+          fullWidth
+        />
+
+        {/* STATUS */}
+        <FormControlLabel
+          control={
+            <Switch
+              checked={Boolean(user.status)}
+              onChange={(e) => handleUserChange("status", e.target.checked)}
             />
-          ))}
+          }
+          label={user.status ? "Active" : "Inactive"}
+        />
+
+        {/* BUSINESS */}
+        <Typography fontWeight={600}>Business Details</Typography>
+        <TextField
+          label="Business Name"
+          value={business.business_name}
+          onChange={(e) => handleBusinessChange("business_name", e.target.value)}
+          size="small"
+          fullWidth
+        />
+
+        {/* ADDRESS */}
+        <Typography fontWeight={600}>Business Address</Typography>
+        <TextField
+          label="Address Line 1"
+          value={businessAddress.address_line1}
+          onChange={(e) => handleBusinessAddressChange("address_line1", e.target.value)}
+          size="small"
+          fullWidth
+        />
+        <TextField
+          label="Address Line 2"
+          value={businessAddress.address_line2}
+          onChange={(e) => handleBusinessAddressChange("address_line2", e.target.value)}
+          size="small"
+          fullWidth
+        />
+        <TextField
+          label="City"
+          value={businessAddress.city}
+          onChange={(e) => handleBusinessAddressChange("city", e.target.value)}
+          size="small"
+          fullWidth
+        />
+        <TextField
+          label="State"
+          value={businessAddress.state}
+          onChange={(e) => handleBusinessAddressChange("state", e.target.value)}
+          size="small"
+          fullWidth
+        />
+        <TextField
+          label="Pincode"
+          value={businessAddress.pincode}
+          onChange={(e) => handleBusinessAddressChange("pincode", e.target.value)}
+          size="small"
+          fullWidth
+        />
       </DialogContent>
 
       <DialogActions sx={{ justifyContent: "space-between", p: 2 }}>
         <Button onClick={onClose} disabled={submitting} color="inherit">
           Cancel
         </Button>
-        <Button
-          onClick={handleSubmit}
-          variant="contained"
-          disabled={submitting}
-        >
+        <Button variant="contained" onClick={handleSubmit} disabled={submitting}>
           {submitting ? "Saving..." : "Create"}
         </Button>
       </DialogActions>
