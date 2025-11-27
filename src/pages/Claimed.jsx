@@ -369,7 +369,7 @@ const Claimed = () => {
               setOpenConfirm(true);
             }}
             size="small"
-            title="Mark as Claimed"
+            title="Mark as Paidd"
           >
             <CheckCircleOutlineIcon />
           </IconButton>
@@ -439,7 +439,7 @@ const Claimed = () => {
                       }}
                     >
                       <SyncAltIcon sx={{ fontSize: 20, mr: 1 }} />
-                      TRANSFER CWP
+                      Mark as Paid
                     </Button>
                   </Tooltip>
                 )}
