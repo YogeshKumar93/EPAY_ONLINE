@@ -46,6 +46,7 @@ import "rsuite/dist/rsuite.min.css";
 import AuthContext from "../../contexts/AuthContext";
 import { useExcelExport } from "../../hooks/useExcelExport";
 import ExportExcelButton from "./ExportExcelButton";
+import CommonLoader from "./CommonLoader";
 // import { RoleUserFilter } from "./RoleUserFilter";
 
 // Memoized TablePaginationActions component
@@ -1047,7 +1048,7 @@ const CommonTable = ({
 
   return (
     <Box>
-      <Loader request={loading} />
+      <CommonLoader loading={loading} />
       {/* Filter Section */}
       {availableFilters.length > 0 && (
         <>
@@ -1201,7 +1202,7 @@ const CommonTable = ({
                   disabled={loading}
                   sx={{ ml: 1 }}
                 >
-                  {loading ? <CircularProgress size={24} /> : <CachedIcon />}
+                  {loading ? <CommonLoader loading={loading}  /> : <CachedIcon />}
                 </IconButton>
               </Tooltip>
             </>

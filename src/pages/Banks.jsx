@@ -8,7 +8,7 @@ import { dateToTime1, ddmmyy, ddmmyyWithTime } from "../utils/DateUtils";
 import CreateBankModal from "../components/Bank/CreateBanks";
 // import ReButton from "../components/common/ReButton";
 import CommonStatus from "../components/common/CommonStatus";
- 
+
 import DeleteIcon from "@mui/icons-material/Delete";
 import UpdateBanks from "../components/Bank/UpdateBanks";
 import DeleteBank from "./DeleteBank";
@@ -30,7 +30,7 @@ const Banks = ({ filters = [] }) => {
   const bank_name = location.state?.bank_name || "Bank";
   const acc_number = location.state?.acc_number || "Account Number";
   const [globalLoader, setGlobalLoader] = useState(false);
-    // const [appliedFilters, setAppliedFilters] = useState({});
+  // const [appliedFilters, setAppliedFilters] = useState({});
 
   // ✅ keep a ref to CommonTable for refreshing
   const fetchBanksRef = useRef(null);
@@ -68,22 +68,22 @@ const Banks = ({ filters = [] }) => {
     return () => clearTimeout(timer);
   }, []);
 
-    // const filters = useMemo(
-    //   () => [
-    //     { id: "mobile", label: "Mobile Number", type: "textfield" },
-    //     {
-    //       id: "user_id",
-    //       label: "Type Est.",
-    //       type: "autocomplete",
-    //       options: userOptions,
-    //       onSearch: (val) => setUserSearch(val),
-    //       getOptionLabel: (option) => option?.label || "",
-    //       isOptionEqualToValue: (option, value) => option.id === value.id, // ✅ this line keeps selection visible
-    //     },
-    //     { id: "asm", label: "Asm Id", type: "textfield" },
-    //   ],
-    //   [user?.role, userOptions, appliedFilters]
-    // );
+  // const filters = useMemo(
+  //   () => [
+  //     { id: "mobile", label: "Mobile Number", type: "textfield" },
+  //     {
+  //       id: "user_id",
+  //       label: "Type Est.",
+  //       type: "autocomplete",
+  //       options: userOptions,
+  //       onSearch: (val) => setUserSearch(val),
+  //       getOptionLabel: (option) => option?.label || "",
+  //       isOptionEqualToValue: (option, value) => option.id === value.id, // ✅ this line keeps selection visible
+  //     },
+  //     { id: "asm", label: "Asm Id", type: "textfield" },
+  //   ],
+  //   [user?.role, userOptions, appliedFilters]
+  // );
 
   // memoized columns
   const columns = useMemo(
@@ -218,44 +218,44 @@ const Banks = ({ filters = [] }) => {
       {!loading && (
         <>
           <CommonTable
-         
             onFetchRef={handleFetchRef}
             columns={columns}
             endpoint={ApiEndpoints.GET_BANKS}
             filters={filters}
             queryParam={queryParam}
             customHeader={
-          <Button
-  label="Bank"
-  onClick={() => setOpenCreate(true)}
-  variant="contained"
-  size="medium"
-  sx={{
-    background: "linear-gradient(135deg, #490277 0%, #6A1B9A 100%)",
-    color: "#FFFFFF",
-    textTransform: "none",
-    fontWeight: 500,
-    letterSpacing: "0.3px",
-    paddingX: 3,
-    paddingY: 1.2,
-   marginBottom: 2,
-    borderRadius: "10px",
-    boxShadow: "0px 4px 12px rgba(73, 2, 119, 0.3)",
-    transition: "all 0.3s ease",
-    "&:hover": {
-      background: "linear-gradient(135deg, #5A048F 0%, #7B2BB5 100%)",
-      boxShadow: "0px 6px 16px rgba(73, 2, 119, 0.45)",
-      transform: "translateY(-2px)",
-    },
-    "&:active": {
-      transform: "scale(0.98)",
-      boxShadow: "0px 2px 6px rgba(73, 2, 119, 0.2)",
-    },
-  }}
->
-  Add Bank
-</Button>
-
+              <Button
+                label="Bank"
+                onClick={() => setOpenCreate(true)}
+                variant="contained"
+                size="medium"
+                sx={{
+                  background:
+                    "linear-gradient(135deg, #490277 0%, #6A1B9A 100%)",
+                  color: "#FFFFFF",
+                  textTransform: "none",
+                  fontWeight: 500,
+                  letterSpacing: "0.3px",
+                  paddingX: 3,
+                  paddingY: 1.2,
+                  marginBottom: 2,
+                  borderRadius: "10px",
+                  boxShadow: "0px 4px 12px rgba(73, 2, 119, 0.3)",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    background:
+                      "linear-gradient(135deg, #5A048F 0%, #7B2BB5 100%)",
+                    boxShadow: "0px 6px 16px rgba(73, 2, 119, 0.45)",
+                    transform: "translateY(-2px)",
+                  },
+                  "&:active": {
+                    transform: "scale(0.98)",
+                    boxShadow: "0px 2px 6px rgba(73, 2, 119, 0.2)",
+                  },
+                }}
+              >
+                Add Bank
+              </Button>
             }
           />
 
