@@ -196,7 +196,7 @@ const Claimed_with_Paid = () => {
 
       {!loading && (
         <Box>
-          <Box mb={2}></Box>
+         
 
           <CommonTable
             onFetchRef={handleFetchRef}

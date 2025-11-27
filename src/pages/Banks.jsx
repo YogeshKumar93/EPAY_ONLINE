@@ -105,6 +105,7 @@ const Banks = ({ filters = [] }) => {
         wrap: true,
         width: "140px",
       },
+    
       {
         name: "Bank Name",
         selector: (row) => (
@@ -113,6 +114,11 @@ const Banks = ({ filters = [] }) => {
           </div>
         ),
         wrap: true,
+      },
+        {
+        name: "Handled By",
+        selector: (row) => <div style={{ textAlign: "left" }}>{row.handled_by_est}</div>,
+        
       },
       {
         name: "Account Number",
@@ -128,6 +134,7 @@ const Banks = ({ filters = [] }) => {
         selector: (row) => <div style={{ textAlign: "left" }}>{row.ifsc}</div>,
         wrap: true,
       },
+      
       {
         name: "Balance",
         selector: (row) => (
