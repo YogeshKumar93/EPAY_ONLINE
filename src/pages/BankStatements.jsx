@@ -335,7 +335,34 @@ const handleUploadExcel = async (file) => {
 {
   name: "Status",
   selector: (row) => {
-    const isUnclaimed = row.status === 0;
+    const status = row.status;
+
+    const statusConfig = {
+      0: { 
+        label: "Unclaimed", 
+        color: "#CC7000", 
+        bg: "#FFF4E5", 
+        icon: "🟠" ,
+          
+      },
+      1: { 
+        label: "Claimed", 
+        color: "#C40000", 
+        bg: "#FFE5E5", 
+        icon: "🔴" ,
+        
+      },
+      2: { 
+        label: "Paid", 
+        color: "#0B7500", 
+        bg: "#E6F9E5", 
+        icon: "🟢" ,
+          
+      },
+    };
+
+    const cfg = statusConfig[status] || statusConfig[0];
+
     return (
       <span
         style={{
@@ -343,22 +370,22 @@ const handleUploadExcel = async (file) => {
           borderRadius: "12px",
           fontSize: "12px",
           fontWeight: 600,
-          backgroundColor: isUnclaimed ? "#FFF4E5" : "#FFE5E5",
-          color: isUnclaimed ? "#CC7000" : "#C40000",
+          backgroundColor: cfg.bg,
+          color: cfg.color,
           display: "inline-flex",
           alignItems: "center",
-          gap: "2px",
-          width:"95px "
+          gap: "4px",
+          width: "100px",
         }}
       >
-        {isUnclaimed ? "🟠" : "🔴"}
-        {isUnclaimed ? "Unclaimed" : "Claimed"}
+        {cfg.icon} {cfg.label}
       </span>
     );
   },
   center: true,
   width: "110px",
 }
+
 
 
   ];
