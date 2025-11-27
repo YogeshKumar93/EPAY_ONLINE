@@ -118,19 +118,48 @@ const Unclaimed = () => {
     { name: "Mode", selector: (row) => row.mop },
     { name: "Remark", selector: (row) => row.remark || "-" },
 
-    {
-      name: "Status",
-      selector: (row) => (
-        <span
-          style={{
-            color: row.status === 0 ? "orange" : "red",
-            fontWeight: 600,
-          }}
-        >
-          {row.status === 0 ? "Unclaimed" : "Claimed"}
-        </span>
-      ),
-    },
+     {
+        name: "Status",
+        selector: (row) => {
+          const statusConfig = {
+            0: {
+              label: "Unclaimed",
+              color: "#f4e9e8ff",
+              bg: "#b82419ff",
+            },
+            1: {
+             label: "Claimed",
+              color: "green",
+              bg: "#b7e8e0ff",
+            },
+            2:{
+               label: "Paid",
+              color: "#0e2d6aff",
+              bg: "#aab0f1ff",
+            }
+          };
+
+          const cfg = statusConfig[row.status] || statusConfig[0];
+
+          return (
+            <button
+              style={{
+                padding: "8px 10px",
+                borderRadius: "8px",
+                fontSize: "12px",
+                fontWeight: 600,
+                border: "none",
+                backgroundColor: cfg.bg,
+                color: cfg.color,
+                cursor: "default",
+              }}
+            >
+              {cfg.label}
+            </button>
+          );
+        },
+        width: "140px",
+      },
   ];
 
   return (

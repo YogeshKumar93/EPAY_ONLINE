@@ -214,140 +214,83 @@ const CreateUser = ({ open, onClose, onFetchRef }) => {
           </Box>
         );
 
-     case 1:
+ case 1:
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-      
-      {/* ------------ PERSONAL INFORMATION ------------ */}
-      <Card variant="outlined" sx={{ bgcolor: 'background.default' }}>
-        <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          
-          <Typography
-            variant="h6"
-            gutterBottom
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <span style={{ fontSize: '1.25rem' }}>📝</span>
-            Personal Information
-          </Typography>
+   <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
 
-          <Grid container spacing={2}>
-            {/* Full Name - Single Row */}
-            <Grid item xs={12}>
-              <TextField
-                label="Full Name *"
-                value={user.name}
-                onChange={(e) => handleUserChange("name", e.target.value)}
-                size="small"
-                fullWidth
-              />
-            </Grid>
+  {/* FULL NAME – full width */}
+  <TextField
+    label="Full Name *"
+    value={user.name}
+    onChange={(e) => handleUserChange("name", e.target.value)}
+    size="small"
+    fullWidth
+  />
 
-            {/* Email + Mobile */}
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Email *"
-                value={user.email}
-                onChange={(e) => handleUserChange("email", e.target.value)}
-                size="small"
-                fullWidth
-                type="email"
-              />
-            </Grid>
+  {/* ROW: Email + Mobile */}
+  <Box sx={{ display: "flex", gap: 2 }}>
+    <TextField
+      label="Email *"
+      type="email"
+      value={user.email}
+      onChange={(e) => handleUserChange("email", e.target.value)}
+      size="small"
+      sx={{ flex: 1 }}
+    />
+    <TextField
+      label="Mobile *"
+      value={user.mobile}
+      onChange={(e) => handleUserChange("mobile", e.target.value)}
+      size="small"
+      sx={{ flex: 1 }}
+    />
+  </Box>
 
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Mobile *"
-                value={user.mobile}
-                onChange={(e) => handleUserChange("mobile", e.target.value)}
-                size="small"
-                fullWidth
-              />
-            </Grid>
+  {/* ROW: PAN + GST */}
+  <Box sx={{ display: "flex", gap: 2 }}>
+    <TextField
+      label="PAN Number"
+      value={user.pan}
+      onChange={(e) => handleUserChange("pan", e.target.value)}
+      size="small"
+      sx={{ flex: 1 }}
+    />
+    <TextField
+      label="GST Number"
+      value={user.gst}
+      onChange={(e) => handleUserChange("gst", e.target.value)}
+      size="small"
+      sx={{ flex: 1 }}
+    />
+  </Box>
 
-            {/* PAN + GST */}
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="PAN Number"
-                value={user.pan}
-                onChange={(e) => handleUserChange("pan", e.target.value)}
-                size="small"
-                fullWidth
-              />
-            </Grid>
+  {/* ROW: Start Date + End Date */}
+  <Box sx={{ display: "flex", gap: 2 }}>
+    <TextField
+      label="Start Date *"
+      type="date"
+      value={user.start_date}
+      onChange={(e) => handleUserChange("start_date", e.target.value)}
+      size="small"
+      InputLabelProps={{ shrink: true }}
+      sx={{ flex: 1 }}
+    />
 
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="GST Number"
-                value={user.gst}
-                onChange={(e) => handleUserChange("gst", e.target.value)}
-                size="small"
-                fullWidth
-              />
-            </Grid>
-          </Grid>
+    <TextField
+      label="End Date *"
+      type="date"
+      value={user.end_date}
+      onChange={(e) => handleUserChange("end_date", e.target.value)}
+      size="small"
+      InputLabelProps={{ shrink: true }}
+      sx={{ flex: 1 }}
+    />
+  </Box>
+<FormControlLabel control={ <Switch checked={Boolean(user.status)} onChange={(e) => handleUserChange("status", e.target.checked) } color="primary" /> } label={ <Typography variant="body2"> Account Status:{" "} <strong>{user.status ? "Active" : "Inactive"}</strong> </Typography> } sx={{ mt: 1 }} />
+</Box>
 
-        </CardContent>
-      </Card>
-
-      {/* ------------ ACCOUNT PERIOD ------------ */}
-      <Card variant="outlined" sx={{ bgcolor: 'background.default' }}>
-        <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <Typography
-            variant="h6"
-            gutterBottom
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <span style={{ fontSize: '1.25rem' }}>📅</span>
-            Account Period
-          </Typography>
-
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Start Date *"
-                type="date"
-                value={user.start_date}
-                onChange={(e) => handleUserChange("start_date", e.target.value)}
-                size="small"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="End Date *"
-                type="date"
-                value={user.end_date}
-                onChange={(e) => handleUserChange("end_date", e.target.value)}
-                size="small"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-              />
-            </Grid>
-          </Grid>
-
-          <FormControlLabel
-            control={
-              <Switch
-                checked={Boolean(user.status)}
-                onChange={(e) => handleUserChange("status", e.target.checked)}
-                color="primary"
-              />
-            }
-            label={
-              <Typography variant="body2">
-                Account Status: <strong>{user.status ? "Active" : "Inactive"}</strong>
-              </Typography>
-            }
-            sx={{ mt: 1 }}
-          />
-        </CardContent>
-      </Card>
-
-    </Box>
   );
+
 
 
       case 2:
