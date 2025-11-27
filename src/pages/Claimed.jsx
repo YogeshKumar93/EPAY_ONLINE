@@ -30,7 +30,6 @@ import { useToast } from "../utils/ToastContext";
 import AuthContext from "../contexts/AuthContext";
 import SyncAltIcon from "@mui/icons-material/SyncAlt";
 
-
 const ConfirmClaimModal = ({ open, handleClose, onConfirm, row }) => {
   return (
     <Dialog
@@ -45,7 +44,7 @@ const ConfirmClaimModal = ({ open, handleClose, onConfirm, row }) => {
 
       <DialogContent sx={{ mt: 1 }}>
         <span style={{ fontSize: "1.2rem" }}>
-          Are you sure you want to make <b>ID {row?.id}  </b> as paid?
+          Are you sure you want to make <b>ID {row?.id} </b> as paid?
         </span>
       </DialogContent>
 
@@ -100,41 +99,39 @@ const Claimed = () => {
   const refreshEntries = () => {
     if (fetchEntriesRef.current) fetchEntriesRef.current();
   };
-    const refreshClaims = () => {
+  const refreshClaims = () => {
     if (fetchEntriesRef.current) {
       fetchEntriesRef.current();
     }
   };
 
-
   // ------------------ MARK SINGLE ROW AS CLAIMED ------------------
- const handleUpdateClaimed = async (rows) => {
-  try {
-    const payload = {
-      api_token: user.api_token,
-      entries: rows.map((r) => ({ id: r.id })),
-    };
+  const handleUpdateClaimed = async (rows) => {
+    try {
+      const payload = {
+        api_token: user.api_token,
+        entries: rows.map((r) => ({ id: r.id })),
+      };
 
-    const { response, error } = await apiCall(
-      "POST",
-      ApiEndpoints.UPDATE_CLAIMED_ENTRIES,
-      payload
-    );
+      const { response, error } = await apiCall(
+        "POST",
+        ApiEndpoints.UPDATE_CLAIMED_ENTRIES,
+        payload
+      );
 
-    if (error) {
-      showToast("error", error?.message || "API failed");
-      return;
+      if (error) {
+        showToast("error", error?.message || "API failed");
+        return;
+      }
+
+      showToast("success", response?.message || "Updated successfully");
+
+      refreshEntries();
+      setSelectedRows([]);
+    } catch (err) {
+      showToast("error", "Something went wrong");
     }
-
-    showToast("success", response?.message || "Updated successfully");
-
-    refreshEntries();
-    setSelectedRows([]);
-  } catch (err) {
-    showToast("error", "Something went wrong");
-  }
-};
-
+  };
 
   // ------------------ FETCH ENTRIES ------------------
   const fetchEntries = async () => {
@@ -303,45 +300,43 @@ const Claimed = () => {
         minWidth: "100px",
       },
 
-     {
-  name: "Status",
-  selector: (row) => {
-    const statusConfig = {
-      0: { 
-        label: "Unclaimed", 
-        color: "#CC7000",
-        bg: "#FFF4E5",
-         
+      {
+        name: "Status",
+        selector: (row) => {
+          const statusConfig = {
+            0: {
+              label: "Unclaimed",
+              color: "#CC7000",
+              bg: "#FFF4E5",
+            },
+            1: {
+              label: "Claimed",
+              color: "#C40000",
+              bg: "#FFE5E5",
+            },
+          };
+
+          const cfg = statusConfig[row.status] || statusConfig[0];
+
+          return (
+            <button
+              style={{
+                padding: "4px 10px",
+                borderRadius: "8px",
+                fontSize: "12px",
+                fontWeight: 600,
+                border: "none",
+                backgroundColor: cfg.bg,
+                color: cfg.color,
+                cursor: "default",
+              }}
+            >
+              {cfg.label}
+            </button>
+          );
+        },
+        width: "140px",
       },
-      1: { 
-        label: "Claimed", 
-        color: "#C40000",
-        bg: "#FFE5E5"
-      },
-    };
-
-    const cfg = statusConfig[row.status] || statusConfig[0];
-
-    return (
-      <button
-        style={{
-          padding: "4px 10px",
-          borderRadius: "8px",
-          fontSize: "12px",
-          fontWeight: 600,
-          border: "none",
-          backgroundColor: cfg.bg,
-          color: cfg.color,
-          cursor: "default",
-        }}
-      >
-        {cfg.label}
-      </button>
-    );
-  },
-  width: "140px",
-},
-
 
       {
         name: "Action",
@@ -408,49 +403,47 @@ const Claimed = () => {
               <Box sx={{ display: "flex", gap: 1, padding: "8px" }}>
                 {selectedRows.length > 0 && (
                   <Tooltip title="Mark selected as claimed">
-                   <Button
-  variant="contained"
-  size="small"
-  color="secondary"
-  onClick={() => {
-    if (selectedRows.length === 0) {
-      showToast("error", "Please select entries");
-      return;
-    }
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color="secondary"
+                      onClick={() => {
+                        if (selectedRows.length === 0) {
+                          showToast("error", "Please select entries");
+                          return;
+                        }
 
-    setRowToConfirm(selectedRows);  // store selected rows in state
-    setOpenConfirm(true);           // open modal
-  }}
->
-  <SyncAltIcon sx={{ fontSize: 20, mr: 1 }} />
-  TRANSFER CWP
-</Button>
-
+                        setRowToConfirm(selectedRows); // store selected rows in state
+                        setOpenConfirm(true); // open modal
+                      }}
+                    >
+                      <SyncAltIcon sx={{ fontSize: 20, mr: 1 }} />
+                      TRANSFER CWP
+                    </Button>
                   </Tooltip>
                 )}
               </Box>
             }
           />
           <DeleteClaimed
-              open={openDelete}
-              handleClose={() => {
-                setOpenDelete(false);
-                setSelectedClaim(null);
-              }}
-              selectedBank={selectedClaim}
-              onFetchRef={refreshClaims}
-            />
+            open={openDelete}
+            handleClose={() => {
+              setOpenDelete(false);
+              setSelectedClaim(null);
+            }}
+            selectedBank={selectedClaim}
+            onFetchRef={refreshClaims}
+          />
 
-         <ConfirmClaimModal
-  open={openConfirm}
-  handleClose={() => setOpenConfirm(false)}
-  row={rowToConfirm}
-  onConfirm={(rows) => {
-    setOpenConfirm(false);
-    handleUpdateClaimed(rows);
-  }}
-/>
-
+          <ConfirmClaimModal
+            open={openConfirm}
+            handleClose={() => setOpenConfirm(false)}
+            row={rowToConfirm}
+            onConfirm={(rows) => {
+              setOpenConfirm(false);
+              handleUpdateClaimed(rows);
+            }}
+          />
         </Box>
       )}
     </>
