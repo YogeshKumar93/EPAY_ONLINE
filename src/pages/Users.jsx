@@ -41,6 +41,8 @@ import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 // import ChangeParentModal from "./ChangeParentModal";
 // import AddInst from "../components/User/AddInst";
 import { useToast } from "../utils/ToastContext";
+import EditIconImg from "../assets/new_dashboardIcon/edituser.png";
+import ViewDocImg from "../assets/new_dashboardIcon/viewdoc.png";
 
 const roleLabels = {
  
@@ -256,17 +258,7 @@ const Users = ({ query }) => {
               }}
             >
               <ListItemText>Edit User</ListItemText>
-            </MenuItem>,
-
-            // <MenuItem
-            //   key="permissions"
-            //   onClick={() => {
-            //     handleOpenPermissions(row);
-            //     handleMenuClose();
-            //   }}
-            // >
-            //   <ListItemText>Edit Permissions</ListItemText>
-            // </MenuItem>,
+            </MenuItem>,             
 
             <MenuItem
               key="documents"
@@ -504,17 +496,46 @@ const Users = ({ query }) => {
    
 
     // Actions column
-    if (["adm",  "sadm"].includes(userRole?.role)) {
-      baseColumns.push({
-        name: "Actions",
-        selector: (row) => (
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <ActionMenu row={row} />
-           
-          </div>
-        ),
-      });
-    }
+  // Actions column
+if (["adm", "sadm"].includes(userRole?.role)) {
+  baseColumns.push({
+    name: "Actions",
+    selector: (row) => (
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        {/* Edit User */}
+        <Tooltip title="Edit User">
+          <IconButton
+            size="small"
+            onClick={() => handleOpenEditUser(row)}
+            sx={{ color: "primary.main" }}
+          >
+           <img
+              src={EditIconImg}
+              alt="edit"
+              style={{ width: 30, height: 30 }}
+            />
+          </IconButton>
+        </Tooltip>
+
+        {/* View Documents */}
+        <Tooltip title="View Documents">
+          <IconButton
+            size="small"
+            onClick={() => handleOpenViewDocuments(row)}
+            sx={{ color: "secondary.main" }}
+          >
+             <img
+              src={ViewDocImg}
+              alt="edit"
+              style={{ width: 30, height: 30 }}
+            />
+          </IconButton>
+        </Tooltip>
+      </Box>
+    ),
+  });
+}
+
 
     return baseColumns;
   }, [userMap, userRole]);
