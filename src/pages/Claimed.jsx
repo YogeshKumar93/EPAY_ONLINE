@@ -322,14 +322,19 @@ const Claimed = () => {
           const statusConfig = {
             0: {
               label: "Unclaimed",
-              color: "#CC7000",
-              bg: "#FFF4E5",
+              color: "#a01309ff",
+              bg: "#e2a5a1ff",
             },
             1: {
-              label: "Claimed",
-              color: "#C40000",
-              bg: "#FFE5E5",
+             label: "Claimed",
+              color: "#e1eae9ff",
+              bg: "#168276ff",
             },
+            2:{
+               label: "Paid",
+              color: "#0e2d6aff",
+              bg: "#aab0f1ff",
+            }
           };
 
           const cfg = statusConfig[row.status] || statusConfig[0];
@@ -337,7 +342,7 @@ const Claimed = () => {
           return (
             <button
               style={{
-                padding: "4px 10px",
+                padding: "8px 10px",
                 borderRadius: "8px",
                 fontSize: "12px",
                 fontWeight: 600,

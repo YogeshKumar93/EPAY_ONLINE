@@ -128,19 +128,48 @@ const Claimed_with_Paid = () => {
     { name: "Mode", selector: (row) => row.mop },
     { name: "Remark", selector: (row) => row.remark || "-" },
 
-    {
-      name: "Status",
-      selector: (row) => (
-        <span
-          style={{
-            color: row.status === 2 ? "#ee8340ff" : "orange",
-            fontWeight: 600,
-          }}
-        >
-          {row.status === 2 ? "Paid" : "Claimed"}
-        </span>
-      ),
-    },
+     {
+        name: "Status",
+        selector: (row) => {
+          const statusConfig = {
+            0: {
+              label: "Unclaimed",
+              color: "#a01309ff",
+              bg: "#e2a5a1ff",
+            },
+            1: {
+             label: "Claimed",
+              color: "green",
+              bg: "#b7e8e0ff",
+            },
+            2:{
+               label: "Paid",
+              color: "#e9ebf0ff",
+              bg: "#2431baff",
+            }
+          };
+
+          const cfg = statusConfig[row.status] || statusConfig[0];
+
+          return (
+            <button
+              style={{
+                padding: "8px 15px",
+                borderRadius: "8px",
+                fontSize: "12px",
+                fontWeight: 600,
+                border: "none",
+                backgroundColor: cfg.bg,
+                color: cfg.color,
+                cursor: "default",
+              }}
+            >
+              {cfg.label}
+            </button>
+          );
+        },
+        width: "140px",
+      },
 
     {
       name: "Actions",
