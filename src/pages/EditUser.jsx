@@ -154,7 +154,7 @@ const EditUser = ({ open, onClose, row, onFetchRef }) => {
     try {
       const { response, error } = await apiCall(
         "POST",
-        `${ApiEndpoints.EDIT_USER}/${row?.id}`,
+        `${ApiEndpoints.EDIT_USER}`,
         payload
       );
 
