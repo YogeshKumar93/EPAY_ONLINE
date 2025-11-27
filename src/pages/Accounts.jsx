@@ -52,6 +52,7 @@ const Accounts = () => {
         user_id: row.user_id,
         establishment: row.establishment,
         mobile: row.mobile,
+        name:row.name,
       },
     });
   };
