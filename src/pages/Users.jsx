@@ -32,7 +32,7 @@ import ViewDocuments from "./ViewDocuments";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Assignment, CurrencyRupee, VerifiedUser } from "@mui/icons-material";
 // import { AssignPlans } from "./AssignPlans";
-import AdminCreateUser from "./AdminCreateUser";
+// import AdminCreateUser from "./AdminCreateUser";
 // import AddLein from "./AddLein";
 import debounce from "lodash.debounce";
 // import { useNavigate } from "react-router-dom";
@@ -538,12 +538,12 @@ const Users = ({ query }) => {
               />
             )}
 
-            {["adm", "sadm"].includes(userRole.role) && (
+            {/* {["adm", "sadm"].includes(userRole.role) && (
               <ReButton
                 label="Create User"
                 onClick={() => setCreateAdmUser(true)}
               />
-            )}
+            )} */}
 
             {/* <input
               type="text"
@@ -578,13 +578,13 @@ const Users = ({ query }) => {
         />
       )} */}
 
-      {createadmuser && (
+      {/* {createadmuser && (
         <AdminCreateUser
           open={createadmuser}
           onClose={() => setCreateAdmUser(false)}
           onFetchRef={refreshUsers}
         />
-      )}
+      )} */}
 
       {openEditUser && selectedUser && (
         <EditUser
