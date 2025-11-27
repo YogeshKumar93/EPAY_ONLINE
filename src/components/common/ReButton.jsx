@@ -5,7 +5,7 @@ import AddIcon from "@mui/icons-material/Add";
 import AuthContext from "../../contexts/AuthContext";
 
 // Fallback defaults
-const DEFAULT_BG = "#13c3c1";
+const DEFAULT_BG = "#492077";
 const DEFAULT_TEXT = "#000";
 
 const ReButton = ({ label, onClick, startIcon = <AddIcon /> }) => {
