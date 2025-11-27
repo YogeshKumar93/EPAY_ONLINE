@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo, useContext } from "react";
 import {
   Box,
   Button,
@@ -16,17 +16,28 @@ import predefinedRanges from "../utils/predefinedRanges";
 import { yyyymmdd } from "../utils/DateUtils";
 import { capitalize1 } from "../utils/TextUtil";
 import { currencySetter } from "../utils/Currencyutil";
-import { secondaryColor } from "../utils/setThemeColor";
+import AuthContext from "../contexts/AuthContext";
+
 
 const Unclaimed = () => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [filters, setFilters] = useState({
-    userId: "",
-    status: "unclaimed",
-    date: {},
-    dateVal: "",
-  });
+
+const authCtx = useContext(AuthContext);
+  const user = authCtx?.user;
+ 
+  const [appliedFilters, setAppliedFilters] = useState({}); //
+
+    const filters = useMemo(
+      () => [
+        { id: "Bank_id", label: "Bank Id", type: "textfield" },
+      { id: "id", label: "Id", type: "textfield" },
+      { id: "particulars", label: "particulars", type: "textfield" },
+      { id: "handle_by", label: "Handle By", type: "textfield" },
+          { id: "daterange",  type: "daterange" },
+      ],
+      [user?.role,  appliedFilters]
+    );
 
   const fetchEntriesRef = useRef(null);
   const handleFetchRef = (fetchFn) => {
@@ -67,15 +78,7 @@ const Unclaimed = () => {
     fetchEntries();
   }, []);
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
-  };
 
-  const handleReset = () => {
-    setFilters({ userId: "", status: "unclaimed", date: {}, dateVal: "" });
-    fetchEntries();
-  };
 
   const columns = [
     { name: "ID", selector: (row) => row.id, width: "80px" },
@@ -201,6 +204,7 @@ const Unclaimed = () => {
               onFetchRef={handleFetchRef}
               endpoint={`${ApiEndpoints.GET_UNCLAIMED_ENTERIES}`}
               columns={columns}
+              filters={filters}
               // loading={loading}
               disableSelectionOnClick
             />

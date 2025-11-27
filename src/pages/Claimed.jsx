@@ -48,12 +48,12 @@ const ConfirmClaimModal = ({ open, handleClose, onConfirm, row,selectedRows }) =
       <>No row selected!</>
     ) : selectedRows?.length === 1 ? (
       <>
-        Are you sure you want to make <b>ID {selectedRows[0]?.id}</b> as paid?
+        Are you sure you want to make <b>ID {row.id}</b> as paid?
       </>
     ) : (
       <>
         Are you sure you want to make 
-        <b> {selectedRows?.length} entries</b> 
+        <b> {selectedRows?.length > 0} entries</b> 
         (IDs: {selectedRows?.map((r) => r.id).join(", ")}) as paid?
       </>
     )}
