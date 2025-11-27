@@ -212,8 +212,16 @@ const Claimed = () => {
     },
     { name: "Particulars", selector: (row) => capitalize1(row.particulars) },
     { name: "Handled By", selector: (row) => row.handle_by },
-    { name: "Credit", selector: (row) => currencySetter(row.credit) },
-    { name: "Debit", selector: (row) => currencySetter(row.debit) },
+    { name: "Credit", selector: (row) =>(
+      <span style={{color:"green"}}>
+      {currencySetter(row.credit) }
+      </span>
+    )},
+    { name: "Debit", selector: (row) =>(
+      <span style={{color:"red"}}>
+      {currencySetter(row.debit)}
+      </span>
+    ) },
     { name: "Balance", selector: (row) => currencySetter(row.balance) },
     { name: "Mode", selector: (row) => row.mop },
     { name: "Remark", selector: (row) => row.remark || "-" },
