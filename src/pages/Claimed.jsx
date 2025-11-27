@@ -225,19 +225,46 @@ const Claimed = () => {
     { name: "Balance", selector: (row) => currencySetter(row.balance) },
     { name: "Mode", selector: (row) => row.mop },
     { name: "Remark", selector: (row) => row.remark || "-" },
-    {
-      name: "Status",
-      selector: (row) => (
-        <span
-          style={{
-            color: row.status === 0 ? "orange" : "red",
-            fontWeight: 600,
-          }}
-        >
-          {row.status === 0 ? "Unclaimed" : "Claimed"}
-        </span>
-      ),
-    },
+{
+  name: "Status",
+  selector: (row) => {
+    const statusConfig = {
+      0: { 
+        label: "Unclaimed", 
+        color: "#CC7000",
+        bg: "#FFF4E5",
+         
+      },
+      1: { 
+        label: "Claimed", 
+        color: "#C40000",
+        bg: "#FFE5E5"
+      },
+    };
+
+    const cfg = statusConfig[row.status] || statusConfig[0];
+
+    return (
+      <button
+        style={{
+          padding: "4px 10px",
+          borderRadius: "8px",
+          fontSize: "12px",
+          fontWeight: 600,
+          border: "none",
+          backgroundColor: cfg.bg,
+          color: cfg.color,
+          cursor: "default",
+        }}
+      >
+        {cfg.label}
+      </button>
+    );
+  },
+  width: "140px",
+},
+
+
     {
       name: "Action",
       selector: (row) => (
