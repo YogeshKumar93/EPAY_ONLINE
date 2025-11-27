@@ -20,19 +20,19 @@ import LockOpenIcon from "@mui/icons-material/LockOpen";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 // import BlockUnblockUser from "./BlockUnblockUser";
 import ReButton from "../components/common/ReButton";
-// import CreateUser from "../components/User/createUser";
+import CreateUser from "../components/User/createUser";
 // import EditIcon from "@mui/icons-material/Edit";
 import { apiCall } from "../api/apiClient";
 // import AdWalletTransfer from "./AdWalletTransfer";
 import CommonStatus from "../components/common/CommonStatus";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-// import EditUser from "./EditUser";
-// import ViewDocuments from "./ViewDocuments";
+import EditUser from "./EditUser";
+import ViewDocuments from "./ViewDocuments";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Assignment, CurrencyRupee, VerifiedUser } from "@mui/icons-material";
 // import { AssignPlans } from "./AssignPlans";
-// import AdminCreateUser from "./AdminCreateUser";
+import AdminCreateUser from "./AdminCreateUser";
 // import AddLein from "./AddLein";
 import debounce from "lodash.debounce";
 // import { useNavigate } from "react-router-dom";
@@ -258,15 +258,15 @@ const Users = ({ query }) => {
               <ListItemText>Edit User</ListItemText>
             </MenuItem>,
 
-            <MenuItem
-              key="permissions"
-              onClick={() => {
-                handleOpenPermissions(row);
-                handleMenuClose();
-              }}
-            >
-              <ListItemText>Edit Permissions</ListItemText>
-            </MenuItem>,
+            // <MenuItem
+            //   key="permissions"
+            //   onClick={() => {
+            //     handleOpenPermissions(row);
+            //     handleMenuClose();
+            //   }}
+            // >
+            //   <ListItemText>Edit Permissions</ListItemText>
+            // </MenuItem>,
 
             <MenuItem
               key="documents"
@@ -278,36 +278,36 @@ const Users = ({ query }) => {
               <ListItemText>View Documents</ListItemText>
             </MenuItem>,
 
-            <MenuItem
-              key="assign_plan"
-              onClick={() => {
-                handleOpenAssignPlans(row);
-                handleMenuClose();
-              }}
-            >
-              <ListItemText>Assign Plan</ListItemText>
-            </MenuItem>,
-            <MenuItem
-              key="change_parent"
-              onClick={() => {
-                handleOpenChangeParent(row);
-                handleMenuClose();
-              }}
-            >
-              <ListItemText>Change Parent</ListItemText>
-            </MenuItem>,
-            <MenuItem
-              key="add_inst"
-              onClick={() => {
-                setSelectedUser(row); // <--- store selected user
-                setOpenAddInst(true); // <--- open modal
-                handleMenuClose();
-              }}
-            >
-              <ListItemText>Add InstId</ListItemText>
-            </MenuItem>,
+            // <MenuItem
+            //   key="assign_plan"
+            //   onClick={() => {
+            //     handleOpenAssignPlans(row);
+            //     handleMenuClose();
+            //   }}
+            // >
+            //   <ListItemText>Assign Plan</ListItemText>
+            // </MenuItem>,
+            // <MenuItem
+            //   key="change_parent"
+            //   onClick={() => {
+            //     handleOpenChangeParent(row);
+            //     handleMenuClose();
+            //   }}
+            // >
+            //   <ListItemText>Change Parent</ListItemText>
+            // </MenuItem>,
+            // <MenuItem
+            //   key="add_inst"
+            //   onClick={() => {
+            //     setSelectedUser(row); // <--- store selected user
+            //     setOpenAddInst(true); // <--- open modal
+            //     handleMenuClose();
+            //   }}
+            // >
+            //   <ListItemText>Add InstId</ListItemText>
+            // </MenuItem>,
           ]}
-
+{/* 
           <MenuItem
             key="lein"
             onClick={() => {
@@ -316,7 +316,7 @@ const Users = ({ query }) => {
             }}
           >
             <ListItemText>Lein Amount</ListItemText>
-          </MenuItem>
+          </MenuItem> */}
         </Menu>
       </Box>
     );
@@ -328,13 +328,13 @@ const Users = ({ query }) => {
     const hierarchy = [
       "sadm",
       "adm",
-      "zsm",
-      "asm",
-      "md",
-      "di",
-      "ret",
-      "dd",
-      "api",
+      // "zsm",
+      // "asm",
+      // "md",
+      // "di",
+      // "ret",
+      // "dd",
+      // "api",
     ];
 
     const hideRoles = (() => {
@@ -459,101 +459,11 @@ const Users = ({ query }) => {
         ),
         width: "100px",
       },
-      ...(userRole.role !== "di" && userRole.role !== "md"
-        ? [
-            {
-              name: "Parent Est.",
-              selector: (row) => {
-                const parentName = userMap[row.parent] || "-";
-                return (
-                  // <Tooltip title={parentName}>
-                  <div style={{ textAlign: "left", cursor: "pointer" }}>
-                    {row.parent_establishment || "--"}
-                  </div>
-                  // </Tooltip>
-                );
-              },
-            },
-          ]
-        : []),
-      {
-        name: "W1",
-        selector: (row) => (
-          <div style={{ textAlign: "left", cursor: "pointer" }}>
-            ₹ {(row.w1 / 100).toFixed(2)}
-          </div>
-        ),
-      },
-      ...(userRole.role !== "md"
-        ? [
-            {
-              name: "W2",
-              selector: (row) => (
-                <div style={{ textAlign: "left", cursor: "pointer" }}>
-                  ₹ {(row.w2 / 100).toFixed(2)}
-                </div>
-              ),
-            },
-          ]
-        : []),
-      ...(userRole.role !== "di" && userRole.role !== "md"
-        ? [
-            {
-              name: "W3",
-              selector: (row) => (
-                <div style={{ textAlign: "left", cursor: "pointer" }}>
-                  ₹ {row.w3}
-                </div>
-              ),
-            },
-            {
-              name: "Lien",
-              selector: (row) => (
-                <Tooltip title={row.lien}>
-                  <div style={{ textAlign: "left", cursor: "pointer" }}>
-                    {row.lien}
-                  </div>
-                </Tooltip>
-              ),
-            },
-          ]
-        : []),
+    
+     
+       
     ];
-    if (["adm", "sadm"].includes(userRole.role)) {
-      baseColumns.push({
-        name: "KYC",
-        selector: (row) => {
-          let iconColor = "";
-          let tooltipTitle = "";
-
-          switch (row.status) {
-            case 1:
-              iconColor = "success.main";
-              tooltipTitle = "KYC Approved";
-              break;
-            case 2:
-              iconColor = "warning.main";
-              tooltipTitle = "KYC Pending";
-              break;
-            case 3:
-              iconColor = "error.main";
-              tooltipTitle = "KYC Image not Uploaded";
-              break;
-            default:
-              iconColor = "text.disabled";
-              tooltipTitle = "KYC Status Unknown";
-          }
-
-          return (
-            <Tooltip title={tooltipTitle}>
-              <IconButton size="small" sx={{ color: iconColor }}>
-                <VerifiedUser fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          );
-        },
-      });
-    }
+  
 
     // Status column
     baseColumns.push({
@@ -591,41 +501,16 @@ const Users = ({ query }) => {
       },
     });
 
-    if (userRole.role === "sadm") {
-      baseColumns.push({
-        name: "Chg Role",
-        selector: (row) => (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Tooltip title="Change Role">
-              <IconButton
-                size="small"
-                sx={{ color: "secondary.main" }}
-                onClick={() => handleChangeRole(row)} // open your ChangeRoleModal
-              >
-                <ManageAccountsIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        ),
-      });
-    }
+   
 
     // Actions column
-    if (["adm", "di", "md", "sadm"].includes(userRole?.role)) {
+    if (["adm",  "sadm"].includes(userRole?.role)) {
       baseColumns.push({
         name: "Actions",
         selector: (row) => (
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <ActionMenu row={row} />
-            <Box
-              sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
-              onClick={() => {
-                handleOpenWalletTransfer(row);
-                // handleMenuClose();
-              }}
-            >
-              <CurrencyRupee fontSize="small" sx={{ color: "green" }} />
-            </Box>
+           
           </div>
         ),
       });
@@ -646,7 +531,7 @@ const Users = ({ query }) => {
         enableActionsHover={true}
         customHeader={
           <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-            {["di", "md"].includes(userRole.role) && (
+            {["sadm", "adm"].includes(userRole.role) && (
               <ReButton
                 label="Add User"
                 onClick={() => setOpenCreateUser(true)}
@@ -677,13 +562,13 @@ const Users = ({ query }) => {
         }
       />
 
-      {/* {openCreateUser && (
+      {openCreateUser && (
         <CreateUser
           open={openCreateUser}
           onClose={() => setOpenCreateUser(false)}
           onFetchRef={refreshUsers}
         />
-      )} */}
+      )}
       {/* {openAddInst && selectedUser && (
         <AddInst
           open={openAddInst}
@@ -693,22 +578,22 @@ const Users = ({ query }) => {
         />
       )} */}
 
-      {/* {createadmuser && (
+      {createadmuser && (
         <AdminCreateUser
           open={createadmuser}
           onClose={() => setCreateAdmUser(false)}
           onFetchRef={refreshUsers}
         />
-      )} */}
+      )}
 
-      {/* {openEditUser && selectedUser && (
+      {openEditUser && selectedUser && (
         <EditUser
           open={openEditUser}
           onClose={handleCloseEditUser}
           user={selectedUser}
           onFetchRef={refreshUsers}
         />
-      )} */}
+      )}
 
       {/* {openPermissions && selectedUser && (
         <PermissionsModal
@@ -744,13 +629,13 @@ const Users = ({ query }) => {
         />
       )} */}
 
-      {/* {openViewDocuments && selectedUser && (
+      {openViewDocuments && selectedUser && (
         <ViewDocuments
           open={openViewDocuments}
           onClose={handleCloseViewDocuments}
           user={selectedUser}
         />
-      )} */}
+      )}
       {/* {openAssignPlans && selectedUser && (
         <AssignPlans
           open={openAssignPlans}
