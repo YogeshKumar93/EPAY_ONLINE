@@ -45,7 +45,7 @@ const ConfirmClaimModal = ({ open, handleClose, onConfirm, row }) => {
 
       <DialogContent sx={{ mt: 1 }}>
         <span style={{ fontSize: "1.2rem" }}>
-          Are you sure you want to make <b>ID {row?.id}</b> as paid?
+          Are you sure you want to make <b>ID {row?.id}  </b> as paid?
         </span>
       </DialogContent>
 
