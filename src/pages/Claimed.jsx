@@ -30,7 +30,7 @@ import { useToast } from "../utils/ToastContext";
 import AuthContext from "../contexts/AuthContext";
 import SyncAltIcon from "@mui/icons-material/SyncAlt";
 
-const ConfirmClaimModal = ({ open, handleClose, onConfirm, row }) => {
+const ConfirmClaimModal = ({ open, handleClose, onConfirm, row,selectedRows }) => {
   return (
     <Dialog
       open={open}
@@ -42,11 +42,24 @@ const ConfirmClaimModal = ({ open, handleClose, onConfirm, row }) => {
         Confirm Action
       </DialogTitle>
 
-      <DialogContent sx={{ mt: 1 }}>
-        <span style={{ fontSize: "1.2rem" }}>
-          Are you sure you want to make <b>ID {row?.id} </b> as paid?
-        </span>
-      </DialogContent>
+     <DialogContent sx={{ mt: 1 }}>
+  <span style={{ fontSize: "1.2rem" }}>
+    {selectedRows?.length === 0 ? (
+      <>No row selected!</>
+    ) : selectedRows?.length === 1 ? (
+      <>
+        Are you sure you want to make <b>ID {selectedRows[0]?.id}</b> as paid?
+      </>
+    ) : (
+      <>
+        Are you sure you want to make 
+        <b> {selectedRows?.length} entries</b> 
+        (IDs: {selectedRows?.map((r) => r.id).join(", ")}) as paid?
+      </>
+    )}
+  </span>
+</DialogContent>
+
 
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button
