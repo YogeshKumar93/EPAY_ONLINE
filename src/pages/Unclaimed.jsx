@@ -148,56 +148,7 @@ const authCtx = useContext(AuthContext);
 
       {!loading && (
         <Box >
-          <Box
-            mb={2}
-            sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}
-          >
-            {/* <Box sx={{ display: "flex", gap: 1 }}>
-              <TextField
-                label="User ID"
-                name="userId"
-                value={filters.userId}
-                onChange={handleFilterChange}
-                size="small"
-              />
-              <TextField
-                select
-                label="Status"
-                name="status"
-                value={filters.status}
-                onChange={handleFilterChange}
-                size="small"
-              >
-                <MenuItem value="unclaimed">Unclaimed</MenuItem>
-                <MenuItem value="claimed">Claimed</MenuItem>
-              </TextField>
-              <Button variant="contained" onClick={fetchEntries}>
-                Search
-              </Button>
-              <Button onClick={handleReset}>Reset</Button>
-            </Box> */}
-            {/* 
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <Tooltip title="Download Sample Excel">
-                <IconButton
-                  size="small"
-                  sx={{
-                    backgroundColor: "#6C4BC7",
-                    color: "#fff",
-                    "&:hover": { backgroundColor: secondaryColor() },
-                  }}
-                  onClick={() => {
-                    const link = document.createElement("a");
-                    link.href = `${process.env.PUBLIC_URL}/sample_unclaimed.xlsx`;
-                    link.download = "sample_unclaimed.xlsx";
-                    link.click();
-                  }}
-                >
-                  <Icon path={mdiFileExcel} size={1} />
-                </IconButton>
-              </Tooltip>
-            </Box> */}
-          </Box>
+      
 
           <Box style={{ width: "100%" }}>
             <CommonTable
