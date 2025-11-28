@@ -31,6 +31,8 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
   const { showToast } = useToast();
   const [submitting, setSubmitting] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
+  const [touched, setTouched] = useState({});
+  const [submitAttempted, setSubmitAttempted] = useState(false);
 
   // ROLE
   const [role, setRole] = useState("");
@@ -74,29 +76,32 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
   ];
 
   // Prefill edit data - SINGLE useEffect
+  const formatDate = (date) => {
+    if (!date) return "";
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return "";
+    return d.toISOString().split("T")[0];
+  };
+
   useEffect(() => {
     if (open && editData) {
-      // Prefill role
       setRole(editData.role || "adm");
 
-      // Prefill user
       setUser({
         name: editData.user?.name || "",
         email: editData.user?.email || "",
         mobile: editData.user?.mobile || "",
         pan: editData.user?.pan || "",
         gst: editData.user?.gst || "",
-        start_date: editData.user?.start_date || "",
-        end_date: editData.user?.end_date || "",
+        start_date: formatDate(editData.user?.start_date),
+        end_date: formatDate(editData.user?.end_date),
         status: editData.user?.status === 1,
       });
 
-      // Prefill business
       setBusiness({
         business_name: editData.business?.business_name || "",
       });
 
-      // Prefill business address
       setBusinessAddress({
         address_line1: editData.business_address?.address_line1 || "",
         address_line2: editData.business_address?.address_line2 || "",
@@ -105,79 +110,172 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
         pincode: editData.business_address?.pincode || "",
       });
 
-      // Reset step to first
       setActiveStep(0);
+      setTouched({});
+      setSubmitAttempted(false);
     }
   }, [open, editData]);
 
-  // Generic change handlers
-  const handleUserChange = (field, value) =>
+  // Generic change handlers with touch tracking
+  const handleUserChange = (field, value) => {
     setUser((prev) => ({ ...prev, [field]: value }));
+    setTouched(prev => ({ ...prev, [field]: true }));
+  };
 
-  const handleBusinessChange = (field, value) =>
+  const handleBusinessChange = (field, value) => {
     setBusiness((prev) => ({ ...prev, [field]: value }));
+    setTouched(prev => ({ ...prev, [field]: true }));
+  };
 
-  const handleBusinessAddressChange = (field, value) =>
+  const handleBusinessAddressChange = (field, value) => {
     setBusinessAddress((prev) => ({ ...prev, [field]: value }));
+    setTouched(prev => ({ ...prev, [field]: true }));
+  };
 
-  // Validation
-  const validate = () => {
-    const errors = [];
+  // Handle blur events for touch tracking
+  const handleBlur = (field) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+  };
 
-    if (!user.name.trim()) errors.push("User name is required");
-    if (!user.email.trim()) errors.push("User email is required");
-    if (!user.mobile.trim()) errors.push("User mobile is required");
-    if (!user.start_date) errors.push("User start date is required");
-    if (!user.end_date) errors.push("User end date is required");
-    if (!business.business_name.trim())
-      errors.push("Business name is required");
-    if (!businessAddress.state.trim())
-      errors.push("Business state is required");
-    if (!businessAddress.pincode.trim())
-      errors.push("Business pincode is required");
+  // Validation functions
+  const validateEmail = (email) => {
+    if (!email) return "Email is required";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return "Please enter a valid email address";
+    return "";
+  };
 
-    return errors;
+  const validateMobile = (mobile) => {
+    if (!mobile) return "Mobile number is required";
+    const mobileRegex = /^[0-9]{10}$/;
+    if (!mobileRegex.test(mobile)) return "Please enter a valid 10-digit mobile number";
+    return "";
+  };
+
+  const validatePAN = (pan) => {
+    if (pan && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan)) {
+      return "Please enter a valid PAN number";
+    }
+    return "";
+  };
+
+  const validateGST = (gst) => {
+    if (gst && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(gst)) {
+      return "Please enter a valid GST number";
+    }
+    return "";
+  };
+
+  const validatePincode = (pincode) => {
+    if (!pincode) return "Pincode is required";
+    const pincodeRegex = /^[0-9]{6}$/;
+    if (!pincodeRegex.test(pincode)) return "Please enter a valid 6-digit pincode";
+    return "";
+  };
+
+  const validateDates = (startDate, endDate) => {
+    if (!startDate) return "Start date is required";
+    if (!endDate) return "End date is required";
+    if (new Date(startDate) > new Date(endDate)) {
+      return "End date must be after or equal to start date";
+    }
+    return "";
+  };
+
+  // Get field errors - industry standard: show errors only after touch/submit attempt
+  const getFieldError = (field, value, additionalData = {}) => {
+    const shouldShowError = touched[field] || submitAttempted;
+    
+    if (!shouldShowError) return "";
+
+    switch (field) {
+      case 'email':
+        return validateEmail(value);
+      case 'mobile':
+        return validateMobile(value);
+      case 'pan':
+        return validatePAN(value);
+      case 'gst':
+        return validateGST(value);
+      case 'pincode':
+        return validatePincode(value);
+      case 'dates':
+        return validateDates(additionalData.startDate, additionalData.endDate);
+      case 'name':
+        return !value ? "Full name is required" : "";
+      case 'business_name':
+        return !value ? "Business name is required" : "";
+      case 'address_line1':
+        return !value ? "Address Line 1 is required" : "";
+      case 'address_line2':
+        return !value ? "Address Line 2 is required" : "";
+      case 'city':
+        return !value ? "City is required" : "";
+      case 'state':
+        return !value ? "State is required" : "";
+      case 'role':
+        return !value ? "Role is required" : "";
+      default:
+        return "";
+    }
+  };
+
+  // Check if step has errors
+  const hasStepErrors = (step) => {
+    switch (step) {
+      case 0:
+        return !!getFieldError('role', role);
+      case 1:
+        return !!getFieldError('name', user.name) ||
+               !!getFieldError('email', user.email) ||
+               !!getFieldError('mobile', user.mobile) ||
+               !!getFieldError('pan', user.pan) ||
+               !!getFieldError('gst', user.gst) ||
+               !!getFieldError('dates', '', { startDate: user.start_date, endDate: user.end_date });
+      case 2:
+        return !!getFieldError('business_name', business.business_name) ||
+               !!getFieldError('address_line1', businessAddress.address_line1) ||
+               !!getFieldError('address_line2', businessAddress.address_line2) ||
+               !!getFieldError('city', businessAddress.city) ||
+               !!getFieldError('state', businessAddress.state) ||
+               !!getFieldError('pincode', businessAddress.pincode);
+      default:
+        return false;
+    }
   };
 
   // Step handlers
   const handleNext = () => {
-    let stepErrors = [];
-
-    if (activeStep === 0) {
-      // Step 1: Role - no required fields
-    }
-
-    if (activeStep === 1) {
-      if (!user.name.trim()) stepErrors.push("User name is required");
-      if (!user.email.trim()) stepErrors.push("User email is required");
-      if (!user.mobile.trim()) stepErrors.push("User mobile is required");
-      if (!user.start_date) stepErrors.push("User start date is required");
-      if (!user.end_date) stepErrors.push("User end date is required");
-    }
-
-    if (activeStep === 2) {
-      if (!business.business_name.trim())
-        stepErrors.push("Business name is required");
-      if (!businessAddress.state.trim())
-        stepErrors.push("Business state is required");
-      if (!businessAddress.pincode.trim())
-        stepErrors.push("Business pincode is required");
-    }
-
-    if (stepErrors.length > 0) {
-      showToast("Please fill all required fields", "error");
+    setSubmitAttempted(true);
+    
+    if (hasStepErrors(activeStep)) {
+      showToast("Please fix all errors before proceeding", "error");
       return;
     }
 
     setActiveStep((prev) => prev + 1);
+    setSubmitAttempted(false);
   };
 
-  const handleBack = () => setActiveStep((prev) => prev - 1);
+  const handleBack = () => {
+    setActiveStep((prev) => prev - 1);
+    setSubmitAttempted(false);
+  };
 
   const handleSubmit = async () => {
-    const errors = validate();
-    if (errors.length > 0) {
-      errors.forEach((e) => showToast(e, "error"));
+    setSubmitAttempted(true);
+
+    // Check if any step has errors
+    let hasErrors = false;
+    for (let step = 0; step < steps.length; step++) {
+      if (hasStepErrors(step)) {
+        hasErrors = true;
+        break;
+      }
+    }
+
+    if (hasErrors) {
+      showToast("Please fix all errors before submitting", "error");
       return;
     }
 
@@ -225,12 +323,13 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
                 <span style={{ fontSize: '1.25rem' }}>👤</span>
                 Role Selection
               </Typography>
-              <FormControl fullWidth size="small">
+              <FormControl fullWidth size="small" error={!!getFieldError('role', role)}>
                 <InputLabel>Role *</InputLabel>
                 <Select
                   value={role}
                   label="Role *"
                   onChange={(e) => setRole(e.target.value)}
+                  onBlur={() => handleBlur('role')}
                 >
                   {rolesList.map((r) => (
                     <MenuItem key={r.value} value={r.value}>
@@ -238,6 +337,11 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
                     </MenuItem>
                   ))}
                 </Select>
+                {getFieldError('role', role) && (
+                  <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+                    {getFieldError('role', role)}
+                  </Typography>
+                )}
               </FormControl>
             </CardContent>
           </Card>
@@ -260,8 +364,11 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
                       label="Full Name *"
                       value={user.name}
                       onChange={(e) => handleUserChange("name", e.target.value)}
+                      onBlur={() => handleBlur('name')}
                       size="small"
                       fullWidth
+                      error={!!getFieldError('name', user.name)}
+                      helperText={getFieldError('name', user.name)}
                     />
                   </Grid>
 
@@ -270,9 +377,12 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
                       label="Email *"
                       value={user.email}
                       onChange={(e) => handleUserChange("email", e.target.value)}
+                      onBlur={() => handleBlur('email')}
                       size="small"
                       fullWidth
                       type="email"
+                      error={!!getFieldError('email', user.email)}
+                      helperText={getFieldError('email', user.email)}
                     />
                   </Grid>
 
@@ -281,8 +391,11 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
                       label="Mobile *"
                       value={user.mobile}
                       onChange={(e) => handleUserChange("mobile", e.target.value)}
+                      onBlur={() => handleBlur('mobile')}
                       size="small"
                       fullWidth
+                      error={!!getFieldError('mobile', user.mobile)}
+                      helperText={getFieldError('mobile', user.mobile)}
                     />
                   </Grid>
 
@@ -290,9 +403,12 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
                     <TextField
                       label="PAN Number"
                       value={user.pan}
-                      onChange={(e) => handleUserChange("pan", e.target.value)}
+                      onChange={(e) => handleUserChange("pan", e.target.value.toUpperCase())}
+                      onBlur={() => handleBlur('pan')}
                       size="small"
                       fullWidth
+                      error={!!getFieldError('pan', user.pan)}
+                      helperText={getFieldError('pan', user.pan)}
                     />
                   </Grid>
 
@@ -300,9 +416,12 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
                     <TextField
                       label="GST Number"
                       value={user.gst}
-                      onChange={(e) => handleUserChange("gst", e.target.value)}
+                      onChange={(e) => handleUserChange("gst", e.target.value.toUpperCase())}
+                      onBlur={() => handleBlur('gst')}
                       size="small"
                       fullWidth
+                      error={!!getFieldError('gst', user.gst)}
+                      helperText={getFieldError('gst', user.gst)}
                     />
                   </Grid>
                 </Grid>
@@ -324,9 +443,12 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
                       type="date"
                       value={user.start_date}
                       onChange={(e) => handleUserChange("start_date", e.target.value)}
+                      onBlur={() => handleBlur('start_date')}
                       size="small"
                       InputLabelProps={{ shrink: true }}
                       fullWidth
+                      error={!!getFieldError('dates', '', { startDate: user.start_date, endDate: user.end_date })}
+                      helperText={getFieldError('dates', '', { startDate: user.start_date, endDate: user.end_date })?.includes('Start date') ? getFieldError('dates', '', { startDate: user.start_date, endDate: user.end_date }) : ''}
                     />
                   </Grid>
 
@@ -336,9 +458,12 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
                       type="date"
                       value={user.end_date}
                       onChange={(e) => handleUserChange("end_date", e.target.value)}
+                      onBlur={() => handleBlur('end_date')}
                       size="small"
                       InputLabelProps={{ shrink: true }}
                       fullWidth
+                      error={!!getFieldError('dates', '', { startDate: user.start_date, endDate: user.end_date })}
+                      helperText={getFieldError('dates', '', { startDate: user.start_date, endDate: user.end_date })?.includes('End date') ? getFieldError('dates', '', { startDate: user.start_date, endDate: user.end_date }) : ''}
                     />
                   </Grid>
                 </Grid>
@@ -378,8 +503,11 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
                   label="Business Name *"
                   value={business.business_name}
                   onChange={(e) => handleBusinessChange("business_name", e.target.value)}
+                  onBlur={() => handleBlur('business_name')}
                   size="small"
                   fullWidth
+                  error={!!getFieldError('business_name', business.business_name)}
+                  helperText={getFieldError('business_name', business.business_name)}
                 />
               </CardContent>
             </Card>
@@ -395,29 +523,38 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
                     <TextField
-                      label="Address Line 1"
+                      label="Address Line 1 *"
                       value={businessAddress.address_line1}
                       onChange={(e) => handleBusinessAddressChange("address_line1", e.target.value)}
+                      onBlur={() => handleBlur('address_line1')}
                       size="small"
                       fullWidth
+                      error={!!getFieldError('address_line1', businessAddress.address_line1)}
+                      helperText={getFieldError('address_line1', businessAddress.address_line1)}
                     />
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
-                      label="Address Line 2"
+                      label="Address Line 2 *"
                       value={businessAddress.address_line2}
                       onChange={(e) => handleBusinessAddressChange("address_line2", e.target.value)}
+                      onBlur={() => handleBlur('address_line2')}
                       size="small"
                       fullWidth
+                      error={!!getFieldError('address_line2', businessAddress.address_line2)}
+                      helperText={getFieldError('address_line2', businessAddress.address_line2)}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <TextField
-                      label="City"
+                      label="City *"
                       value={businessAddress.city}
                       onChange={(e) => handleBusinessAddressChange("city", e.target.value)}
+                      onBlur={() => handleBlur('city')}
                       size="small"
                       fullWidth
+                      error={!!getFieldError('city', businessAddress.city)}
+                      helperText={getFieldError('city', businessAddress.city)}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -425,8 +562,11 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
                       label="State *"
                       value={businessAddress.state}
                       onChange={(e) => handleBusinessAddressChange("state", e.target.value)}
+                      onBlur={() => handleBlur('state')}
                       size="small"
                       fullWidth
+                      error={!!getFieldError('state', businessAddress.state)}
+                      helperText={getFieldError('state', businessAddress.state)}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -434,8 +574,11 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
                       label="Pincode *"
                       value={businessAddress.pincode}
                       onChange={(e) => handleBusinessAddressChange("pincode", e.target.value)}
+                      onBlur={() => handleBlur('pincode')}
                       size="small"
                       fullWidth
+                      error={!!getFieldError('pincode', businessAddress.pincode)}
+                      helperText={getFieldError('pincode', businessAddress.pincode)}
                     />
                   </Grid>
                 </Grid>
