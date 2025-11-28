@@ -153,6 +153,8 @@ const CommonTable = ({
   exportFileName = "TableData", // New prop for export file name
   exportEndpoint, // New prop for export API endpoint (can be different from main endpoint)
   exportPayload,
+  onSelectionChange, // Add this prop
+  selectedRows = [], // Add this prop
   onExportComplete,
 }) => {
   const { afterToday } = DateRangePicker;
@@ -170,6 +172,8 @@ const CommonTable = ({
   const authCtx = useContext(AuthContext);
   const [exportFilters, setExportFilters] = useState({}); // ✅ Use state for export filters
   const [resetKey, setResetKey] = useState(0);
+  // const [selectedRows, setSelectedRows] = useState([]); // array of selected row IDs
+  const allRowIds = useMemo(() => data.map((row) => row.id), [data]); // assumes each row has unique `id`
 
   const user = authCtx?.user;
   // Use refs to track values without causing re-renders
@@ -199,6 +203,25 @@ const CommonTable = ({
     });
     return values;
   }, [availableFilters]);
+  // Select/unselect all
+const handleSelectAll = (event) => {
+  if (event.target.checked) {
+    onSelectionChange?.(data); // Pass full row objects
+  } else {
+    onSelectionChange?.([]);
+  }
+};
+  // Select/unselect individual row - use the prop function
+  const handleSelectRow = (row) => {
+    const isSelected = selectedRows.some(
+      (selectedRow) => selectedRow.id === row.id
+    );
+    const newSelectedRows = isSelected
+      ? selectedRows.filter((selectedRow) => selectedRow.id !== row.id)
+      : [...selectedRows, row];
+    onSelectionChange?.(newSelectedRows);
+  };
+
   // useEffect(() => {
   //   setFilterValues(initialFilterValues);
   //   setAppliedFilters(initialFilterValues);
@@ -971,6 +994,16 @@ const CommonTable = ({
           onMouseEnter={() => enableActionsHover && setHoveredRow(row.id)} // ✅ hover sirf jab enableActionsHover true ho
           onMouseLeave={() => enableActionsHover && setHoveredRow(null)}
         >
+          <td style={{ padding: "6px 10px", textAlign: "center" }}>
+            <input
+              type="checkbox"
+              checked={selectedRows.some(
+                (selectedRow) => selectedRow.id === row.id
+              )}
+              onChange={() => handleSelectRow(row)}
+            />
+          </td>
+
           {initialColumns.map((column, colIndex) => (
             <td
               key={colIndex}
@@ -1015,35 +1048,58 @@ const CommonTable = ({
         </tr>
       </React.Fragment>
     ));
-  }, [loading, data, initialColumns, hoveredRow, enableActionsHover]);
+  }, [loading, data, initialColumns, hoveredRow, enableActionsHover, selectedRows]);
 
   // Memoized table headers
-  const tableHeaders = useMemo(
-    () =>
-      initialColumns.map((column, index) => (
-        <th
-          key={index}
-          style={{
-            backgroundColor: "#ebecedff",
-            boxShadow: " rgba(0,0,0,0.08)", // ✅ same as row
-            // borderRadius: "8px",
-            marginBottom: "12px",
-            padding: "12px 16px",
-            verticalAlign: "middle",
-            textAlign: "left",
-            fontSize: "14.5px",
-            lineHeight: "1.3",
-            fontFamily: "DM Sans, sans-serif",
-            fontWeight: 600,
-            color: "#492077", // header ka thoda dark color
-            border: "none",
-          }}
-        >
-          {column.name}
-        </th>
-      )),
-    [initialColumns]
-  );
+// Memoized table headers
+const tableHeaders = useMemo(
+  () => [
+    <th key="select-all" style={{ padding: "12px" }}>
+      <input
+        type="checkbox"
+        checked={
+          selectedRows.length > 0 && 
+          selectedRows.length === data.length && 
+          data.length > 0
+        }
+        indeterminate={
+          selectedRows.length > 0 && 
+          selectedRows.length < data.length
+        }
+        onChange={handleSelectAll}
+      />
+    </th>,
+    ...initialColumns.map((column, index) => (
+      <th
+        key={index}
+        style={{
+          backgroundColor: "#ebecedff",
+          padding: "12px 16px",
+          verticalAlign: "middle",
+          textAlign: "left",
+          fontSize: "14.5px",
+          lineHeight: "1.3",
+          fontFamily: "DM Sans, sans-serif",
+          fontWeight: 600,
+          color: "#492077",
+          border: "none",
+        }}
+      >
+        {column.name}
+      </th>
+    )),
+  ],
+  [initialColumns, selectedRows, data]
+);
+
+  // In the table rows section, update the checkbox:
+  // <td style={{ padding: "6px 10px", textAlign: "center" }}>
+  //   <input
+  //     type="checkbox"
+  //     checked={selectedRows.includes(row.id)}
+  //     onChange={() => handleSelectRow(row.id)}
+  //   />
+  // </td>;
 
   return (
     <Box>
