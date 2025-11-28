@@ -100,10 +100,11 @@ const Claimed = () => {
 
   const refreshEntries = () => fetchEntriesRef.current && fetchEntriesRef.current();
 
-  const handlePrint = (row) => {
-    localStorage.setItem("PRINT_DATA", JSON.stringify(row));
-    window.open("/print-claimedreceipt", "_blank");
-  };
+  const handlePrint = (rows) => {
+  localStorage.setItem("PRINT_DATA", JSON.stringify(rows));
+  window.open("/print-claimedreceipt", "_blank");
+};
+
 
 
   /* ---------------- UPDATE CLAIMED ---------------- */
@@ -320,7 +321,8 @@ const Claimed = () => {
               <CheckCircleOutlineIcon />
             </IconButton>
 
-            <IconButton size="small" onClick={() => handlePrint(row)} sx={{ color: "#6C4BC7" }}>
+            <IconButton size="small" onClick={() => handlePrint([row])}
+sx={{ color: "#6C4BC7" }}>
               <PrintIcon fontSize="small" />
             </IconButton>
           </>
@@ -408,20 +410,21 @@ const Claimed = () => {
           />
 
           {/* CONFIRM MODAL WITH AUTO PRINT */}
-          <ConfirmClaimModal
-            open={openConfirm}
-            handleClose={() => setOpenConfirm(false)}
-            row={rowToConfirm}
-            onConfirm={async (rows) => {
-              setOpenConfirm(false);
+    <ConfirmClaimModal
+  open={openConfirm}
+  handleClose={() => setOpenConfirm(false)}
+  row={rowToConfirm}
+  onConfirm={async (rows) => {
+    setOpenConfirm(false);
 
-              const success = await handleUpdateClaimed(rows);
+    const success = await handleUpdateClaimed(rows);
 
-              if (success) {
-                rows.forEach((r) => handlePrint(r)); // 🔥 AUTO PRINT HERE
-              }
-            }}
-          />
+    if (success) {
+      handlePrint(rows); // 🔥 PRINT MULTIPLE ROWS TOGETHER
+    }
+  }}
+/>
+
         </Box>
       )}
     </>

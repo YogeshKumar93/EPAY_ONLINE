@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Divider } from "@mui/material";
- 
+import { Box, Button } from "@mui/material";
 
 const PrintClaimedReceipt = () => {
-  const [row, setRow] = useState(null);
+  const [rows, setRows] = useState([]);
 
   useEffect(() => {
     const stored = localStorage.getItem("PRINT_DATA");
-    if (stored) setRow(JSON.parse(stored));
+    if (!stored) return;
+
+    const parsed = JSON.parse(stored);
+
+    // Ensure always an array
+    setRows(Array.isArray(parsed) ? parsed : [parsed]);
   }, []);
 
-  if (!row) return <h2>No Data Found</h2>;
+  if (!rows.length) return <h2>No Data Found</h2>;
 
   const handlePrint = () => window.print();
 
@@ -24,24 +28,16 @@ const PrintClaimedReceipt = () => {
         border: "1px solid #ccc",
         borderRadius: "10px",
         background: "#fff",
-        overflow: "hidden",
       }}
     >
-      
-
-     
-
-     
-
-      {/* HORIZONTAL TABLE */}
-      <Box sx={{ marginTop: 3, overflowX: "auto" }}>
+      {/* TABLE */}
+      <Box sx={{ marginTop: 2, overflowX: "auto" }}>
         <table
           style={{
             width: "100%",
             borderCollapse: "collapse",
             border: "1px solid #ddd",
             fontSize: "14px",
-            background: "rgba(255,255,255,0.85)",
           }}
         >
           <thead>
@@ -67,29 +63,32 @@ const PrintClaimedReceipt = () => {
           </thead>
 
           <tbody>
-            <tr>
-              {[
-                row.id,
-                row.bank_id,
-                row.date,
-                row.mop,
-                row.utr,
-                row.particulars,
-                row.credit,
-                row.debit,
-                row.balance,
-                row.remark,
-                row.status === 0 ? "Unclaimed" : "Claimed",
-              ].map((value, index) => (
-                <td key={index} style={tdStyle}>
-                  {value ? value : "N/A"}
-                </td>
-              ))}
-            </tr>
+            {rows.map((row, idx) => (
+              <tr key={idx}>
+                {[
+                  row.id,
+                  row.bank_id,
+                  row.date,
+                  row.mop,
+                  row.utr,
+                  row.particulars,
+                  row.credit,
+                  row.debit,
+                  row.balance,
+                  row.remark,
+                  row.status === 0 ? "Unclaimed" : "Claimed",
+                ].map((value, i) => (
+                  <td key={i} style={tdStyle}>
+                    {value ?? "N/A"}
+                  </td>
+                ))}
+              </tr>
+            ))}
           </tbody>
         </table>
       </Box>
 
+      {/* PRINT BUTTON */}
       <Box sx={{ textAlign: "center", marginTop: 4 }}>
         <Button variant="contained" onClick={handlePrint}>
           Print Receipt
