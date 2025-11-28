@@ -424,7 +424,7 @@ const Users = ({ query }) => {
         name: "Date/Time",
         selector: (row) => (
           <div style={{ textAlign: "left" }}>
-            {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
+            {ddmmyy(row?.created_at)} {dateToTime(row?.created_at)}
           </div>
         ),
       },
@@ -491,7 +491,7 @@ const Users = ({ query }) => {
         if (["adm", "sadm"].includes(userRole.role)) {
           return (
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              {row.is_active === 1 ? (
+              {row?.is_active === 1 ? (
                 <Tooltip title="Click to Block">
                   <IconButton
                     size="small"
