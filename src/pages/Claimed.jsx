@@ -354,7 +354,7 @@ const handleUpdateClaimed = async (rows) => {
         selector: (row) => (
           <>
             <IconButton
-              color="primary"
+              color="secondary"
               onClick={() => {
                 setRowToConfirm(row);
                 setOpenConfirm(true);
@@ -403,6 +403,7 @@ const handleUpdateClaimed = async (rows) => {
                     <Button
                       variant="contained"
                       size="small"
+                      color="secondary"
                       onClick={() => {
                         if (selectedRows.length === 0) {
                           showToast("error", "Please select entries");
