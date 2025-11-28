@@ -17,7 +17,7 @@ const Unclaimed = () => {
 
   const [dateVal, setDateVal] = useState(null);       // for UI
   const [dateFilter, setDateFilter] = useState({});   // for API
-
+  const [appliedFilters, setAppliedFilters] = useState({});
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
 
@@ -30,8 +30,18 @@ const Unclaimed = () => {
       { id: "handle_by", label: "Handle By", type: "textfield" },
       { id: "daterange", type: "daterange" },
     ],
-    []
+    [user?.role,appliedFilters]
   );
+
+  const filterRows = (rows) => {
+    if (!searchTerm) return rows;
+    const lowerSearch = searchTerm.toLowerCase();
+    return rows.filter((row) =>
+      Object.values(row).some((val) =>
+        String(val).toLowerCase().includes(lowerSearch)
+      )
+    );
+  };
 
   // Fetch Entries
   const fetchEntries = async () => {
@@ -114,6 +124,7 @@ const Unclaimed = () => {
       ),
     },
     { name: "Balance", selector: (row) => currencySetter(row.balance) },
+    { name: "Bank Nmae", selector: (row) =>(row.bank_name) },
 
     { name: "Mode", selector: (row) => row.mop },
     { name: "Remark", selector: (row) => row.remark || "-" },
@@ -171,7 +182,8 @@ const Unclaimed = () => {
           <CommonTable
             endpoint={ApiEndpoints.GET_UNCLAIMED_ENTERIES}
             columns={columns}
-            filters={filters}           
+            filters={filters}  
+             transformData={filterRows}         
             disableSelectionOnClick
           />
         </Box>
