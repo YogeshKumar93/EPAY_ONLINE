@@ -994,9 +994,10 @@ const handleSelectAll = (event) => {
           onMouseEnter={() => enableActionsHover && setHoveredRow(row.id)} // ✅ hover sirf jab enableActionsHover true ho
           onMouseLeave={() => enableActionsHover && setHoveredRow(null)}
         >
-          <td style={{ padding: "6px 10px", textAlign: "center" }}>
+          <td style={{ padding: "6px 10px", textAlign: "center",}}>
             <input
               type="checkbox"
+            
               checked={selectedRows.some(
                 (selectedRow) => selectedRow.id === row.id
               )}
@@ -1015,7 +1016,7 @@ const handleSelectAll = (event) => {
                 lineHeight: "1",
                 fontFamily: "DM Sans, sans-serif",
                 fontWeight: 600,
-
+              
                 color: "#7e51b2ff",
                 border: "none", // Remove default borders
               }}

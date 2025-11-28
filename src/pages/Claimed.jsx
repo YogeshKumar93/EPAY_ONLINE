@@ -82,7 +82,7 @@ const Claimed = () => {
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   
-  const [filters, setFilters] = useState({
+  const [filter, setFilters] = useState({
     userId: "",
     status: "unclaimed",
     date: {},
@@ -95,6 +95,27 @@ const Claimed = () => {
   const [selectedClaim, setSelectedClaim] = useState(null);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [rowToConfirm, setRowToConfirm] = useState(null);
+    const [appliedFilters, setAppliedFilters] = useState({});
+
+   const filters = useMemo(
+      () => [
+        { id: "bank_name", label: "Bank Name", type: "textfield" },
+        { id: "id", label: "Id", type: "textfield" },
+        { id: "particulars", label: "Particulars", type: "textfield" },
+        { id: "handle_by", label: "Handle By", type: "textfield" },
+        { id: "daterange", type: "daterange" },
+      ],
+      [user?.role,appliedFilters]
+    );
+     const filterRows = (rows) => {
+    if (!searchTerm) return rows;
+    const lowerSearch = searchTerm.toLowerCase();
+    return rows.filter((row) =>
+      Object.values(row).some((val) =>
+        String(val).toLowerCase().includes(lowerSearch)
+      )
+    );
+  };
 
   const fetchEntriesRef = useRef(null);
   const handleFetchRef = (fetchFn) => {
@@ -151,10 +172,10 @@ const handleUpdateClaimed = async (rows) => {
 
     try {
       const queryParams = new URLSearchParams({
-        user_id: filters.userId,
-        status: filters.status,
-        date_from: filters.date.start || "",
-        date_to: filters.date.end || "",
+        user_id: filters?.userId,
+        status: filters?.status,
+        date_from: filters?.date?.start || "",
+        date_to: filters?.date?.end || "",
       }).toString();
 
       const response = await apiCall(
@@ -373,6 +394,8 @@ const handleUpdateClaimed = async (rows) => {
             columns={columns}
             selectedRows={selectedRows}
             onSelectionChange={setSelectedRows} // Set full row objects
+                filters={filters}  
+             transformData={filterRows}         
             customHeader={
               <Box sx={{ display: "flex", gap: 1, padding: "8px" }}>
                 {selectedRows.length > 0 && (
