@@ -174,10 +174,10 @@ const handleUpdateClaimed = async (rows) => {
   }, []);
 
   /* ---------------- FILTER CHANGE ---------------- */
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
-  };
+  // const handleFilterChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFilters((prev) => ({ ...prev, [name]: value }));
+  // };
 
   /* ---------------- TABLE COLUMNS ---------------- */
   const columns = useMemo(() => {
