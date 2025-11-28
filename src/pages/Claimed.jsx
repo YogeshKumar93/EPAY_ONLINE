@@ -108,7 +108,7 @@ const Claimed = () => {
 
  const filters = useMemo(
     () => [
-      
+      { id: "bank_name", label: "Bank Name", type: "textfield" },
       { id: "id", label: "Id", type: "textfield" },
       { id: "particulars", label: "Particulars", type: "textfield" },
       { id: "handle_by", label: "Handle By", type: "textfield" },
