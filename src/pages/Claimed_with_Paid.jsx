@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo, useContext } from "react";
 import {
   Box,
   Button,
@@ -19,19 +19,23 @@ import { currencySetter } from "../utils/Currencyutil";
 import PrintIcon from "@mui/icons-material/Print";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteClaimed from "./DeleteClaimed";
+import AuthContext from "../contexts/AuthContext";
 
 const Claimed_with_Paid = () => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState(null);
+  const [appliedFilters, setAppliedFilters] = useState({});
+const authCtx = useContext(AuthContext);
+const user = authCtx?.user;
 
-  const [filters, setFilters] = useState({
-    userId: "",
-    status: "claimed",
-    date: {},
-    dateVal: "",
-  });
+  // const [filters, setFilters] = useState({
+  //   userId: "",
+  //   status: "claimed",
+  //   date: {},
+  //   dateVal: "",
+  // });
 
   const fetchEntriesRef = useRef(null);
 
@@ -53,6 +57,27 @@ const Claimed_with_Paid = () => {
     setOpenDelete(true);
   };
 
+   const filters = useMemo(
+      () => [
+        { id: "bank_name", label: "Bank Name", type: "textfield" },
+        { id: "id", label: "Id", type: "textfield" },
+        { id: "particulars", label: "Particulars", type: "textfield" },
+        { id: "handle_by", label: "Handle By", type: "textfield" },
+        { id: "daterange", type: "daterange" },
+      ],
+      [user?.role,appliedFilters]
+    );
+  
+     const filterRows = (rows) => {
+      if (!searchTerm) return rows;
+      const lowerSearch = searchTerm.toLowerCase();
+      return rows.filter((row) =>
+        Object.values(row).some((val) =>
+          String(val).toLowerCase().includes(lowerSearch)
+        )
+      );
+    };
+
   const fetchEntries = async () => {
     setLoading(true);
     try {
@@ -64,7 +89,7 @@ const Claimed_with_Paid = () => {
       }).toString();
 
       const response = await apiCall(
-        `${ApiEndpoints.GET_UNCLAIMED_ENTERIES}?${queryParams}`
+        `${ApiEndpoints.GET_UNCLAIMED_ENTERIES}`
       );
 
       if (response?.data?.success) {
@@ -203,6 +228,8 @@ const Claimed_with_Paid = () => {
             endpoint={ApiEndpoints.GET_ENTRIES}
             columns={columns}
             queryParam={`status=2`}
+              filters={filters}  
+             transformData={filterRows} 
           />
 
          
