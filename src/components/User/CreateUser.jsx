@@ -14,6 +14,13 @@ import {
   Typography,
   Switch,
   FormControlLabel,
+  Grid,
+  Card,
+  CardContent,
+  Box,
+  Stepper,
+  Step,
+  StepLabel,
 } from "@mui/material";
 import { apiCall } from "../../api/apiClient";
 import ApiEndpoints from "../../api/ApiEndpoints";
@@ -23,6 +30,7 @@ import { okSuccessToast } from "../../utils/ToastUtil";
 const CreateUser = ({ open, onClose, onFetchRef }) => {
   const { showToast } = useToast();
   const [submitting, setSubmitting] = useState(false);
+  const [activeStep, setActiveStep] = useState(0);
 
   // ROLE — Only adm & sadm
   const [role, setRole] = useState("sadm");
@@ -86,6 +94,41 @@ const CreateUser = ({ open, onClose, onFetchRef }) => {
     return errors;
   };
 
+  // STEP HANDLERS
+ const handleNext = () => {
+  let stepErrors = [];
+
+  if (activeStep === 0) {
+    // Step 1: Role - no required fields
+  }
+
+  if (activeStep === 1) {
+    if (!user.name.trim()) stepErrors.push("User name is required");
+    if (!user.email.trim()) stepErrors.push("User email is required");
+    if (!user.mobile.trim()) stepErrors.push("User mobile is required");
+    if (!user.start_date) stepErrors.push("User start date is required");
+    if (!user.end_date) stepErrors.push("User end date is required");
+  }
+
+  if (activeStep === 2) {
+    if (!business.business_name.trim()) stepErrors.push("Business name is required");
+    if (!businessAddress.state.trim()) stepErrors.push("Business state is required");
+    if (!businessAddress.pincode.trim()) stepErrors.push("Business pincode is required");
+  }
+
+  if (stepErrors.length > 0) {
+    stepErrors.forEach((msg) => showToast("Please fill all details first", "error"));
+    return;
+  }
+
+  setActiveStep((prev) => prev + 1);
+};
+
+
+  const handleBack = () => {
+    setActiveStep((prev) => prev - 1);
+  };
+
   // SUBMIT
   const handleSubmit = async () => {
     const errors = validate();
@@ -119,6 +162,7 @@ const CreateUser = ({ open, onClose, onFetchRef }) => {
         okSuccessToast(response?.message || "User created successfully");
         onFetchRef?.();
         onClose();
+        setActiveStep(0); // Reset step on success
       } else {
         // Handle backend validation errors
         if (error?.message && typeof error.message === "object") {
@@ -138,154 +182,253 @@ const CreateUser = ({ open, onClose, onFetchRef }) => {
     }
   };
 
+  const steps = ['Role & Basic Info', 'User Details', 'Business Details'];
+
+  const getStepContent = (step) => {
+    switch (step) {
+      case 0:
+        return (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+            <Card variant="outlined" sx={{ bgcolor: 'background.default' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <span style={{ fontSize: '1.25rem' }}>👤</span>
+                  Role Selection
+                </Typography>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Role *</InputLabel>
+                  <Select 
+                    value={role} 
+                    label="Role *" 
+                    onChange={(e) => setRole(e.target.value)}
+                  >
+                    {rolesList.map((r) => (
+                      <MenuItem key={r.value} value={r.value}>
+                        {r.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </CardContent>
+            </Card>
+          </Box>
+        );
+
+ case 1:
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ pb: 1 }}>
-        <Typography variant="h6" fontWeight={600}>
+   <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+
+  {/* FULL NAME – full width */}
+  <TextField
+    label="Full Name *"
+    value={user.name}
+    onChange={(e) => handleUserChange("name", e.target.value)}
+    size="small"
+    fullWidth
+  />
+
+  {/* ROW: Email + Mobile */}
+  <Box sx={{ display: "flex", gap: 2 }}>
+    <TextField
+      label="Email *"
+      type="email"
+      value={user.email}
+      onChange={(e) => handleUserChange("email", e.target.value)}
+      size="small"
+      sx={{ flex: 1 }}
+    />
+    <TextField
+      label="Mobile *"
+      value={user.mobile}
+      onChange={(e) => handleUserChange("mobile", e.target.value)}
+      size="small"
+      sx={{ flex: 1 }}
+    />
+  </Box>
+
+  {/* ROW: PAN + GST */}
+  <Box sx={{ display: "flex", gap: 2 }}>
+    <TextField
+      label="PAN Number"
+      value={user.pan}
+      onChange={(e) => handleUserChange("pan", e.target.value)}
+      size="small"
+      sx={{ flex: 1 }}
+    />
+    <TextField
+      label="GST Number"
+      value={user.gst}
+      onChange={(e) => handleUserChange("gst", e.target.value)}
+      size="small"
+      sx={{ flex: 1 }}
+    />
+  </Box>
+
+  {/* ROW: Start Date + End Date */}
+  <Box sx={{ display: "flex", gap: 2 }}>
+    <TextField
+      label="Start Date *"
+      type="date"
+      value={user.start_date}
+      onChange={(e) => handleUserChange("start_date", e.target.value)}
+      size="small"
+      InputLabelProps={{ shrink: true }}
+      sx={{ flex: 1 }}
+    />
+
+    <TextField
+      label="End Date *"
+      type="date"
+      value={user.end_date}
+      onChange={(e) => handleUserChange("end_date", e.target.value)}
+      size="small"
+      InputLabelProps={{ shrink: true }}
+      sx={{ flex: 1 }}
+    />
+  </Box>
+<FormControlLabel control={ <Switch checked={Boolean(user.status)} onChange={(e) => handleUserChange("status", e.target.checked) } color="primary" /> } label={ <Typography variant="body2"> Account Status:{" "} <strong>{user.status ? "Active" : "Inactive"}</strong> </Typography> } sx={{ mt: 1 }} />
+</Box>
+
+  );
+
+
+
+      case 2:
+        return (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+            <Card variant="outlined" sx={{ bgcolor: 'background.default' }}>
+              <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <span style={{ fontSize: '1.25rem' }}>🏢</span>
+                  Business Information
+                </Typography>
+                
+                <TextField
+                  label="Business Name *"
+                  value={business.business_name}
+                  onChange={(e) => handleBusinessChange("business_name", e.target.value)}
+                  size="small"
+                  fullWidth
+                />
+              </CardContent>
+            </Card>
+
+            <Card variant="outlined" sx={{ bgcolor: 'background.default' }}>
+              <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <span style={{ fontSize: '1.25rem' }}>📍</span>
+                  Business Address
+                </Typography>
+                
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Address Line 1"
+                      value={businessAddress.address_line1}
+                      onChange={(e) => handleBusinessAddressChange("address_line1", e.target.value)}
+                      size="small"
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Address Line 2"
+                      value={businessAddress.address_line2}
+                      onChange={(e) => handleBusinessAddressChange("address_line2", e.target.value)}
+                      size="small"
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="City"
+                      value={businessAddress.city}
+                      onChange={(e) => handleBusinessAddressChange("city", e.target.value)}
+                      size="small"
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="State *"
+                      value={businessAddress.state}
+                      onChange={(e) => handleBusinessAddressChange("state", e.target.value)}
+                      size="small"
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Pincode *"
+                      value={businessAddress.pincode}
+                      onChange={(e) => handleBusinessAddressChange("pincode", e.target.value)}
+                      size="small"
+                      fullWidth
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Box>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+      <DialogTitle sx={{ pb: 1, borderBottom: 1, borderColor: '#blue', backgroundColor:"#f3ebebff" }}>
+        <Typography variant="h5" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <span style={{ fontSize: '1.5rem' }}>👥</span>
           Create New User
+        </Typography>
+        <Typography variant="body2" color="text.secondary" fontWeight="600" sx={{ mt: 1 }}>
+          Fill in the user details step by step
         </Typography>
       </DialogTitle>
 
-      <Divider />
+      <DialogContent sx={{ p: 3, mt:2 }}>
+        <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
 
-      <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
-        {/* ROLE */}
-        <FormControl fullWidth size="small">
-          <InputLabel>Role</InputLabel>
-          <Select value={role} label="Role" onChange={(e) => setRole(e.target.value)}>
-            {rolesList.map((r) => (
-              <MenuItem key={r.value} value={r.value}>
-                {r.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        {/* USER FIELDS */}
-        <Typography fontWeight={600}>User Details</Typography>
-        <TextField
-          label="Name"
-          value={user.name}
-          onChange={(e) => handleUserChange("name", e.target.value)}
-          size="small"
-          fullWidth
-        />
-        <TextField
-          label="Email"
-          value={user.email}
-          onChange={(e) => handleUserChange("email", e.target.value)}
-          size="small"
-          fullWidth
-          type="email"
-        />
-        <TextField
-          label="Mobile"
-          value={user.mobile}
-          onChange={(e) => handleUserChange("mobile", e.target.value)}
-          size="small"
-          fullWidth
-        />
-        <TextField
-          label="PAN"
-          value={user.pan}
-          onChange={(e) => handleUserChange("pan", e.target.value)}
-          size="small"
-          fullWidth
-        />
-        <TextField
-          label="GST"
-          value={user.gst}
-          onChange={(e) => handleUserChange("gst", e.target.value)}
-          size="small"
-          fullWidth
-        />
-
-        <TextField
-          label="Start Date"
-          type="date"
-          value={user.start_date}
-          onChange={(e) => handleUserChange("start_date", e.target.value)}
-          size="small"
-          InputLabelProps={{ shrink: true }}
-          fullWidth
-        />
-        <TextField
-          label="End Date"
-          type="date"
-          value={user.end_date}
-          onChange={(e) => handleUserChange("end_date", e.target.value)}
-          size="small"
-          InputLabelProps={{ shrink: true }}
-          fullWidth
-        />
-
-        {/* STATUS */}
-        <FormControlLabel
-          control={
-            <Switch
-              checked={Boolean(user.status)}
-              onChange={(e) => handleUserChange("status", e.target.checked)}
-            />
-          }
-          label={user.status ? "Active" : "Inactive"}
-        />
-
-        {/* BUSINESS */}
-        <Typography fontWeight={600}>Business Details</Typography>
-        <TextField
-          label="Business Name"
-          value={business.business_name}
-          onChange={(e) => handleBusinessChange("business_name", e.target.value)}
-          size="small"
-          fullWidth
-        />
-
-        {/* ADDRESS */}
-        <Typography fontWeight={600}>Business Address</Typography>
-        <TextField
-          label="Address Line 1"
-          value={businessAddress.address_line1}
-          onChange={(e) => handleBusinessAddressChange("address_line1", e.target.value)}
-          size="small"
-          fullWidth
-        />
-        <TextField
-          label="Address Line 2"
-          value={businessAddress.address_line2}
-          onChange={(e) => handleBusinessAddressChange("address_line2", e.target.value)}
-          size="small"
-          fullWidth
-        />
-        <TextField
-          label="City"
-          value={businessAddress.city}
-          onChange={(e) => handleBusinessAddressChange("city", e.target.value)}
-          size="small"
-          fullWidth
-        />
-        <TextField
-          label="State"
-          value={businessAddress.state}
-          onChange={(e) => handleBusinessAddressChange("state", e.target.value)}
-          size="small"
-          fullWidth
-        />
-        <TextField
-          label="Pincode"
-          value={businessAddress.pincode}
-          onChange={(e) => handleBusinessAddressChange("pincode", e.target.value)}
-          size="small"
-          fullWidth
-        />
+        {getStepContent(activeStep)}
       </DialogContent>
 
-      <DialogActions sx={{ justifyContent: "space-between", p: 2 }}>
-        <Button onClick={onClose} disabled={submitting} color="inherit">
-          Cancel
-        </Button>
-        <Button variant="contained" onClick={handleSubmit} disabled={submitting}>
-          {submitting ? "Saving..." : "Create"}
-        </Button>
+      <DialogActions sx={{ justifyContent: "space-between", p: 3, borderTop: 1, borderColor: 'divider' }}>
+        <Box>
+          {activeStep > 0 && (
+            <Button onClick={handleBack} disabled={submitting}  sx={{backgroundColor:"#9180a2ff", color:"#fff"}}>
+              Back
+            </Button>
+          )}
+        </Box>
+        
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button onClick={onClose} disabled={submitting} color="inherit" sx={{backgroundColor:"#9180a2ff", color:"#fff"}}>
+            Cancel
+          </Button>
+          
+          {activeStep < steps.length - 1 ? (
+            <Button variant="contained" onClick={handleNext} sx={{backgroundColor:"#492077"}}>
+              Next
+            </Button>
+          ) : (
+            <Button 
+              variant="contained" 
+              onClick={handleSubmit} 
+              disabled={submitting}
+            >
+              {submitting ? "Creating..." : "Create User"}
+            </Button>
+          )}
+        </Box>
       </DialogActions>
     </Dialog>
   );

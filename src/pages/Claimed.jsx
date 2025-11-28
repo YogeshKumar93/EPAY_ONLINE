@@ -20,28 +20,21 @@ import predefinedRanges from "../utils/predefinedRanges";
 import { yyyymmdd } from "../utils/DateUtils";
 import { capitalize1 } from "../utils/TextUtil";
 import { currencySetter } from "../utils/Currencyutil";
-import { secondaryColor } from "../utils/setThemeColor";
 import PrintIcon from "@mui/icons-material/Print";
 import { useNavigate } from "react-router-dom";
-import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteClaimed from "./DeleteClaimed";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { useToast } from "../utils/ToastContext";
 import AuthContext from "../contexts/AuthContext";
 import SyncAltIcon from "@mui/icons-material/SyncAlt";
 
-const ConfirmClaimModal = ({ open, handleClose, onConfirm, row, selectedRows }) => {
-  
-  // Normalize rows so it always becomes an array
+
+/* ---------------- CONFIRM MODAL ---------------- */
+const ConfirmClaimModal = ({ open, handleClose, onConfirm, row }) => {
   const rowsArray = Array.isArray(row) ? row : row ? [row] : [];
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      fullWidth
-      maxWidth="sm"
-    >
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
       <DialogTitle sx={{ fontSize: "1.4rem", fontWeight: 600 }}>
         Confirm Action
       </DialogTitle>
@@ -51,12 +44,10 @@ const ConfirmClaimModal = ({ open, handleClose, onConfirm, row, selectedRows }) 
           {rowsArray.length === 0 ? (
             <>No row selected!</>
           ) : rowsArray.length === 1 ? (
-            <>
-              Are you sure you want to make <b>ID {rowsArray[0]?.id}</b> as paid?
-            </>
+            <>Are you sure you want to mark <b>ID {rowsArray[0]?.id}</b> as paid?</>
           ) : (
             <>
-              Are you sure you want to make <b>{rowsArray.length} entries</b>{" "}
+              Are you sure you want to mark <b>{rowsArray.length} entries</b>{" "}
               (IDs: {rowsArray.map((r) => r.id).join(", ")}) as paid?
             </>
           )}
@@ -64,12 +55,7 @@ const ConfirmClaimModal = ({ open, handleClose, onConfirm, row, selectedRows }) 
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button
-          onClick={handleClose}
-          color="error"
-          variant="outlined"
-          sx={{ fontSize: "1rem" }}
-        >
+        <Button onClick={handleClose} color="error" variant="outlined" sx={{ fontSize: "1rem" }}>
           Cancel
         </Button>
 
@@ -87,6 +73,7 @@ const ConfirmClaimModal = ({ open, handleClose, onConfirm, row, selectedRows }) 
 };
 
 
+/* ---------------- MAIN PAGE ---------------- */
 const Claimed = () => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -101,7 +88,6 @@ const Claimed = () => {
 
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
-  const navigate = useNavigate();
   const { showToast } = useToast();
   const [selectedClaim, setSelectedClaim] = useState(null);
   const [openConfirm, setOpenConfirm] = useState(false);
@@ -112,16 +98,16 @@ const Claimed = () => {
     fetchEntriesRef.current = fetchFn;
   };
 
-  const refreshEntries = () => {
-    if (fetchEntriesRef.current) fetchEntriesRef.current();
-  };
-  const refreshClaims = () => {
-    if (fetchEntriesRef.current) {
-      fetchEntriesRef.current();
-    }
-  };
+  const refreshEntries = () => fetchEntriesRef.current && fetchEntriesRef.current();
 
-  // ------------------ MARK SINGLE ROW AS CLAIMED ------------------
+  const handlePrint = (rows) => {
+  localStorage.setItem("PRINT_DATA", JSON.stringify(rows));
+  window.open("/print-claimedreceipt", "_blank");
+};
+
+
+
+  /* ---------------- UPDATE CLAIMED ---------------- */
   const handleUpdateClaimed = async (rows) => {
     try {
       const payload = {
@@ -141,15 +127,18 @@ const Claimed = () => {
       }
 
       showToast("success", response?.message || "Updated successfully");
-
       refreshEntries();
       setSelectedRows([]);
-    } catch (err) {
+
+      return true;
+    } catch {
       showToast("error", "Something went wrong");
+      return false;
     }
   };
 
-  // ------------------ FETCH ENTRIES ------------------
+
+  /* ---------------- FETCH ENTRIES ---------------- */
   const fetchEntries = async () => {
     setLoading(true);
 
@@ -165,13 +154,9 @@ const Claimed = () => {
         `${ApiEndpoints.GET_UNCLAIMED_ENTERIES}?${queryParams}`
       );
 
-      if (response?.data?.success) {
-        setEntries(response.data.entries || []);
-      } else {
-        setEntries([]);
-      }
-    } catch (error) {
-      console.error("Fetch error:", error);
+      setEntries(response?.data?.entries || []);
+    } catch (err) {
+      console.error("Fetch error:", err);
     } finally {
       setLoading(false);
     }
@@ -181,34 +166,27 @@ const Claimed = () => {
     fetchEntries();
   }, []);
 
-  // ------------------ FILTER CHANGE ------------------
+
+  /* ---------------- FILTER CHANGE ---------------- */
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleReset = () => {
-    setFilters({ userId: "", status: "unclaimed", date: {}, dateVal: "" });
-    fetchEntries();
-  };
 
-  // ------------------ TABLE COLUMNS ------------------
+  /* ---------------- TABLE COLUMNS ---------------- */
   const columns = useMemo(() => {
-    const baseColumns = [
+    const base = [
       {
         name: "ID",
-        selector: (row) => (
-          <div style={{ fontSize: "12px", fontWeight: 600 }}>{row.id}</div>
-        ),
+        selector: (row) => <div style={{ fontSize: 12, fontWeight: 600 }}>{row.id}</div>,
         width: "80px",
         center: true,
       },
 
       {
         name: "Bank ID",
-        selector: (row) => (
-          <div style={{ fontSize: "12px", fontWeight: 600 }}>{row.bank_id}</div>
-        ),
+        selector: (row) => <div style={{ fontSize: 12, fontWeight: 600 }}>{row.bank_id}</div>,
         width: "100px",
         center: true,
       },
@@ -230,10 +208,7 @@ const Claimed = () => {
               }
               setFilters({
                 ...filters,
-                date: {
-                  start: yyyymmdd(value[0]),
-                  end: yyyymmdd(value[1]),
-                },
+                date: { start: yyyymmdd(value[0]), end: yyyymmdd(value[1]) },
                 dateVal: value,
               });
               fetchEntries();
@@ -247,22 +222,14 @@ const Claimed = () => {
 
       {
         name: "Particulars",
-        selector: (row) => (
-          <div style={{ fontSize: "12px", fontWeight: 600 }}>
-            {capitalize1(row.particulars)}
-          </div>
-        ),
+        selector: (row) => <div style={{ fontSize: 12, fontWeight: 600 }}>{capitalize1(row.particulars)}</div>,
         wrap: true,
         minWidth: "120px",
       },
 
       {
         name: "Handled By",
-        selector: (row) => (
-          <div style={{ fontSize: "12px", fontWeight: 600 }}>
-            {row.handle_by}
-          </div>
-        ),
+        selector: (row) => <div style={{ fontSize: 12, fontWeight: 600 }}>{row.handle_by}</div>,
         wrap: true,
         width: "120px",
       },
@@ -270,9 +237,7 @@ const Claimed = () => {
       {
         name: "Credit",
         selector: (row) => (
-          <span style={{ color: "green", fontWeight: 600 }}>
-            {currencySetter(row.credit)}
-          </span>
+          <span style={{ color: "green", fontWeight: 600 }}>{currencySetter(row.credit)}</span>
         ),
         right: true,
         width: "100px",
@@ -281,9 +246,7 @@ const Claimed = () => {
       {
         name: "Debit",
         selector: (row) => (
-          <span style={{ color: "red", fontWeight: 600 }}>
-            {currencySetter(row.debit)}
-          </span>
+          <span style={{ color: "red", fontWeight: 600 }}>{currencySetter(row.debit)}</span>
         ),
         right: true,
         width: "100px",
@@ -300,18 +263,14 @@ const Claimed = () => {
 
       {
         name: "Mode",
-        selector: (row) => (
-          <div style={{ fontSize: "12px", fontWeight: 600 }}>{row.mop}</div>
-        ),
+        selector: (row) => <div style={{ fontSize: 12, fontWeight: 600 }}>{row.mop}</div>,
         width: "80px",
         center: true,
       },
 
       {
         name: "Remark",
-        selector: (row) => (
-          <div style={{ fontSize: "12px" }}>{row.remark || "-"}</div>
-        ),
+        selector: (row) => <div style={{ fontSize: 12 }}>{row.remark || "-"}</div>,
         wrap: true,
         minWidth: "100px",
       },
@@ -320,24 +279,16 @@ const Claimed = () => {
         name: "Status",
         selector: (row) => {
           const statusConfig = {
-            0: {
-              label: "Unclaimed",
-              color: "#CC7000",
-              bg: "#FFF4E5",
-            },
-            1: {
-              label: "Claimed",
-              color: "#C40000",
-              bg: "#FFE5E5",
-            },
+            0: { label: "Unclaimed", color: "#a01309ff", bg: "#e2a5a1ff" },
+            1: { label: "Claimed", color: "#e1eae9ff", bg: "#168276ff" },
+            2: { label: "Paid", color: "#0e2d6aff", bg: "#aab0f1ff" },
           };
-
           const cfg = statusConfig[row.status] || statusConfig[0];
 
           return (
             <button
               style={{
-                padding: "4px 10px",
+                padding: "8px 10px",
                 borderRadius: "8px",
                 fontSize: "12px",
                 fontWeight: 600,
@@ -357,27 +308,33 @@ const Claimed = () => {
       {
         name: "Action",
         selector: (row) => (
-          <IconButton
-            color="primary"
-            onClick={() => {
-              setRowToConfirm(row);
-              setOpenConfirm(true);
-            }}
-            size="small"
-            title="Mark as Claimed"
-          >
-            <CheckCircleOutlineIcon />
-          </IconButton>
+          <>
+            <IconButton
+              color="primary"
+              onClick={() => {
+                setRowToConfirm(row);
+                setOpenConfirm(true);
+              }}
+              size="small"
+              title="Mark as Paid"
+            >
+              <CheckCircleOutlineIcon />
+            </IconButton>
+
+            <IconButton size="small" onClick={() => handlePrint([row])}
+sx={{ color: "#6C4BC7" }}>
+              <PrintIcon fontSize="small" />
+            </IconButton>
+          </>
         ),
-        center: true,
-        width: "90px",
       },
     ];
 
-    return [...baseColumns];
+    return base;
   }, [filters, user]);
 
-  // ------------------ ADD SELECTION COLUMN ------------------
+
+  /* ---------------- SELECTION COLUMN ---------------- */
   const columnsWithSelection = useMemo(() => {
     return [
       {
@@ -402,6 +359,7 @@ const Claimed = () => {
     ];
   }, [selectedRows, columns]);
 
+
   return (
     <>
       <CommonLoader loading={loading} text="Loading Unclaimed Entries..." />
@@ -418,29 +376,29 @@ const Claimed = () => {
             customHeader={
               <Box sx={{ display: "flex", gap: 1, padding: "8px" }}>
                 {selectedRows.length > 0 && (
-                  <Tooltip title="Mark selected as claimed">
+                  <Tooltip title="Mark as claimed">
                     <Button
                       variant="contained"
                       size="small"
-                      color="secondary"
                       onClick={() => {
                         if (selectedRows.length === 0) {
                           showToast("error", "Please select entries");
                           return;
                         }
-
-                        setRowToConfirm(selectedRows); // store selected rows in state
-                        setOpenConfirm(true); // open modal
+                        setRowToConfirm(selectedRows);
+                        setOpenConfirm(true);
                       }}
                     >
                       <SyncAltIcon sx={{ fontSize: 20, mr: 1 }} />
-                      TRANSFER CWP
+                      Mark as Paid
                     </Button>
                   </Tooltip>
                 )}
               </Box>
             }
           />
+
+          {/* DELETE */}
           <DeleteClaimed
             open={openDelete}
             handleClose={() => {
@@ -448,18 +406,25 @@ const Claimed = () => {
               setSelectedClaim(null);
             }}
             selectedBank={selectedClaim}
-            onFetchRef={refreshClaims}
+            onFetchRef={refreshEntries}
           />
 
-          <ConfirmClaimModal
-            open={openConfirm}
-            handleClose={() => setOpenConfirm(false)}
-            row={rowToConfirm}
-            onConfirm={(rows) => {
-              setOpenConfirm(false);
-              handleUpdateClaimed(rows);
-            }}
-          />
+          {/* CONFIRM MODAL WITH AUTO PRINT */}
+    <ConfirmClaimModal
+  open={openConfirm}
+  handleClose={() => setOpenConfirm(false)}
+  row={rowToConfirm}
+  onConfirm={async (rows) => {
+    setOpenConfirm(false);
+
+    const success = await handleUpdateClaimed(rows);
+
+    if (success) {
+      handlePrint(rows); // 🔥 PRINT MULTIPLE ROWS TOGETHER
+    }
+  }}
+/>
+
         </Box>
       )}
     </>
