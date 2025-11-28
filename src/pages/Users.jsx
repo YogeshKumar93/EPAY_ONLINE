@@ -20,11 +20,12 @@ import LockOpenIcon from "@mui/icons-material/LockOpen";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 // import BlockUnblockUser from "./BlockUnblockUser";
 import ReButton from "../components/common/ReButton";
-import CreateUser from "../components/User/createUser";
+import CreateUser from "../components/User/CreateUser";
 // import EditIcon from "@mui/icons-material/Edit";
 import { apiCall } from "../api/apiClient";
 // import AdWalletTransfer from "./AdWalletTransfer";
 import CommonStatus from "../components/common/CommonStatus";
+import CommonLoader from "../components/common/CommonLoader";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditUser from "./EditUser";
@@ -116,10 +117,36 @@ const Users = ({ query }) => {
   };
   const handleCloseLein = () => setOpenLeinModal(false);
 
-  const handleOpenEditUser = (user) => {
-    setSelectedUser(user);
+  const handleOpenEditUser = (row) => {
+    const formatted = {
+      id: row.id,
+      role: row.role,
+      user: {
+        name: row.name || "",
+        email: row.email || "",
+        mobile: row.mobile || "",
+        pan: row.pan || "",
+        gst: row.gst || "",
+        start_date: row.start_date || "",
+        end_date: row.end_date || "",
+        status: row.status || 0,
+      },
+      business: {
+        business_name: row.business_name || row.establishment || "",
+      },
+      business_address: {
+        address_line1: row.address_line1 || "",
+        address_line2: row.address_line2 || "",
+        city: row.city || "",
+        state: row.state || "",
+        pincode: row.pincode || "",
+      },
+    };
+
+    setSelectedUser(formatted);
     setOpenEditUser(true);
   };
+
   const handleCloseEditUser = () => {
     setOpenEditUser(false);
     setSelectedUser(null);
@@ -397,7 +424,7 @@ const Users = ({ query }) => {
         name: "Date/Time",
         selector: (row) => (
           <div style={{ textAlign: "left" }}>
-            {ddmmyy(row.created_at)} {dateToTime(row.created_at)}
+            {ddmmyy(row?.created_at)} {dateToTime(row?.created_at)}
           </div>
         ),
       },
@@ -464,7 +491,7 @@ const Users = ({ query }) => {
         if (["adm", "sadm"].includes(userRole.role)) {
           return (
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              {row.is_active === 1 ? (
+              {row?.is_active === 1 ? (
                 <Tooltip title="Click to Block">
                   <IconButton
                     size="small"
@@ -609,12 +636,11 @@ if (["adm", "sadm"].includes(userRole?.role)) {
 
       {openEditUser && selectedUser && (
        <EditUser
-  open={openEditUser}
-  onClose={handleCloseEditUser}
-  editData={selectedUser}
-  onFetchRef={refreshUsers}
-/>
-
+          open={openEditUser}
+          onClose={handleCloseEditUser}
+          editData={selectedUser}
+          onFetchRef={refreshUsers}
+        />
       )}
 
       {/* {openPermissions && selectedUser && (

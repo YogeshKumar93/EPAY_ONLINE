@@ -22,7 +22,7 @@ const PrintClaimedReceipt = () => {
     <Box
       sx={{
         position: "relative",
-        width: "95%",
+        width: "98%",
         margin: "20px auto",
         padding: "20px",
         border: "1px solid #ccc",

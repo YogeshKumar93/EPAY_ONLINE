@@ -124,7 +124,7 @@ const Unclaimed = () => {
       ),
     },
     { name: "Balance", selector: (row) => currencySetter(row.balance) },
-    { name: "Bank Nmae", selector: (row) =>(row.bank_name) },
+    { name: "Bank Name", selector: (row) =>(row.bank_name) },
 
     { name: "Mode", selector: (row) => row.mop },
     { name: "Remark", selector: (row) => row.remark || "-" },
