@@ -79,12 +79,13 @@ const Claimed = () => {
   const [loading, setLoading] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [filters, setFilters] = useState({
-    userId: "",
-    status: "unclaimed",
-    date: {},
-    dateVal: "",
-  });
+  const [appliedFilters, setAppliedFilters] = useState({});
+  // const [filters, setFilters] = useState({
+  //   userId: "",
+  //   status: "unclaimed",
+  //   date: {},
+  //   dateVal: "",
+  // });
 
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
@@ -105,7 +106,26 @@ const Claimed = () => {
   window.open("/print-claimedreceipt", "_blank");
 };
 
+ const filters = useMemo(
+    () => [
+      
+      { id: "id", label: "Id", type: "textfield" },
+      { id: "particulars", label: "Particulars", type: "textfield" },
+      { id: "handle_by", label: "Handle By", type: "textfield" },
+      { id: "daterange", type: "daterange" },
+    ],
+    [user?.role,appliedFilters]
+  );
 
+   const filterRows = (rows) => {
+    if (!searchTerm) return rows;
+    const lowerSearch = searchTerm.toLowerCase();
+    return rows.filter((row) =>
+      Object.values(row).some((val) =>
+        String(val).toLowerCase().includes(lowerSearch)
+      )
+    );
+  };
 
   /* ---------------- UPDATE CLAIMED ---------------- */
   const handleUpdateClaimed = async (rows) => {
@@ -168,10 +188,10 @@ const Claimed = () => {
 
 
   /* ---------------- FILTER CHANGE ---------------- */
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
-  };
+  // const handleFilterChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFilters((prev) => ({ ...prev, [name]: value }));
+  // };
 
 
   /* ---------------- TABLE COLUMNS ---------------- */
@@ -370,6 +390,8 @@ sx={{ color: "#6C4BC7" }}>
             onFetchRef={handleFetchRef}
             endpoint={ApiEndpoints.GET_ENTRIES}
             queryParam={"status=1"}
+              filters={filters}  
+             transformData={filterRows}  
             columns={columnsWithSelection}
             selectedRows={selectedRows}
             onSelectionChange={setSelectedRows}
