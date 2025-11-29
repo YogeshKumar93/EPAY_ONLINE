@@ -20,6 +20,7 @@ import {
   Stepper,
   Step,
   StepLabel,
+  CircularProgress,
 } from "@mui/material";
 
 import { apiCall } from "../api/apiClient";
@@ -30,6 +31,7 @@ import { okSuccessToast } from "../utils/ToastUtil";
 const EditUser = ({ open, onClose, onFetchRef, editData }) => {
   const { showToast } = useToast();
   const [submitting, setSubmitting] = useState(false);
+  const [loadingBusinessData, setLoadingBusinessData] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [touched, setTouched] = useState({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
@@ -110,6 +112,7 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
     setTouched({});
     setSubmitAttempted(false);
     setSubmitting(false);
+    setLoadingBusinessData(false);
   }, []);
 
   // Handle close with reset
@@ -118,32 +121,49 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
     onClose();
   }, [resetForm, onClose]);
 
-  // Prefill edit data
+  // Prefill edit data - CORRECTED VERSION
   useEffect(() => {
     if (open && editData) {
+      console.log("Edit Data received:", editData);
+      
+      // Set role
       setRole(editData.role || "adm");
 
+      // Set user data with proper fallbacks
       setUser({
-        name: editData.user?.name || "",
-        email: editData.user?.email || "",
-        mobile: editData.user?.mobile || "",
-        pan: editData.user?.pan || "",
-        gst: editData.user?.gst || "",
-        start_date: formatDate(editData.user?.start_date),
-        end_date: formatDate(editData.user?.end_date),
-        status: editData.user?.status === 1,
+        name: editData.name || editData.user?.name || "",
+        email: editData.email || editData.user?.email || "",
+        mobile: editData.mobile || editData.user?.mobile || "",
+        pan: editData.pan || editData.user?.pan || "",
+        gst: editData.gst || editData.user?.gst || "",
+        start_date: formatDate(editData.start_date || editData.user?.start_date),
+        end_date: formatDate(editData.end_date || editData.user?.end_date),
+        status: (editData.status === 1 || editData.user?.status === 1) ? true : false,
       });
 
+      // Set business data with proper fallbacks
       setBusiness({
-        business_name: editData.business?.business_name || "",
+        business_name: editData.business_name || editData.business?.business_name || "",
       });
 
+      // Set business address with proper fallbacks
       setBusinessAddress({
-        address_line1: editData.business_address?.address_line1 || "",
-        address_line2: editData.business_address?.address_line2 || "",
-        city: editData.business_address?.city || "",
-        state: editData.business_address?.state || "",
-        pincode: editData.business_address?.pincode || "",
+        address_line1: editData.address_line1 || editData.business_address?.address_line1 || editData.address?.address_line1 || "",
+        address_line2: editData.address_line2 || editData.business_address?.address_line2 || editData.address?.address_line2 || "",
+        city: editData.city || editData.business_address?.city || editData.address?.city || "",
+        state: editData.state || editData.business_address?.state || editData.address?.state || "",
+        pincode: editData.pincode || editData.business_address?.pincode || editData.address?.pincode || "",
+      });
+
+      console.log("Prefilled business:", {
+        business_name: editData.business_name || editData.business?.business_name || "",
+      });
+      console.log("Prefilled address:", {
+        address_line1: editData.address_line1 || editData.business_address?.address_line1 || editData.address?.address_line1 || "",
+        address_line2: editData.address_line2 || editData.business_address?.address_line2 || editData.address?.address_line2 || "",
+        city: editData.city || editData.business_address?.city || editData.address?.city || "",
+        state: editData.state || editData.business_address?.state || editData.address?.state || "",
+        pincode: editData.pincode || editData.business_address?.pincode || editData.address?.pincode || "",
       });
 
       setActiveStep(0);
@@ -308,68 +328,69 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
     setSubmitAttempted(false);
   }, []);
 
-  // Fetch business data when reaching step 2 - CORRECTED VERSION
+  // Fetch business data when reaching step 2 - SIMPLIFIED AND CORRECTED
   useEffect(() => {
-    if (activeStep === 2) {
+    if (activeStep === 2 && editData?.id) {
       fetchBusinessData();
     }
-  }, [activeStep]);
+  }, [activeStep, editData?.id]);
 
   const fetchBusinessData = async () => {
+    if (!editData?.id) {
+      console.log("No user ID available for fetching business data");
+      return;
+    }
+
+    setLoadingBusinessData(true);
     try {
-      // CORRECTED: Using the same structure as your fetchBusinessDetails function
+      console.log("Fetching business data for user ID:", editData.id);
+      
+      // Try the most common endpoint first
       const payload = {
-        user_id: editData?.id, // Using the user ID from editData
-        type: "business_info",
+        user_id: editData.id,
+        type: "basic", // Adjust this based on your API
       };
 
       const response = await apiCall("POST", ApiEndpoints.GET_BY_TYPE, payload);
+      console.log("Business API Response:", response);
+
+      // Handle different response structures
+      const responseData = response?.data || response?.response?.data || response;
       
-      // CORRECTED: Handle response structure like your example
-      const data = response?.data || response?.response?.data || {};
-
-      if (response?.status || response?.response?.status) {
-        setBusiness({
-          business_name: data?.business_name || "",
-        });
-
-        setBusinessAddress({
-          address_line1: data?.address_line1 || "",
-          address_line2: data?.address_line2 || "",
-          city: data?.city || "",
-          state: data?.state || "",
-          pincode: data?.pincode || "",
-        });
-      } else {
-        showToast(response?.message || "Failed to fetch business details", "error");
+      if (responseData && (responseData.business_name || responseData.address_line1 || responseData.city)) {
+        console.log("✅ Business data found:", responseData);
         
-        // Initialize with empty data if API fails (like your example)
-        setBusiness({
-          business_name: "",
-        });
-        setBusinessAddress({
-          address_line1: "",
-          address_line2: "",
-          city: "",
-          state: "",
-          pincode: "",
-        });
+        // Update business info if new data is available
+        if (responseData.business_name && responseData.business_name !== business.business_name) {
+          setBusiness({
+            business_name: responseData.business_name,
+          });
+        }
+
+        // Update address if new data is available
+        const newAddress = {
+          address_line1: responseData.address_line1 || responseData.address_line_1 || responseData.address1 || businessAddress.address_line1,
+          address_line2: responseData.address_line2 || responseData.address_line_2 || responseData.address2 || businessAddress.address_line2,
+          city: responseData.city || businessAddress.city,
+          state: responseData.state || businessAddress.state,
+          pincode: responseData.pincode || responseData.pin_code || responseData.zip_code || businessAddress.pincode,
+        };
+
+        if (JSON.stringify(newAddress) !== JSON.stringify(businessAddress)) {
+          setBusinessAddress(newAddress);
+        }
+
+        showToast("Business data loaded successfully", "success");
+      } else {
+        console.log("ℹ️ No additional business data found in API response, using existing data");
+        // Keep the existing pre-filled data
       }
-    } catch (err) {
-      console.error("Error fetching business details:", err);
-      showToast("Unable to fetch business details", "error");
-      
-      // Initialize with empty data on error (like your example)
-      setBusiness({
-        business_name: "",
-      });
-      setBusinessAddress({
-        address_line1: "",
-        address_line2: "",
-        city: "",
-        state: "",
-        pincode: "",
-      });
+    } catch (error) {
+      console.error("❌ Error fetching business data:", error);
+      // Don't show error toast - just use the existing data quietly
+      showToast("Using pre-filled business information", "info");
+    } finally {
+      setLoadingBusinessData(false);
     }
   };
 
@@ -405,6 +426,8 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
       business_address: businessAddress,
     };
 
+    console.log("Submitting payload:", payload);
+
     setSubmitting(true);
 
     try {
@@ -414,13 +437,18 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
         payload
       );
 
-      // CORRECTED: Handle response structure consistently
       if (response?.status || response?.response?.status) {
         okSuccessToast("User updated successfully");
         onFetchRef?.();
         handleClose();
       } else {
-        showToast(response?.message || response?.error?.message || "Failed to update user", "error");
+        // Handle API validation errors
+        if (response?.errors) {
+          const errorMessages = Object.values(response.errors).flat().join(', ');
+          showToast(`Validation error: ${errorMessages}`, "error");
+        } else {
+          showToast(response?.message || response?.error?.message || "Failed to update user", "error");
+        }
       }
     } catch (err) {
       console.error("Error updating user:", err);
@@ -608,13 +636,33 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
       case 2:
         return (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+            {/* Debug Info - Remove in production */}
+            <Card variant="outlined" sx={{ bgcolor: 'warning.light', display: 'none' }}> {/* Set to 'none' to hide debug info */}
+              <CardContent>
+                <Typography variant="h6" color="warning.dark">Debug Information:</Typography>
+                <Typography variant="body2">Business: {JSON.stringify(business)}</Typography>
+                <Typography variant="body2">Address: {JSON.stringify(businessAddress)}</Typography>
+                <Typography variant="body2">Loading: {loadingBusinessData ? "Yes" : "No"}</Typography>
+              </CardContent>
+            </Card>
+
             {/* Business Info */}
             <Card variant="outlined" sx={{ bgcolor: 'background.default' }}>
               <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <span style={{ fontSize: '1.25rem' }}>🏢</span>
-                  Business Information
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <span style={{ fontSize: '1.25rem' }}>🏢</span>
+                    Business Information
+                  </Typography>
+                  {loadingBusinessData && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <CircularProgress size={20} />
+                      <Typography variant="body2" color="text.secondary">
+                        Loading...
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
                 
                 <TextField
                   label="Business Name *"
@@ -652,7 +700,7 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
-                      label="Address Line 2 *"
+                      label="Address Line 2"
                       value={businessAddress.address_line2}
                       onChange={(e) => handleBusinessAddressChange("address_line2", e.target.value)}
                       onBlur={() => handleBlur('address_line2')}
@@ -707,7 +755,7 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
       default:
         return null;
     }
-  }, [activeStep, user, business, businessAddress, role, getFieldError, handleBlur, handleUserChange, handleBusinessChange, handleBusinessAddressChange, rolesList]);
+  }, [activeStep, user, business, businessAddress, role, getFieldError, handleBlur, handleUserChange, handleBusinessChange, handleBusinessAddressChange, rolesList, loadingBusinessData]);
 
   return (
     <Dialog 
@@ -778,7 +826,7 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
             <Button
               variant="contained"
               onClick={handleSubmit}
-              disabled={submitting}
+              disabled={submitting || loadingBusinessData}
               sx={{ backgroundColor: "#492077" }}
             >
               {submitting ? "Updating..." : "Update User"}

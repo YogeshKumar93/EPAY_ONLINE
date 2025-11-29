@@ -90,7 +90,7 @@ const ApiEndpoints = {
   GET_ENTRIES: "bankStatement/getEntries",
 
 
-  GET_BY_TYPE: "business/getByType",
+    GET_BY_TYPE: "business/getByType",
   UPDATE_BY_TYPE: "business/updateByType",
   GET_ALL_BY_USER: "business/getAllByUser",
   APPROVE_REJECT_DOCS: "business/approveReject",
