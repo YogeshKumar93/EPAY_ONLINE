@@ -18,7 +18,7 @@ import ApiEndpoints from "../api/ApiEndpoints";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-// import BlockUnblockUser from "./BlockUnblockUser";
+ import BlockUnblockUser from "./BlockUnblockUser";
 import ReButton from "../components/common/ReButton";
 import CreateUser from "../components/User/CreateUser";
 // import EditIcon from "@mui/icons-material/Edit";
@@ -638,14 +638,14 @@ if (["adm", "sadm"].includes(userRole?.role)) {
         />
       )} */}
 
-      {/* {userToToggle && (
+       {userToToggle && (
         <BlockUnblockUser
           open={lockModalOpen}
           handleClose={handleCloseLockModal}
           user={userToToggle}
           onSuccess={refreshUsers}
         />
-      )} */}
+      )} 
       {/* {openWalletTranser && (
         <AdWalletTransfer
           open={openWalletTranser}
