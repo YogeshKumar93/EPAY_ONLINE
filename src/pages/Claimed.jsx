@@ -284,7 +284,7 @@ const handleUpdateClaimed = async (rows) => {
       {
         name: "Handled By",
         selector: (row) => (
-          <div style={{ fontSize: 12, fontWeight: 600 }}>{row.handle_by}</div>
+          <div style={{  fontWeight: 600 }}>{row.handle_by}</div>
         ),
         wrap: true,
         width: "120px",
