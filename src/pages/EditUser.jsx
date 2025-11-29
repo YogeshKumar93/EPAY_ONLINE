@@ -348,7 +348,7 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
       // Try the most common endpoint first
       const payload = {
         user_id: editData.id,
-        type: "basic", // Adjust this based on your API
+        type: "address", // Adjust this based on your API
       };
 
       const response = await apiCall("POST", ApiEndpoints.GET_BY_TYPE, payload);
@@ -416,7 +416,7 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
     }
 
     const payload = {
-      user_id: editData?.id,
+      id: editData?.id,
       role,
       user: {
         ...user,
