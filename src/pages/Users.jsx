@@ -341,6 +341,8 @@ const Users = ({ query }) => {
     );
   }
 
+
+  
   const filters = useMemo(() => {
     const userRole = user?.role?.toLowerCase?.();
 

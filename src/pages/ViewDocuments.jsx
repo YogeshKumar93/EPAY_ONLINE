@@ -1,286 +1,301 @@
-import React, { useEffect, useState } from "react";
-import CommonModal from "../components/common/CommonModal";
+import React from "react";
 import {
-  Box,
-  Typography,
-  Paper,
-  Grid,
   Dialog,
+  DialogTitle,
   DialogContent,
-  IconButton,
+  DialogActions,
+  Button,
+  Typography,
+  Grid,
+  Divider,
+  Box,
+  Chip,
+  Avatar,
+  Card,
+  CardContent,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import { apiCall } from "../api/apiClient";
-import ApiEndpoints from "../api/ApiEndpoints";
-import CommonLoader from "../components/common/CommonLoader";
-import { useToast } from "../utils/ToastContext";
-
-const ALLOWED_SECTIONS = ["basic", "address", "kyc"];
-const EXCLUDE_KEYS = ["id", "user_id", "created_at", "updated_at"];
-const DOCUMENT_KEYS = [
-  "gst_certificate",
-  "udyam_certificate",
-  "shop_license",
-  "rent_agreement",
-  "electricity_bill",
-];
+import {
+  Person,
+  Phone,
+  Email,
+  Business,
+  CalendarToday,
+  LocationOn,
+  Badge,
+  Close,
+} from "@mui/icons-material";
 
 const ViewDocuments = ({ open, onClose, user }) => {
-  const [userData, setUserData] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [actionLoading, setActionLoading] = useState(false);
-  const [zoomImage, setZoomImage] = useState(null); // for zoom modal
-  const { showToast } = useToast();
+  if (!user) return null;
 
-  useEffect(() => {
-    if (open && user?.id) fetchUserData();
-  }, [open, user]);
-
-  const fetchUserData = async () => {
-    setLoading(true);
-    try {
-      const { error, response } = await apiCall(
-        "post",
-        ApiEndpoints.GET_ALL_BY_USER,
-        { id: user.id }
-      );
-      setUserData(response?.data || {});
-    } catch (err) {
-      console.error(err);
-      setUserData({});
-    } finally {
-      setLoading(false);
-    }
+  const getStatusColor = (status) => {
+    return status ? "success" : "error";
   };
 
-  const handleAction = async (action) => {
-    setActionLoading(true);
-    try {
-      const payload = { user_id: user.id, action };
-      const { error, response } = await apiCall(
-        "post",
-        ApiEndpoints.APPROVE_REJECT_DOCS,
-        payload
-      );
-
-      if (response) {
-        showToast(response?.message, "success");
-        onClose();
-      } else {
-        showToast(error?.message, "error");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error processing action");
-    } finally {
-      setActionLoading(false);
-    }
+  const getRoleColor = (role) => {
+    const roleColors = {
+      admin: "error",
+      user: "primary",
+      manager: "warning",
+      editor: "info",
+    };
+    return roleColors[role?.toLowerCase()] || "default";
   };
-
-  const renderField = (key, value) => {
-    const formattedKey = key
-      .replace(/_/g, " ")
-      .replace(/\b\w/g, (c) => c.toUpperCase());
-
-    const isImage =
-      typeof value === "string" &&
-      (value.startsWith("http://") || value.startsWith("https://"));
-
-    return (
-      <Box key={key} sx={{ mb: 1, mr: 2 }}>
-        <Typography sx={{ fontWeight: 500, fontSize: 14 }}>
-          {formattedKey}:
-        </Typography>
-        {value ? (
-          isImage ? (
-            <img
-              src={value}
-              alt={formattedKey}
-              onClick={() => setZoomImage(value)}
-              style={{
-                maxWidth: "120px",
-                maxHeight: "120px",
-                border: "1px solid #ccc",
-                borderRadius: "4px",
-                marginTop: 4,
-                cursor: "pointer",
-                objectFit: "cover",
-                transition: "transform 0.2s",
-              }}
-            />
-          ) : (
-            <Typography sx={{ fontSize: 14, display: "inline-block", ml: 1 }}>
-              {value}
-            </Typography>
-          )
-        ) : (
-          <Typography
-            sx={{ fontStyle: "italic", color: "#777", fontSize: 14, ml: 1 }}
-          >
-            Not Provided
-          </Typography>
-        )}
-      </Box>
-    );
-  };
-
-  const renderSection = (sectionData = {}, sectionName) => {
-    if (!sectionData || Object.keys(sectionData).length === 0) {
-      return (
-        <Typography sx={{ fontStyle: "italic", color: "#777", fontSize: 14 }}>
-          No data available for this section.
-        </Typography>
-      );
-    }
-
-    const textKeys = Object.keys(sectionData).filter(
-      (key) => !EXCLUDE_KEYS.includes(key) && !DOCUMENT_KEYS.includes(key)
-    );
-
-    const docKeys = Object.keys(sectionData).filter((key) =>
-      DOCUMENT_KEYS.includes(key)
-    );
-
-    return (
-      <Box sx={{ display: "flex", flexWrap: "wrap" }}>
-        {textKeys.length > 0 &&
-          textKeys.map((key) => renderField(key, sectionData[key]))}
-
-        {sectionName === "kyc" && docKeys.length > 0 && (
-          <Box sx={{ display: "flex", flexWrap: "wrap", mt: 1 }}>
-            {docKeys.map((key) => renderField(key, sectionData[key]))}
-          </Box>
-        )}
-      </Box>
-    );
-  };
-
-  const sectionEntries = Object.entries(userData).filter(([sectionName]) =>
-    ALLOWED_SECTIONS.includes(sectionName)
-  );
 
   return (
-    <>
-      <CommonModal
-        open={open}
-        onClose={onClose}
-        title={`View Details of ${user?.name}`}
-        maxWidth="lg"
-        footerButtons={
-          user?.status !== 1
-            ? [
-                {
-                  text: "Approve",
-                  variant: "contained",
-                  color: "success",
-                  onClick: () => handleAction("approve"),
-                  disabled: actionLoading,
-                },
-                {
-                  text: "Reject",
-                  variant: "outlined",
-                  color: "error",
-                  onClick: () => handleAction("reject"),
-                  disabled: actionLoading,
-                },
-              ]
-            : []
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      maxWidth="md" 
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+          overflow: "hidden",
         }
+      }}
+    >
+      {/* Header with Gradient Background */}
+      <DialogTitle 
+        sx={{ 
+          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          color: "white",
+          py: 2,
+          position: "relative",
+        }}
       >
-        <Box
-          sx={{
-            position: "relative",
-            maxHeight: "70vh",
-            overflowX: "auto",
-            overflowY: "hidden",
-            display: "flex",
-            flexDirection: "row",
-            gap: 2,
-            py: 1,
-          }}
-        >
-          {(loading || actionLoading) && (
-            <Box
-              position="absolute"
-              top={0}
-              left={0}
-              right={0}
-              bottom={0}
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              bgcolor="rgba(255,255,255,0.6)"
-              zIndex={1}
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Box display="flex" alignItems="center" gap={2}>
+            <Avatar
+              sx={{
+                bgcolor: "rgba(255,255,255,0.2)",
+                width: 50,
+                height: 50,
+                border: "2px solid rgba(255,255,255,0.3)",
+              }}
             >
-              <CommonLoader />
+              <Person sx={{ fontSize: 30 }} />
+            </Avatar>
+            <Box>
+              <Typography variant="h5" fontWeight="bold">
+                User Details
+              </Typography>
+              <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                Complete profile information
+              </Typography>
             </Box>
-          )}
-
-          {!loading &&
-            sectionEntries.length > 0 &&
-            sectionEntries.map(([sectionName, sectionData]) => (
-              <Paper
-                key={sectionName}
-                variant="outlined"
-                sx={{
-                  p: 2,
-                  backgroundColor: "#fafafa",
-                  minWidth: "300px",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 1,
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontWeight: 600,
-                    mb: 1,
-                    textTransform: "capitalize",
-                    fontSize: 16,
-                  }}
-                >
-                  {sectionName}
-                </Typography>
-                {renderSection(sectionData, sectionName)}
-              </Paper>
-            ))}
-        </Box>
-      </CommonModal>
-
-      {/* Zoom Image Modal */}
-      <Dialog
-        open={!!zoomImage}
-        onClose={() => setZoomImage(null)}
-        maxWidth="md"
-      >
-        <DialogContent sx={{ position: "relative", p: 0 }}>
-          <IconButton
-            onClick={() => setZoomImage(null)}
+          </Box>
+          <Button
+            onClick={onClose}
             sx={{
-              position: "absolute",
-              top: 8,
-              right: 8,
-              zIndex: 10,
-              color: "#fff",
+              color: "white",
+              minWidth: "auto",
+              p: 1,
+              borderRadius: "50%",
+              "&:hover": {
+                backgroundColor: "rgba(255,255,255,0.1)",
+              },
             }}
           >
-            <CloseIcon />
-          </IconButton>
-          <Box
-            component="img"
-            src={zoomImage}
-            alt="Zoomed"
-            sx={{
-              width: "100%",
-              height: "auto",
-              maxHeight: "80vh",
-              objectFit: "contain",
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-    </>
+            <Close />
+          </Button>
+        </Box>
+      </DialogTitle>
+
+      <DialogContent dividers sx={{ p: 0 }}>
+        {/* Status Bar */}
+        <Box
+          sx={{
+            backgroundColor: "grey.50",
+            p: 2,
+            borderBottom: 1,
+            borderColor: "divider",
+          }}
+        >
+          <Box display="flex" gap={2} alignItems="center" flexWrap="wrap">
+            <Chip
+              label={user.status ? "Active" : "Inactive"}
+              color={getStatusColor(user.status)}
+              variant="filled"
+              size="small"
+            />
+            <Chip
+              label={user.role}
+              color={getRoleColor(user.role)}
+              variant="outlined"
+              size="small"
+            />
+            <Typography variant="body2" color="text.secondary" sx={{ ml: "auto" }}>
+              User ID: #{user.id || "N/A"}
+            </Typography>
+          </Box>
+        </Box>
+
+        <Box sx={{ p: 3 }}>
+          <Grid container spacing={3}>
+            {/* Personal Information Card */}
+            <Grid item xs={12} md={6}>
+              <Card 
+                variant="outlined"
+                sx={{
+                  borderRadius: 2,
+                  borderColor: "grey.200",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                  height: "100%",
+                }}
+              >
+                <CardContent sx={{ p: 3 }}>
+                  <Box display="flex" alignItems="center" gap={1} mb={2}>
+                    <Badge color="primary" />
+                    <Typography variant="h6" fontWeight="bold">
+                      Personal Information
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ space: 2 }}>
+                    <InfoRow icon={<Person />} label="Full Name" value={user.name} />
+                    <InfoRow icon={<Phone />} label="Mobile" value={user.mobile} />
+                    <InfoRow icon={<Email />} label="Email" value={user.email} />
+                    <InfoRow icon={<Business />} label="Role" value={user.role} />
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            {/* Dates & Timeline Card */}
+            <Grid item xs={12} md={6}>
+              <Card 
+                variant="outlined"
+                sx={{
+                  borderRadius: 2,
+                  borderColor: "grey.200",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                  height: "100%",
+                }}
+              >
+                <CardContent sx={{ p: 3 }}>
+                  <Box display="flex" alignItems="center" gap={1} mb={2}>
+                    <CalendarToday color="primary" />
+                    <Typography variant="h6" fontWeight="bold">
+                      Timeline
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ space: 2 }}>
+                    <InfoRow 
+                      icon={<CalendarToday />} 
+                      label="Start Date" 
+                      value={user.start_date} 
+                      highlight
+                    />
+                    <InfoRow 
+                      icon={<CalendarToday />} 
+                      label="End Date" 
+                      value={user.end_date} 
+                      highlight
+                    />
+                    
+                    {/* Status Timeline */}
+                    <Box sx={{ mt: 3, p: 2, backgroundColor: "grey.50", borderRadius: 2 }}>
+                      <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                        Current Status
+                      </Typography>
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <Box
+                          sx={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: "50%",
+                            backgroundColor: user.status ? "success.main" : "error.main",
+                          }}
+                        />
+                        <Typography variant="body2">
+                          {user.status ? "Active User" : "Inactive User"}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            {/* Additional Information Cards can be added here */}
+            {/* Uncomment and style these sections as needed */}
+
+            {/* 
+            <Grid item xs={12}>
+              <Card variant="outlined" sx={{ borderRadius: 2, borderColor: 'grey.200' }}>
+                <CardContent sx={{ p: 3 }}>
+                  <Box display="flex" alignItems="center" gap={1} mb={2}>
+                    <LocationOn color="primary" />
+                    <Typography variant="h6" fontWeight="bold">
+                      Business Information
+                    </Typography>
+                  </Box>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <InfoRow label="Business Name" value={user.business_name} />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <InfoRow label="GST Number" value={user.gst || "N/A"} />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <InfoRow label="PAN Number" value={user.pan || "N/A"} />
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
+            */}
+          </Grid>
+        </Box>
+      </DialogContent>
+
+      <DialogActions sx={{ p: 3, borderTop: 1, borderColor: "divider" }}>
+       
+      </DialogActions>
+    </Dialog>
   );
 };
+
+// Reusable component for information rows
+const InfoRow = ({ icon, label, value, highlight = false }) => (
+  <Box
+    sx={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      py: 1.5,
+      borderBottom: "1px solid",
+      borderColor: "grey.100",
+      "&:last-child": {
+        borderBottom: "none",
+      },
+    }}
+  >
+    <Box display="flex" alignItems="center" gap={1.5}>
+      <Box sx={{ color: "primary.main", display: "flex" }}>
+        {icon}
+      </Box>
+      <Typography variant="body2" color="text.secondary">
+        {label}
+      </Typography>
+    </Box>
+    <Typography
+      variant="body2"
+      fontWeight={highlight ? "bold" : "normal"}
+      color={highlight ? "primary.main" : "text.primary"}
+      sx={{
+        backgroundColor: highlight ? "primary.50" : "transparent",
+        px: highlight ? 1.5 : 0,
+        py: highlight ? 0.5 : 0,
+        borderRadius: highlight ? 1 : 0,
+      }}
+    >
+      {value || "N/A"}
+    </Typography>
+  </Box>
+);
 
 export default ViewDocuments;
