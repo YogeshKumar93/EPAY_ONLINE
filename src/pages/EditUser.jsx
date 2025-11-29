@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Button,
   Dialog,
@@ -68,21 +68,57 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
     pincode: "",
   });
 
-  // Steps with unique IDs
-  const steps = [
+  // Memoized steps
+  const steps = useMemo(() => [
     { id: 'step-role', label: "Role & Basic Info" },
     { id: 'step-user', label: "User Details" },
     { id: 'step-business', label: "Business Details" },
-  ];
+  ], []);
 
-  // Prefill edit data - SINGLE useEffect
-  const formatDate = (date) => {
+  // Format date utility
+  const formatDate = useCallback((date) => {
     if (!date) return "";
     const d = new Date(date);
     if (isNaN(d.getTime())) return "";
     return d.toISOString().split("T")[0];
-  };
+  }, []);
 
+  // Reset form function
+  const resetForm = useCallback(() => {
+    setRole("");
+    setUser({
+      name: "",
+      email: "",
+      mobile: "",
+      pan: "",
+      gst: "",
+      start_date: "",
+      end_date: "",
+      status: false,
+    });
+    setBusiness({
+      business_name: "",
+    });
+    setBusinessAddress({
+      address_line1: "",
+      address_line2: "",
+      city: "",
+      state: "",
+      pincode: "",
+    });
+    setActiveStep(0);
+    setTouched({});
+    setSubmitAttempted(false);
+    setSubmitting(false);
+  }, []);
+
+  // Handle close with reset
+  const handleClose = useCallback(() => {
+    resetForm();
+    onClose();
+  }, [resetForm, onClose]);
+
+  // Prefill edit data
   useEffect(() => {
     if (open && editData) {
       setRole(editData.role || "adm");
@@ -114,76 +150,86 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
       setTouched({});
       setSubmitAttempted(false);
     }
-  }, [open, editData]);
+  }, [open, editData, formatDate]);
 
   // Generic change handlers with touch tracking
-  const handleUserChange = (field, value) => {
+  const handleUserChange = useCallback((field, value) => {
     setUser((prev) => ({ ...prev, [field]: value }));
     setTouched(prev => ({ ...prev, [field]: true }));
-  };
+  }, []);
 
-  const handleBusinessChange = (field, value) => {
+  const handleBusinessChange = useCallback((field, value) => {
     setBusiness((prev) => ({ ...prev, [field]: value }));
     setTouched(prev => ({ ...prev, [field]: true }));
-  };
+  }, []);
 
-  const handleBusinessAddressChange = (field, value) => {
+  const handleBusinessAddressChange = useCallback((field, value) => {
     setBusinessAddress((prev) => ({ ...prev, [field]: value }));
     setTouched(prev => ({ ...prev, [field]: true }));
-  };
+  }, []);
 
   // Handle blur events for touch tracking
-  const handleBlur = (field) => {
+  const handleBlur = useCallback((field) => {
     setTouched(prev => ({ ...prev, [field]: true }));
-  };
+  }, []);
 
   // Validation functions
-  const validateEmail = (email) => {
+  const validateEmail = useCallback((email) => {
     if (!email) return "Email is required";
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) return "Please enter a valid email address";
     return "";
-  };
+  }, []);
 
-  const validateMobile = (mobile) => {
+  const validateMobile = useCallback((mobile) => {
     if (!mobile) return "Mobile number is required";
     const mobileRegex = /^[0-9]{10}$/;
     if (!mobileRegex.test(mobile)) return "Please enter a valid 10-digit mobile number";
     return "";
-  };
+  }, []);
 
-  const validatePAN = (pan) => {
+  const validatePAN = useCallback((pan) => {
     if (pan && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan)) {
       return "Please enter a valid PAN number";
     }
     return "";
-  };
+  }, []);
 
-  const validateGST = (gst) => {
+  const validateGST = useCallback((gst) => {
     if (gst && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(gst)) {
       return "Please enter a valid GST number";
     }
     return "";
-  };
+  }, []);
 
-  const validatePincode = (pincode) => {
+  const validatePincode = useCallback((pincode) => {
     if (!pincode) return "Pincode is required";
     const pincodeRegex = /^[0-9]{6}$/;
     if (!pincodeRegex.test(pincode)) return "Please enter a valid 6-digit pincode";
     return "";
-  };
+  }, []);
 
-  const validateDates = (startDate, endDate) => {
+  const validateDates = useCallback((startDate, endDate) => {
     if (!startDate) return "Start date is required";
     if (!endDate) return "End date is required";
-    if (new Date(startDate) > new Date(endDate)) {
-      return "End date must be after or equal to start date";
-    }
+    
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    if (isNaN(start.getTime())) return "Please enter a valid start date";
+    if (isNaN(end.getTime())) return "Please enter a valid end date";
+    if (start > end) return "End date must be after or equal to start date";
+    
     return "";
-  };
+  }, []);
 
-  // Get field errors - industry standard: show errors only after touch/submit attempt
-  const getFieldError = (field, value, additionalData = {}) => {
+  const validateRequired = useCallback((value, fieldName) => {
+    if (!value || value.trim() === "") return `${fieldName} is required`;
+    return "";
+  }, []);
+
+  // Get field errors
+  const getFieldError = useCallback((field, value, additionalData = {}) => {
     const shouldShowError = touched[field] || submitAttempted;
     
     if (!shouldShowError) return "";
@@ -202,26 +248,26 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
       case 'dates':
         return validateDates(additionalData.startDate, additionalData.endDate);
       case 'name':
-        return !value ? "Full name is required" : "";
+        return validateRequired(value, "Full name");
       case 'business_name':
-        return !value ? "Business name is required" : "";
+        return validateRequired(value, "Business name");
       case 'address_line1':
-        return !value ? "Address Line 1 is required" : "";
+        return validateRequired(value, "Address Line 1");
       case 'address_line2':
-        return !value ? "Address Line 2 is required" : "";
+        return validateRequired(value, "Address Line 2");
       case 'city':
-        return !value ? "City is required" : "";
+        return validateRequired(value, "City");
       case 'state':
-        return !value ? "State is required" : "";
+        return validateRequired(value, "State");
       case 'role':
-        return !value ? "Role is required" : "";
+        return validateRequired(value, "Role");
       default:
         return "";
     }
-  };
+  }, [touched, submitAttempted, validateEmail, validateMobile, validatePAN, validateGST, validatePincode, validateDates, validateRequired]);
 
   // Check if step has errors
-  const hasStepErrors = (step) => {
+  const hasStepErrors = useCallback((step) => {
     switch (step) {
       case 0:
         return !!getFieldError('role', role);
@@ -242,10 +288,10 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
       default:
         return false;
     }
-  };
+  }, [getFieldError, role, user, business, businessAddress]);
 
   // Step handlers
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     setSubmitAttempted(true);
     
     if (hasStepErrors(activeStep)) {
@@ -255,11 +301,76 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
 
     setActiveStep((prev) => prev + 1);
     setSubmitAttempted(false);
-  };
+  }, [activeStep, hasStepErrors, showToast]);
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     setActiveStep((prev) => prev - 1);
     setSubmitAttempted(false);
+  }, []);
+
+  // Fetch business data when reaching step 2 - CORRECTED VERSION
+  useEffect(() => {
+    if (activeStep === 2) {
+      fetchBusinessData();
+    }
+  }, [activeStep]);
+
+  const fetchBusinessData = async () => {
+    try {
+      // CORRECTED: Using the same structure as your fetchBusinessDetails function
+      const payload = {
+        user_id: editData?.id, // Using the user ID from editData
+        type: "business_info",
+      };
+
+      const response = await apiCall("POST", ApiEndpoints.GET_BY_TYPE, payload);
+      
+      // CORRECTED: Handle response structure like your example
+      const data = response?.data || response?.response?.data || {};
+
+      if (response?.status || response?.response?.status) {
+        setBusiness({
+          business_name: data?.business_name || "",
+        });
+
+        setBusinessAddress({
+          address_line1: data?.address_line1 || "",
+          address_line2: data?.address_line2 || "",
+          city: data?.city || "",
+          state: data?.state || "",
+          pincode: data?.pincode || "",
+        });
+      } else {
+        showToast(response?.message || "Failed to fetch business details", "error");
+        
+        // Initialize with empty data if API fails (like your example)
+        setBusiness({
+          business_name: "",
+        });
+        setBusinessAddress({
+          address_line1: "",
+          address_line2: "",
+          city: "",
+          state: "",
+          pincode: "",
+        });
+      }
+    } catch (err) {
+      console.error("Error fetching business details:", err);
+      showToast("Unable to fetch business details", "error");
+      
+      // Initialize with empty data on error (like your example)
+      setBusiness({
+        business_name: "",
+      });
+      setBusinessAddress({
+        address_line1: "",
+        address_line2: "",
+        city: "",
+        state: "",
+        pincode: "",
+      });
+    }
   };
 
   const handleSubmit = async () => {
@@ -267,15 +378,19 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
 
     // Check if any step has errors
     let hasErrors = false;
+    let firstErrorStep = 0;
+    
     for (let step = 0; step < steps.length; step++) {
       if (hasStepErrors(step)) {
         hasErrors = true;
+        firstErrorStep = step;
         break;
       }
     }
 
     if (hasErrors) {
       showToast("Please fix all errors before submitting", "error");
+      setActiveStep(firstErrorStep);
       return;
     }
 
@@ -293,27 +408,29 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
     setSubmitting(true);
 
     try {
-      const { response, error } = await apiCall(
+      const response = await apiCall(
         "POST",
         ApiEndpoints.EDIT_USER,
         payload
       );
 
-      if (response) {
+      // CORRECTED: Handle response structure consistently
+      if (response?.status || response?.response?.status) {
         okSuccessToast("User updated successfully");
         onFetchRef?.();
-        onClose();
+        handleClose();
       } else {
-        showToast(error?.message || "Failed to update user", "error");
+        showToast(response?.message || response?.error?.message || "Failed to update user", "error");
       }
     } catch (err) {
+      console.error("Error updating user:", err);
       showToast("Something went wrong while updating user", "error");
     } finally {
       setSubmitting(false);
     }
   };
 
-  const getStepContent = (step) => {
+  const getStepContent = useCallback((step) => {
     switch (step) {
       case 0:
         return (
@@ -590,11 +707,21 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
       default:
         return null;
     }
-  };
+  }, [activeStep, user, business, businessAddress, role, getFieldError, handleBlur, handleUserChange, handleBusinessChange, handleBusinessAddressChange, rolesList]);
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle sx={{ pb: 1, borderBottom: 1, borderColor: 'divider', backgroundColor: "#f3ebebff" }}>
+    <Dialog 
+      open={open} 
+      onClose={handleClose} 
+      maxWidth="md" 
+      fullWidth
+      aria-labelledby="edit-user-dialog-title"
+      aria-describedby="edit-user-dialog-description"
+    >
+      <DialogTitle 
+        id="edit-user-dialog-title"
+        sx={{ pb: 1, borderBottom: 1, borderColor: 'divider', backgroundColor: "#f3ebebff" }}
+      >
         <Typography variant="h5" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <span style={{ fontSize: '1.5rem' }}>✏️</span>
           Edit User
@@ -632,7 +759,7 @@ const EditUser = ({ open, onClose, onFetchRef, editData }) => {
 
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button
-            onClick={onClose}
+            onClick={handleClose}
             disabled={submitting}
             sx={{ backgroundColor: "#9180a2ff", color: "#fff" }}
           >
