@@ -28,7 +28,7 @@ import CommonStatus from "../components/common/CommonStatus";
 import CommonLoader from "../components/common/CommonLoader";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-// import EditUser from "./EditUser";
+import EditUser from "./EditUser";
 // import ViewDocuments from "./ViewDocuments";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Assignment, CurrencyRupee, VerifiedUser } from "@mui/icons-material";
