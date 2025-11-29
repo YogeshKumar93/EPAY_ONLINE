@@ -376,7 +376,7 @@ const Users = ({ query }) => {
         id: "role",
         label: "Role",
         type: "dropdown",
-        roles: ["adm", "md", "zsm", "asm", "sadm"],
+        roles: ["adm",  "sadm"],
         options: roleOptions,
       },
 
