@@ -30,12 +30,7 @@ const Claimed_with_Paid = () => {
 const authCtx = useContext(AuthContext);
 const user = authCtx?.user;
 
-  // const [filters, setFilters] = useState({
-  //   userId: "",
-  //   status: "claimed",
-  //   date: {},
-  //   dateVal: "",
-  // });
+ 
 
       const formatLogDate = (dateString) => {
   if (!dateString) return "";
@@ -71,16 +66,24 @@ const user = authCtx?.user;
     setOpenDelete(true);
   };
 
-   const filters = useMemo(
-      () => [
-        { id: "bank_name", label: "Bank Name", type: "textfield" },
-        { id: "id", label: "Id", type: "textfield" },
-        { id: "particulars", label: "Particulars", type: "textfield" },
-        { id: "handle_by", label: "Handle By", type: "textfield" },
-        { id: "daterange", type: "daterange" },
-      ],
-      [user?.role,appliedFilters]
-    );
+  const [filters, setFilters] = useState({
+  userId: "",
+  status: "claimed",
+  date: {},
+  dateVal: "",
+});
+
+const filterConfig = useMemo(
+  () => [
+    { id: "bank_name", label: "Bank Name", type: "textfield" },
+    { id: "id", label: "Id", type: "textfield" },
+    { id: "particulars", label: "Particulars", type: "textfield" },
+    { id: "handle_by", label: "Handle By", type: "textfield" },
+    { id: "daterange", type: "daterange" }
+  ],
+  [user?.role, appliedFilters]
+);
+
   
      const filterRows = (rows) => {
       if (!searchTerm) return rows;
@@ -157,7 +160,17 @@ const user = authCtx?.user;
 ),
 
     },
-    { name: "Particulars", selector: (row) => capitalize1(row.particulars) },
+   
+         {
+           name: "Particulars",
+           selector: (row) => (
+             <div style={{ fontSize: 13, fontWeight: 600 }}>
+               {capitalize1(row.particulars)}
+             </div>
+           ),
+           wrap: true,
+           minWidth: "120px",
+         },
     { name: "Handled By", selector: (row) => row.handle_by },
     { name: "Credit", selector: (row) => (
       <span style={{color:"green"}}>
@@ -248,7 +261,7 @@ const user = authCtx?.user;
             endpoint={ApiEndpoints.GET_ENTRIES}
             columns={columns}
             queryParam={`status=2`}
-              filters={filters}  
+              filters={filterConfig}  
              transformData={filterRows} 
           />
 
