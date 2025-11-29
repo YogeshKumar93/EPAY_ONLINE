@@ -109,7 +109,7 @@ const Banks = ({ filters = [] }) => {
       {
         name: "Bank Name",
         selector: (row) => (
-          <div style={{ textAlign: "left", fontWeight: 500 }}>
+          <div style={{ textAlign: "left", fontWeight: 600 }}>
             {row.bank_name?.toUpperCase()}
           </div>
         ),

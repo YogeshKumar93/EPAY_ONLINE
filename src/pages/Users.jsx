@@ -67,19 +67,16 @@ const Users = ({ query }) => {
   const [lockModalOpen, setLockModalOpen] = useState(false);
   const [userToToggle, setUserToToggle] = useState(null);
   const [openCreateUser, setOpenCreateUser] = useState(false);
-  const [createadmuser, setCreateAdmUser] = useState(false);
-  const [openAddInst, setOpenAddInst] = useState(false);
+
   const [openLeinModal, setOpenLeinModal] = useState(false);
   const [openWalletTranser, setOpenWalletTranser] = useState(false);
-  const [openAssignPlans, setOpenAssignPlans] = useState(false);
+
   const [userSearch, setUserSearch] = useState("");
   const [userOptions, setUserOptions] = useState([]);
-  const [selectedUserFilter, setSelectedUserFilter] = useState(null); // selected option
+
   const [appliedFilters, setAppliedFilters] = useState({}); // applied filter payload
-  // const navigate = useNavigate();
-  const [openChangeRole, setOpenChangeRole] = useState(false);
-  // const [selectedUser, setSelectedUser] = useState(null);
-  const [openChangeParent, setOpenChangeParent] = useState(false);
+
+
   const { showToast } = useToast();
   // const handleOpenChangeParent = (row) => {
   //   setSelectedUser(row);
@@ -347,13 +344,7 @@ const Users = ({ query }) => {
     const hierarchy = [
       "sadm",
       "adm",
-      // "zsm",
-      // "asm",
-      // "md",
-      // "di",
-      // "ret",
-      // "dd",
-      // "api",
+     
     ];
 
     const hideRoles = (() => {
@@ -375,7 +366,7 @@ const Users = ({ query }) => {
         id: "role",
         label: "Role",
         type: "dropdown",
-        roles: ["adm", "md", "zsm", "asm", "sadm"],
+        roles: ["adm",  "sadm"],
         options: roleOptions,
       },
 
@@ -398,12 +389,7 @@ const Users = ({ query }) => {
         isOptionEqualToValue: (option, value) => option.id === value.id, // ✅ this line keeps selection visible
         roles: ["adm", "sadm"],
       },
-      {
-        id: "parent_id",
-        label: "Parent Id",
-        type: "textfield",
-        roles: ["adm"],
-      },
+     
       {
         id: "id",
         label: "User Id",
