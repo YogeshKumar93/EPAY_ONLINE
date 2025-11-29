@@ -37,6 +37,20 @@ const user = authCtx?.user;
   //   dateVal: "",
   // });
 
+      const formatLogDate = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+
+   return date.toLocaleString("en-US", {
+    month: "short",  // Nov
+    day: "2-digit",  // 29
+    hour: "2-digit", // 11
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,   // 11:46:50 instead of 11:46:50 AM
+  });
+};
+
   const fetchEntriesRef = useRef(null);
 
   const handleFetchRef = (fetchFn) => {
@@ -111,31 +125,37 @@ const user = authCtx?.user;
   const columns = [
     { name: "ID", selector: (row) => row.id, width: "80px" },
     { name: "Bank ID", selector: (row) => row.bank_id },
-    {
+  {
       name: (
-        <DateRangePicker
-          showOneCalendar
-          placeholder="Date"
-          ranges={predefinedRanges}
-          value={filters.dateVal}
-          onChange={(value) => {
-            if (!value) {
-              setFilters({ ...filters, date: {}, dateVal: "" });
+         <DateRangePicker
+            showOneCalendar
+            placeholder="Date"
+            size="medium"
+            cleanable
+            ranges={predefinedRanges}
+            value={filters.dateVal}
+            onChange={(value) => {
+              if (!value) {
+                setFilters({ ...filters, date: {}, dateVal: "" });
+                fetchEntries();
+                return;
+              }
+              setFilters({
+                ...filters,
+                date: { start: yyyymmdd(value[0]), end: yyyymmdd(value[1]) },
+                dateVal: value,
+              });
               fetchEntries();
-              return;
-            }
-            const dates = { start: value[0], end: value[1] };
-            setFilters({
-              ...filters,
-              date: { start: yyyymmdd(dates.start), end: yyyymmdd(dates.end) },
-              dateVal: value,
-            });
-            fetchEntries();
-          }}
-          style={{ width: 200 }}
-        />
-      ),
-      selector: (row) => row.date,
+            }}
+            style={{ width: 200 }}
+          />
+        ),
+    selector: (row) => (
+  <Tooltip title={formatLogDate(row.updated_at)} arrow>
+    <span>{formatLogDate(row.created_at)}</span>
+  </Tooltip>
+),
+
     },
     { name: "Particulars", selector: (row) => capitalize1(row.particulars) },
     { name: "Handled By", selector: (row) => row.handle_by },

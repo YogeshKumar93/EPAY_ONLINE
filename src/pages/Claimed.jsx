@@ -89,6 +89,20 @@ const Claimed = () => {
     dateVal: "",
   });
 
+     const formatLogDate = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+
+   return date.toLocaleString("en-US", {
+    month: "short",  // Nov
+    day: "2-digit",  // 29
+    hour: "2-digit", // 11
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,   // 11:46:50 instead of 11:46:50 AM
+  });
+};
+
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
   const { showToast } = useToast();
@@ -116,6 +130,8 @@ const Claimed = () => {
       )
     );
   };
+
+    
 
   const fetchEntriesRef = useRef(null);
   const handleFetchRef = (fetchFn) => {
@@ -222,8 +238,8 @@ const handleUpdateClaimed = async (rows) => {
       },
 
       {
-        name: (
-          <DateRangePicker
+      name: (
+         <DateRangePicker
             showOneCalendar
             placeholder="Date"
             size="medium"
@@ -246,14 +262,13 @@ const handleUpdateClaimed = async (rows) => {
             style={{ width: 200 }}
           />
         ),
-          selector: (row) => (
-    <Tooltip title={ddmmyyWithTime(row.updated_at)} arrow>
-      <span>{ddmmyyWithTime(row.created_at)}</span>
-    </Tooltip>
-  ),
+    selector: (row) => (
+  <Tooltip title={formatLogDate(row.updated_at)} arrow>
+    <span>{formatLogDate(row.created_at)}</span>
+  </Tooltip>
+),
 
-        width: "150px",
-      },
+    },
 
       {
         name: "Particulars",

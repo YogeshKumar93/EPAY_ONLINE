@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef, useMemo, useContext } from "react";
-import { Box } from "@mui/material";
+import { Box, Tooltip } from "@mui/material";
 import { DateRangePicker } from "rsuite";
 import CommonTable from "../components/common/CommonTable";
 import CommonLoader from "../components/common/CommonLoader";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import predefinedRanges from "../utils/predefinedRanges";
-import { yyyymmdd } from "../utils/DateUtils";
+import { ddmmyyWithTime, yyyymmdd } from "../utils/DateUtils";
 import { capitalize1 } from "../utils/TextUtil";
 import { currencySetter } from "../utils/Currencyutil";
 import AuthContext from "../contexts/AuthContext";
@@ -20,6 +20,28 @@ const Unclaimed = () => {
   const [appliedFilters, setAppliedFilters] = useState({});
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
+
+    const [filter, setFilters] = useState({
+      userId: "",
+      status: "unclaimed",
+      date: {},
+      dateVal: "",
+    });
+
+    const formatLogDate = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+
+  return date.toLocaleString("en-US", {
+    month: "short",  // Nov
+    day: "2-digit",  // 29
+    hour: "2-digit", // 11
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,   // 11:46:50 instead of 11:46:50 AM
+  });
+};
+
 
   // Only UI filters (NO appliedFilters)
   const filters = useMemo(
@@ -79,33 +101,35 @@ const Unclaimed = () => {
 
     {
       name: (
-        <DateRangePicker
-          showOneCalendar
-          placeholder="Date"
-          size="medium"
-          cleanable
-          ranges={predefinedRanges}
-          value={dateVal}
-          onChange={(value) => {
-            if (!value) {
-              setDateVal(null);
-              setDateFilter({});
+         <DateRangePicker
+            showOneCalendar
+            placeholder="Date"
+            size="medium"
+            cleanable
+            ranges={predefinedRanges}
+            value={filters.dateVal}
+            onChange={(value) => {
+              if (!value) {
+                setFilters({ ...filters, date: {}, dateVal: "" });
+                fetchEntries();
+                return;
+              }
+              setFilters({
+                ...filters,
+                date: { start: yyyymmdd(value[0]), end: yyyymmdd(value[1]) },
+                dateVal: value,
+              });
               fetchEntries();
-              return;
-            }
+            }}
+            style={{ width: 200 }}
+          />
+        ),
+    selector: (row) => (
+  <Tooltip title={formatLogDate(row.updated_at)} arrow>
+    <span>{formatLogDate(row.created_at)}</span>
+  </Tooltip>
+),
 
-            const start = yyyymmdd(value[0]);
-            const end = yyyymmdd(value[1]);
-
-            setDateVal(value);
-            setDateFilter({ start, end });
-
-            fetchEntries();
-          }}
-          style={{ width: 200 }}
-        />
-      ),
-      selector: (row) => row.date,
     },
 
     { name: "Particulars", selector: (row) => capitalize1(row.particulars) },
