@@ -17,7 +17,7 @@ import CommonLoader from "../components/common/CommonLoader";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import predefinedRanges from "../utils/predefinedRanges";
-import { yyyymmdd } from "../utils/DateUtils";
+import { ddmmyy, ddmmyyWithTime, yyyymmdd } from "../utils/DateUtils";
 import { capitalize1 } from "../utils/TextUtil";
 import { currencySetter } from "../utils/Currencyutil";
 import PrintIcon from "@mui/icons-material/Print";
@@ -246,7 +246,12 @@ const handleUpdateClaimed = async (rows) => {
             style={{ width: 200 }}
           />
         ),
-        selector: (row) => row.date,
+          selector: (row) => (
+    <Tooltip title={ddmmyyWithTime(row.updated_at)} arrow>
+      <span>{ddmmyyWithTime(row.created_at)}</span>
+    </Tooltip>
+  ),
+
         width: "150px",
       },
 
