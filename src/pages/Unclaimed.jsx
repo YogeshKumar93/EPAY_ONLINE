@@ -183,6 +183,7 @@ const Unclaimed = () => {
             endpoint={ApiEndpoints.GET_UNCLAIMED_ENTERIES}
             columns={columns}
             filters={filters}  
+              enableRowSelection={false} 
              transformData={filterRows}         
             disableSelectionOnClick
           />

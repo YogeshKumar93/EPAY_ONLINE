@@ -392,6 +392,7 @@ const handleUpdateClaimed = async (rows) => {
             endpoint={ApiEndpoints.GET_ENTRIES}
             queryParam={"status=1"}
             columns={columns}
+             enableRowSelection={true} 
             selectedRows={selectedRows}
             onSelectionChange={setSelectedRows} // Set full row objects
                 filters={filters}  
