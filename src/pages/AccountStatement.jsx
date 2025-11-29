@@ -111,7 +111,7 @@ const AccountStatement = () => {
           <DateRangePicker
             showOneCalendar
             placeholder="Date"
-            size="xs"
+            size="medium"
             cleanable
             ranges={predefinedRanges}
             value={filterValues.dateVal}
