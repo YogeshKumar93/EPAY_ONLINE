@@ -29,8 +29,6 @@ const PrintClaimedReceipt = () => {
   const totalCredit = rows.reduce((sum, r) => sum + (Number(r.credit) || 0), 0);
   const totalDebit = rows.reduce((sum, r) => sum + (Number(r.debit) || 0), 0);
 
-  // ------------------- DOWNLOAD HANDLERS -------------------
-
   const downloadPDF = async () => {
     const element = receiptRef.current;
     const canvas = await html2canvas(element);
@@ -87,7 +85,8 @@ const PrintClaimedReceipt = () => {
         background: "#fff",
       }}
     >
-      <Box sx={{ marginTop: 4, overflowX: "auto" }} ref={receiptRef}>
+      {/* ONLY RECEIPT CONTENT WILL BE PRINTED */}
+      <Box sx={{ marginTop: 4, overflowX: "auto" }} ref={receiptRef} className="receipt-content">
         <table
           style={{
             width: "100%",
@@ -98,37 +97,26 @@ const PrintClaimedReceipt = () => {
         >
           <thead>
             <tr style={{ backgroundColor: "#dbd3e4ff", color: "#492077" }}>
-              {[
-                "S.No",
-                "Txn Date",
-                "Mode",
-                "Particulars",
-                "Credit",
-                "Debit",
-                "Status",
-              ].map((title) => (
-                <th key={title} style={thStyle}>
-                  {title}
-                </th>
-              ))}
+              {["S.No", "Txn Date", "Mode", "Particulars", "Credit", "Debit", "Status"].map(
+                (title) => (
+                  <th key={title} style={thStyle}>
+                    {title}
+                  </th>
+                )
+              )}
             </tr>
           </thead>
           <tbody>
             {rows.map((row, idx) => (
               <tr key={idx}>
                 <td style={tdStyle}>{idx + 1}</td>
-                {[
-                  row.date,
-                  row.mop,
-                  row.particulars,
-                  row.credit,
-                  row.debit,
-                  row.status === 0 ? "Unclaimed" : "Claimed",
-                ].map((value, i) => (
-                  <td key={i} style={tdStyle}>
-                    {value ?? "N/A"}
-                  </td>
-                ))}
+                {[row.date, row.mop, row.particulars, row.credit, row.debit, row.status === 0 ? "Unclaimed" : "Claimed"].map(
+                  (value, i) => (
+                    <td key={i} style={tdStyle}>
+                      {value ?? "N/A"}
+                    </td>
+                  )
+                )}
               </tr>
             ))}
             <tr style={{ backgroundColor: "#f0e8ff", fontWeight: "bold" }}>
@@ -143,20 +131,22 @@ const PrintClaimedReceipt = () => {
         </table>
       </Box>
 
-      <Box sx={{ textAlign: "center", marginTop: 5, display: "flex", justifyContent: "center", gap: 2 }}>
-        <Button
-          variant="contained"
-          sx={{ fontSize: "14px", padding: "12px 30px" }}
-          onClick={handlePrint}
-        >
+      {/* BUTTONS - HIDDEN ON PRINT */}
+      <Box
+        sx={{
+          textAlign: "center",
+          marginTop: 5,
+          display: "flex",
+          justifyContent: "center",
+          gap: 2,
+        }}
+        className="no-print"
+      >
+        <Button variant="contained" sx={{ fontSize: "14px", padding: "12px 30px" }} onClick={handlePrint}>
           Print Receipt
         </Button>
 
-        <Button
-          variant="contained"
-          sx={{ fontSize: "14px", padding: "12px 30px" }}
-          onClick={handleMenuClick}
-        >
+        <Button variant="contained" sx={{ fontSize: "14px", padding: "12px 30px" }} onClick={handleMenuClick}>
           Download
         </Button>
 
@@ -166,6 +156,17 @@ const PrintClaimedReceipt = () => {
           <MenuItem onClick={downloadPNG}>PNG</MenuItem>
         </Menu>
       </Box>
+
+      {/* PRINT STYLES */}
+      <style>
+        {`
+          @media print {
+            .no-print {
+              display: none !important;
+            }
+          }
+        `}
+      </style>
     </Box>
   );
 };
