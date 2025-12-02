@@ -97,6 +97,18 @@ export const navConfig = [
     roles: ["adm", "sadm"],
   },
 
+   {
+    title: "Account Summary",
+    icon: riskImage,
+    icon2: "🏦",
+    to: {
+      adm: "/admin/getaccountsummary",
+      sadm: "/admin/getaccountsummary",
+    },
+    permissionKey: "nav",
+    roles: ["adm", "sadm"],
+  },
+
   // Settings
   // {
   //   title: "Settings",
@@ -144,13 +156,13 @@ const roleHierarchy = {
       // "Manage Users",
       
  
-     
+      
       "Banks",
       "Accounts",
       "Unclaimed",
          "Claimed",
          "Paid",
-    
+    "Account Summary",
       "Login History",
     ],
   
@@ -167,7 +179,7 @@ const roleHierarchy = {
       "Unclaimed",
          "Claimed",
          "Paid",
-   
+   "Account Summary",
       "Login History",
     ],
   

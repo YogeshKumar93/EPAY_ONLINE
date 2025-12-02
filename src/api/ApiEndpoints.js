@@ -89,6 +89,7 @@ const ApiEndpoints = {
   UPDATE_CLAIMED_ENTRIES: "bankStatement/updateClaimedEntries",
   GET_ENTRIES: "bankStatement/getEntries",
 
+GET_ACCOUNT_SUMMARY:"accountStatement/getAccountsummary",
 
     GET_BY_TYPE: "business/getByType",
   UPDATE_BY_TYPE: "business/updateByType",
