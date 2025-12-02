@@ -20,6 +20,7 @@ import PrintIcon from "@mui/icons-material/Print";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteClaimed from "./DeleteClaimed";
 import AuthContext from "../contexts/AuthContext";
+import debounce from "lodash.debounce";
 
 const Claimed_with_Paid = () => {
   const [entries, setEntries] = useState([]);
@@ -27,6 +28,8 @@ const Claimed_with_Paid = () => {
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState(null);
   const [appliedFilters, setAppliedFilters] = useState({});
+   const [userSearch, setUserSearch] = useState("");
+  const [userOptions, setUserOptions] = useState([]);
 const authCtx = useContext(AuthContext);
 const user = authCtx?.user;
 
@@ -71,12 +74,61 @@ const user = authCtx?.user;
     setOpenDelete(true);
   };
 
+
+    useEffect(() => {
+    if (userSearch.length <= 4) {
+      setUserOptions([]); // Clear options if less than or equal to 4 chars
+      return;
+    }
+
+    const fetchUsersByHandleBy = async (searchTerm) => {
+      try {
+        const { error, response } = await apiCall(
+          "post",
+          ApiEndpoints.GET_USER_DEBOUNCE,
+          {
+            handle_by: searchTerm, // send under establishment key
+          }
+        );
+        console.log("respinse ofthe debounce is thius ", response?.data?.id);
+
+        if (!error && response?.data) {
+          setUserOptions(
+            response.data.map((u) => ({
+              id: u.id, // ✅ consistent key
+              label: u.handle_by,
+            }))
+          );
+        } else {
+          showToast(error?.message, "error");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    const debouncedFetch = debounce(fetchUsersByHandleBy, 500); // 500ms delay
+    debouncedFetch(userSearch);
+
+    return () => debouncedFetch.cancel();
+  }, [userSearch]);
+
    const filters = useMemo(
       () => [
         { id: "bank_name", label: "Bank Name", type: "textfield" },
         { id: "id", label: "Id", type: "textfield" },
-        { id: "particulars", label: "Particulars", type: "textfield" },
-        { id: "handle_by", label: "Handle By", type: "textfield" },
+                { id: "particulars", label: "Particulars", type: "textfield" },
+ {
+        id: "handle_by",
+        label: "Handle By",
+        type: "autocomplete",
+        options: userOptions,
+        onSearch: (val) => setUserSearch(val),
+        getOptionLabel: (option) => option?.label || "",
+        isOptionEqualToValue: (option, value) => option.handle_by === value.handle_by, // ✅ this line keeps selection visible
+        roles: ["adm", "sadm"],
+      },
+
         { id: "daterange", type: "daterange" },
       ],
       [user?.role,appliedFilters]
