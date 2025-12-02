@@ -84,8 +84,7 @@ const CreateBankStatement = ({ onFetchRef, bankId, balance }) => {
       mop.trim() !== "" &&
 
       particulars.trim() !== "" &&
-      date.trim() !== "" &&
-      remark.trim() !== "";
+      date.trim() !== "" ;
 
     // Credit/Debit old logic
     const creditDebitValid =
