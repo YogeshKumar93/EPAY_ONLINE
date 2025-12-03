@@ -198,36 +198,35 @@ console.log("summary",summary);
             endpoint={ApiEndpoints.GET_ACCOUNT_SUMMARY}
             customHeader={
               (
-               <Box
+ <Box
   sx={{
-     display: "flex",
+    display: "flex",
     gap: 1,
     mb: 1,
     flexWrap: "wrap",
     justifyContent: "flex-end",
- 
-    alignItems:"center",
-    background: "#492077",        
-    p: 0.5,
-    borderRadius: 2,
- 
+    alignItems: "center",
+    p: 0.25,
+    borderRadius: 1,
+    ml:60
   }}
 >
   {/* Total Credit */}
   <Box
     sx={{
-      flex: "1 1 calc(33.33% - 16px)",
-      background: "#e3f2fd",
-      p: 2,
-      borderRadius: 2,
-      boxShadow: 1,
-      minWidth: "250px",
+      flex: "0 0 auto",
+      background: "linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)",
+      p: 1,
+      borderRadius: 1.5,
+      boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+      minWidth: "180px",
+      border: "1px solid #81c784",
     }}
   >
-    <Typography variant="subtitle1" fontWeight={600}>
+    <Typography variant="body2" fontWeight={600} color="#2e7d32">
       Total Credit
     </Typography>
-    <Typography variant="h5" fontWeight={700}>
+    <Typography variant="h6" fontWeight={700} color="#1b5e20">
       ₹ {summary?.total_credit}
     </Typography>
   </Box>
@@ -235,18 +234,19 @@ console.log("summary",summary);
   {/* Total Debit */}
   <Box
     sx={{
-      flex: "1 1 calc(33.33% - 16px)",
-      background: "#ffebee",
-      p: 2,
-      borderRadius: 2,
-      boxShadow: 1,
-      minWidth: "250px",
+      flex: "0 0 auto",
+      background: "linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%)",
+      p: 1,
+      borderRadius: 1.5,
+      boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+      minWidth: "180px",
+      border: "1px solid #e57373",
     }}
   >
-    <Typography variant="subtitle1" fontWeight={600}>
+    <Typography variant="body2" fontWeight={600} color="#c62828">
       Total Debit
     </Typography>
-    <Typography variant="h5" fontWeight={700}>
+    <Typography variant="h6" fontWeight={700} color="#b71c1c">
       ₹ {summary?.total_debit}
     </Typography>
   </Box>
@@ -254,18 +254,19 @@ console.log("summary",summary);
   {/* Total Entries */}
   <Box
     sx={{
-      flex: "1 1 calc(33.33% - 16px)",
-      background: "#f3e5f5",
-      p: 2,
-      borderRadius: 2,
-      boxShadow: 1,
-      minWidth: "250px",
+      flex: "0 0 auto",
+      background: "linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)",
+      p: 1,
+      borderRadius: 1.5,
+      boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+      minWidth: "180px",
+      border: "1px solid #64b5f6",
     }}
   >
-    <Typography variant="subtitle1" fontWeight={600}>
+    <Typography variant="body2" fontWeight={600} color="#1565c0">
       Total Entries
     </Typography>
-    <Typography variant="h5" fontWeight={700}>
+    <Typography variant="h6" fontWeight={700} color="#0d47a1">
       {summary?.total_entries}
     </Typography>
   </Box>
