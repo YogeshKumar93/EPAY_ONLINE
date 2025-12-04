@@ -35,28 +35,49 @@ import PrintClaimedReceipt from "../pages/PrintClaimedReceipt";
 import Users from "../pages/Users";
 import Claimed_with_Paid from "../pages/Claimed_with_Paid";
  
+import AccountSummary from "../pages/AccountSummary";
+ 
+
+// const PrivateRoute = ({ children }) => {
+//   const { isAuthenticated, loading, user } = useContext(AuthContext);
+
+//   if (loading) return <div>Loading...</div>;
+
+//   if (user) {
+//     if (user.status === 1) {
+//       // ✅ KYC approved → allow access
+//       return children;
+//     } else if (user.status === 2) {
+//       // ✅ KYC pending
+//       return <KycPending />;
+//     } else if (user.status === 3) {
+//       // ✅ Some other case → go to profile
+//       return <Banks user={user} />;
+//     }
+//   }
+
+//   // 🚨 Not logged in
+//   return <Navigate to="/login" replace />;
+// };
+
 
 const PrivateRoute = ({ children }) => {
-  const { isAuthenticated, loading, user } = useContext(AuthContext);
+  const { loading, user } = useContext(AuthContext);
 
   if (loading) return <div>Loading...</div>;
 
   if (user) {
-    if (user.status === 1) {
-      // ✅ KYC approved → allow access
-      return children;
-    } else if (user.status === 2) {
-      // ✅ KYC pending
-      return <KycPending />;
-    } else if (user.status === 3) {
-      // ✅ Some other case → go to profile
-      return <OnBoarding user={user} />;
-    }
+    return children;
+  
+  // }else{
+  // // ⬅️ always go to Banks page after login
+  //   return <Banks user={user} />;
   }
 
   // 🚨 Not logged in
   return <Navigate to="/login" replace />;
 };
+
 
 export default function AppRoutes() {
   const { user } = useContext(AuthContext) || {};
@@ -121,7 +142,7 @@ export default function AppRoutes() {
             <>
               {/* <Route path="admin/dashboard" element={<Dashboard />} /> */}
               <Route path="admin/users" element={<Users />} />
-             
+               <Route path="admin/getaccountsummary" element={<AccountSummary />} />
               {/* <Route path="admin/transactions" element={<Transaction />} /> */}
               {/* <Route path="admin/notification" element={<Notification />} /> */}
               {/* <Route path="admin/fund-request" element={<FundRequest />} /> */}

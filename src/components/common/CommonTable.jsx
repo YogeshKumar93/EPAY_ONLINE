@@ -143,6 +143,7 @@ const CommonTable = ({
   title = "",
   queryParam = "",
   onFetchRef,
+  setSummary=()=>{},
   refresh = true,
   customHeader = null, // Add this line
   rowHoverHandlers, // Add this prop to accept hover handlers
@@ -156,10 +157,12 @@ const CommonTable = ({
   onSelectionChange, // Add this prop
   selectedRows = [], // Add this prop
   onExportComplete,
+  enableRowSelection = false, 
 }) => {
   const { afterToday } = DateRangePicker;
   const [hoveredRow, setHoveredRow] = useState(null);
   const [data, setData] = useState([]);
+ 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterValues, setFilterValues] = useState({});
@@ -372,7 +375,7 @@ const handleSelectAll = (event) => {
               response?.total ||
               normalizedData?.length ||
               0;
-
+             setSummary(response?.data?.summary??[])
             setData(dataWithSerial); // ✅ Use dataWithSerial instead of normalizedData
             setTotalCount(total);
           } else if (Array.isArray(response)) {
@@ -931,69 +934,71 @@ const handleSelectAll = (event) => {
     [availableFilters, filterValues, handleFilterChange]
   );
 
-  // Memoized table rows
-  const tableRows = useMemo(() => {
-    if (loading) {
-      return (
-        <tr>
-          <td
-            colSpan={initialColumns.length}
-            style={{
-              textAlign: "center",
-              padding: 40,
-              fontFamily: "DM Sans, sans-serif",
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 2,
-                fontFamily: "DM Sans, sans-serif",
-              }}
-            >
-              <CircularProgress size={30} />
-              <Typography variant="body2">Loading data...</Typography>
-            </Box>
-          </td>
-        </tr>
-      );
-    }
 
-    if (data.length === 0) {
-      return (
-        <tr>
-          <td
-            colSpan={initialColumns.length}
-            style={{
-              textAlign: "center",
-              padding: 40,
-              fontFamily: "DM Sans, sans-serif",
-            }}
-          >
-            <Typography variant="body1">No data available</Typography>
-          </td>
-        </tr>
-      );
-    }
-
-    return data.map((row, rowIndex) => (
-      <React.Fragment key={rowIndex}>
-        {/* This is the main row with data */}
-        <tr
+// Memoized table rows
+const tableRows = useMemo(() => {
+  if (loading) {
+    return (
+      <tr>
+        <td
+          colSpan={enableRowSelection ? initialColumns.length + 1 : initialColumns.length} // ✅ colspan adjust करें
           style={{
-            backgroundColor: "rgba(254, 254, 254, 1)",
-            boxShadow: "0px 2px 8px rgba(0,0,0,0.08)",
-            borderRadius: "8px",
-            marginBottom: "12px",
-            display: "table-row",
+            textAlign: "center",
+            padding: 40,
+            fontFamily: "DM Sans, sans-serif",
           }}
-          className="table-row"
-          // Add hover handlers if provided
-          onMouseEnter={() => enableActionsHover && setHoveredRow(row.id)} // ✅ hover sirf jab enableActionsHover true ho
-          onMouseLeave={() => enableActionsHover && setHoveredRow(null)}
         >
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 2,
+              fontFamily: "DM Sans, sans-serif",
+            }}
+          >
+            <CircularProgress size={30} />
+            <Typography variant="body2">Loading data...</Typography>
+          </Box>
+        </td>
+      </tr>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <tr>
+        <td
+          colSpan={enableRowSelection ? initialColumns.length + 1 : initialColumns.length} // ✅ colspan adjust करें
+          style={{
+            textAlign: "center",
+            padding: 40,
+            fontFamily: "DM Sans, sans-serif",
+          }}
+        >
+          <Typography variant="body1">No data available</Typography>
+        </td>
+      </tr>
+    );
+  }
+
+  return data.map((row, rowIndex) => (
+    <React.Fragment key={rowIndex}>
+      {/* This is the main row with data */}
+      <tr
+        style={{
+          backgroundColor: "rgba(254, 254, 254, 1)",
+          boxShadow: "0px 2px 8px rgba(0,0,0,0.08)",
+          borderRadius: "8px",
+          marginBottom: "12px",
+          display: "table-row",
+        }}
+        className="table-row"
+        onMouseEnter={() => enableActionsHover && setHoveredRow(row.id)}
+        onMouseLeave={() => enableActionsHover && setHoveredRow(null)}
+      >
+        {/* ✅ Conditionally render checkbox cell */}
+        {enableRowSelection && (
           <td style={{ padding: "6px 10px", textAlign: "center" }}>
             <input
               type="checkbox"
@@ -1003,72 +1008,85 @@ const handleSelectAll = (event) => {
               onChange={() => handleSelectRow(row)}
             />
           </td>
+        )}
 
-          {initialColumns.map((column, colIndex) => (
-            <td
-              key={colIndex}
-              style={{
-                padding: "6px 10px",
-                verticalAlign: "middle",
-                textAlign: "left",
-                fontSize: "15px",
-                lineHeight: "1",
-                fontFamily: "DM Sans, sans-serif",
-                fontWeight: 600,
-
-                color: "#7e51b2ff",
-                border: "none", // Remove default borders
-              }}
-            >
-              {column.selector ? (
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  {column.selector(row, {
-                    hoveredRow,
-                    enableActionsHover, // ✅ pass down as helper
-                  })}
-                </Box>
-              ) : (
-                <Typography
-                  variant="body2"
-                  sx={{ fontFamily: "DM Sans, sans-serif", color: "#8094ae" }}
-                >
-                  {row[column.name] || "—"}
-                </Typography>
-              )}
-            </td>
-          ))}
-        </tr>
-
-        {/* This is the spacing row between cards */}
-        <tr style={{ height: "12px", backgroundColor: "transparent" }}>
+        {initialColumns.map((column, colIndex) => (
           <td
-            colSpan={initialColumns.length}
-            style={{ padding: 0, border: "none" }}
-          ></td>
-        </tr>
-      </React.Fragment>
-    ));
-  }, [loading, data, initialColumns, hoveredRow, enableActionsHover, selectedRows]);
+            key={colIndex}
+            style={{
+              padding: "6px 10px",
+              verticalAlign: "middle",
+              textAlign: "left",
+              fontSize: "15px",
+              lineHeight: "1",
+              fontFamily: "DM Sans, sans-serif",
+              fontWeight: 600,
+              color: "#7e51b2ff",
+              border: "none",
+            }}
+          >
+            {column.selector ? (
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                {column.selector(row, {
+                  hoveredRow,
+                  enableActionsHover,
+                })}
+              </Box>
+            ) : (
+              <Typography
+                variant="body2"
+                sx={{ fontFamily: "DM Sans, sans-serif", color: "#8094ae" }}
+              >
+                {row[column.name] || "—"}
+              </Typography>
+            )}
+          </td>
+        ))}
+      </tr>
 
-  // Memoized table headers
+      {/* This is the spacing row between cards */}
+      <tr style={{ height: "12px", backgroundColor: "transparent" }}>
+        <td
+          colSpan={enableRowSelection ? initialColumns.length + 1 : initialColumns.length} // ✅ colspan adjust करें
+          style={{ padding: 0, border: "none" }}
+        ></td>
+      </tr>
+    </React.Fragment>
+  ));
+}, [
+  loading, 
+  data, 
+  initialColumns, 
+  hoveredRow, 
+  enableActionsHover, 
+  selectedRows, 
+  enableRowSelection // ✅ dependency add करें
+]);
+
+ 
 // Memoized table headers
-const tableHeaders = useMemo(
-  () => [
-    <th key="select-all" style={{ padding: "12px" }}>
-      <input
-        type="checkbox"
-        checked={
-          selectedRows.length > 0 && 
-          selectedRows.length === data.length && 
-          data.length > 0
-        }
-        indeterminate={
-          selectedRows.length > 0 && 
-          selectedRows.length < data.length
-        }
-        onChange={handleSelectAll}
-      />
-    </th>,
+const tableHeaders = useMemo(() => {
+  const headers = [];
+  
+  // ✅ Conditionally add select-all checkbox header
+  if (enableRowSelection) {
+    headers.push(
+      <th key="select-all" style={{ padding: "12px" }}>
+        <input
+          type="checkbox"
+          checked={
+            selectedRows.length > 0 && 
+            selectedRows.length === data.length && 
+            data.length > 0
+          }
+          onChange={handleSelectAll}
+        />
+      </th>
+    );
+  }
+  
+  // Regular column headers
+  headers.push(
     ...initialColumns.map((column, index) => (
       <th
         key={index}
@@ -1087,10 +1105,11 @@ const tableHeaders = useMemo(
       >
         {column.name}
       </th>
-    )),
-  ],
-  [initialColumns, selectedRows, data]
-);
+    ))
+  );
+  
+  return headers;
+}, [initialColumns, selectedRows, data, enableRowSelection]); // ✅ enableRowSelection dependency add करें
 
   // In the table rows section, update the checkbox:
   // <td style={{ padding: "6px 10px", textAlign: "center" }}>

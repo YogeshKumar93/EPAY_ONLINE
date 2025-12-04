@@ -2,6 +2,7 @@
 const titleMap = {
   admin: {
     "/admin/dashboard": "Dashboard",
+    
     "/admin/users": "Users",
     "/admin/employees": "Employees",
     "/admin/transactions": "Transactions",
@@ -37,6 +38,8 @@ const titleMap = {
     "/admin/pg-orders": "PG Orders",
     "/admin/virtual_accounts": "Virtual Accounts",
     "/admin/invoice": "Invoices",
+
+     "/admin/getaccountsummary": "Account Summary",
   },
 
  

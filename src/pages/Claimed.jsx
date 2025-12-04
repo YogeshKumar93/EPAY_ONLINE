@@ -17,7 +17,7 @@ import CommonLoader from "../components/common/CommonLoader";
 import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import predefinedRanges from "../utils/predefinedRanges";
-import { yyyymmdd } from "../utils/DateUtils";
+import { ddmmyy, ddmmyyWithTime, yyyymmdd } from "../utils/DateUtils";
 import { capitalize1 } from "../utils/TextUtil";
 import { currencySetter } from "../utils/Currencyutil";
 import PrintIcon from "@mui/icons-material/Print";
@@ -82,12 +82,26 @@ const Claimed = () => {
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   
-  const [filters, setFilters] = useState({
+  const [filter, setFilters] = useState({
     userId: "",
     status: "unclaimed",
     date: {},
     dateVal: "",
   });
+
+     const formatLogDate = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+
+   return date.toLocaleString("en-US", {
+    month: "short",  // Nov
+    day: "2-digit",  // 29
+    hour: "2-digit", // 11
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,   // 11:46:50 instead of 11:46:50 AM
+  });
+};
 
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
@@ -95,6 +109,29 @@ const Claimed = () => {
   const [selectedClaim, setSelectedClaim] = useState(null);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [rowToConfirm, setRowToConfirm] = useState(null);
+    const [appliedFilters, setAppliedFilters] = useState({});
+
+   const filters = useMemo(
+      () => [
+        { id: "bank_name", label: "Bank Name", type: "textfield" },
+        { id: "id", label: "Id", type: "textfield" },
+        { id: "particulars", label: "Particulars", type: "textfield" },
+        { id: "handle_by", label: "Handle By", type: "textfield" },
+        { id: "daterange", type: "daterange" },
+      ],
+      [user?.role,appliedFilters]
+    );
+     const filterRows = (rows) => {
+    if (!searchTerm) return rows;
+    const lowerSearch = searchTerm.toLowerCase();
+    return rows.filter((row) =>
+      Object.values(row).some((val) =>
+        String(val).toLowerCase().includes(lowerSearch)
+      )
+    );
+  };
+
+    
 
   const fetchEntriesRef = useRef(null);
   const handleFetchRef = (fetchFn) => {
@@ -151,10 +188,10 @@ const handleUpdateClaimed = async (rows) => {
 
     try {
       const queryParams = new URLSearchParams({
-        user_id: filters.userId,
-        status: filters.status,
-        date_from: filters.date.start || "",
-        date_to: filters.date.end || "",
+        user_id: filters?.userId,
+        status: filters?.status,
+        date_from: filters?.date?.start || "",
+        date_to: filters?.date?.end || "",
       }).toString();
 
       const response = await apiCall(
@@ -201,8 +238,8 @@ const handleUpdateClaimed = async (rows) => {
       },
 
       {
-        name: (
-          <DateRangePicker
+      name: (
+         <DateRangePicker
             showOneCalendar
             placeholder="Date"
             size="medium"
@@ -225,9 +262,13 @@ const handleUpdateClaimed = async (rows) => {
             style={{ width: 200 }}
           />
         ),
-        selector: (row) => row.date,
-        width: "150px",
-      },
+    selector: (row) => (
+  <Tooltip title={formatLogDate(row.updated_at)} arrow>
+    <span>{formatLogDate(row.created_at)}</span>
+  </Tooltip>
+),
+
+    },
 
       {
         name: "Particulars",
@@ -333,7 +374,7 @@ const handleUpdateClaimed = async (rows) => {
         selector: (row) => (
           <>
             <IconButton
-              color="primary"
+              color="secondary"
               onClick={() => {
                 setRowToConfirm(row);
                 setOpenConfirm(true);
@@ -371,8 +412,11 @@ const handleUpdateClaimed = async (rows) => {
             endpoint={ApiEndpoints.GET_ENTRIES}
             queryParam={"status=1"}
             columns={columns}
+             enableRowSelection={true} 
             selectedRows={selectedRows}
             onSelectionChange={setSelectedRows} // Set full row objects
+                filters={filters}  
+             transformData={filterRows}         
             customHeader={
               <Box sx={{ display: "flex", gap: 1, padding: "8px" }}>
                 {selectedRows.length > 0 && (
@@ -380,6 +424,7 @@ const handleUpdateClaimed = async (rows) => {
                     <Button
                       variant="contained"
                       size="small"
+                      color="secondary"
                       onClick={() => {
                         if (selectedRows.length === 0) {
                           showToast("error", "Please select entries");

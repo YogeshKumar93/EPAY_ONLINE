@@ -20,6 +20,7 @@ import PrintIcon from "@mui/icons-material/Print";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteClaimed from "./DeleteClaimed";
 import AuthContext from "../contexts/AuthContext";
+import debounce from "lodash.debounce";
 
 const Claimed_with_Paid = () => {
   const [entries, setEntries] = useState([]);
@@ -27,6 +28,8 @@ const Claimed_with_Paid = () => {
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState(null);
   const [appliedFilters, setAppliedFilters] = useState({});
+   const [userSearch, setUserSearch] = useState("");
+  const [userOptions, setUserOptions] = useState([]);
 const authCtx = useContext(AuthContext);
 const user = authCtx?.user;
 
@@ -36,6 +39,20 @@ const user = authCtx?.user;
   //   date: {},
   //   dateVal: "",
   // });
+
+      const formatLogDate = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+
+   return date.toLocaleString("en-US", {
+    month: "short",  // Nov
+    day: "2-digit",  // 29
+    hour: "2-digit", // 11
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,   // 11:46:50 instead of 11:46:50 AM
+  });
+};
 
   const fetchEntriesRef = useRef(null);
 
@@ -57,12 +74,61 @@ const user = authCtx?.user;
     setOpenDelete(true);
   };
 
+
+    useEffect(() => {
+    if (userSearch.length <= 4) {
+      setUserOptions([]); // Clear options if less than or equal to 4 chars
+      return;
+    }
+
+    const fetchUsersByHandleBy = async (searchTerm) => {
+      try {
+        const { error, response } = await apiCall(
+          "post",
+          ApiEndpoints.GET_USER_DEBOUNCE,
+          {
+            handle_by: searchTerm, // send under establishment key
+          }
+        );
+        console.log("respinse ofthe debounce is thius ", response?.data?.id);
+
+        if (!error && response?.data) {
+          setUserOptions(
+            response.data.map((u) => ({
+              id: u.id, // ✅ consistent key
+              label: u.handle_by,
+            }))
+          );
+        } else {
+          showToast(error?.message, "error");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    const debouncedFetch = debounce(fetchUsersByHandleBy, 500); // 500ms delay
+    debouncedFetch(userSearch);
+
+    return () => debouncedFetch.cancel();
+  }, [userSearch]);
+
    const filters = useMemo(
       () => [
         { id: "bank_name", label: "Bank Name", type: "textfield" },
         { id: "id", label: "Id", type: "textfield" },
-        { id: "particulars", label: "Particulars", type: "textfield" },
-        { id: "handle_by", label: "Handle By", type: "textfield" },
+                { id: "particulars", label: "Particulars", type: "textfield" },
+ {
+        id: "handle_by",
+        label: "Handle By",
+        type: "autocomplete",
+        options: userOptions,
+        onSearch: (val) => setUserSearch(val),
+        getOptionLabel: (option) => option?.label || "",
+        isOptionEqualToValue: (option, value) => option.handle_by === value.handle_by, // ✅ this line keeps selection visible
+        roles: ["adm", "sadm"],
+      },
+
         { id: "daterange", type: "daterange" },
       ],
       [user?.role,appliedFilters]
@@ -111,31 +177,37 @@ const user = authCtx?.user;
   const columns = [
     { name: "ID", selector: (row) => row.id, width: "80px" },
     { name: "Bank ID", selector: (row) => row.bank_id },
-    {
+  {
       name: (
-        <DateRangePicker
-          showOneCalendar
-          placeholder="Date"
-          ranges={predefinedRanges}
-          value={filters.dateVal}
-          onChange={(value) => {
-            if (!value) {
-              setFilters({ ...filters, date: {}, dateVal: "" });
+         <DateRangePicker
+            showOneCalendar
+            placeholder="Date"
+            size="medium"
+            cleanable
+            ranges={predefinedRanges}
+            value={filters.dateVal}
+            onChange={(value) => {
+              if (!value) {
+                setFilters({ ...filters, date: {}, dateVal: "" });
+                fetchEntries();
+                return;
+              }
+              setFilters({
+                ...filters,
+                date: { start: yyyymmdd(value[0]), end: yyyymmdd(value[1]) },
+                dateVal: value,
+              });
               fetchEntries();
-              return;
-            }
-            const dates = { start: value[0], end: value[1] };
-            setFilters({
-              ...filters,
-              date: { start: yyyymmdd(dates.start), end: yyyymmdd(dates.end) },
-              dateVal: value,
-            });
-            fetchEntries();
-          }}
-          style={{ width: 200 }}
-        />
-      ),
-      selector: (row) => row.date,
+            }}
+            style={{ width: 200 }}
+          />
+        ),
+    selector: (row) => (
+  <Tooltip title={formatLogDate(row.updated_at)} arrow>
+    <span>{formatLogDate(row.created_at)}</span>
+  </Tooltip>
+),
+
     },
     { name: "Particulars", selector: (row) => capitalize1(row.particulars) },
     { name: "Handled By", selector: (row) => row.handle_by },
