@@ -166,7 +166,19 @@ console.log("summary",summary);
   // Table Columns Mapping
   // -------------------------
   const columns = [
-    { name: "Created At", selector: (row) => row?.created_at },
+{
+  name: "Created At",
+  selector: (row) =>
+    new Date(row?.created_at).toLocaleString("en-IN", {
+      timeZone: "Asia/Kolkata",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+}
+,
 
     { name: "Bank Txn", selector: (row) => row?.bank_txnid },
     { name: "Particulars", selector: (row) => row?.particulars },
@@ -208,7 +220,7 @@ console.log("summary",summary);
     alignItems: "center",
     p: 0.25,
     borderRadius: 1,
-    ml:60
+     ml: 'auto',
   }}
 >
   {/* Total Credit */}
