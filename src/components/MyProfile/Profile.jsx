@@ -147,14 +147,14 @@ const ProfilePage = () => {
       hoverGradient: "linear-gradient(135deg, #43e97b, #38f9d7)",
       roles: ["adm", "sadm"], // allowed roles
     },
-    // {
-    //   id: 4,
-    //   label: "Change MPIN",
-    //   icon: <VerifiedUser sx={{ fontSize: { xs: 18, sm: 20 } }} />,
-    //   onClick: handleChangeMpin,
-    //   gradient: "#fff",
-    //   hoverGradient: "linear-gradient(135deg, #ff758c, #ff7eb3)",
-    // },
+    {
+      id: 4,
+      label: "Forgot Password",
+      icon: <VerifiedUser sx={{ fontSize: { xs: 18, sm: 20 } }} />,
+      onClick: handleChangeMpin,
+      gradient: "#fff",
+      hoverGradient: "linear-gradient(135deg, #ff758c, #ff7eb3)",
+    },
     // {
     //   id: 5,
     //   label: "View Information",

@@ -22,6 +22,7 @@ import DeleteClaimed from "./DeleteClaimed";
 import AuthContext from "../contexts/AuthContext";
 import debounce from "lodash.debounce";
 import { useToast } from "../utils/ToastContext";
+import { fi } from "date-fns/locale";
 
 const Claimed_with_Paid = () => {
   const [entries, setEntries] = useState([]);
@@ -29,26 +30,25 @@ const Claimed_with_Paid = () => {
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState(null);
   const [appliedFilters, setAppliedFilters] = useState({});
-   const [userSearch, setUserSearch] = useState("");
+  const [userSearch, setUserSearch] = useState("");
   const [userOptions, setUserOptions] = useState([]);
-const authCtx = useContext(AuthContext);
-const user = authCtx?.user;
+  const authCtx = useContext(AuthContext);
+  const user = authCtx?.user;
   const { showToast } = useToast();
- 
 
-      const formatLogDate = (dateString) => {
-  if (!dateString) return "";
-  const date = new Date(dateString);
+  const formatLogDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
 
-   return date.toLocaleString("en-US", {
-    month: "short",  // Nov
-    day: "2-digit",  // 29
-    hour: "2-digit", // 11
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,   // 11:46:50 instead of 11:46:50 AM
-  });
-};
+    return date.toLocaleString("en-US", {
+      month: "short", // Nov
+      day: "2-digit", // 29
+      hour: "2-digit", // 11
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false, // 11:46:50 instead of 11:46:50 AM
+    });
+  };
 
   const fetchEntriesRef = useRef(null);
 
@@ -70,8 +70,7 @@ const user = authCtx?.user;
     setOpenDelete(true);
   };
 
-
-    useEffect(() => {
+  useEffect(() => {
     if (userSearch.length <= 4) {
       setUserOptions([]); // Clear options if less than or equal to 4 chars
       return;
@@ -83,16 +82,16 @@ const user = authCtx?.user;
           "post",
           ApiEndpoints.GET_USER_DEBOUNCE,
           {
-            handle_by: searchTerm, // send under establishment key
+            establishment: searchTerm, // send under establishment key
           }
         );
         console.log("respinse ofthe debounce is thius ", response?.data?.id);
 
-        if (!error && response?.data) {
+        if (response) {
           setUserOptions(
             response.data.map((u) => ({
               id: u.id, // ✅ consistent key
-              label: u.handle_by,
+              label: u.establishment,
             }))
           );
         } else {
@@ -108,37 +107,37 @@ const user = authCtx?.user;
 
     return () => debouncedFetch.cancel();
   }, [userSearch]);
-
-   const filters = useMemo(
-      () => [
-        { id: "bank_name", label: "Bank Name", type: "textfield" },
-        { id: "id", label: "Id", type: "textfield" },
-                { id: "particulars", label: "Particulars", type: "textfield" },
- {
+  const filters = useMemo(
+    () => [
+      { id: "bank_name", label: "Bank Name", type: "textfield" },
+      { id: "id", label: "Id", type: "textfield" },
+      { id: "particulars", label: "Particulars", type: "textfield" },
+      {
         id: "handle_by",
         label: "Handle By",
         type: "autocomplete",
         options: userOptions,
         onSearch: (val) => setUserSearch(val),
         getOptionLabel: (option) => option?.label || "",
-        isOptionEqualToValue: (option, value) => option.handle_by === value.handle_by, // ✅ this line keeps selection visible
+        isOptionEqualToValue: (option, value) =>
+          option.establishment === value.establishment, // ✅ this line keeps selection visible
         roles: ["adm", "sadm"],
       },
 
-        { id: "daterange", type: "daterange" },
-      ],
-      [user?.role,appliedFilters]
+      { id: "daterange", type: "daterange" },
+    ],
+    [user?.role, appliedFilters]
+  );
+  console.log("the filters in the claimed with paid are ", userOptions);
+  const filterRows = (rows) => {
+    if (!searchTerm) return rows;
+    const lowerSearch = searchTerm.toLowerCase();
+    return rows.filter((row) =>
+      Object.values(row).some((val) =>
+        String(val).toLowerCase().includes(lowerSearch)
+      )
     );
-  
-     const filterRows = (rows) => {
-      if (!searchTerm) return rows;
-      const lowerSearch = searchTerm.toLowerCase();
-      return rows.filter((row) =>
-        Object.values(row).some((val) =>
-          String(val).toLowerCase().includes(lowerSearch)
-        )
-      );
-    };
+  };
 
   const fetchEntries = async () => {
     setLoading(true);
@@ -150,9 +149,7 @@ const user = authCtx?.user;
         date_to: filters.date.end || "",
       }).toString();
 
-      const response = await apiCall(
-        `${ApiEndpoints.GET_UNCLAIMED_ENTERIES}`
-      );
+      const response = await apiCall(`${ApiEndpoints.GET_UNCLAIMED_ENTERIES}`);
 
       if (response?.data?.success) {
         setEntries(response.data.entries || []);
@@ -173,106 +170,107 @@ const user = authCtx?.user;
   const columns = [
     { name: "ID", selector: (row) => row.id, width: "80px" },
     { name: "Bank ID", selector: (row) => row.bank_id },
-  {
+    {
       name: (
-         <DateRangePicker
-            showOneCalendar
-            placeholder="Date"
-            size="medium"
-            cleanable
-            ranges={predefinedRanges}
-            value={filters.dateVal}
-            onChange={(value) => {
-              if (!value) {
-                setFilters({ ...filters, date: {}, dateVal: "" });
-                fetchEntries();
-                return;
-              }
-              setFilters({
-                ...filters,
-                date: { start: yyyymmdd(value[0]), end: yyyymmdd(value[1]) },
-                dateVal: value,
-              });
+        <DateRangePicker
+          showOneCalendar
+          placeholder="Date"
+          size="medium"
+          cleanable
+          ranges={predefinedRanges}
+          value={filters.dateVal}
+          onChange={(value) => {
+            if (!value) {
+              setFilters({ ...filters, date: {}, dateVal: "" });
               fetchEntries();
-            }}
-            style={{ width: 200 }}
-          />
-        ),
-    selector: (row) => (
-  <Tooltip title={formatLogDate(row.updated_at)} arrow>
-    <span>{formatLogDate(row.created_at)}</span>
-  </Tooltip>
-),
-
+              return;
+            }
+            setFilters({
+              ...filters,
+              date: { start: yyyymmdd(value[0]), end: yyyymmdd(value[1]) },
+              dateVal: value,
+            });
+            fetchEntries();
+          }}
+          style={{ width: 200 }}
+        />
+      ),
+      selector: (row) => (
+        <Tooltip title={formatLogDate(row.updated_at)} arrow>
+          <span>{formatLogDate(row.created_at)}</span>
+        </Tooltip>
+      ),
     },
-   
-         {
-           name: "Particulars",
-           selector: (row) => (
-             <div style={{ fontSize: 13, fontWeight: 600 }}>
-               {capitalize1(row.particulars)}
-             </div>
-           ),
-           wrap: true,
-           minWidth: "120px",
-         },
+
+    {
+      name: "Particulars",
+      selector: (row) => (
+        <div style={{ fontSize: 13, fontWeight: 600 }}>
+          {capitalize1(row.particulars)}
+        </div>
+      ),
+      wrap: true,
+      minWidth: "120px",
+    },
     { name: "Handled By", selector: (row) => row.handle_by },
-    { name: "Credit", selector: (row) => (
-      <span style={{color:"green"}}>
-    {  currencySetter(row.credit) }
-    </span>
-    )},
-    { name: "Debit", selector: (row) => (
-      <span style={{color:"red"}}>
-      {currencySetter(row.debit)}
-    </span>
-    )},
+    {
+      name: "Credit",
+      selector: (row) => (
+        <span style={{ color: "green" }}>{currencySetter(row.credit)}</span>
+      ),
+    },
+    {
+      name: "Debit",
+      selector: (row) => (
+        <span style={{ color: "red" }}>{currencySetter(row.debit)}</span>
+      ),
+    },
     { name: "Balance", selector: (row) => currencySetter(row.balance) },
     { name: "Mode", selector: (row) => row.mop },
     { name: "Remark", selector: (row) => row.remark || "-" },
 
-     {
-        name: "Status",
-        selector: (row) => {
-          const statusConfig = {
-            0: {
-              label: "Unclaimed",
-              color: "#a01309ff",
-              bg: "#e2a5a1ff",
-            },
-            1: {
-             label: "Claimed",
-              color: "green",
-              bg: "#b7e8e0ff",
-            },
-            2:{
-               label: "Paid",
-              color: "#e9ebf0ff",
-              bg: "#2431baff",
-            }
-          };
+    {
+      name: "Status",
+      selector: (row) => {
+        const statusConfig = {
+          0: {
+            label: "Unclaimed",
+            color: "#a01309ff",
+            bg: "#e2a5a1ff",
+          },
+          1: {
+            label: "Claimed",
+            color: "green",
+            bg: "#b7e8e0ff",
+          },
+          2: {
+            label: "Paid",
+            color: "#e9ebf0ff",
+            bg: "#2431baff",
+          },
+        };
 
-          const cfg = statusConfig[row.status] || statusConfig[0];
+        const cfg = statusConfig[row.status] || statusConfig[0];
 
-          return (
-            <button
-              style={{
-                padding: "8px 15px",
-                borderRadius: "8px",
-                fontSize: "12px",
-                fontWeight: 600,
-                border: "none",
-                backgroundColor: cfg.bg,
-                color: cfg.color,
-                cursor: "default",
-              }}
-            >
-              {cfg.label}
-            </button>
-          );
-        },
-        width: "140px",
+        return (
+          <button
+            style={{
+              padding: "8px 15px",
+              borderRadius: "8px",
+              fontSize: "12px",
+              fontWeight: 600,
+              border: "none",
+              backgroundColor: cfg.bg,
+              color: cfg.color,
+              cursor: "default",
+            }}
+          >
+            {cfg.label}
+          </button>
+        );
       },
+      width: "140px",
+    },
 
     {
       name: "Actions",
@@ -285,8 +283,6 @@ const user = authCtx?.user;
           >
             <PrintIcon fontSize="small" />
           </IconButton>
-
-          
         </div>
       ),
       width: "100px",
@@ -299,18 +295,14 @@ const user = authCtx?.user;
 
       {!loading && (
         <Box>
-         
-
           <CommonTable
             onFetchRef={handleFetchRef}
             endpoint={ApiEndpoints.GET_ENTRIES}
             columns={columns}
             queryParam={`status=2`}
-              filters={filterConfig}  
-             transformData={filterRows} 
+            filters={filters}
+            transformData={filterRows}
           />
-
-         
         </Box>
       )}
     </>
