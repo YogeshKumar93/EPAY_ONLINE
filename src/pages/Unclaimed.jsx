@@ -33,10 +33,9 @@ const Unclaimed = () => {
     });
   };
 
-  // Debounced search for establishments
   useEffect(() => {
     if (userSearch.length < 3) {
-      setUserOptions([]); // Clear if less than 3 characters
+      setUserOptions([]); 
       return;
     }
 
@@ -76,7 +75,7 @@ const Unclaimed = () => {
     return () => debouncedFetch.cancel();
   }, [userSearch]);
 
-  // Filters for CommonTable - FIXED
+
   const filters = useMemo(() => {
     const baseFilters = [
       { id: "bank_name", label: "Bank Name", type: "textfield" },
@@ -120,14 +119,7 @@ const Unclaimed = () => {
     ];
     
     return baseFilters;
-  }, [userOptions]); // Only depend on userOptions, not appliedFilters
-
-  // Custom fetch function to handle the autocomplete filter
-  const handleFilterChange = useCallback((newFilters) => {
-    console.log("Filters changed:", newFilters);
-    // If you need to handle filter changes specifically, do it here
-  }, []);
-
+  }, [userOptions]); 
   const columns = [
     { name: "ID", selector: (row) => row.id, width: "80px" },
     { name: "Bank ID", selector: (row) => row.bank_id },
@@ -198,9 +190,9 @@ const Unclaimed = () => {
             columns={columns}
             filters={filters}
             enableRowSelection={false}
-            onFilterChange={handleFilterChange} // Pass the handler
+          
             disableSelectionOnClick
-            title="Unclaimed Entries"
+           
             defaultPageSize={15}
           />
         </Box>
