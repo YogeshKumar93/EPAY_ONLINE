@@ -175,6 +175,7 @@ const CommonTable = ({
   const authCtx = useContext(AuthContext);
   const [exportFilters, setExportFilters] = useState({}); // ✅ Use state for export filters
   const [resetKey, setResetKey] = useState(0);
+  const [initialized, setInitialized] = useState(false);
   // const [selectedRows, setSelectedRows] = useState([]); // array of selected row IDs
   const allRowIds = useMemo(() => data.map((row) => row.id), [data]); // assumes each row has unique `id`
 
@@ -241,31 +242,6 @@ const CommonTable = ({
   };
 
   const { handleExportExcel } = useExcelExport();
-
-  const handleTableExport = useCallback(async () => {
-    const payload = {
-      ...exportFilters, // filters from UI
-      ...exportPayload, // extra payload from props
-    };
-    const result = await handleExportExcel(
-      exportEndpoint || endpoint,
-      payload,
-      exportFilters, // ✅ Use state instead of ref
-      exportFileName
-    );
-
-    if (onExportComplete) {
-      onExportComplete(result);
-    }
-  }, [
-    endpoint,
-    exportEndpoint,
-    exportFileName,
-    handleExportExcel,
-    onExportComplete,
-    exportPayload,
-    exportFilters, // ✅ Add to dependencies
-  ]);
 
   const enhancedCustomHeader = useMemo(
     () => (
@@ -415,14 +391,6 @@ const CommonTable = ({
     rowsPerPageRef.current = rowsPerPage;
     refreshIntervalRef.current = refreshInterval;
   }, [appliedFilters, page, rowsPerPage, refreshInterval]);
-
-  // Initial data fetch
-  useEffect(() => {
-    if (!hasFetchedInitialData.current) {
-      fetchData();
-      hasFetchedInitialData.current = true;
-    }
-  }, [fetchData]);
 
   // Setup refresh interval
   useEffect(() => {
@@ -630,49 +598,56 @@ const CommonTable = ({
     },
     [fetchData]
   );
-// Initialize filter values
-useEffect(() => {
-  setFilterValues(initialFilterValues);
-  
-  const apiReadyFilters = {};
-  
-  // Convert initialFilterValues to API format
-  Object.keys(initialFilterValues).forEach(key => {
-    const filterConfig = availableFilters.find(f => f.id === key);
-    const val = initialFilterValues[key];
-    
-    if (filterConfig?.type === "daterange" && val) {
-      // Only add date params if autoToday is true
-      if (filterConfig.autoToday === true && val.start && val.end) {
-        apiReadyFilters["from_date"] = val.start;
-        apiReadyFilters["to_date"] = val.end;
-      }
-    } else if (filterConfig?.type === "date" && val) {
-      // Only add date params if autoToday is true
-      if (filterConfig.autoToday === true) {
+  useEffect(() => {
+    setFilterValues(initialFilterValues);
+
+    const apiReadyFilters = {};
+
+    Object.keys(initialFilterValues).forEach((key) => {
+      const filterConfig = availableFilters.find((f) => f.id === key);
+      const val = initialFilterValues[key];
+
+      if (filterConfig?.type === "daterange" && val) {
+        if (filterConfig.autoToday === true && val.start && val.end) {
+          apiReadyFilters["from_date"] = val.start;
+          apiReadyFilters["to_date"] = val.end;
+        }
+      } else if (filterConfig?.type === "date" && val) {
+        if (filterConfig.autoToday === true) {
+          apiReadyFilters[key] = val;
+        }
+      } else if (val && val !== "All" && val !== "") {
         apiReadyFilters[key] = val;
       }
-    } else if (val && val !== "All" && val !== "") {
-      apiReadyFilters[key] = val;
-    }
-  });
-  
-  setAppliedFilters(apiReadyFilters);
-  appliedFiltersRef.current = apiReadyFilters;
-}, [initialFilterValues, availableFilters]);
+    });
 
-  // Manual refresh handler
+    setAppliedFilters(apiReadyFilters);
+    setExportFilters(apiReadyFilters);
+    appliedFiltersRef.current = apiReadyFilters;
+
+    setInitialized(true);
+
+    if (!hasFetchedInitialData.current) {
+      console.log("🚀 Fetching initial data...");
+      fetchData();
+      hasFetchedInitialData.current = true;
+    }
+  }, [initialFilterValues, availableFilters]);
+
   const handleManualRefresh = useCallback(() => {
     fetchData(true);
   }, [fetchData]);
   useEffect(() => {
     if (onFetchRef) onFetchRef(fetchData);
   }, [fetchData, onFetchRef]);
-  // Fetch only when queryParam changes, not when fetchData reference changes
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(queryParam)]);
+
+  useEffect(
+    () => {
+      fetchData();
+    },
+    [JSON.stringify(queryParam)],
+    initialized
+  );
 
   const renderFilterInputs = useCallback(
     () =>
@@ -770,7 +745,6 @@ useEffect(() => {
     [availableFilters, filterValues, handleFilterChange]
   );
 
-  // Memoized applied filters chips
   const appliedFiltersChips = useMemo(
     () =>
       Object.entries(appliedFilters)
@@ -1011,7 +985,6 @@ useEffect(() => {
     [availableFilters, filterValues, handleFilterChange]
   );
 
-  // Memoized table rows
   const tableRows = useMemo(() => {
     if (loading) {
       return (
@@ -1151,7 +1124,6 @@ useEffect(() => {
     enableRowSelection, // ✅ dependency add करें
   ]);
 
-  // Memoized table headers
   const tableHeaders = useMemo(() => {
     const headers = [];
 
@@ -1197,15 +1169,6 @@ useEffect(() => {
 
     return headers;
   }, [initialColumns, selectedRows, data, enableRowSelection]); // ✅ enableRowSelection dependency add करें
-
-  // In the table rows section, update the checkbox:
-  // <td style={{ padding: "6px 10px", textAlign: "center" }}>
-  //   <input
-  //     type="checkbox"
-  //     checked={selectedRows.includes(row.id)}
-  //     onChange={() => handleSelectRow(row.id)}
-  //   />
-  // </td>;
 
   return (
     <Box>
