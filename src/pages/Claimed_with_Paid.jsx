@@ -29,24 +29,22 @@ const Claimed_with_Paid = () => {
   const [loading, setLoading] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState(null);
-  const [appliedFilters, setAppliedFilters] = useState({});
   const [userSearch, setUserSearch] = useState("");
   const [userOptions, setUserOptions] = useState([]);
+  const [searchTerm, setSearchTerm] = useState(""); // ADDED: Missing state
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
-  const { showToast } = useToast();
 
   const formatLogDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
-
     return date.toLocaleString("en-US", {
-      month: "short", // Nov
-      day: "2-digit", // 29
-      hour: "2-digit", // 11
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
-      hour12: false, // 11:46:50 instead of 11:46:50 AM
+      hour12: false,
     });
   };
 
@@ -65,86 +63,90 @@ const Claimed_with_Paid = () => {
     window.open("/print-claimedreceipt", "_blank");
   };
 
-  const handleDelete = (row) => {
-    setSelectedClaim(row);
-    setOpenDelete(true);
-  };
+  // Debounced search for handle_by
 
   useEffect(() => {
-    if (userSearch.length <= 4) {
-      setUserOptions([]); // Clear options if less than or equal to 4 chars
+    if (userSearch.length < 3) {
+      setUserOptions([]);
       return;
     }
 
-    const fetchUsersByHandleBy = async (searchTerm) => {
+    const fetchUsersByEstablishment = async (searchTerm) => {
       try {
         const { error, response } = await apiCall(
-          "post",
+          "POST",
           ApiEndpoints.GET_USER_DEBOUNCE,
-          {
-            establishment: searchTerm, // send under establishment key
-          }
+          null,
+          { establishment: searchTerm }
         );
-        if (response) {
-          setUserOptions(
-            response?.data?.map((u) => ({
-              id: u.id, // ✅ consistent key
-              label: u.establishment,
-            }))
-          );
-        } else {
-          showToast(error?.message, "error");
+
+        console.log("Response from debounce:", response?.data);
+
+        if (!error && response?.data) {
+          const options = response.data.map((u) => ({
+            id: u.id,
+            value: u.id,
+            label: u.establishment,
+
+            establishment: u.establishment,
+          }));
+
+          setUserOptions(options);
         }
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching users:", err);
       }
     };
 
-    const debouncedFetch = debounce(fetchUsersByHandleBy, 500); // 500ms delay
+    const debouncedFetch = debounce(fetchUsersByEstablishment, 500);
     debouncedFetch(userSearch);
 
     return () => debouncedFetch.cancel();
   }, [userSearch]);
-  const filters = useMemo(
-    () => [
+
+  // Filters - FIXED dependency array
+  const filters = useMemo(() => {
+    const baseFilters = [
       { id: "bank_name", label: "Bank Name", type: "textfield" },
-      { id: "id", label: "Id", type: "textfield" },
+      { id: "id", label: "ID", type: "textfield" },
       { id: "particulars", label: "Particulars", type: "textfield" },
       {
         id: "handle_by",
         label: "Handle By",
         type: "autocomplete",
         options: userOptions,
-        onSearch: (val) => setUserSearch(val),
-        getOptionLabel: (option) => option?.label || "",
-        isOptionEqualToValue: (option, value) => option.label === value.label, // ✅ this line keeps selection visible roles: ["adm", "sadm"], },
+        onSearch: (val) => {
+          console.log("Searching for:", val);
+          setUserSearch(val);
+        },
+        getOptionLabel: (option) => {
+          if (typeof option === "string") return option;
+          return option?.label || option?.establishment || "";
+        },
+        isOptionEqualToValue: (option, value) => {
+          if (!option || !value) return false;
+          if (option.id && value.id) return option.id === value.id;
+          if (option.value && value.value) return option.value === value.value;
+          return option === value;
+        },
       },
-      { id: "daterange", type: "daterange" },
-    ],
-    [user?.role, appliedFilters]
-  );
-  console.log("the filters in the claimed with paid are ", userOptions);
-  const filterRows = (rows) => {
-    if (!searchTerm) return rows;
-    const lowerSearch = searchTerm.toLowerCase();
-    return rows.filter((row) =>
-      Object.values(row).some((val) =>
-        String(val).toLowerCase().includes(lowerSearch)
-      )
-    );
-  };
+      {
+        id: "daterange",
+        type: "daterange",
+        // label: "Date Range",
+         autoToday: true,
+      },
+    ];
+
+    return baseFilters;
+  }, [userOptions]);
 
   const fetchEntries = async () => {
     setLoading(true);
     try {
-      const queryParams = new URLSearchParams({
-        user_id: filters.userId,
-        status: filters.status,
-        date_from: filters.date.start || "",
-        date_to: filters.date.end || "",
-      }).toString();
-
-      const response = await apiCall(`${ApiEndpoints.GET_UNCLAIMED_ENTERIES}`);
+      const response = await apiCall("POST", ApiEndpoints.GET_ENTRIES, {
+        status: 2,
+      });
 
       if (response?.data?.success) {
         setEntries(response.data.entries || []);
@@ -158,56 +160,24 @@ const Claimed_with_Paid = () => {
     }
   };
 
+  // Optional: initial fetch if needed
   useEffect(() => {
-    fetchEntries();
+    fetchEntries(); // Commented out since CommonTable handles it
   }, []);
 
   const columns = [
     { name: "ID", selector: (row) => row.id, width: "80px" },
     { name: "Bank ID", selector: (row) => row.bank_id },
     {
-      name: (
-        <DateRangePicker
-          showOneCalendar
-          placeholder="Date"
-          size="medium"
-          cleanable
-          ranges={predefinedRanges}
-          value={filters.dateVal}
-          onChange={(value) => {
-            if (!value) {
-              setFilters({ ...filters, date: {}, dateVal: "" });
-              fetchEntries();
-              return;
-            }
-            setFilters({
-              ...filters,
-              date: { start: yyyymmdd(value[0]), end: yyyymmdd(value[1]) },
-              dateVal: value,
-            });
-            fetchEntries();
-          }}
-          style={{ width: 200 }}
-        />
-      ),
+      name: "Date", // CHANGED: Removed DateRangePicker from header
       selector: (row) => (
         <Tooltip title={formatLogDate(row.updated_at)} arrow>
           <span>{formatLogDate(row.created_at)}</span>
         </Tooltip>
       ),
     },
-
-    {
-      name: "Particulars",
-      selector: (row) => (
-        <div style={{ fontSize: 13, fontWeight: 600 }}>
-          {capitalize1(row.particulars)}
-        </div>
-      ),
-      wrap: true,
-      minWidth: "120px",
-    },
-    { name: "Handled By", selector: (row) => row.handle_by },
+    { name: "Particulars", selector: (row) => capitalize1(row.particulars) },
+    { name: "Handle By", selector: (row) => row.handle_by },
     {
       name: "Credit",
       selector: (row) => (
@@ -223,30 +193,15 @@ const Claimed_with_Paid = () => {
     { name: "Balance", selector: (row) => currencySetter(row.balance) },
     { name: "Mode", selector: (row) => row.mop },
     { name: "Remark", selector: (row) => row.remark || "-" },
-
     {
       name: "Status",
       selector: (row) => {
         const statusConfig = {
-          0: {
-            label: "Unclaimed",
-            color: "#a01309ff",
-            bg: "#e2a5a1ff",
-          },
-          1: {
-            label: "Claimed",
-            color: "green",
-            bg: "#b7e8e0ff",
-          },
-          2: {
-            label: "Paid",
-            color: "#e9ebf0ff",
-            bg: "#2431baff",
-          },
+          0: { label: "Unclaimed", color: "#a01309ff", bg: "#e2a5a1ff" },
+          1: { label: "Claimed", color: "green", bg: "#b7e8e0ff" },
+          2: { label: "Paid", color: "#e9ebf0ff", bg: "#2431baff" },
         };
-
         const cfg = statusConfig[row.status] || statusConfig[0];
-
         return (
           <button
             style={{
@@ -266,7 +221,6 @@ const Claimed_with_Paid = () => {
       },
       width: "140px",
     },
-
     {
       name: "Actions",
       selector: (row) => (
@@ -294,9 +248,10 @@ const Claimed_with_Paid = () => {
             onFetchRef={handleFetchRef}
             endpoint={ApiEndpoints.GET_ENTRIES}
             columns={columns}
-            queryParam={`status=2`}
             filters={filters}
-            transformData={filterRows}
+            queryParam={{ status: 2 }}
+            defaultPageSize={15}
+            refreshInterval={0}
           />
         </Box>
       )}

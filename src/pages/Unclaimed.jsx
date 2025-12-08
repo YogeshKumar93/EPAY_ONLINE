@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useRef, useMemo, useContext, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useContext,
+  useCallback,
+} from "react";
 import { Box, Tooltip } from "@mui/material";
 import { DateRangePicker } from "rsuite";
 import CommonTable from "../components/common/CommonTable";
@@ -33,36 +40,32 @@ const Unclaimed = () => {
     });
   };
 
-  // Debounced search for establishments
   useEffect(() => {
     if (userSearch.length < 3) {
-      setUserOptions([]); // Clear if less than 3 characters
+      setUserOptions([]);
       return;
     }
 
     const fetchUsersByEstablishment = async (searchTerm) => {
       try {
         const { error, response } = await apiCall(
-          "POST", 
+          "POST",
           ApiEndpoints.GET_USER_DEBOUNCE,
-          null, 
-          { establishment: searchTerm } 
+          null,
+          { establishment: searchTerm }
         );
 
         console.log("Response from debounce:", response?.data);
 
         if (!error && response?.data) {
-
           const options = response.data.map((u) => ({
             id: u.id,
             value: u.id,
             label: u.establishment,
-          
-            establishment: u.establishment
+
+            establishment: u.establishment,
           }));
-          
-  
-          
+
           setUserOptions(options);
         }
       } catch (err) {
@@ -76,24 +79,23 @@ const Unclaimed = () => {
     return () => debouncedFetch.cancel();
   }, [userSearch]);
 
-  // Filters for CommonTable - FIXED
   const filters = useMemo(() => {
     const baseFilters = [
       { id: "bank_name", label: "Bank Name", type: "textfield" },
       { id: "id", label: "ID", type: "textfield" },
       { id: "particulars", label: "Particulars", type: "textfield" },
       {
-        id: "user_id",
-        label: "User Establishment",
+        id: "handle_by",
+        label: "Handle By",
         type: "autocomplete",
-        options: userOptions, 
+        options: userOptions,
         onSearch: (val) => {
           console.log("Searching for:", val);
           setUserSearch(val);
         },
         getOptionLabel: (option) => {
           // Handle both string and object options
-          if (typeof option === 'string') return option;
+          if (typeof option === "string") return option;
           if (option && option.label) return option.label;
           if (option && option.establishment) return option.establishment;
           return "";
@@ -107,27 +109,20 @@ const Unclaimed = () => {
         },
         // Add this to help with filtering
         filterOptions: (options, { inputValue }) => {
-          return options.filter(option =>
+          return options.filter((option) =>
             option.label.toLowerCase().includes(inputValue.toLowerCase())
           );
-        }
+        },
       },
-      { 
-        id: "daterange", 
+      {
+        id: "daterange",
         // label: "Date Range",
-        type: "daterange" 
+        type: "daterange",
       },
     ];
-    
+
     return baseFilters;
-  }, [userOptions]); // Only depend on userOptions, not appliedFilters
-
-  // Custom fetch function to handle the autocomplete filter
-  const handleFilterChange = useCallback((newFilters) => {
-    console.log("Filters changed:", newFilters);
-    // If you need to handle filter changes specifically, do it here
-  }, []);
-
+  }, [userOptions]);
   const columns = [
     { name: "ID", selector: (row) => row.id, width: "80px" },
     { name: "Bank ID", selector: (row) => row.bank_id },
@@ -190,7 +185,7 @@ const Unclaimed = () => {
   return (
     <>
       <CommonLoader loading={loading} text="Loading Unclaimed Entries..." />
-      
+
       {!loading && (
         <Box>
           <CommonTable
@@ -198,9 +193,7 @@ const Unclaimed = () => {
             columns={columns}
             filters={filters}
             enableRowSelection={false}
-            onFilterChange={handleFilterChange} // Pass the handler
             disableSelectionOnClick
-          
             defaultPageSize={15}
           />
         </Box>
