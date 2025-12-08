@@ -168,6 +168,7 @@ const Claimed_with_Paid = () => {
   const columns = [
     { name: "ID", selector: (row) => row.id, width: "80px" },
     { name: "Bank ID", selector: (row) => row.bank_id },
+     { name: "Bank Name", selector: (row) => row.bank_name },
     {
       name: "Date", // CHANGED: Removed DateRangePicker from header
       selector: (row) => (
