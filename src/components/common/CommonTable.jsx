@@ -781,13 +781,18 @@ const CommonTable = ({
           {filter.type === "autocomplete" ? (
             <Autocomplete
               options={filter.options || []}
-              getOptionLabel={filter.getOptionLabel}
-              isOptionEqualToValue={filter.isOptionEqualToValue}
+              getOptionLabel={(option) => option.label || ""}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
               onInputChange={(e, val) => filter.onSearch?.(val)}
-              value={filterValues[filter.id] || null}
+              value={
+                // Convert stored ID → object for Autocomplete display
+                filter.options?.find(
+                  (opt) => opt.id === filterValues[filter.id]
+                ) || null
+              }
               onChange={(e, newValue) => {
                 console.log("🟠 Selected value:", newValue);
-                handleFilterChange(filter.id, newValue);
+                handleFilterChange(filter.id, newValue ? newValue.id : "");
               }}
               renderInput={(params) => (
                 <TextField

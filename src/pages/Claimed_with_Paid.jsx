@@ -85,11 +85,9 @@ const Claimed_with_Paid = () => {
             establishment: searchTerm, // send under establishment key
           }
         );
-        console.log("respinse ofthe debounce is thius ", response?.data?.id);
-
         if (response) {
           setUserOptions(
-            response.data.map((u) => ({
+            response?.data?.map((u) => ({
               id: u.id, // ✅ consistent key
               label: u.establishment,
             }))
@@ -119,11 +117,8 @@ const Claimed_with_Paid = () => {
         options: userOptions,
         onSearch: (val) => setUserSearch(val),
         getOptionLabel: (option) => option?.label || "",
-        isOptionEqualToValue: (option, value) =>
-          option.establishment === value.establishment, // ✅ this line keeps selection visible
-        roles: ["adm", "sadm"],
+        isOptionEqualToValue: (option, value) => option.label === value.label, // ✅ this line keeps selection visible roles: ["adm", "sadm"], },
       },
-
       { id: "daterange", type: "daterange" },
     ],
     [user?.role, appliedFilters]
