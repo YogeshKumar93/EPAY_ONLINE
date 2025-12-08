@@ -82,7 +82,7 @@ const handleForgotPassword = () => setForgotPasswordModalOpen(true);
     if (successMessage) {
       const timer = setTimeout(() => {
         setSuccessMessage("");
-      }, 5000);
+      }, 2000);
       return () => clearTimeout(timer);
     }
   }, [successMessage]);
