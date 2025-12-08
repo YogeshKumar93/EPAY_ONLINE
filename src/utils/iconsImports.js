@@ -45,6 +45,7 @@ import windows_1 from "../assets/windows1.png";
 import linux_1 from "../assets/linux.png";
 import okhttp_1 from "../assets/okhttp.png";
 import postman_1 from "../assets/postman.svg";
+import summary_account from "../assets/summary3.png";
 
 // export const sbi2 = sbi1;
 // export const pnb2 = pnb1;
@@ -86,3 +87,5 @@ export const windows2 = windows_1;
 export const linux2 = linux_1;
 export const okhttp = okhttp_1;
 export const postman = postman_1;
+
+export const summaryAccount = summary_account; 

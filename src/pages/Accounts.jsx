@@ -122,7 +122,7 @@ const Accounts = () => {
   // ✅ Columns definition
   const columns = [
     { name: "Name", selector: (row) => row.name },
-    { name: "User ID", selector: (row) => row.id },
+    { name: "ID", selector: (row) => row.id },
     { name: "Establishment", selector: (row) => row.establishment },
     { name: "Mobile", selector: (row) => row.mobile },
     { name: "Credit Limit", selector: (row) => row.credit_limit },

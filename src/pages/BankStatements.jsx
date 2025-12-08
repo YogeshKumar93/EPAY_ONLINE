@@ -28,6 +28,7 @@ import {
   ddmmyy,
   ddmmyyWithTime,
   dateToTime1,
+  dateToTime,
 } from "../utils/DateUtils";
 import { capitalize1 } from "../utils/TextUtil";
 import { currencySetter } from "../utils/Currencyutil";
@@ -119,7 +120,7 @@ const BankStatements = () => {
 
       const tableData = response.data.map((row, index) => ({
         "S.No": index + 1,
-        Date: ddmmyy(row.created_at),
+        Date: ddmmyy(row.date),
         Time: dateToTime1(row.created_at),
         "Handled By": row.handle_by,
         Particulars: row.particulars,
@@ -145,6 +146,14 @@ const BankStatements = () => {
       showToast("Failed to download Excel", "error");
     }
   };
+
+
+  const excelDateToJSDate = (excelDate) => {
+  if (typeof excelDate === "number") {
+    return new Date((excelDate - 25569) * 86400 * 1000); 
+  }
+  return new Date(excelDate);
+};
 
   // 👇 Add this inside BankStatements component
 const handleUploadExcel = async (file) => {
@@ -175,15 +184,13 @@ const handleUploadExcel = async (file) => {
         const payload = {
           bank_id: bank_id,
           balance: oldBalance || 0,
-          date: (() => {
-            if (row.date) {
-              const parsedDate = new Date(row.date);
-              if (!isNaN(parsedDate)) {
-                return parsedDate.toISOString().slice(0, 19).replace("T", " ");
-              }
-            }
-            return new Date().toISOString().slice(0, 19).replace("T", " ");
-          })(),
+             date: (() => {
+  if (row.date) {
+    const parsedDate = excelDateToJSDate(row.date);
+    return yyyymmdd(parsedDate) + " " + dateToTime1(parsedDate);
+  }
+  return new Date().toISOString().slice(0, 19).replace("T", " ");
+})(),
           credit: Number(row.credit || 0),
           debit: Number(row.debit || 0),
           mop: row.mop || "",
@@ -274,7 +281,11 @@ const handleUploadExcel = async (file) => {
           style={{ width: 200 }} // <-- set the width you want
         />
       ),
-      selector: (row) => datemonthYear1(row.created_at),
+           selector: (row) => (
+  <span>
+    {ddmmyy(row.date)} {dateToTime(row.created_at)}
+  </span>
+)
     },
 
     { name: "By", selector: (row) => row.handle_by },

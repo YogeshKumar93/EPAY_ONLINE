@@ -143,6 +143,7 @@ const CommonTable = ({
   title = "",
   queryParam = "",
   onFetchRef,
+  setSummary=()=>{},
   refresh = true,
   customHeader = null, // Add this line
   rowHoverHandlers, // Add this prop to accept hover handlers
@@ -161,6 +162,7 @@ const CommonTable = ({
   const { afterToday } = DateRangePicker;
   const [hoveredRow, setHoveredRow] = useState(null);
   const [data, setData] = useState([]);
+ 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterValues, setFilterValues] = useState({});
@@ -373,7 +375,7 @@ const handleSelectAll = (event) => {
               response?.total ||
               normalizedData?.length ||
               0;
-
+             setSummary(response?.data?.summary??[])
             setData(dataWithSerial); // ✅ Use dataWithSerial instead of normalizedData
             setTotalCount(total);
           } else if (Array.isArray(response)) {

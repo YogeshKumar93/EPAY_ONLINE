@@ -35,6 +35,8 @@ import PrintClaimedReceipt from "../pages/PrintClaimedReceipt";
 import Users from "../pages/Users";
 import Claimed_with_Paid from "../pages/Claimed_with_Paid";
  
+import AccountSummary from "../pages/AccountSummary";
+ 
 
 // const PrivateRoute = ({ children }) => {
 //   const { isAuthenticated, loading, user } = useContext(AuthContext);
@@ -140,7 +142,7 @@ export default function AppRoutes() {
             <>
               {/* <Route path="admin/dashboard" element={<Dashboard />} /> */}
               <Route path="admin/users" element={<Users />} />
-             
+               <Route path="admin/getaccountsummary" element={<AccountSummary />} />
               {/* <Route path="admin/transactions" element={<Transaction />} /> */}
               {/* <Route path="admin/notification" element={<Notification />} /> */}
               {/* <Route path="admin/fund-request" element={<FundRequest />} /> */}

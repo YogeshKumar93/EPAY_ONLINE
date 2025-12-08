@@ -82,14 +82,14 @@ const CreateUser = ({ open, onClose, onFetchRef }) => {
     if (!user.name.trim()) errors.push("User name is required");
     if (!user.email.trim()) errors.push("User email is required");
     if (!user.mobile.trim()) errors.push("User mobile is required");
-    if (!user.start_date) errors.push("User start date is required");
-    if (!user.end_date) errors.push("User end date is required");
+    // if (!user.start_date) errors.push("User start date is required");
+    // if (!user.end_date) errors.push("User end date is required");
 
-    if (!business.business_name.trim())
-      errors.push("Business name is required");
-    if (!businessAddress.state.trim()) errors.push("Business state is required");
-    if (!businessAddress.pincode.trim())
-      errors.push("Business pincode is required");
+    // if (!business.business_name.trim())
+    //   errors.push("Business name is required");
+    // if (!businessAddress.state.trim()) errors.push("Business state is required");
+    // if (!businessAddress.pincode.trim())
+    //   errors.push("Business pincode is required");
 
     return errors;
   };
@@ -106,15 +106,15 @@ const CreateUser = ({ open, onClose, onFetchRef }) => {
     if (!user.name.trim()) stepErrors.push("User name is required");
     if (!user.email.trim()) stepErrors.push("User email is required");
     if (!user.mobile.trim()) stepErrors.push("User mobile is required");
-    if (!user.start_date) stepErrors.push("User start date is required");
-    if (!user.end_date) stepErrors.push("User end date is required");
+    // if (!user.start_date) stepErrors.push("User start date is required");
+    // if (!user.end_date) stepErrors.push("User end date is required");
   }
 
-  if (activeStep === 2) {
-    if (!business.business_name.trim()) stepErrors.push("Business name is required");
-    if (!businessAddress.state.trim()) stepErrors.push("Business state is required");
-    if (!businessAddress.pincode.trim()) stepErrors.push("Business pincode is required");
-  }
+  // if (activeStep === 2) {
+  //   if (!business.business_name.trim()) stepErrors.push("Business name is required");
+  //   if (!businessAddress.state.trim()) stepErrors.push("Business state is required");
+  //   if (!businessAddress.pincode.trim()) stepErrors.push("Business pincode is required");
+  // }
 
   if (stepErrors.length > 0) {
     stepErrors.forEach((msg) => showToast("Please fill all details first", "error"));

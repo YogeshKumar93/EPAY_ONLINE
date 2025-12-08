@@ -8,6 +8,7 @@ import {
   claimedImage,
   paidimage
 } from "../../iconsImports";
+import { summaryAccount } from "../../utils/iconsImports";
 
 export const navConfig = [
   // Dashboard
@@ -97,6 +98,18 @@ export const navConfig = [
     roles: ["adm", "sadm"],
   },
 
+   {
+    title: "Summary",
+    icon: summaryAccount,
+    icon2: "🏦",
+    to: {
+      adm: "/admin/getaccountsummary",
+      sadm: "/admin/getaccountsummary",
+    },
+    permissionKey: "nav",
+    roles: ["adm", "sadm"],
+  },
+
   // Settings
   // {
   //   title: "Settings",
@@ -144,13 +157,13 @@ const roleHierarchy = {
       // "Manage Users",
       
  
-     
+      
       "Banks",
       "Accounts",
       "Unclaimed",
          "Claimed",
          "Paid",
-    
+    "Summary",
       "Login History",
     ],
   
@@ -167,7 +180,7 @@ const roleHierarchy = {
       "Unclaimed",
          "Claimed",
          "Paid",
-   
+   "Summary",
       "Login History",
     ],
   

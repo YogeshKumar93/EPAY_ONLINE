@@ -5,25 +5,29 @@ import { apiCall } from "../api/apiClient";
 import ApiEndpoints from "../api/ApiEndpoints";
 import { useToast } from "../utils/ToastContext";
 
-const DownloadExcel = ({ open, handleClose, onFetchRef, bankId }) => {
+const DownloadExcel = ({
+  open,
+  handleClose,
+  onFetchRef,
+  bankId,
+  selectedDate,
+}) => {
   const { showToast } = useToast();
 
   useEffect(() => {
     if (open) {
       generateAndDownloadExcel();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   const generateAndDownloadExcel = async () => {
     try {
-      // ✅ Fetch schema (optional)
+      // Fetch schema
       const { data: schemaResponse } = await apiCall(
         "POST",
         ApiEndpoints.GET_BANK_STATEMENT_SCHEMA
       );
 
-      // ✅ Use schema field names if available
       const fields = schemaResponse?.fields?.map((f) => f.name) || [
         "date",
         "credit",
@@ -33,18 +37,27 @@ const DownloadExcel = ({ open, handleClose, onFetchRef, bankId }) => {
         "particulars",
       ];
 
-      // ✅ Dummy data for Excel
+      const getDefaultDate = () => {
+  const d = new Date();
+  return d.toISOString().split("T")[0]; // "2025-12-03"
+};
+
+
+     
+     const dateToUse = selectedDate || getDefaultDate();
+
+
       const dummyData = [
         {
-          date: new Date().toISOString().split("T")[0],
+          date: dateToUse || 13 / 11 / 2025,
           credit: 205000,
           debit: 0,
           mop: "OFFLINE",
           handle_by: "RAUSHAN",
-          particulars: "EPAY",
+          particulars: "P2PAE",
         },
         {
-          date: new Date().toISOString().split("T")[0],
+          date: dateToUse || 12 / 11 / 2025,
           credit: 0,
           debit: 901000,
           mop: "SHANKY",
@@ -53,18 +66,15 @@ const DownloadExcel = ({ open, handleClose, onFetchRef, bankId }) => {
         },
       ];
 
-      // ✅ Generate worksheet
       const worksheet = XLSX.utils.json_to_sheet(dummyData, { header: fields });
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "BankStatement");
 
-      // ✅ Create Excel buffer
       const excelBuffer = XLSX.write(workbook, {
         bookType: "xlsx",
         type: "array",
       });
 
-      // ✅ Save as file
       const blob = new Blob([excelBuffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
@@ -72,7 +82,6 @@ const DownloadExcel = ({ open, handleClose, onFetchRef, bankId }) => {
       saveAs(blob, `BankStatement_Sample_${bankId || "Data"}.xlsx`);
       showToast("Sample Excel downloaded successfully!", "success");
 
-      // ✅ Trigger callbacks
       handleClose?.();
       onFetchRef?.();
     } catch (err) {
