@@ -190,23 +190,38 @@ const CommonTable = ({
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
 
-  // Memoized initial filter values
   const initialFilterValues = useMemo(() => {
     const values = {};
     availableFilters?.forEach((filter) => {
       if (filter.type === "dropdown") {
         values[filter.id] = "All";
       } else if (filter.type === "date") {
-        values[filter.id] = "";
+        // Set today's date ONLY if autoToday is explicitly true
+        if (filter.autoToday === true) {
+          const today = new Date();
+          values[filter.id] = today.toISOString().split("T")[0];
+        } else {
+          values[filter.id] = "";
+        }
       } else if (filter.type === "daterange") {
-        values[filter.id] = { start: "", end: "" };
+        // Auto-set to today ONLY if filter.autoToday is explicitly true
+        if (filter.autoToday === true) {
+          const today = new Date();
+          const todayStr = today.toISOString().split("T")[0];
+          values[filter.id] = {
+            start: todayStr,
+            end: todayStr,
+            value: [today, today],
+          };
+        } else {
+          values[filter.id] = { start: "", end: "", value: null };
+        }
       } else {
         values[filter.id] = "";
       }
     });
     return values;
   }, [availableFilters]);
-  // Select/unselect all
   const handleSelectAll = (event) => {
     if (event.target.checked) {
       onSelectionChange?.(data); // Pass full row objects
@@ -225,13 +240,6 @@ const CommonTable = ({
     onSelectionChange?.(newSelectedRows);
   };
 
-  // useEffect(() => {
-  //   setFilterValues(initialFilterValues);
-  //   setAppliedFilters(initialFilterValues);
-  //   setExportFilters(initialFilterValues); // ✅ Initialize export filters state
-  //   appliedFiltersRef.current = initialFilterValues;
-  //   console.log("🔍 [Table] Initialized all filters:", initialFilterValues);
-  // }, [initialFilterValues]);
   const { handleExportExcel } = useExcelExport();
 
   const handleTableExport = useCallback(async () => {
@@ -430,13 +438,6 @@ const CommonTable = ({
     };
   }, [fetchData]);
 
-  // Memoized filter handlers
-  // ✅ Memoized filter change handler
-  // ✅ Memoized filter change handler
-  // const handleFilterChange = (id, newValue) => {
-  //   console.log("🧩 Updating filter value for:", id, newValue);
-  //   setFilterValues((prev) => ({ ...prev, [id]: newValue }));
-  // };
   const handleFilterChange = (id, value) => {
     console.log("🟢 [Table] Filter change:", id, value);
 
@@ -444,7 +445,6 @@ const CommonTable = ({
     setFilterValues((prev) => ({ ...prev, [id]: value }));
     setAppliedFilters((prev) => ({ ...prev, [id]: value }));
   };
-
   const applyFilters = useCallback(() => {
     console.log("🔍 [Table] applyFilters called with:", filterValues);
 
@@ -459,22 +459,22 @@ const CommonTable = ({
         delete formattedFilters[key];
         return;
       }
-      // Add this case in the Object.keys(formattedFilters).forEach loop:
+
+      // Handle roleuser filter
       if (filterConfig?.type === "roleuser" && val) {
-        // If val is an object with user_id, extract it, otherwise use as-is
         formattedFilters[key] =
           typeof val === "object" ? val.id || val.id || val : val;
         return;
       }
+
       // 🧠 Extract ID or value for dropdown/autocomplete
       if (
         (filterConfig?.type === "dropdown" ||
           filterConfig?.type === "autocomplete") &&
         val
       ) {
-        // For autocomplete, we want to send the ID (value property)
         if (filterConfig?.type === "autocomplete" && typeof val === "object") {
-          formattedFilters[key] = val.value || val.id || val; // Use value property which contains the ID
+          formattedFilters[key] = val.value || val.id || val;
         } else {
           formattedFilters[key] = val.id || val.value || val;
         }
@@ -485,35 +485,40 @@ const CommonTable = ({
         formattedFilters[key] = new Date(val).toISOString().split("T")[0];
       }
 
-      // 📆 Handle date range
+      // 📆 Handle date range - IMPORTANT CHANGE HERE
       if (filterConfig?.type === "daterange" && val) {
-        if (val.start) {
-          formattedFilters["from_date"] = new Date(val.start)
+        // Only add dates if they exist (not empty strings)
+        let startDate = val.start;
+        let endDate = val.end;
+
+        // Don't auto-fill if autoToday is false or not set
+        if (startDate && startDate.trim() !== "") {
+          formattedFilters["from_date"] = new Date(startDate)
             .toISOString()
             .split("T")[0];
         }
-        if (val.end) {
-          formattedFilters["to_date"] = new Date(val.end)
+        if (endDate && endDate.trim() !== "") {
+          formattedFilters["to_date"] = new Date(endDate)
             .toISOString()
             .split("T")[0];
         }
+
+        // Remove the original daterange object
         delete formattedFilters[key];
       }
     });
 
     console.log("✅ [Table] Final formatted filters:", formattedFilters);
 
-    // ✅ Update filter states & refs
+    // Rest of the function remains same...
     setAppliedFilters(formattedFilters);
     setExportFilters(formattedFilters);
     appliedFiltersRef.current = formattedFilters;
 
-    // ✅ Trigger parent callback if present
     if (onFilterChange) {
       onFilterChange(formattedFilters);
     }
 
-    // Reset pagination & refetch data
     setPage(0);
     pageRef.current = 0;
 
@@ -521,7 +526,6 @@ const CommonTable = ({
       setFilterModalOpen(false);
     }
 
-    // 🚀 Fetch data with updated filters
     fetchData();
   }, [
     filterValues,
@@ -530,33 +534,48 @@ const CommonTable = ({
     fetchData,
     onFilterChange,
   ]);
-
-  // ✅ Reset filters completely
   const resetFilters = useCallback(() => {
-    // clear filters
-    const cleared = {};
+    // Reset to initial values
+    setFilterValues(initialFilterValues);
+    setAppliedFilters(initialFilterValues);
+
+    // Extract just the API-ready filters from initialFilterValues
+    const apiReadyFilters = {};
+
+    // Process the initial values to match API format
     Object.keys(initialFilterValues).forEach((key) => {
-      cleared[key] = null;
+      const filterConfig = availableFilters.find((f) => f.id === key);
+      const val = initialFilterValues[key];
+
+      if (filterConfig?.type === "daterange" && val) {
+        // Only add to API if autoToday is true and dates exist
+        if (filterConfig.autoToday === true && val.start && val.end) {
+          apiReadyFilters["from_date"] = val.start;
+          apiReadyFilters["to_date"] = val.end;
+        }
+      } else if (filterConfig?.type === "date" && val) {
+        // Only add to API if autoToday is true
+        if (filterConfig.autoToday === true) {
+          apiReadyFilters[key] = val;
+        }
+      } else if (val && val !== "All" && val !== "") {
+        apiReadyFilters[key] = val;
+      }
     });
 
-    setFilterValues(cleared);
-    setAppliedFilters(cleared);
-    setExportFilters(cleared);
-    appliedFiltersRef.current = cleared;
+    setExportFilters(apiReadyFilters);
+    appliedFiltersRef.current = apiReadyFilters;
 
-    // 🔥 FORCE RE-MOUNT ALL FILTER COMPONENTS
     setResetKey((prev) => prev + 1);
 
     if (onFilterChange) {
-      onFilterChange(cleared);
+      onFilterChange(apiReadyFilters);
     }
 
     setPage(0);
     pageRef.current = 0;
     fetchData();
-  }, [initialFilterValues, fetchData, onFilterChange]);
-
-  // ✅ Remove an individual filter safely
+  }, [initialFilterValues, fetchData, onFilterChange, availableFilters]);
   const removeFilter = useCallback(
     (filterId) => {
       const filterConfig = availableFilters.find((f) => f.id === filterId);
@@ -611,6 +630,36 @@ const CommonTable = ({
     },
     [fetchData]
   );
+// Initialize filter values
+useEffect(() => {
+  setFilterValues(initialFilterValues);
+  
+  const apiReadyFilters = {};
+  
+  // Convert initialFilterValues to API format
+  Object.keys(initialFilterValues).forEach(key => {
+    const filterConfig = availableFilters.find(f => f.id === key);
+    const val = initialFilterValues[key];
+    
+    if (filterConfig?.type === "daterange" && val) {
+      // Only add date params if autoToday is true
+      if (filterConfig.autoToday === true && val.start && val.end) {
+        apiReadyFilters["from_date"] = val.start;
+        apiReadyFilters["to_date"] = val.end;
+      }
+    } else if (filterConfig?.type === "date" && val) {
+      // Only add date params if autoToday is true
+      if (filterConfig.autoToday === true) {
+        apiReadyFilters[key] = val;
+      }
+    } else if (val && val !== "All" && val !== "") {
+      apiReadyFilters[key] = val;
+    }
+  });
+  
+  setAppliedFilters(apiReadyFilters);
+  appliedFiltersRef.current = apiReadyFilters;
+}, [initialFilterValues, availableFilters]);
 
   // Manual refresh handler
   const handleManualRefresh = useCallback(() => {
@@ -624,10 +673,6 @@ const CommonTable = ({
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(queryParam)]);
-
-  // useEffect(() => {
-  //   fetchData();
-  // }, [queryParam]);
 
   const renderFilterInputs = useCallback(
     () =>

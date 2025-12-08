@@ -130,8 +130,9 @@ const Claimed_with_Paid = () => {
       },
       {
         id: "daterange",
-
         type: "daterange",
+        // label: "Date Range",
+         autoToday: true,
       },
     ];
 
@@ -141,7 +142,7 @@ const Claimed_with_Paid = () => {
   const fetchEntries = async () => {
     setLoading(true);
     try {
-      const response = await apiCall("GET", ApiEndpoints.GET_ENTRIES, {
+      const response = await apiCall("POST", ApiEndpoints.GET_ENTRIES, {
         status: 2,
       });
 
