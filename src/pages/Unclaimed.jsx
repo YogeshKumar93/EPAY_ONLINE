@@ -200,7 +200,7 @@ const Unclaimed = () => {
             enableRowSelection={false}
             onFilterChange={handleFilterChange} // Pass the handler
             disableSelectionOnClick
-            title="Unclaimed Entries"
+          
             defaultPageSize={15}
           />
         </Box>

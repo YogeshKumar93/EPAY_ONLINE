@@ -160,6 +160,7 @@ const handleForgotPassword = () => setForgotPasswordModalOpen(true);
   onClick: handleForgotPassword,
   gradient: "#fff",
   hoverGradient: "linear-gradient(135deg, #ff758c, #ff7eb3)",
+  roles: [ "sadm"], // allowed roles
 },
     // {
     //   id: 5,
