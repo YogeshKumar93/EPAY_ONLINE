@@ -276,7 +276,6 @@ const CommonTable = ({
   // 🔴 MAIN FETCH DATA FUNCTION - useRef के साथ
   const fetchData = useCallback(
     async (isManualRefresh = false) => {
-  
       setLoading(true);
       setError(null);
 
