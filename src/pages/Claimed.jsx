@@ -245,6 +245,14 @@ const handleUpdateClaimed = async (rows) => {
       
         wrap: true,
       },
+           {
+        name: "Account Name",
+        selector: (row) => (
+          <div style={{ fontSize: 12, fontWeight: 600 }}>{row?.account?.name ||""}</div>
+        ),
+      
+        wrap: true,
+      },
       {
       name: (
          <DateRangePicker
