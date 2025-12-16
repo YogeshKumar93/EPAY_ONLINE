@@ -42,11 +42,11 @@ const AccountSummary = () => {
       const { error, response } = await apiCall(
         "POST",
         ApiEndpoints.GET_ACCOUNTS,
-        {}
+        { export: 1 }
       );
 
       if (!error && response?.data) {
-        setAccountOptions(response.data);
+        setAccountOptions(response?.data);
       } else {
         setAccountOptions([]);
       }
