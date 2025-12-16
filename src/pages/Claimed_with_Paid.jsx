@@ -25,13 +25,11 @@ import { useToast } from "../utils/ToastContext";
 import { fi } from "date-fns/locale";
 
 const Claimed_with_Paid = () => {
-  const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [openDelete, setOpenDelete] = useState(false);
-  const [selectedClaim, setSelectedClaim] = useState(null);
   const [userSearch, setUserSearch] = useState("");
   const [userOptions, setUserOptions] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); // ADDED: Missing state
+  const [accountSearch, setAccountSearch] = useState("");
+  const [accountOptions, setAccountOptions] = useState([]);
   const authCtx = useContext(AuthContext);
   const user = authCtx?.user;
 
@@ -54,17 +52,12 @@ const Claimed_with_Paid = () => {
     fetchEntriesRef.current = fetchFn;
   };
 
-  const refreshEntries = () => {
-    if (fetchEntriesRef.current) fetchEntriesRef.current();
-  };
-
   const handlePrint = (row) => {
     localStorage.setItem("PRINT_DATA", JSON.stringify(row));
     window.open("/print-claimedreceipt", "_blank");
   };
 
   // Debounced search for handle_by
-
   useEffect(() => {
     if (userSearch.length < 3) {
       setUserOptions([]);
@@ -87,7 +80,6 @@ const Claimed_with_Paid = () => {
             id: u.id,
             value: u.id,
             label: u.establishment,
-
             establishment: u.establishment,
           }));
 
@@ -104,12 +96,67 @@ const Claimed_with_Paid = () => {
     return () => debouncedFetch.cancel();
   }, [userSearch]);
 
-  // Filters - FIXED dependency array
+  useEffect(() => {
+    const loadInitialAccounts = async () => {
+      try {
+        const { error, response } = await apiCall(
+          "POST",
+          ApiEndpoints.GET_ACCOUNTS,
+          { export: 1 }
+        );
+
+        if (!error && response?.data) {
+          const options = response.data.map((account) => ({
+            id: account.id,
+            value: account.id,
+            label:
+              account.name || account.account_name || `Account ${account.id}`,
+            name: account.name || account.account_name,
+          }));
+
+          setAccountOptions(options);
+        }
+      } catch (err) {
+        console.error("Error loading initial accounts:", err);
+      }
+    };
+
+    loadInitialAccounts();
+  }, []);
+
   const filters = useMemo(() => {
     const baseFilters = [
       { id: "bank_name", label: "Bank Name", type: "textfield" },
-      { id: "id", label: "ID", type: "textfield" },
       { id: "particulars", label: "Particulars", type: "textfield" },
+
+      {
+        id: "account_id",
+        label: "Account",
+        type: "autocomplete",
+        options: accountOptions,
+        onSearch: (val) => {
+          setAccountSearch(val);
+        },
+        getOptionLabel: (option) => {
+          if (!option) return "";
+          if (typeof option === "string") return option;
+          return option.label || option.name || String(option.id || "");
+        },
+        isOptionEqualToValue: (option, value) => {
+          if (!option || !value) return false;
+
+          if (option.id && value.id) return option.id === value.id;
+
+          if (option.value && value.value) return option.value === value.value;
+
+          return option.label === value.label;
+        },
+        renderOption: (props, option) => (
+          <li {...props} key={option.id}>
+            {option.label}
+          </li>
+        ),
+      },
       {
         id: "handle_by",
         label: "Handle By",
@@ -133,44 +180,19 @@ const Claimed_with_Paid = () => {
       {
         id: "daterange",
         type: "daterange",
-        // label: "Date Range",
-         autoToday: true,
+        autoToday: true,
       },
     ];
 
     return baseFilters;
-  }, [userOptions]);
-
-  const fetchEntries = async () => {
-    setLoading(true);
-    try {
-      const response = await apiCall("POST", ApiEndpoints.GET_ENTRIES, {
-        status: 2,
-      });
-
-      if (response?.data?.success) {
-        setEntries(response.data.entries || []);
-      } else {
-        setEntries([]);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Optional: initial fetch if needed
-  useEffect(() => {
-    fetchEntries(); // Commented out since CommonTable handles it
-  }, []);
+  }, [userOptions, accountOptions]);
 
   const columns = [
     { name: "ID", selector: (row) => row.id, width: "80px" },
     { name: "Bank ID", selector: (row) => row.bank_id },
-     { name: "Bank Name", selector: (row) => row.bank_name },
+    { name: "Bank Name", selector: (row) => row.bank_name },
     {
-      name: "Date", // CHANGED: Removed DateRangePicker from header
+      name: "Date",
       selector: (row) => (
         <Tooltip title={formatLogDate(row.updated_at)} arrow>
           <span>{formatLogDate(row.created_at)}</span>
@@ -178,9 +200,12 @@ const Claimed_with_Paid = () => {
       ),
     },
     { name: "Particulars", selector: (row) => capitalize1(row.particulars) },
-     { name: "Account Name", selector: (row) => row.account.name },
+    {
+      name: "Account Name",
+      selector: (row) =>
+        row.account?.name || row.account?.account_name || "N/A",
+    },
     { name: "Handle By", selector: (row) => row.handle_by },
-   
     {
       name: "Credit",
       selector: (row) => (
