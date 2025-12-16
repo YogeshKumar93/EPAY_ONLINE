@@ -54,10 +54,11 @@ const PrintClaimedReceipt = () => {
 
   const downloadExcel = () => {
     const wsData = [
-      ["S.No", "Txn Date", "Mode", "Particulars", "Credit", "Debit", "Status"],
+      ["S.No", "Txn Date","Account Name", "Mode", "Particulars", "Credit", "Debit", "Status"],
       ...rows.map((r, idx) => [
         idx + 1,
         r.date ?? "N/A",
+        r.account?.name ?? "N/A",
         r.mop ?? "N/A",
         r.particulars ?? "N/A",
         r.credit ?? 0,
@@ -97,7 +98,7 @@ const PrintClaimedReceipt = () => {
         >
           <thead>
             <tr style={{ backgroundColor: "#dbd3e4ff", color: "#492077" }}>
-              {["S.No", "Txn Date", "Mode", "Particulars", "Credit", "Debit", "Status"].map(
+              {["S.No", "Txn Date", "Account Name", "Mode", "Particulars", "Credit", "Debit", "Status"].map(
                 (title) => (
                   <th key={title} style={thStyle}>
                     {title}
@@ -110,7 +111,7 @@ const PrintClaimedReceipt = () => {
             {rows.map((row, idx) => (
               <tr key={idx}>
                 <td style={tdStyle}>{idx + 1}</td>
-                {[row.date, row.mop, row.particulars, row.credit, row.debit, row.status === 0 ? "Unclaimed" : "Claimed"].map(
+                {[row.date, row.account?.name ?? "N/A", row.mop, row.particulars, row.credit, row.debit, row.status === 0 ? "Unclaimed" : "Claimed"].map(
                   (value, i) => (
                     <td key={i} style={tdStyle}>
                       {value ?? "N/A"}
