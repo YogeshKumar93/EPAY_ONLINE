@@ -30,11 +30,13 @@ const CreateBankModal = ({ open, onClose, onFetchRef, setGlobalLoader }) => {
   const fetchUsers = async () => {
     setUserLoading(true);
     try {
-      const { response } = await apiCall("POST", ApiEndpoints.GET_USERS);
-      if (response?.data.data) {
+      const { response } = await apiCall("POST", ApiEndpoints.GET_USERS, {
+        export: 1,
+      });
+      if (response) {
         setUsers(
-          response.data.data.map((u) => ({
-            label: u.name || u.username, 
+          response.data.map((u) => ({
+            label: `${u.name || u.username} (ID: ${u.id})`,
             value: u.id,
           }))
         );
@@ -121,7 +123,7 @@ const CreateBankModal = ({ open, onClose, onFetchRef, setGlobalLoader }) => {
     {
       name: "handled_by",
       label: "Handled By",
-      type: "select",
+      type: "autocomplete",
       options: users, // dropdown options
       required: true,
       disabled: userLoading,
@@ -153,8 +155,7 @@ const CreateBankModal = ({ open, onClose, onFetchRef, setGlobalLoader }) => {
           variant: "contained",
           color: "primary",
           onClick: handleSubmit,
-          disabled:
-            submitting || loading || userLoading || !schema.length,
+          disabled: submitting || loading || userLoading || !schema.length,
         },
       ]}
     />
