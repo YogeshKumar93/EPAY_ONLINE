@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useRef, useMemo, useContext, use } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useContext,
+  use,
+} from "react";
 import { Box, Typography } from "@mui/material";
 import CommonTable from "../components/common/CommonTable";
 import CommonLoader from "../components/common/CommonLoader";
@@ -10,7 +17,7 @@ const AccountSummary = () => {
   const [entries, setEntries] = useState([]);
   const [summary, setSummary] = useState([]);
   const [loading, setLoading] = useState(false);
-console.log("summary",summary);
+  console.log("summary", summary);
 
   const [accountOptions, setAccountOptions] = useState([]);
   // const [selectedAccount, setSelectedAccount] = useState(null);
@@ -123,72 +130,65 @@ console.log("summary",summary);
   //   }
   // }, [selectedAccount]);
 
-//   const fetchEntries = async (accId) => {
-//   if (!accId) {
-//     setEntries([]);
-//     setSummary(null);
-//     return;
-//   }
+  //   const fetchEntries = async (accId) => {
+  //   if (!accId) {
+  //     setEntries([]);
+  //     setSummary(null);
+  //     return;
+  //   }
 
-//   setLoading(true);
+  //   setLoading(true);
 
-//   try {
-//     const payload = { account_id: accId };
+  //   try {
+  //     const payload = { account_id: accId };
 
-//     const { error, response } = await apiCall(
-//       "POST",
-//       ApiEndpoints.GET_ACCOUNT_SUMMARY,
-//       payload
-//     );
+  //     const { error, response } = await apiCall(
+  //       "POST",
+  //       ApiEndpoints.GET_ACCOUNT_SUMMARY,
+  //       payload
+  //     );
 
-//     if (!error && response) {
-//       setEntries(response.data.data || []);
-//       console.log("response sdhs",response.data.data);
-      
-//       setSummary(response || []);
-//     } else {
-//       setEntries([]);
-//       setSummary(null);
-//     }
+  //     if (!error && response) {
+  //       setEntries(response.data.data || []);
+  //       console.log("response sdhs",response.data.data);
 
-//   } catch (err) {
-//     console.error(err);
-//     setEntries([]);
-//     setSummary(null);
-//   }
+  //       setSummary(response || []);
+  //     } else {
+  //       setEntries([]);
+  //       setSummary(null);
+  //     }
 
-//   setLoading(false);
-// };
+  //   } catch (err) {
+  //     console.error(err);
+  //     setEntries([]);
+  //     setSummary(null);
+  //   }
 
-
+  //   setLoading(false);
+  // };
 
   // -------------------------
   // Table Columns Mapping
   // -------------------------
   const columns = [
-{
-  name: "Created At",
-  selector: (row) =>
-    new Date(row?.created_at).toLocaleString("en-IN", {
-      timeZone: "Asia/Kolkata",
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
-}
-,
-
+    {
+      name: "Created At",
+      selector: (row) =>
+        new Date(row?.created_at).toLocaleString("en-IN", {
+          timeZone: "Asia/Kolkata",
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+    },
     { name: "Bank Txn", selector: (row) => row?.bank_txnid },
     { name: "Particulars", selector: (row) => row?.particulars },
     { name: "Remarks", selector: (row) => row?.remarks },
     { name: "Credit", selector: (row) => row?.credit },
     { name: "Debit", selector: (row) => row?.debit },
     { name: "Balance", selector: (row) => row?.balance },
-
-
-
   ];
 
   return (
@@ -197,9 +197,6 @@ console.log("summary",summary);
 
       {!loading && (
         <Box>
-
-
-
           {/* ORIGINAL TABLE */}
           <CommonTable
             onFetchRef={handleFetchRef}
@@ -209,90 +206,88 @@ console.log("summary",summary);
             // externalData={entries}
             endpoint={ApiEndpoints.GET_ACCOUNT_SUMMARY}
             customHeader={
-              (
- <Box
-  sx={{
-    display: "flex",
-    gap: 1,
-    mb: 1,
-    flexWrap: "wrap",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    p: 0.25,
-    borderRadius: 1,
-     ml: 'auto',
-  }}
->
-  {/* Total Credit */}
-  <Box
-    sx={{
-      flex: "0 0 auto",
-      background: "linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)",
-      p: 1,
-      borderRadius: 1.5,
-      boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-      minWidth: "180px",
-      border: "1px solid #81c784",
-    }}
-  >
-    <Typography variant="body2" fontWeight={600} color="#2e7d32">
-      Total Credit
-    </Typography>
-    <Typography variant="h6" fontWeight={700} color="#1b5e20">
-      ₹ {summary?.total_credit}
-    </Typography>
-  </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  mb: 1,
+                  flexWrap: "wrap",
+                  justifyContent: "flex-end",
+                  alignItems: "center",
+                  p: 0.25,
+                  borderRadius: 1,
+                  ml: "auto",
+                }}
+              >
+                {/* Total Credit */}
+                <Box
+                  sx={{
+                    flex: "0 0 auto",
+                    background:
+                      "linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)",
+                    p: 1,
+                    borderRadius: 1.5,
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                    minWidth: "180px",
+                    border: "1px solid #81c784",
+                  }}
+                >
+                  <Typography variant="body2" fontWeight={600} color="#2e7d32">
+                    Total Credit
+                  </Typography>
+                  <Typography variant="h6" fontWeight={700} color="#1b5e20">
+                    ₹ {summary?.total_credit}
+                  </Typography>
+                </Box>
 
-  {/* Total Debit */}
-  <Box
-    sx={{
-      flex: "0 0 auto",
-      background: "linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%)",
-      p: 1,
-      borderRadius: 1.5,
-      boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-      minWidth: "180px",
-      border: "1px solid #e57373",
-    }}
-  >
-    <Typography variant="body2" fontWeight={600} color="#c62828">
-      Total Debit
-    </Typography>
-    <Typography variant="h6" fontWeight={700} color="#b71c1c">
-      ₹ {summary?.total_debit}
-    </Typography>
-  </Box>
+                {/* Total Debit */}
+                <Box
+                  sx={{
+                    flex: "0 0 auto",
+                    background:
+                      "linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%)",
+                    p: 1,
+                    borderRadius: 1.5,
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                    minWidth: "180px",
+                    border: "1px solid #e57373",
+                  }}
+                >
+                  <Typography variant="body2" fontWeight={600} color="#c62828">
+                    Total Debit
+                  </Typography>
+                  <Typography variant="h6" fontWeight={700} color="#b71c1c">
+                    ₹ {summary?.total_debit}
+                  </Typography>
+                </Box>
 
-  {/* Total Entries */}
-  <Box
-    sx={{
-      flex: "0 0 auto",
-      background: "linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)",
-      p: 1,
-      borderRadius: 1.5,
-      boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-      minWidth: "180px",
-      border: "1px solid #64b5f6",
-    }}
-  >
-    <Typography variant="body2" fontWeight={600} color="#1565c0">
-      Total Entries
-    </Typography>
-    <Typography variant="h6" fontWeight={700} color="#0d47a1">
-      {summary?.total_entries}
-    </Typography>
-  </Box>
-</Box>
-
-              )
+                {/* Total Entries */}
+                <Box
+                  sx={{
+                    flex: "0 0 auto",
+                    background:
+                      "linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)",
+                    p: 1,
+                    borderRadius: 1.5,
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                    minWidth: "180px",
+                    border: "1px solid #64b5f6",
+                  }}
+                >
+                  <Typography variant="body2" fontWeight={600} color="#1565c0">
+                    Total Entries
+                  </Typography>
+                  <Typography variant="h6" fontWeight={700} color="#0d47a1">
+                    {summary?.total_entries}
+                  </Typography>
+                </Box>
+              </Box>
             }
           />
-
         </Box>
       )}
     </>
   );
-
 };
 
 export default AccountSummary;

@@ -178,7 +178,9 @@ const Claimed_with_Paid = () => {
       ),
     },
     { name: "Particulars", selector: (row) => capitalize1(row.particulars) },
+     { name: "Account Name", selector: (row) => row.account.name },
     { name: "Handle By", selector: (row) => row.handle_by },
+   
     {
       name: "Credit",
       selector: (row) => (
