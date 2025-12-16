@@ -238,6 +238,22 @@ const handleUpdateClaimed = async (rows) => {
       },
 
       {
+        name: "Bank Name",
+        selector: (row) => (
+          <div style={{ fontSize: 12, fontWeight: 600 }}>{row.bank_name}</div>
+        ),
+      
+        wrap: true,
+      },
+           {
+        name: "Account Name",
+        selector: (row) => (
+          <div style={{ fontSize: 12, fontWeight: 600 }}>{row?.account?.name ||""}</div>
+        ),
+      
+        wrap: true,
+      },
+      {
       name: (
          <DateRangePicker
             showOneCalendar
@@ -284,7 +300,7 @@ const handleUpdateClaimed = async (rows) => {
       {
         name: "Handled By",
         selector: (row) => (
-          <div style={{ fontSize: 12, fontWeight: 600 }}>{row.handle_by}</div>
+          <div style={{  fontWeight: 600 }}>{row.handle_by}</div>
         ),
         wrap: true,
         width: "120px",

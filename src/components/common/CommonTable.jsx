@@ -143,27 +143,26 @@ const CommonTable = ({
   title = "",
   queryParam = "",
   onFetchRef,
-  setSummary=()=>{},
+  setSummary = () => {},
   refresh = true,
-  customHeader = null, // Add this line
-  rowHoverHandlers, // Add this prop to accept hover handlers
+  customHeader = null,
+  rowHoverHandlers,
   rowProps,
   enableActionsHover = true,
-  onFilterChange, // Add this prop
-  enableExcelExport = false, // New prop to enable export
-  exportFileName = "TableData", // New prop for export file name
-  exportEndpoint, // New prop for export API endpoint (can be different from main endpoint)
+  onFilterChange,
+  enableExcelExport = false,
+  exportFileName = "TableData",
+  exportEndpoint,
   exportPayload,
-  onSelectionChange, // Add this prop
-  selectedRows = [], // Add this prop
+  onSelectionChange,
+  selectedRows = [],
   onExportComplete,
-  enableRowSelection = false, 
+  enableRowSelection = false,
 }) => {
   const { afterToday } = DateRangePicker;
   const [hoveredRow, setHoveredRow] = useState(null);
   const [data, setData] = useState([]);
- 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [filterValues, setFilterValues] = useState({});
   const [appliedFilters, setAppliedFilters] = useState({});
@@ -173,48 +172,64 @@ const CommonTable = ({
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [dateRange, setDateRange] = useState([null, null]);
   const authCtx = useContext(AuthContext);
-  const [exportFilters, setExportFilters] = useState({}); // ✅ Use state for export filters
+  const [exportFilters, setExportFilters] = useState({});
   const [resetKey, setResetKey] = useState(0);
-  // const [selectedRows, setSelectedRows] = useState([]); // array of selected row IDs
-  const allRowIds = useMemo(() => data.map((row) => row.id), [data]); // assumes each row has unique `id`
+  const [initialized, setInitialized] = useState(false);
 
+  const allRowIds = useMemo(() => data.map((row) => row.id), [data]);
   const user = authCtx?.user;
+
   // Use refs to track values without causing re-renders
   const appliedFiltersRef = useRef({});
   const pageRef = useRef(0);
   const rowsPerPageRef = useRef(defaultPageSize);
   const refreshIntervalRef = useRef(refreshInterval);
   const hasFetchedInitialData = useRef(false);
-  const currentAppliedFiltersRef = useRef({});
+  const fetchDataRef = useRef(null);
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
 
-  // Memoized initial filter values
+  // Initialize filter values - मेमोइज्ड
   const initialFilterValues = useMemo(() => {
     const values = {};
     availableFilters?.forEach((filter) => {
       if (filter.type === "dropdown") {
         values[filter.id] = "All";
       } else if (filter.type === "date") {
-        values[filter.id] = "";
+        if (filter.autoToday === true) {
+          const today = new Date();
+          values[filter.id] = today.toISOString().split("T")[0];
+        } else {
+          values[filter.id] = "";
+        }
       } else if (filter.type === "daterange") {
-        values[filter.id] = { start: "", end: "" };
+        if (filter.autoToday === true) {
+          const today = new Date();
+          const todayStr = today.toISOString().split("T")[0];
+          values[filter.id] = {
+            start: todayStr,
+            end: todayStr,
+            value: [today, today],
+          };
+        } else {
+          values[filter.id] = { start: "", end: "", value: null };
+        }
       } else {
         values[filter.id] = "";
       }
     });
     return values;
   }, [availableFilters]);
-  // Select/unselect all
-const handleSelectAll = (event) => {
-  if (event.target.checked) {
-    onSelectionChange?.(data); // Pass full row objects
-  } else {
-    onSelectionChange?.([]);
-  }
-};
-  // Select/unselect individual row - use the prop function
+
+  const handleSelectAll = (event) => {
+    if (event.target.checked) {
+      onSelectionChange?.(data);
+    } else {
+      onSelectionChange?.([]);
+    }
+  };
+
   const handleSelectRow = (row) => {
     const isSelected = selectedRows.some(
       (selectedRow) => selectedRow.id === row.id
@@ -225,39 +240,7 @@ const handleSelectAll = (event) => {
     onSelectionChange?.(newSelectedRows);
   };
 
-  // useEffect(() => {
-  //   setFilterValues(initialFilterValues);
-  //   setAppliedFilters(initialFilterValues);
-  //   setExportFilters(initialFilterValues); // ✅ Initialize export filters state
-  //   appliedFiltersRef.current = initialFilterValues;
-  //   console.log("🔍 [Table] Initialized all filters:", initialFilterValues);
-  // }, [initialFilterValues]);
   const { handleExportExcel } = useExcelExport();
-
-  const handleTableExport = useCallback(async () => {
-    const payload = {
-      ...exportFilters, // filters from UI
-      ...exportPayload, // extra payload from props
-    };
-    const result = await handleExportExcel(
-      exportEndpoint || endpoint,
-      payload,
-      exportFilters, // ✅ Use state instead of ref
-      exportFileName
-    );
-
-    if (onExportComplete) {
-      onExportComplete(result);
-    }
-  }, [
-    endpoint,
-    exportEndpoint,
-    exportFileName,
-    handleExportExcel,
-    onExportComplete,
-    exportPayload,
-    exportFilters, // ✅ Add to dependencies
-  ]);
 
   const enhancedCustomHeader = useMemo(
     () => (
@@ -266,7 +249,7 @@ const handleSelectAll = (event) => {
         {enableExcelExport && (
           <ExportExcelButton
             endpoint={exportEndpoint || endpoint}
-            appliedFilters={{ ...exportFilters, ...exportPayload }} // ✅ merge both
+            appliedFilters={{ ...exportFilters, ...exportPayload }}
             fileName={exportFileName}
             variant="icon"
           />
@@ -285,17 +268,12 @@ const handleSelectAll = (event) => {
 
   const visibleFilters = useMemo(() => {
     return availableFilters.filter((filter) => {
-      if (!filter.roles) return true; // filters with no role restriction
-      return filter.roles.includes(user?.role); // only include if allowed
+      if (!filter.roles) return true;
+      return filter.roles.includes(user?.role);
     });
   }, [availableFilters, user?.role]);
-  // Initialize filter values
-  useEffect(() => {
-    setFilterValues(initialFilterValues);
-    setAppliedFilters(initialFilterValues);
-    appliedFiltersRef.current = initialFilterValues;
-  }, []);
 
+  // 🔴 MAIN FETCH DATA FUNCTION - useRef के साथ
   const fetchData = useCallback(
     async (isManualRefresh = false) => {
       setLoading(true);
@@ -305,7 +283,9 @@ const handleSelectAll = (event) => {
       const currentPage = pageRef.current;
       const currentRowsPerPage = rowsPerPageRef.current;
 
-      // Prepare params for API call - this will go in the request body
+      console.log("📡 Fetching data with filters:", currentAppliedFilters);
+
+      // Prepare params for API call
       const requestBody = {
         ...currentAppliedFilters,
         page: currentPage + 1,
@@ -323,19 +303,17 @@ const handleSelectAll = (event) => {
         }
       });
 
-      // Handle queryParam - if it's an object, merge into requestBody
+      // Handle queryParam
       let finalEndpoint = endpoint;
       let finalRequestBody = requestBody;
 
       if (typeof queryParam === "string" && queryParam.trim() !== "") {
-        // queryParam is a query string → append to URL
         finalEndpoint = `${endpoint}?${queryParam}`;
       } else if (
         typeof queryParam === "object" &&
         queryParam !== null &&
         Object.keys(queryParam).length > 0
       ) {
-        // queryParam is an object → merge into request body
         finalRequestBody = {
           ...requestBody,
           ...queryParam,
@@ -347,21 +325,16 @@ const handleSelectAll = (event) => {
           "POST",
           finalEndpoint,
           null,
-          finalRequestBody // This sends the data in the request body
+          finalRequestBody
         );
 
         if (apiError) {
           setError(apiError.message || "Failed to fetch data");
         } else {
           if (response) {
-            // ✅ Normalize data structure
             let normalizedData =
-              response?.data?.data || // case: response.data.data
-              response?.data || // case: response.data
-              response || // case: direct response
-              [];
+              response?.data?.data || response?.data || response || [];
 
-            // ✅ Add serial numbers here
             const dataWithSerial = Array.isArray(normalizedData)
               ? normalizedData.map((item, index) => ({
                   ...item,
@@ -369,17 +342,15 @@ const handleSelectAll = (event) => {
                 }))
               : [{ ...normalizedData, serialNo: 1 }];
 
-            // ✅ Handle total count safely
             let total =
               response?.data?.total ||
               response?.total ||
               normalizedData?.length ||
               0;
-             setSummary(response?.data?.summary??[])
-            setData(dataWithSerial); // ✅ Use dataWithSerial instead of normalizedData
+            setSummary(response?.data?.summary ?? []);
+            setData(dataWithSerial);
             setTotalCount(total);
           } else if (Array.isArray(response)) {
-            // ✅ Also add serial numbers for array response case
             const dataWithSerial = response.map((item, index) => ({
               ...item,
               serialNo: index + 1,
@@ -397,8 +368,13 @@ const handleSelectAll = (event) => {
         setLoading(false);
       }
     },
-    [endpoint, queryParam]
+    [endpoint, queryParam, initialized]
   );
+
+  // Store fetchData in ref
+  useEffect(() => {
+    fetchDataRef.current = fetchData;
+  }, [fetchData]);
 
   // Update refs when state changes
   useEffect(() => {
@@ -408,112 +384,147 @@ const handleSelectAll = (event) => {
     refreshIntervalRef.current = refreshInterval;
   }, [appliedFilters, page, rowsPerPage, refreshInterval]);
 
-  // Initial data fetch
+  // 🔴 SINGLE INITIALIZATION useEffect
   useEffect(() => {
-    if (!hasFetchedInitialData.current) {
-      fetchData();
+    // Skip if already initialized
+    if (hasFetchedInitialData.current) return;
+
+    console.log("🟡 Initializing filters...");
+
+    // Set UI filter values
+    setFilterValues(initialFilterValues);
+
+    // Create API-ready filters
+    const apiReadyFilters = {};
+
+    // Convert initialFilterValues to API format
+    Object.keys(initialFilterValues).forEach((key) => {
+      const filterConfig = availableFilters.find((f) => f.id === key);
+      const val = initialFilterValues[key];
+
+      if (filterConfig?.type === "daterange" && val) {
+        if (filterConfig.autoToday === true && val.start && val.end) {
+          apiReadyFilters["from_date"] = val.start;
+          apiReadyFilters["to_date"] = val.end;
+        }
+      } else if (filterConfig?.type === "date" && val) {
+        if (filterConfig.autoToday === true) {
+          apiReadyFilters[key] = val;
+        }
+      } else if (val && val !== "All" && val !== "") {
+        apiReadyFilters[key] = val;
+      }
+    });
+
+    console.log("🟢 Initial API filters:", apiReadyFilters);
+
+    // Set all filter states
+    setAppliedFilters(apiReadyFilters);
+    setExportFilters(apiReadyFilters);
+    appliedFiltersRef.current = apiReadyFilters;
+
+    // Mark as initialized
+    setInitialized(true);
+
+    // Fetch initial data
+    console.log("🚀 Fetching initial data...");
+    const fetchInitial = async () => {
+      await fetchData();
       hasFetchedInitialData.current = true;
-    }
-  }, [fetchData]);
+    };
+
+    fetchInitial();
+  }, []); // 🔴 EMPTY DEPENDENCY ARRAY - RUNS ONLY ONCE
 
   // Setup refresh interval
   useEffect(() => {
     let intervalId;
-    if (refreshIntervalRef.current > 0) {
+    if (refreshInterval > 0 && initialized) {
+      console.log("⏰ Setting up refresh interval");
       intervalId = setInterval(() => {
-        fetchData();
-      }, refreshIntervalRef.current);
+        if (fetchDataRef.current) {
+          fetchDataRef.current();
+        }
+      }, refreshInterval);
     }
 
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
-  }, [fetchData]);
+  }, [refreshInterval, initialized]);
 
-  // Memoized filter handlers
-  // ✅ Memoized filter change handler
-  // ✅ Memoized filter change handler
-  // const handleFilterChange = (id, newValue) => {
-  //   console.log("🧩 Updating filter value for:", id, newValue);
-  //   setFilterValues((prev) => ({ ...prev, [id]: newValue }));
-  // };
   const handleFilterChange = (id, value) => {
     console.log("🟢 [Table] Filter change:", id, value);
-
-    // Update both states
     setFilterValues((prev) => ({ ...prev, [id]: value }));
     setAppliedFilters((prev) => ({ ...prev, [id]: value }));
   };
 
   const applyFilters = useCallback(() => {
-    console.log("🔍 [Table] applyFilters called with:", filterValues);
+    if (!initialized) return;
 
+    console.log("🔍 [Table] applyFilters called with:", filterValues);
     const formattedFilters = { ...filterValues };
 
     Object.keys(formattedFilters).forEach((key) => {
       const filterConfig = availableFilters.find((f) => f.id === key);
       const val = formattedFilters[key];
 
-      // 🚫 Skip empty or "All" values
       if (val === "" || val === null || val === undefined || val === "All") {
         delete formattedFilters[key];
         return;
       }
-      // Add this case in the Object.keys(formattedFilters).forEach loop:
+
       if (filterConfig?.type === "roleuser" && val) {
-        // If val is an object with user_id, extract it, otherwise use as-is
         formattedFilters[key] =
           typeof val === "object" ? val.id || val.id || val : val;
         return;
       }
-      // 🧠 Extract ID or value for dropdown/autocomplete
+
       if (
         (filterConfig?.type === "dropdown" ||
           filterConfig?.type === "autocomplete") &&
         val
       ) {
-        // For autocomplete, we want to send the ID (value property)
         if (filterConfig?.type === "autocomplete" && typeof val === "object") {
-          formattedFilters[key] = val.value || val.id || val; // Use value property which contains the ID
+          formattedFilters[key] = val.value || val.id || val;
         } else {
           formattedFilters[key] = val.id || val.value || val;
         }
       }
 
-      // 📅 Handle single date filter
       if (filterConfig?.type === "date" && val) {
         formattedFilters[key] = new Date(val).toISOString().split("T")[0];
       }
 
-      // 📆 Handle date range
       if (filterConfig?.type === "daterange" && val) {
-        if (val.start) {
-          formattedFilters["from_date"] = new Date(val.start)
+        let startDate = val.start;
+        let endDate = val.end;
+
+        if (startDate && startDate.trim() !== "") {
+          formattedFilters["from_date"] = new Date(startDate)
             .toISOString()
             .split("T")[0];
         }
-        if (val.end) {
-          formattedFilters["to_date"] = new Date(val.end)
+        if (endDate && endDate.trim() !== "") {
+          formattedFilters["to_date"] = new Date(endDate)
             .toISOString()
             .split("T")[0];
         }
+
         delete formattedFilters[key];
       }
     });
 
     console.log("✅ [Table] Final formatted filters:", formattedFilters);
 
-    // ✅ Update filter states & refs
     setAppliedFilters(formattedFilters);
     setExportFilters(formattedFilters);
     appliedFiltersRef.current = formattedFilters;
 
-    // ✅ Trigger parent callback if present
     if (onFilterChange) {
       onFilterChange(formattedFilters);
     }
 
-    // Reset pagination & refetch data
     setPage(0);
     pageRef.current = 0;
 
@@ -521,44 +532,70 @@ const handleSelectAll = (event) => {
       setFilterModalOpen(false);
     }
 
-    // 🚀 Fetch data with updated filters
-    fetchData();
+    // Call fetchData
+    if (fetchDataRef.current) {
+      fetchDataRef.current();
+    }
   }, [
     filterValues,
     availableFilters,
     isSmallScreen,
-    fetchData,
     onFilterChange,
+    initialized,
   ]);
 
-  // ✅ Reset filters completely
   const resetFilters = useCallback(() => {
-    // clear filters
-    const cleared = {};
+    if (!initialized) return;
+
+    console.log("🔄 [Table] Resetting filters...");
+
+    // Reset to initial values
+    setFilterValues(initialFilterValues);
+
+    // Extract just the API-ready filters from initialFilterValues
+    const apiReadyFilters = {};
+
     Object.keys(initialFilterValues).forEach((key) => {
-      cleared[key] = null;
+      const filterConfig = availableFilters.find((f) => f.id === key);
+      const val = initialFilterValues[key];
+
+      if (filterConfig?.type === "daterange" && val) {
+        if (filterConfig.autoToday === true && val.start && val.end) {
+          apiReadyFilters["from_date"] = val.start;
+          apiReadyFilters["to_date"] = val.end;
+        }
+      } else if (filterConfig?.type === "date" && val) {
+        if (filterConfig.autoToday === true) {
+          apiReadyFilters[key] = val;
+        }
+      } else if (val && val !== "All" && val !== "") {
+        apiReadyFilters[key] = val;
+      }
     });
 
-    setFilterValues(cleared);
-    setAppliedFilters(cleared);
-    setExportFilters(cleared);
-    appliedFiltersRef.current = cleared;
+    setAppliedFilters(apiReadyFilters);
+    setExportFilters(apiReadyFilters);
+    appliedFiltersRef.current = apiReadyFilters;
 
-    // 🔥 FORCE RE-MOUNT ALL FILTER COMPONENTS
     setResetKey((prev) => prev + 1);
 
     if (onFilterChange) {
-      onFilterChange(cleared);
+      onFilterChange(apiReadyFilters);
     }
 
     setPage(0);
     pageRef.current = 0;
-    fetchData();
-  }, [initialFilterValues, fetchData, onFilterChange]);
 
-  // ✅ Remove an individual filter safely
+    // Call fetchData
+    if (fetchDataRef.current) {
+      fetchDataRef.current();
+    }
+  }, [initialFilterValues, availableFilters, onFilterChange, initialized]);
+
   const removeFilter = useCallback(
     (filterId) => {
+      if (!initialized) return;
+
       const filterConfig = availableFilters.find((f) => f.id === filterId);
       let resetValue;
 
@@ -586,49 +623,64 @@ const handleSelectAll = (event) => {
 
       setPage(0);
       pageRef.current = 0;
-      fetchData();
+
+      // Call fetchData
+      if (fetchDataRef.current) {
+        fetchDataRef.current();
+      }
     },
-    [availableFilters, fetchData, onFilterChange]
+    [availableFilters, onFilterChange, initialized]
   );
 
   const handleChangePage = useCallback(
     (event, newPage) => {
+      if (!initialized) return;
       setPage(newPage);
       pageRef.current = newPage;
-      fetchData();
+      if (fetchDataRef.current) {
+        fetchDataRef.current();
+      }
     },
-    [fetchData]
+    [initialized]
   );
 
   const handleChangeRowsPerPage = useCallback(
     (event) => {
+      if (!initialized) return;
       const newRowsPerPage = parseInt(event.target.value, 10);
       setRowsPerPage(newRowsPerPage);
       rowsPerPageRef.current = newRowsPerPage;
       setPage(0);
       pageRef.current = 0;
-      fetchData();
+      if (fetchDataRef.current) {
+        fetchDataRef.current();
+      }
     },
-    [fetchData]
+    [initialized]
   );
 
-  // Manual refresh handler
   const handleManualRefresh = useCallback(() => {
-    fetchData(true);
-  }, [fetchData]);
-  useEffect(() => {
-    if (onFetchRef) onFetchRef(fetchData);
-  }, [fetchData, onFetchRef]);
-  // Fetch only when queryParam changes, not when fetchData reference changes
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(queryParam)]);
+    if (fetchDataRef.current) {
+      fetchDataRef.current(true);
+    }
+  }, []);
 
-  // useEffect(() => {
-  //   fetchData();
-  // }, [queryParam]);
+  // Provide fetchData to parent
+  useEffect(() => {
+    if (onFetchRef) onFetchRef(fetchDataRef.current);
+  }, [onFetchRef]);
 
+  // Fetch when queryParam changes
+  useEffect(() => {
+    if (initialized && hasFetchedInitialData.current) {
+      console.log("🔄 Query param changed, refetching...");
+      if (fetchDataRef.current) {
+        fetchDataRef.current();
+      }
+    }
+  }, [JSON.stringify(queryParam), initialized]);
+
+  // Rest of your render functions remain the same...
   const renderFilterInputs = useCallback(
     () =>
       availableFilters.map((filter) => (
@@ -711,7 +763,6 @@ const handleSelectAll = (event) => {
               value={filterValues[filter.id] || ""}
               onChange={(e) => {
                 let value = e.target.value;
-
                 handleFilterChange(filter.id, value);
               }}
               inputProps={{
@@ -725,14 +776,11 @@ const handleSelectAll = (event) => {
     [availableFilters, filterValues, handleFilterChange]
   );
 
-  // Memoized applied filters chips
   const appliedFiltersChips = useMemo(
     () =>
       Object.entries(appliedFilters)
         .filter(([key, value]) => {
-          // Skip date range sub-filters (they're handled separately)
           if (key.includes("_start") || key.includes("_end")) return false;
-
           const filterConfig = availableFilters.find((f) => f.id === key);
 
           if (filterConfig?.type === "daterange") {
@@ -781,12 +829,42 @@ const handleSelectAll = (event) => {
           {filter.type === "autocomplete" ? (
             <Autocomplete
               options={filter.options || []}
-              getOptionLabel={filter.getOptionLabel}
-              isOptionEqualToValue={filter.isOptionEqualToValue}
+              getOptionLabel={(option) => {
+                if (typeof option === "string") return option;
+                return filter.getOptionLabel
+                  ? filter.getOptionLabel(option)
+                  : option.label || option.value || "";
+              }}
+              isOptionEqualToValue={(option, value) => {
+                if (filter.isOptionEqualToValue) {
+                  return filter.isOptionEqualToValue(option, value);
+                }
+                if (!option || !value) return false;
+                if (typeof option === "object" && typeof value === "object") {
+                  return option.id === value.id || option.value === value.value;
+                }
+                return option === value;
+              }}
               onInputChange={(e, val) => filter.onSearch?.(val)}
-              value={filterValues[filter.id] || null}
+              value={(() => {
+                const currentValue = filterValues[filter.id];
+                if (!currentValue) return null;
+
+                if (
+                  typeof currentValue === "string" ||
+                  typeof currentValue === "number"
+                ) {
+                  const foundOption = filter.options?.find(
+                    (opt) =>
+                      opt.id === currentValue || opt.value === currentValue
+                  );
+                  return foundOption || currentValue;
+                }
+
+                return currentValue;
+              })()}
               onChange={(e, newValue) => {
-                console.log("🟠 Selected value:", newValue);
+                console.log("🟠 Autocomplete selected:", newValue);
                 handleFilterChange(filter.id, newValue);
               }}
               renderInput={(params) => (
@@ -838,10 +916,10 @@ const handleSelectAll = (event) => {
                 minWidth: 120,
                 fontFamily: "DM Sans, sans-serif",
                 "& .MuiInputBase-root": {
-                  height: 32, // reduce overall height
+                  height: 32,
                 },
                 "& input": {
-                  padding: "8px 8px", // tighter padding
+                  padding: "8px 8px",
                   fontSize: "0.85rem",
                 },
                 "& .MuiInputLabel-root": {
@@ -869,7 +947,7 @@ const handleSelectAll = (event) => {
                 {filter.label}
               </Typography>
               <DateRangePicker
-                size="md" // ✅ smaller built-in size
+                size="md"
                 editable
                 ranges={predefinedRanges}
                 cleanable
@@ -915,210 +993,205 @@ const handleSelectAll = (event) => {
                 maxLength: filter.id === "mobile" ? 10 : undefined,
                 inputMode: filter.id === "mobile" ? "numeric" : undefined,
                 style: {
-                  padding: "6px 8px", // ✅ reduces inner padding (default is ~10px 14px)
-                  fontSize: "0.85rem", // optional: smaller text for compact look
+                  padding: "6px 8px",
+                  fontSize: "0.85rem",
                 },
               }}
               sx={{
                 "& .MuiInputBase-root": {
-                  height: 40, // ✅ total input height
+                  height: 40,
                 },
                 "& .MuiInputLabel-root": {
-                  fontSize: "0.8rem", // optional: smaller label
+                  fontSize: "0.8rem",
                 },
               }}
             />
           )}
         </Box>
       )),
-    [availableFilters, filterValues, handleFilterChange]
+    [visibleFilters, filterValues, handleFilterChange, resetKey, appliedFilters]
   );
 
-
-// Memoized table rows
-const tableRows = useMemo(() => {
-  if (loading) {
-    return (
-      <tr>
-        <td
-          colSpan={enableRowSelection ? initialColumns.length + 1 : initialColumns.length} // ✅ colspan adjust करें
-          style={{
-            textAlign: "center",
-            padding: 40,
-            fontFamily: "DM Sans, sans-serif",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 2,
-              fontFamily: "DM Sans, sans-serif",
-            }}
-          >
-            <CircularProgress size={30} />
-            <Typography variant="body2">Loading data...</Typography>
-          </Box>
-        </td>
-      </tr>
-    );
-  }
-
-  if (data.length === 0) {
-    return (
-      <tr>
-        <td
-          colSpan={enableRowSelection ? initialColumns.length + 1 : initialColumns.length} // ✅ colspan adjust करें
-          style={{
-            textAlign: "center",
-            padding: 40,
-            fontFamily: "DM Sans, sans-serif",
-          }}
-        >
-          <Typography variant="body1">No data available</Typography>
-        </td>
-      </tr>
-    );
-  }
-
-  return data.map((row, rowIndex) => (
-    <React.Fragment key={rowIndex}>
-      {/* This is the main row with data */}
-      <tr
-        style={{
-          backgroundColor: "rgba(254, 254, 254, 1)",
-          boxShadow: "0px 2px 8px rgba(0,0,0,0.08)",
-          borderRadius: "8px",
-          marginBottom: "12px",
-          display: "table-row",
-        }}
-        className="table-row"
-        onMouseEnter={() => enableActionsHover && setHoveredRow(row.id)}
-        onMouseLeave={() => enableActionsHover && setHoveredRow(null)}
-      >
-        {/* ✅ Conditionally render checkbox cell */}
-        {enableRowSelection && (
-          <td style={{ padding: "6px 10px", textAlign: "center" }}>
-            <input
-              type="checkbox"
-              checked={selectedRows.some(
-                (selectedRow) => selectedRow.id === row.id
-              )}
-              onChange={() => handleSelectRow(row)}
-            />
-          </td>
-        )}
-
-        {initialColumns.map((column, colIndex) => (
+  // Memoized table rows
+  const tableRows = useMemo(() => {
+    if (loading) {
+      return (
+        <tr>
           <td
-            key={colIndex}
+            colSpan={
+              enableRowSelection
+                ? initialColumns.length + 1
+                : initialColumns.length
+            }
             style={{
-              padding: "6px 10px",
-              verticalAlign: "middle",
-              textAlign: "left",
-              fontSize: "15px",
-              lineHeight: "1",
+              textAlign: "center",
+              padding: 40,
               fontFamily: "DM Sans, sans-serif",
-              fontWeight: 600,
-              color: "#7e51b2ff",
-              border: "none",
             }}
           >
-            {column.selector ? (
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                {column.selector(row, {
-                  hoveredRow,
-                  enableActionsHover,
-                })}
-              </Box>
-            ) : (
-              <Typography
-                variant="body2"
-                sx={{ fontFamily: "DM Sans, sans-serif", color: "#8094ae" }}
-              >
-                {row[column.name] || "—"}
-              </Typography>
-            )}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 2,
+                fontFamily: "DM Sans, sans-serif",
+              }}
+            >
+              <CircularProgress size={30} />
+              <Typography variant="body2">Loading data...</Typography>
+            </Box>
           </td>
-        ))}
-      </tr>
+        </tr>
+      );
+    }
 
-      {/* This is the spacing row between cards */}
-      <tr style={{ height: "12px", backgroundColor: "transparent" }}>
-        <td
-          colSpan={enableRowSelection ? initialColumns.length + 1 : initialColumns.length} // ✅ colspan adjust करें
-          style={{ padding: 0, border: "none" }}
-        ></td>
-      </tr>
-    </React.Fragment>
-  ));
-}, [
-  loading, 
-  data, 
-  initialColumns, 
-  hoveredRow, 
-  enableActionsHover, 
-  selectedRows, 
-  enableRowSelection // ✅ dependency add करें
-]);
+    if (data.length === 0) {
+      return (
+        <tr>
+          <td
+            colSpan={
+              enableRowSelection
+                ? initialColumns.length + 1
+                : initialColumns.length
+            }
+            style={{
+              textAlign: "center",
+              padding: 40,
+              fontFamily: "DM Sans, sans-serif",
+            }}
+          >
+            <Typography variant="body1">No data available</Typography>
+          </td>
+        </tr>
+      );
+    }
 
- 
-// Memoized table headers
-const tableHeaders = useMemo(() => {
-  const headers = [];
-  
-  // ✅ Conditionally add select-all checkbox header
-  if (enableRowSelection) {
+    return data.map((row, rowIndex) => (
+      <React.Fragment key={rowIndex}>
+        <tr
+          style={{
+            backgroundColor: "rgba(254, 254, 254, 1)",
+            boxShadow: "0px 2px 8px rgba(0,0,0,0.08)",
+            borderRadius: "8px",
+            marginBottom: "12px",
+            display: "table-row",
+          }}
+          className="table-row"
+          onMouseEnter={() => enableActionsHover && setHoveredRow(row.id)}
+          onMouseLeave={() => enableActionsHover && setHoveredRow(null)}
+        >
+          {enableRowSelection && (
+            <td style={{ padding: "6px 10px", textAlign: "center" }}>
+              <input
+                type="checkbox"
+                checked={selectedRows.some(
+                  (selectedRow) => selectedRow.id === row.id
+                )}
+                onChange={() => handleSelectRow(row)}
+              />
+            </td>
+          )}
+
+          {initialColumns.map((column, colIndex) => (
+            <td
+              key={colIndex}
+              style={{
+                padding: "6px 10px",
+                verticalAlign: "middle",
+                textAlign: "left",
+                fontSize: "15px",
+                lineHeight: "1",
+                fontFamily: "DM Sans, sans-serif",
+                fontWeight: 600,
+                color: "#7e51b2ff",
+                border: "none",
+              }}
+            >
+              {column.selector ? (
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  {column.selector(row, {
+                    hoveredRow,
+                    enableActionsHover,
+                  })}
+                </Box>
+              ) : (
+                <Typography
+                  variant="body2"
+                  sx={{ fontFamily: "DM Sans, sans-serif", color: "#8094ae" }}
+                >
+                  {row[column.name] || "—"}
+                </Typography>
+              )}
+            </td>
+          ))}
+        </tr>
+
+        <tr style={{ height: "12px", backgroundColor: "transparent" }}>
+          <td
+            colSpan={
+              enableRowSelection
+                ? initialColumns.length + 1
+                : initialColumns.length
+            }
+            style={{ padding: 0, border: "none" }}
+          ></td>
+        </tr>
+      </React.Fragment>
+    ));
+  }, [
+    loading,
+    data,
+    initialColumns,
+    hoveredRow,
+    enableActionsHover,
+    selectedRows,
+    enableRowSelection,
+  ]);
+
+  const tableHeaders = useMemo(() => {
+    const headers = [];
+
+    if (enableRowSelection) {
+      headers.push(
+        <th key="select-all" style={{ padding: "12px" }}>
+          <input
+            type="checkbox"
+            checked={
+              selectedRows.length > 0 &&
+              selectedRows.length === data.length &&
+              data.length > 0
+            }
+            onChange={handleSelectAll}
+          />
+        </th>
+      );
+    }
+
     headers.push(
-      <th key="select-all" style={{ padding: "12px" }}>
-        <input
-          type="checkbox"
-          checked={
-            selectedRows.length > 0 && 
-            selectedRows.length === data.length && 
-            data.length > 0
-          }
-          onChange={handleSelectAll}
-        />
-      </th>
+      ...initialColumns.map((column, index) => (
+        <th
+          key={index}
+          style={{
+            backgroundColor: "#ebecedff",
+            padding: "12px 16px",
+            verticalAlign: "middle",
+            textAlign: "left",
+            fontSize: "14.5px",
+            lineHeight: "1.3",
+            fontFamily: "DM Sans, sans-serif",
+            fontWeight: 600,
+            color: "#492077",
+            border: "none",
+          }}
+        >
+          {column.name}
+        </th>
+      ))
     );
-  }
-  
-  // Regular column headers
-  headers.push(
-    ...initialColumns.map((column, index) => (
-      <th
-        key={index}
-        style={{
-          backgroundColor: "#ebecedff",
-          padding: "12px 16px",
-          verticalAlign: "middle",
-          textAlign: "left",
-          fontSize: "14.5px",
-          lineHeight: "1.3",
-          fontFamily: "DM Sans, sans-serif",
-          fontWeight: 600,
-          color: "#492077",
-          border: "none",
-        }}
-      >
-        {column.name}
-      </th>
-    ))
-  );
-  
-  return headers;
-}, [initialColumns, selectedRows, data, enableRowSelection]); // ✅ enableRowSelection dependency add करें
 
-  // In the table rows section, update the checkbox:
-  // <td style={{ padding: "6px 10px", textAlign: "center" }}>
-  //   <input
-  //     type="checkbox"
-  //     checked={selectedRows.includes(row.id)}
-  //     onChange={() => handleSelectRow(row.id)}
-  //   />
-  // </td>;
+    return headers;
+  }, [initialColumns, selectedRows, data, enableRowSelection]);
 
   return (
     <Box>
@@ -1133,14 +1206,10 @@ const tableHeaders = useMemo(() => {
                 alignItems: "center",
                 flexWrap: "wrap",
                 gap: 1,
-
-                // mb: 2
               }}
             >
               {renderDesktopFilters()}
-              {/* Apply and Reset buttons */}
               <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                {/* Left side buttons */}
                 <Button
                   className="btnCustom"
                   variant="contained"
@@ -1152,8 +1221,6 @@ const tableHeaders = useMemo(() => {
                 </Button>
 
                 <Button
-                  // className="btnCustom"
-                  // variant="outlined"
                   onClick={resetFilters}
                   startIcon={<ClearIcon />}
                   size="small"
@@ -1170,22 +1237,15 @@ const tableHeaders = useMemo(() => {
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 {enhancedCustomHeader}
               </Box>
-              {/* <Box sx={{ marginLeft: "auto" }}>{customHeader}</Box> */}
-              {/* <Box sx={{ marginLeft: "auto" }}>{enhancedCustomHeader}</Box> */}
             </Box>
-            {/* Applied filters chips */}
-            {/* <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-              {appliedFiltersChips}
-            </Box> */}
           </Paper>
 
-          {/* Mobile filter + header row */}
           <Box
             sx={{
               display: { xs: "flex", md: "none" },
               justifyContent: "space-between",
               alignItems: "center",
-              flexWrap: "wrap", // ✅ ensures no overflow on small screens
+              flexWrap: "wrap",
               gap: 1,
               mb: 2,
             }}
@@ -1194,16 +1254,14 @@ const tableHeaders = useMemo(() => {
               variant="outlined"
               startIcon={<FilterListIcon />}
               onClick={() => setFilterModalOpen(true)}
-              size="small" // ✅ smaller button looks better on mobile
+              size="small"
             >
               Filters
             </Button>
 
-            {/* custom header aligned to the right */}
             <Box>{customHeader}</Box>
           </Box>
 
-          {/* Filter Modal for mobile */}
           <Dialog
             open={filterModalOpen}
             onClose={() => setFilterModalOpen(false)}
@@ -1218,8 +1276,6 @@ const tableHeaders = useMemo(() => {
             </DialogTitle>
             <DialogContent>
               <Box sx={{ mt: 2 }}>{renderFilterInputs()}</Box>
-
-              {/* Applied filters chips */}
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 2 }}>
                 {appliedFiltersChips}
               </Box>
@@ -1242,7 +1298,6 @@ const tableHeaders = useMemo(() => {
         </>
       )}
 
-      {/* Table Header with Refresh */}
       <Box
         sx={{
           display: "flex",
@@ -1252,8 +1307,6 @@ const tableHeaders = useMemo(() => {
         }}
       >
         <Typography variant="h5">{title}</Typography>
-
-        {/* <Box sx={{ display: "flex", alignItems: "center" }}></Box> */}
       </Box>
       <Box
         sx={{
@@ -1265,11 +1318,9 @@ const tableHeaders = useMemo(() => {
         <Typography variant="h5">{title}</Typography>
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {/* ✅ Show Refresh only if no filters are used */}
           {availableFilters.length === 0 && refresh && (
             <>
               <Box sx={{ marginLeft: "auto" }}>{customHeader}</Box>
-
               <Tooltip title="Refresh">
                 <IconButton
                   onClick={handleManualRefresh}
@@ -1284,7 +1335,6 @@ const tableHeaders = useMemo(() => {
         </Box>
       </Box>
 
-      {/* Data Table */}
       <Paper
         sx={{
           width: "100%",
@@ -1310,14 +1360,12 @@ const tableHeaders = useMemo(() => {
               <table
                 style={{
                   width: "100%",
-                  // borderCollapse: "separate",
                 }}
               >
                 <thead>
                   <tr
                     style={{
                       display: "table-row",
-
                       backgroundColor: "#fefefe",
                       boxShadow: "0px 2px 8px rgba(0,0,0,0.08)",
                     }}
@@ -1329,14 +1377,13 @@ const tableHeaders = useMemo(() => {
                       height: "10px",
                       boxShadow: "0px 2px 8px rgba(0,0,0,0.08)",
                     }}
-                  />{" "}
+                  />
                 </thead>
 
                 <tbody>{tableRows}</tbody>
               </table>
             </Box>
 
-            {/* Pagination */}
             <TablePagination
               rowsPerPageOptions={[5, 10, 15, 25, 50, 100]}
               component="div"

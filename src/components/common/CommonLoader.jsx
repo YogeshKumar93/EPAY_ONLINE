@@ -43,7 +43,7 @@ const CommonLoader = ({ loading, children }) => {
       {children}
       <style jsx>{`
         .loader-text {
-          margin-top: 50px;
+          margin-top: 80px;
         }
         .loader-container {
           position: relative;

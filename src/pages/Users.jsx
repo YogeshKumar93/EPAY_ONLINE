@@ -78,37 +78,7 @@ const Users = ({ query }) => {
 
 
   const { showToast } = useToast();
-  // const handleOpenChangeParent = (row) => {
-  //   setSelectedUser(row);
-  //   setOpenChangeParent(true);
-  // };
-  // const handleCloseChangeParent = () => {
-  //   setSelectedUser(null);
-  //   setOpenChangeParent(false);
-  // };
 
-  // const handleChangeRole = (row) => {
-  //   setSelectedUser(row); // store selected user details
-  //   setOpenChangeRole(true); // open the modal
-  // };
-
-  // const handleOpenAssignPlans = (user) => {
-  //   setSelectedUser(user);
-  //   setOpenAssignPlans(true);
-  // };
-  // const handleCloseAssignPlans = () => {
-  //   setSelectedUser(null);
-  //   setOpenAssignPlans(false);
-  // };
-
-  // const handleOpenLein = (row) => {
-  //   setOpenLeinModal(true);
-  //   setSelectedUser(row);
-  // };
-  // const handleOpenWalletTransfer = (row) => {
-  //   setOpenWalletTranser(true);
-  //   setSelectedUser(row);
-  // };
   const handleCloseWalletTransfer = (row) => {
     setOpenWalletTranser(false);
   };
@@ -231,29 +201,7 @@ const Users = ({ query }) => {
     return () => debouncedFetch.cancel();
   }, [userSearch]);
 
-  // Fetch user map
-  useEffect(() => {
-    const fetchUserMap = async () => {
-      try {
-        const res = await apiCall("post", ApiEndpoints.GET_USERS,
-         {
-          id: user?.id || user?.user_id,   
-        }
-      );
-        const usersArray = res?.response?.data?.data;
-        if (Array.isArray(usersArray)) {
-          const map = {};
-          usersArray.forEach((user) => (map[user.id] = user.name));
-          setUserMap(map);
-        }
-      } catch (err) {
-        console.error("Error fetching users:", err);
-      }
-    };
-    fetchUserMap();
-  }, []);
 
-  // Action Menu Component
   function ActionMenu({ row }) {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);

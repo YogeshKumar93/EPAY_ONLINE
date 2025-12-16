@@ -21,38 +21,30 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteClaimed from "./DeleteClaimed";
 import AuthContext from "../contexts/AuthContext";
 import debounce from "lodash.debounce";
+import { useToast } from "../utils/ToastContext";
+import { fi } from "date-fns/locale";
 
 const Claimed_with_Paid = () => {
-  const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [openDelete, setOpenDelete] = useState(false);
-  const [selectedClaim, setSelectedClaim] = useState(null);
-  const [appliedFilters, setAppliedFilters] = useState({});
-   const [userSearch, setUserSearch] = useState("");
+  const [userSearch, setUserSearch] = useState("");
   const [userOptions, setUserOptions] = useState([]);
-const authCtx = useContext(AuthContext);
-const user = authCtx?.user;
+  const [accountSearch, setAccountSearch] = useState("");
+  const [accountOptions, setAccountOptions] = useState([]);
+  const authCtx = useContext(AuthContext);
+  const user = authCtx?.user;
 
-  // const [filters, setFilters] = useState({
-  //   userId: "",
-  //   status: "claimed",
-  //   date: {},
-  //   dateVal: "",
-  // });
-
-      const formatLogDate = (dateString) => {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-
-   return date.toLocaleString("en-US", {
-    month: "short",  // Nov
-    day: "2-digit",  // 29
-    hour: "2-digit", // 11
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,   // 11:46:50 instead of 11:46:50 AM
-  });
-};
+  const formatLogDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleString("en-US", {
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    });
+  };
 
   const fetchEntriesRef = useRef(null);
 
@@ -60,214 +52,203 @@ const user = authCtx?.user;
     fetchEntriesRef.current = fetchFn;
   };
 
-  const refreshEntries = () => {
-    if (fetchEntriesRef.current) fetchEntriesRef.current();
-  };
-
   const handlePrint = (row) => {
     localStorage.setItem("PRINT_DATA", JSON.stringify(row));
     window.open("/print-claimedreceipt", "_blank");
   };
 
-  const handleDelete = (row) => {
-    setSelectedClaim(row);
-    setOpenDelete(true);
-  };
-
-
-    useEffect(() => {
-    if (userSearch.length <= 4) {
-      setUserOptions([]); // Clear options if less than or equal to 4 chars
+  // Debounced search for handle_by
+  useEffect(() => {
+    if (userSearch.length < 3) {
+      setUserOptions([]);
       return;
     }
 
-    const fetchUsersByHandleBy = async (searchTerm) => {
+    const fetchUsersByEstablishment = async (searchTerm) => {
       try {
         const { error, response } = await apiCall(
-          "post",
+          "POST",
           ApiEndpoints.GET_USER_DEBOUNCE,
-          {
-            handle_by: searchTerm, // send under establishment key
-          }
+          null,
+          { establishment: searchTerm }
         );
-        console.log("respinse ofthe debounce is thius ", response?.data?.id);
+
+        console.log("Response from debounce:", response?.data);
 
         if (!error && response?.data) {
-          setUserOptions(
-            response.data.map((u) => ({
-              id: u.id, // ✅ consistent key
-              label: u.handle_by,
-            }))
-          );
-        } else {
-          showToast(error?.message, "error");
+          const options = response.data.map((u) => ({
+            id: u.id,
+            value: u.id,
+            label: u.establishment,
+            establishment: u.establishment,
+          }));
+
+          setUserOptions(options);
         }
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching users:", err);
       }
     };
 
-    const debouncedFetch = debounce(fetchUsersByHandleBy, 500); // 500ms delay
+    const debouncedFetch = debounce(fetchUsersByEstablishment, 500);
     debouncedFetch(userSearch);
 
     return () => debouncedFetch.cancel();
   }, [userSearch]);
 
-   const filters = useMemo(
-      () => [
-        { id: "bank_name", label: "Bank Name", type: "textfield" },
-        { id: "id", label: "Id", type: "textfield" },
-                { id: "particulars", label: "Particulars", type: "textfield" },
- {
+  useEffect(() => {
+    const loadInitialAccounts = async () => {
+      try {
+        const { error, response } = await apiCall(
+          "POST",
+          ApiEndpoints.GET_ACCOUNTS,
+          { export: 1 }
+        );
+
+        if (!error && response?.data) {
+          const options = response.data.map((account) => ({
+            id: account.id,
+            value: account.id,
+            label:
+              account.name || account.account_name || `Account ${account.id}`,
+            name: account.name || account.account_name,
+          }));
+
+          setAccountOptions(options);
+        }
+      } catch (err) {
+        console.error("Error loading initial accounts:", err);
+      }
+    };
+
+    loadInitialAccounts();
+  }, []);
+
+  const filters = useMemo(() => {
+    const baseFilters = [
+      { id: "bank_name", label: "Bank Name", type: "textfield" },
+      { id: "particulars", label: "Particulars", type: "textfield" },
+
+      {
+        id: "account_id",
+        label: "Account",
+        type: "autocomplete",
+        options: accountOptions,
+        onSearch: (val) => {
+          setAccountSearch(val);
+        },
+        getOptionLabel: (option) => {
+          if (!option) return "";
+          if (typeof option === "string") return option;
+          return option.label || option.name || String(option.id || "");
+        },
+        isOptionEqualToValue: (option, value) => {
+          if (!option || !value) return false;
+
+          if (option.id && value.id) return option.id === value.id;
+
+          if (option.value && value.value) return option.value === value.value;
+
+          return option.label === value.label;
+        },
+        renderOption: (props, option) => (
+          <li {...props} key={option.id}>
+            {option.label}
+          </li>
+        ),
+      },
+      {
         id: "handle_by",
         label: "Handle By",
         type: "autocomplete",
         options: userOptions,
-        onSearch: (val) => setUserSearch(val),
-        getOptionLabel: (option) => option?.label || "",
-        isOptionEqualToValue: (option, value) => option.handle_by === value.handle_by, // ✅ this line keeps selection visible
-        roles: ["adm", "sadm"],
+        onSearch: (val) => {
+          console.log("Searching for:", val);
+          setUserSearch(val);
+        },
+        getOptionLabel: (option) => {
+          if (typeof option === "string") return option;
+          return option?.label || option?.establishment || "";
+        },
+        isOptionEqualToValue: (option, value) => {
+          if (!option || !value) return false;
+          if (option.id && value.id) return option.id === value.id;
+          if (option.value && value.value) return option.value === value.value;
+          return option === value;
+        },
       },
+      {
+        id: "daterange",
+        type: "daterange",
+        autoToday: true,
+      },
+    ];
 
-        { id: "daterange", type: "daterange" },
-      ],
-      [user?.role,appliedFilters]
-    );
-  
-     const filterRows = (rows) => {
-      if (!searchTerm) return rows;
-      const lowerSearch = searchTerm.toLowerCase();
-      return rows.filter((row) =>
-        Object.values(row).some((val) =>
-          String(val).toLowerCase().includes(lowerSearch)
-        )
-      );
-    };
-
-  const fetchEntries = async () => {
-    setLoading(true);
-    try {
-      const queryParams = new URLSearchParams({
-        user_id: filters.userId,
-        status: filters.status,
-        date_from: filters.date.start || "",
-        date_to: filters.date.end || "",
-      }).toString();
-
-      const response = await apiCall(
-        `${ApiEndpoints.GET_UNCLAIMED_ENTERIES}`
-      );
-
-      if (response?.data?.success) {
-        setEntries(response.data.entries || []);
-      } else {
-        setEntries([]);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchEntries();
-  }, []);
+    return baseFilters;
+  }, [userOptions, accountOptions]);
 
   const columns = [
     { name: "ID", selector: (row) => row.id, width: "80px" },
     { name: "Bank ID", selector: (row) => row.bank_id },
-  {
-      name: (
-         <DateRangePicker
-            showOneCalendar
-            placeholder="Date"
-            size="medium"
-            cleanable
-            ranges={predefinedRanges}
-            value={filters.dateVal}
-            onChange={(value) => {
-              if (!value) {
-                setFilters({ ...filters, date: {}, dateVal: "" });
-                fetchEntries();
-                return;
-              }
-              setFilters({
-                ...filters,
-                date: { start: yyyymmdd(value[0]), end: yyyymmdd(value[1]) },
-                dateVal: value,
-              });
-              fetchEntries();
-            }}
-            style={{ width: 200 }}
-          />
-        ),
-    selector: (row) => (
-  <Tooltip title={formatLogDate(row.updated_at)} arrow>
-    <span>{formatLogDate(row.created_at)}</span>
-  </Tooltip>
-),
-
+    { name: "Bank Name", selector: (row) => row.bank_name },
+    {
+      name: "Date",
+      selector: (row) => (
+        <Tooltip title={formatLogDate(row.updated_at)} arrow>
+          <span>{formatLogDate(row.created_at)}</span>
+        </Tooltip>
+      ),
     },
     { name: "Particulars", selector: (row) => capitalize1(row.particulars) },
-    { name: "Handled By", selector: (row) => row.handle_by },
-    { name: "Credit", selector: (row) => (
-      <span style={{color:"green"}}>
-    {  currencySetter(row.credit) }
-    </span>
-    )},
-    { name: "Debit", selector: (row) => (
-      <span style={{color:"red"}}>
-      {currencySetter(row.debit)}
-    </span>
-    )},
+    {
+      name: "Account Name",
+      selector: (row) =>
+        row.account?.name || row.account?.account_name || "N/A",
+    },
+    { name: "Handle By", selector: (row) => row.handle_by },
+    {
+      name: "Credit",
+      selector: (row) => (
+        <span style={{ color: "green" }}>{currencySetter(row.credit)}</span>
+      ),
+    },
+    {
+      name: "Debit",
+      selector: (row) => (
+        <span style={{ color: "red" }}>{currencySetter(row.debit)}</span>
+      ),
+    },
     { name: "Balance", selector: (row) => currencySetter(row.balance) },
     { name: "Mode", selector: (row) => row.mop },
     { name: "Remark", selector: (row) => row.remark || "-" },
-
-     {
-        name: "Status",
-        selector: (row) => {
-          const statusConfig = {
-            0: {
-              label: "Unclaimed",
-              color: "#a01309ff",
-              bg: "#e2a5a1ff",
-            },
-            1: {
-             label: "Claimed",
-              color: "green",
-              bg: "#b7e8e0ff",
-            },
-            2:{
-               label: "Paid",
-              color: "#e9ebf0ff",
-              bg: "#2431baff",
-            }
-          };
-
-          const cfg = statusConfig[row.status] || statusConfig[0];
-
-          return (
-            <button
-              style={{
-                padding: "8px 15px",
-                borderRadius: "8px",
-                fontSize: "12px",
-                fontWeight: 600,
-                border: "none",
-                backgroundColor: cfg.bg,
-                color: cfg.color,
-                cursor: "default",
-              }}
-            >
-              {cfg.label}
-            </button>
-          );
-        },
-        width: "140px",
+    {
+      name: "Status",
+      selector: (row) => {
+        const statusConfig = {
+          0: { label: "Unclaimed", color: "#a01309ff", bg: "#e2a5a1ff" },
+          1: { label: "Claimed", color: "green", bg: "#b7e8e0ff" },
+          2: { label: "Paid", color: "#e9ebf0ff", bg: "#2431baff" },
+        };
+        const cfg = statusConfig[row.status] || statusConfig[0];
+        return (
+          <button
+            style={{
+              padding: "8px 15px",
+              borderRadius: "8px",
+              fontSize: "12px",
+              fontWeight: 600,
+              border: "none",
+              backgroundColor: cfg.bg,
+              color: cfg.color,
+              cursor: "default",
+            }}
+          >
+            {cfg.label}
+          </button>
+        );
       },
-
+      width: "140px",
+    },
     {
       name: "Actions",
       selector: (row) => (
@@ -279,8 +260,6 @@ const user = authCtx?.user;
           >
             <PrintIcon fontSize="small" />
           </IconButton>
-
-          
         </div>
       ),
       width: "100px",
@@ -293,18 +272,15 @@ const user = authCtx?.user;
 
       {!loading && (
         <Box>
-         
-
           <CommonTable
             onFetchRef={handleFetchRef}
             endpoint={ApiEndpoints.GET_ENTRIES}
             columns={columns}
-            queryParam={`status=2`}
-              filters={filters}  
-             transformData={filterRows} 
+            filters={filters}
+            queryParam={{ status: 2 }}
+            defaultPageSize={15}
+            refreshInterval={0}
           />
-
-         
         </Box>
       )}
     </>

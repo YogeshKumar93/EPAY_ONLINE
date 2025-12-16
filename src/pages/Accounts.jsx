@@ -52,7 +52,7 @@ const Accounts = () => {
         user_id: row.user_id,
         establishment: row.establishment,
         mobile: row.mobile,
-        name:row.name,
+        name: row.name,
       },
     });
   };
@@ -99,7 +99,6 @@ const Accounts = () => {
     return () => debouncedFetch.cancel(); // cleanup on unmount or change
   }, [userSearch]);
 
-  // ✅ Add new account
   const handleSaveCreate = (newAccount) => {
     setAccounts((prev) => [newAccount, ...prev]);
     setOpenCreate(false);
@@ -142,10 +141,9 @@ const Accounts = () => {
               alignItems: "center",
               minWidth: "120px",
               position: "relative",
-              height: 40, // reserve fixed height to prevent fluctuation
+              height: 40,
             }}
           >
-            {/* Icons always rendered, visibility toggled */}
             <Box
               sx={{
                 display: "flex",
@@ -215,13 +213,14 @@ const Accounts = () => {
             filters={filters}
             queryParam={appliedFilters} // only updates when Apply is clicked
             customHeader={
-                   <Button
+              <Button
                 label="Account"
-                 onClick={() => setOpenCreate(true)}
+                onClick={() => setOpenCreate(true)}
                 variant="contained"
                 size="medium"
                 sx={{
-                  background: "linear-gradient(135deg, #490277 0%, #6A1B9A 100%)",
+                  background:
+                    "linear-gradient(135deg, #490277 0%, #6A1B9A 100%)",
                   color: "#FFFFFF",
                   textTransform: "none",
                   fontWeight: 600,
@@ -232,7 +231,8 @@ const Accounts = () => {
                   boxShadow: "0px 4px 12px rgba(73, 2, 119, 0.3)",
                   transition: "all 0.3s ease",
                   "&:hover": {
-                    background: "linear-gradient(135deg, #5A048F 0%, #7B2BB5 100%)",
+                    background:
+                      "linear-gradient(135deg, #5A048F 0%, #7B2BB5 100%)",
                     boxShadow: "0px 6px 16px rgba(73, 2, 119, 0.45)",
                     transform: "translateY(-2px)",
                   },

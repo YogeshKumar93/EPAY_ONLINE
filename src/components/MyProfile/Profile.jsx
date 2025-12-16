@@ -44,6 +44,9 @@ import { BusinessInformation } from "./BusinessInformation";
 import ProfileTabs from "./ProfileTabs";
 import TwoFA from "./TwoFA";
 import ProfileImageUploadModal from "./ProfileImageUploadModal";
+import ForgotPasswordModal from "./ForgotPasswordModal.jsx";
+import CommonModal from "../common/CommonModal.jsx";
+import { okSuccessToast } from "../../utils/ToastUtil.js";
 // import ProfileTabs from "./ProfileTabs";
 
 const ProfilePage = () => {
@@ -66,6 +69,9 @@ const ProfilePage = () => {
   const [businessModal, setBusinessModal] = useState(false);
   const [viewInfoModalOpen, setViewInfoModalOpen] = useState(false);
   const [profileImageModalOpen, setProfileImageModalOpen] = useState(false);
+const [forgotPasswordModalOpen, setForgotPasswordModalOpen] = useState(false);
+const handleForgotPassword = () => setForgotPasswordModalOpen(true);
+
 
   // Sync editedUser with user context when user changes
   useEffect(() => {
@@ -76,7 +82,7 @@ const ProfilePage = () => {
     if (successMessage) {
       const timer = setTimeout(() => {
         setSuccessMessage("");
-      }, 5000);
+      }, 2000);
       return () => clearTimeout(timer);
     }
   }, [successMessage]);
@@ -147,14 +153,15 @@ const ProfilePage = () => {
       hoverGradient: "linear-gradient(135deg, #43e97b, #38f9d7)",
       roles: ["adm", "sadm"], // allowed roles
     },
-    // {
-    //   id: 4,
-    //   label: "Change MPIN",
-    //   icon: <VerifiedUser sx={{ fontSize: { xs: 18, sm: 20 } }} />,
-    //   onClick: handleChangeMpin,
-    //   gradient: "#fff",
-    //   hoverGradient: "linear-gradient(135deg, #ff758c, #ff7eb3)",
-    // },
+   {
+  id: 4,
+  label: "Change User Password",
+  icon: <VerifiedUser sx={{ fontSize: { xs: 18, sm: 20 } }} />,
+  onClick: handleForgotPassword,
+  gradient: "#fff",
+  hoverGradient: "linear-gradient(135deg, #ff758c, #ff7eb3)",
+  roles: [ "sadm"], // allowed roles
+},
     // {
     //   id: 5,
     //   label: "View Information",
@@ -644,6 +651,14 @@ const ProfilePage = () => {
       {twoFAModalOpen && (
         <TwoFA open={twoFAModalOpen} onClose={() => setTwoFAModalOpen(false)} />
       )}
+<ForgotPasswordModal
+  open={forgotPasswordModalOpen}
+  onClose={() => setForgotPasswordModalOpen(false)}
+/>
+
+
+
+
       {profileImageModalOpen && (
         <ProfileImageUploadModal
           open={profileImageModalOpen}
