@@ -6,7 +6,7 @@ import React, {
   useContext,
   useCallback,
 } from "react";
-import { Box, Tooltip } from "@mui/material";
+import { Box, Tooltip, Typography } from "@mui/material";
 import { DateRangePicker } from "rsuite";
 import CommonTable from "../components/common/CommonTable";
 import CommonLoader from "../components/common/CommonLoader";
@@ -25,6 +25,7 @@ const Unclaimed = () => {
   const [userSearch, setUserSearch] = useState("");
   const [userOptions, setUserOptions] = useState([]);
   const authCtx = useContext(AuthContext);
+  const [summary, setSummary] = useState([]);
   const user = authCtx?.user;
 
   const formatLogDate = (dateString) => {
@@ -193,8 +194,87 @@ const Unclaimed = () => {
             columns={columns}
             filters={filters}
             enableRowSelection={false}
+            setSummary={setSummary}
             disableSelectionOnClick
             defaultPageSize={15}
+            customHeader={
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  mb: 1,
+                  flexWrap: "wrap",
+                  justifyContent: "flex-end",
+                  alignItems: "center",
+                  p: 0.25,
+                  borderRadius: 1,
+                  ml: "auto",
+                }}
+              >
+                {/* Total Credit */}
+                <Box
+                  sx={{
+                    flex: "0 0 auto",
+                    background:
+                      "linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)",
+                    p: 1,
+                    borderRadius: 1.5,
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                    minWidth: "180px",
+                    border: "1px solid #81c784",
+                  }}
+                >
+                  <Typography variant="body2" fontWeight={600} color="#2e7d32">
+                    Total Credit
+                  </Typography>
+                  <Typography variant="h6" fontWeight={700} color="#1b5e20">
+                    ₹ {summary?.total_credit}
+                  </Typography>
+                </Box>
+
+                {/* Total Debit */}
+                <Box
+                  sx={{
+                    flex: "0 0 auto",
+                    background:
+                      "linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%)",
+                    p: 1,
+                    borderRadius: 1.5,
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                    minWidth: "180px",
+                    border: "1px solid #e57373",
+                  }}
+                >
+                  <Typography variant="body2" fontWeight={600} color="#c62828">
+                    Total Debit
+                  </Typography>
+                  <Typography variant="h6" fontWeight={700} color="#b71c1c">
+                    ₹ {summary?.total_debit}
+                  </Typography>
+                </Box>
+
+                {/* Total Entries */}
+                <Box
+                  sx={{
+                    flex: "0 0 auto",
+                    background:
+                      "linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)",
+                    p: 1,
+                    borderRadius: 1.5,
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                    minWidth: "180px",
+                    border: "1px solid #64b5f6",
+                  }}
+                >
+                  <Typography variant="body2" fontWeight={600} color="#1565c0">
+                    Total Entries
+                  </Typography>
+                  <Typography variant="h6" fontWeight={700} color="#0d47a1">
+                    {summary?.total_entries}
+                  </Typography>
+                </Box>
+              </Box>
+            }
           />
         </Box>
       )}
