@@ -26,7 +26,7 @@ const CreateAccountStatement = ({
       ApiEndpoints.GET_UNCLAIMED_ENTERIES
     );
     if (response) {
-      setTransactions(response.data || []);
+      setTransactions(response.data.data || []);
     } else {
       showToast(error?.message || "Failed to fetch transactions", "error");
     }
